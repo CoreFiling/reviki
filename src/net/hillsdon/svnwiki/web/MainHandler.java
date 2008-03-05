@@ -16,6 +16,7 @@ import net.hillsdon.svnwiki.web.handlers.History;
 import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
+import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
 /**
@@ -39,7 +40,9 @@ public class MainHandler implements RequestHandler {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
-    _get = new GetPage(_pageStore, searcher, new RadeoxMarkupRenderer(new PageStoreConfiguration(_pageStore), _pageStore));
+    MarkupRenderer renderer = new RadeoxMarkupRenderer(new PageStoreConfiguration(_pageStore), _pageStore);
+    //MarkupRenderer renderer = new CreoleMarkupRenderer();
+    _get = new GetPage(_pageStore, searcher, renderer);
     _search = new Search(_pageStore, searcher);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);

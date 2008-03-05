@@ -58,11 +58,11 @@ public class CreoleRenderer {
                               .setChildren(bold, italic, lineBreak, unorderedList, orderedList);
     root.setChildren(
         noWiki.setChildren(), 
-        new Heading(5).setChildren(bold, italic, lineBreak),
-        new Heading(4).setChildren(bold, italic, lineBreak), 
-        new Heading(3).setChildren(bold, italic, lineBreak), 
-        new Heading(2).setChildren(bold, italic, lineBreak), 
-        new Heading(1).setChildren(bold, italic, lineBreak),
+        new Heading(5).setChildren(bold, italic),
+        new Heading(4).setChildren(bold, italic), 
+        new Heading(3).setChildren(bold, italic), 
+        new Heading(2).setChildren(bold, italic), 
+        new Heading(1).setChildren(bold, italic),
         orderedList.setChildren(listItem),
         unorderedList.setChildren(listItem),
         paragraph.setChildren(bold, italic, lineBreak, orderedList, unorderedList), 
@@ -72,7 +72,7 @@ public class CreoleRenderer {
   }
   
   public String render(final String in) {
-    return ROOT.render(in);
+    return ROOT.render(in.replaceAll("\r", ""));
   }
   
 }
