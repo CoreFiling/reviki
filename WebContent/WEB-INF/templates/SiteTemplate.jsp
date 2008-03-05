@@ -26,6 +26,9 @@
     #sidebar {
       float: right;
     }
+    #wiki-rendering {
+      width: 55em;
+    }
     #flash {
       text-align: center;
       background-color: yellow;

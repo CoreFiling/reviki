@@ -4,7 +4,7 @@
   <tiles:putAttribute name="title"><c:out value="${pageInfo.path} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <h1><c:out value="${pageInfo.path}"/></h1>
-    <div id="content">
+    <div id="wiki-rendering">
     ${renderedContents}
     </div>
     <hr/>
