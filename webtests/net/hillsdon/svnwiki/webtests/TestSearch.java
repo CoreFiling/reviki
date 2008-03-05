@@ -5,10 +5,20 @@ import java.io.IOException;
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.xml.XmlPage;
 
 public class TestSearch extends WebTestSupport {
 
+  public void testLinkToOpenSearchAvailableFromRegularPages() throws Exception {
+    HtmlPage results = getWebPage("pages/FrontPage");
+    HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
+    // Session crap on the end.
+    assertTrue(link.getHrefAttribute().startsWith("/svnwiki/pages/FindPage/opensearch.xml"));
+    XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
+  }
+  
   public void testSearchOffersToCreateWikiPageThatDoesntExistWhenWeSearchForAWikiWord() throws Exception {
     String name = uniqueWikiPageName("ThisDoesNotExist");
     HtmlPage results = search(getWebPage(""), name);

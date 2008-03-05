@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class FeedWriter {
 
-  private static final String ATOM_NS = "http://www.w3.org/2005/Atom";
+  static final String ATOM_NS = "http://www.w3.org/2005/Atom";
 
   private static void addElement(final TransformerHandler handler, final String name, final String content) throws SAXException {
     handler.startElement(ATOM_NS, "", name, null);

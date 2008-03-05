@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>svnwiki - <tiles:insertAttribute name="title"/></title>
-  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/feeds/atom.xml"/>" />
+  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/pages/RecentChanges/atom.xml"/>" />
+  <link rel="search" href="<c:url value="/pages/FindPage/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   <style type="text/css">
     body {
       font-size: 11pt;
@@ -50,10 +51,11 @@
   </c:if>
   <div id="sidebar">
     <ul class="menu">
-      <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">Recent changes</a></li>
-      <li class="menu"><a href="<c:url value="/pages/AllPages"/>">All pages</a></li>
+      <li class="menu"><a href="<c:url value="/pages/FrontPage"/>">Front Page</a></li>
+      <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">Recent Changes</a></li>
+      <li class="menu"><a href="<c:url value="/pages/AllPages"/>">All Pages</a></li>
     </ul>
-    <form name="searchForm" style="margin-top:0.2em;" action="<c:url value="/search"/>" method="get">
+    <form name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/FindPage"/>" method="get">
       <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
       <input value="Go" type="submit"/>
     </form>

@@ -11,13 +11,11 @@ import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
-import net.hillsdon.svnwiki.web.handlers.AtomRecentChanges;
 import net.hillsdon.svnwiki.web.handlers.Attachments;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetAttachment;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
 import net.hillsdon.svnwiki.web.handlers.History;
-import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
@@ -36,12 +34,10 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _get;
   private final RequestHandler _editor;
   private final RequestHandler _set;
-  private final RequestHandler _search;
   private final RequestHandler _history;
   private final RequestHandler _attachments;
   private final RequestHandler _uploadAttachment;
   private final RequestHandler _getAttachment;
-  private final RequestHandler _atom;
 
   public MainHandler(final InitialConfiguration configuration) throws IOException {
     ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
@@ -50,14 +46,12 @@ public class MainHandler implements RequestHandler {
     searchEngine.setPageStore(_pageStore);
     MarkupRenderer renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_pageStore));
     _get = new GetPage(_pageStore, searchEngine, renderer);
-    _search = new Search(_pageStore, searchEngine);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
     _history = new History(_pageStore);
     _attachments = new Attachments(_pageStore);
     _uploadAttachment = new UploadAttachment(_pageStore);
     _getAttachment = new GetAttachment(_pageStore);
-    _atom = new AtomRecentChanges(_pageStore);
   }
   
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -89,12 +83,6 @@ public class MainHandler implements RequestHandler {
         }
         else if (urls.isAttachment(requestURL)) {
           _getAttachment.handle(request, response);
-        }
-        else if (urls.search().equals(requestURL)) {
-          _search.handle(request, response);
-        }
-        else if (urls.feed().equals(requestURL)) {
-          _atom.handle(request, response);
         }
       }
       finally {

@@ -1,0 +1,24 @@
+=A plan to alter the URL space so as to support sub-wikis
+
+{{{
+http://localhost:8080/svnwiki/wikis/$wikiName/
+                                              ConfigBasic
+                                              FrontPage etc
+                                              FindPage
+                                              FindPage/opensearch.xml
+                                              RecentChanges
+                                              RecentChanges/atom.xml
+                                              ConfigInterWikiLinks
+}}}
+
+Not sure about ConfigBasic, really it is more fundamental than
+the $wikiName sections.
+
+Perhaps keep /configuration but make it a map from $wikiName to
+SVN URL.  Also need to come up for some kind of security for that
+... but later.
+
+Other parts now implemented but only with the 'pages' wiki.  The
+FindPage doesn't work as a page though, only with '?query=...'.
+We should add a build-in page that explains search.
+

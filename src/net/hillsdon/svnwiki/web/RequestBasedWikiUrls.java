@@ -32,7 +32,7 @@ public class RequestBasedWikiUrls implements WikiUrls {
   }
 
   public String search() {
-    return _base + "/search";
+    return _base + "/pages/FindPage";
   }
 
   public String attachment(final String page, final String name) {
@@ -40,7 +40,7 @@ public class RequestBasedWikiUrls implements WikiUrls {
   }
 
   public String feed() {
-    return _base + "/feeds/atom.xml";
+    return _base + "/pages/RecentChanges/atom.xml";
   }
 
   public boolean isAttachment(final String url) {
