@@ -72,7 +72,7 @@ public class SVNPageStore implements PageStore {
             String name = path.substring(rootPath.length() + 1);
             String user = entry.getAuthor();
             Date date = entry.getDate();
-            results.add(0, new ChangeInfo(name, user, date, entry.getRevision()));
+            results.add(new ChangeInfo(name, user, date, entry.getRevision()));
           }
         }
       }
@@ -86,11 +86,15 @@ public class SVNPageStore implements PageStore {
     }
   }
 
+  /**
+   * @return Last N log entries in reverse chronological order.
+   * @throws SVNException On failure.
+   */
   private List<SVNLogEntry> limitedLog() throws SVNException {
-    final List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
+    final List<SVNLogEntry> entries = new LinkedList<SVNLogEntry>();
     _repository.log(new String[]{""}, -1, 0, true, true, RECENT_CHANGES_HISTORY_SIZE, new ISVNLogEntryHandler() {
       public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.add(logEntry);
+        entries.add(0, logEntry);
       }
     });
     return entries;
