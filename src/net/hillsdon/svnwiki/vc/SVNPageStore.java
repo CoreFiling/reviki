@@ -5,8 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import junit.framework.AssertionFailedError;
-
+import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
@@ -57,6 +56,9 @@ public class SVNPageStore implements PageStore {
         throw new PageStoreException(String.format("Unexpected node kind '%s' at '%s'", kind, path));
       }
     }
+    catch (SVNAuthenticationException ex) {
+      throw new PageStoreAuthenticationException(ex);
+    }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
     }
@@ -72,6 +74,9 @@ public class SVNPageStore implements PageStore {
         editFile(commitEditor, path, baseRevision, fromUTF8(content));
       }
       commitEditor.closeEdit();
+    }
+    catch (SVNAuthenticationException ex) {
+      throw new PageStoreAuthenticationException(ex);
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
@@ -104,7 +109,7 @@ public class SVNPageStore implements PageStore {
       return new String(bytes, UTF8);
     }
     catch (UnsupportedEncodingException e) {
-      throw new AssertionFailedError("Java supports UTF8.");
+      throw new AssertionError("Java supports UTF8.");
     }
   }
   
@@ -113,7 +118,7 @@ public class SVNPageStore implements PageStore {
       return string.getBytes(UTF8);
     }
     catch (UnsupportedEncodingException e) {
-      throw new AssertionFailedError("Java supports UTF8.");
+      throw new AssertionError("Java supports UTF8.");
     }
   }
   
