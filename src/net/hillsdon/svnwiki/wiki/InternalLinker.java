@@ -27,13 +27,19 @@ public class InternalLinker {
     }
   }
   
-  public String link(final String pageName) {
-    String cssClass = exists(pageName) ? "existing-page" : "new-page";
-    return format("<a class='%s' href='%s/pages/%s%s'>%s</a>",
-      cssClass,
+  public String url(final String pageName) {
+    return String.format("%s/pages/%s%s", 
       _contextPath,
       _wikiName != null ? Escape.url(_wikiName) + "/" : "", 
-      Escape.url(pageName), 
+      Escape.url(pageName)
+    );
+  }
+  
+  public String link(final String pageName) {
+    String cssClass = exists(pageName) ? "existing-page" : "new-page";
+    return format("<a class='%s' href='%s'>%s</a>",
+      cssClass,
+      Escape.html(url(pageName)),
       Escape.html(pageName)
     );
   }

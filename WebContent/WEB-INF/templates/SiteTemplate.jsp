@@ -1,11 +1,13 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/svnwiki/tags" prefix="sw" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>svnwiki - <tiles:insertAttribute name="title"/></title>
-  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/pages/RecentChanges/atom.xml"/>" />
-  <link rel="search" href="<c:url value="/pages/${wikiName}/FindPage/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
+  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml"" />
+  <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
   <style type="text/css">
     h1.title {
       margin: 0;
@@ -81,9 +83,9 @@
   <div id="topbar">
     <ul class="menu">
       <tiles:insertAttribute name="menuItems" ignore="true"/>
-      <li class="menu"><a href="<c:url value="/pages/${wikiName}/FrontPage"/>">FrontPage</a></li>
-      <li class="menu"><a href="<c:url value="/pages/${wikiName}/RecentChanges"/>">RecentChanges</a></li>
-      <li class="menu"><a href="<c:url value="/pages/${wikiName}/AllPages"/>">AllPages</a></li>
+      <li class="menu"><sw:wikiLink page="FrontPage"/></li>
+      <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
+      <li class="menu"><sw:wikiLink page="AllPages"/></li>
       <li class="menu">
         <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
           <input name="query" type="text" value="<c:out value="${param.query}"/>"/>

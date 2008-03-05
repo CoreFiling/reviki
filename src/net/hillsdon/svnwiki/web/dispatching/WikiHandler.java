@@ -33,10 +33,11 @@ import net.hillsdon.svnwiki.wiki.renderer.CreoleMarkupRenderer;
 public class WikiHandler implements RequestHandler {
 
   private final RequestScopedThreadLocalPageStore _pageStore;
-  private MarkupRenderer _renderer;
-  private ConfigPageCachingPageStore _cachingPageStore;
+  private final MarkupRenderer _renderer;
+  private final ConfigPageCachingPageStore _cachingPageStore;
   
-  private PageHandler _handler;
+  private final PageHandler _handler;
+  private final InternalLinker _internalLinker;
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
     // The search engine is informed of page changes by a delegating page store.
@@ -47,11 +48,13 @@ public class WikiHandler implements RequestHandler {
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
-    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore));
+    _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
+    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), _internalLinker);
     _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer);
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    request.setAttribute("internalLinker", _internalLinker);
     try {
       // Handle the lifecycle of the thread-local request dependent page store.
       _pageStore.create(request);

@@ -32,11 +32,25 @@
     <copy todir="${build}">
       <fileset dir="${source}">
         <include name="${preopulated-pages}"/>
+        <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
       </fileset>
     </copy>
   </target>
 
-  <target name="war" depends="compile">
+  <target name="taglibJar" depends="compile">
+    <mkdir dir="${build}/META-INF"/>
+    <move file="${build}/net/hillsdon/svnwiki/web/taglib/svnwiki.tld" tofile="${build}/META-INF/svnwiki.tld"/>
+    <jar destfile="WebContent/WEB-INF/lib/svnwiki-tlds.jar" >
+      <fileset dir="${build}">
+        <include name="net/hillsdon/svnwiki/web/taglib/**/*.class"/>
+      </fileset>
+      <metainf dir="${build}/META-INF">
+        <include name="**/*"/>
+      </metainf>
+    </jar>
+  </target>
+
+  <target name="war" depends="compile, taglibJar">
     <war warfile="${war}"
          webxml="${web}/WEB-INF/web.xml">
        <classes dir="${build}">

@@ -1,5 +1,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/svnwiki/tags" prefix="sw" %>
+
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Search results</tiles:putAttribute>
   <tiles:putAttribute name="heading">Search results for '<c:out value="${param.query}"/>'</tiles:putAttribute>
@@ -9,7 +11,7 @@
         <ul>
           <c:forEach var="match" items="${results}">
             <li>
-              <a href="<c:url value="/pages/${wikiName}/${match.page}"/>"><c:out value="${match.page}"/></a>
+              <sw:wikiLink page="${match.page}"/>
               <p style="margin-top: 0px">
                 ${match.htmlExtract}
               </p>

@@ -16,7 +16,7 @@ public class TestAllPages extends WebTestSupport {
 
     HtmlPage allPages = getWebPage("pages/test/AllPages");
     assertTrue(allPages.getTitleText().endsWith("All Pages"));
-    HtmlAnchor link = allPages.getAnchorByHref(name);
+    HtmlAnchor link = allPages.getAnchorByHref("/svnwiki/pages/test/" + name);
     assertEquals(name, link.asText());
   }
   
