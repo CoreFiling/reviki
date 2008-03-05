@@ -20,7 +20,7 @@ public class RadeoxMarkupRenderer implements MarkupRenderer {
   private final Configuration _configuration;
 
   public RadeoxMarkupRenderer(final Configuration configuration, final PageStore store) {
-    AttachedMacro attached = new AttachedMacro();
+    AttachedFileMacro attached = new AttachedFileMacro();
     AttachedImageMacro image = new AttachedImageMacro();
     MacroRepository.getInstance().put(attached.getName(), attached);
     MacroRepository.getInstance().put(image.getName(), image);
