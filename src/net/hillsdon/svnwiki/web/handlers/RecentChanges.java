@@ -19,7 +19,7 @@ public class RecentChanges implements RequestHandler {
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
-  private static final int RECENT_CHANGES_HISTORY_SIZE = 100;
+  private static final int RECENT_CHANGES_HISTORY_SIZE = 50;
 
   private final PageStore _store;
 
