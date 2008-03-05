@@ -6,6 +6,11 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.RequestHandler;
 
+/**
+ * Common super-class to parse the page name out of the URL.
+ * 
+ * @author mth
+ */
 public abstract class PageRequestHandler  implements RequestHandler {
 
   private PageStore _store;
