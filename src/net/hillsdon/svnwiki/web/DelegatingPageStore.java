@@ -9,6 +9,7 @@ import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
+import net.hillsdon.svnwiki.vc.PageStoreEntry;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
 /**
@@ -56,11 +57,11 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.history(path);
   }
 
-  public void attach(final String page, final String storeName, final InputStream in) throws PageStoreException {
-    _delegate.attach(page, storeName, in);
+  public void attach(final String page, final String storeName, long baseRevision, final InputStream in) throws PageStoreException {
+    _delegate.attach(page, storeName, baseRevision, in);
   }
 
-  public Collection<String> attachments(final String page) throws PageStoreException {
+  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
     return _delegate.attachments(page);
   }
 

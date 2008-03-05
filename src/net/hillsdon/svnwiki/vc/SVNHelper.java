@@ -49,14 +49,14 @@ public class SVNHelper {
     return entries;
   }
   
-  public Collection<String> listFiles(final String dir) throws SVNException {
+  public Collection<PageStoreEntry> listFiles(final String dir) throws SVNException {
     List<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
     _repository.getDir(dir, -1, false, entries);
     // Need order, contains() is a reasonable operation however.
-    Set<String> results = new LinkedHashSet<String>(entries.size());
+    Set<PageStoreEntry> results = new LinkedHashSet<PageStoreEntry>(entries.size());
     for (SVNDirEntry e : entries) {
       if (SVNNodeKind.FILE.equals(e.getKind())) {
-        results.add(e.getName());
+        results.add(new PageStoreEntry(e.getName(), e.getRevision()));
       }
     }
     return results;

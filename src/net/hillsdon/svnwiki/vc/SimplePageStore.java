@@ -50,11 +50,11 @@ public class SimplePageStore implements PageStore {
     return Collections.emptyList();
   }
 
-  public void attach(final String page, final String storeName, final InputStream in) throws PageStoreException {
+  public void attach(final String page, final String storeName, long baseRevision, final InputStream in) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
 
-  public Collection<String> attachments(final String page) throws PageStoreException {
+  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
     return Collections.emptySet();
   }
 

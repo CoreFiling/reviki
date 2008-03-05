@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.commons.io.IOUtils;
+
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -24,25 +26,41 @@ public class TestAttachments extends WebTestSupport {
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {
+    final String file1 = "webtests/file1.txt";
+    final String file2 = "webtests/file2.txt";
+    
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "", "", true);
+    HtmlPage attachments = clickAttachmentsLink(page, name);
+    HtmlForm form = attachments.getFormByName("attachmentUpload");
+    form.getInputByName("file").setValueAttribute(file1);
+    form.getInputByName("attachmentName").setValueAttribute("file");
+    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+    assertEquals("File 1.", getAttachmentAtEndOfLink(attachments.getAnchorByHref("file.txt")));
+    
+    page = editWikiPage(name, "{attached:file.txt}", "Linked to attachment", false);
+    System.err.println(page.asXml());
+    assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
+    
+    attachments = clickAttachmentsLink(page, name);
+    form = attachments.getFormByName("replaceAttachmentUpload");
+    form.getInputByName("file").setValueAttribute(file2);
+    attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
+    assertEquals("File 2.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
+  }
+
+  private HtmlPage clickAttachmentsLink(final HtmlPage page, final String name) throws IOException {
     HtmlAnchor attachmentsLink = page.getAnchorByHref(name + "/attachments/");
     assertEquals("Attachments", attachmentsLink.asText());
     HtmlPage attachments = (HtmlPage) attachmentsLink.click();
-    HtmlForm form = attachments.getFormByName("attachmentUpload");
-    form.getInputByName("file").setValueAttribute("build.xml");
-    attachments = (HtmlPage) form.getInputByValue("Upload").click();
-    checkAttachmentIsAtEndOfLink(attachments.getAnchorByHref("build.xml"));
-    
-    page = editWikiPage(name, "{attached:build.xml}", "Linked to attachment", false);
-    checkAttachmentIsAtEndOfLink(page.getAnchorByHref(name + "/attachments/build.xml"));
+    return attachments;
   }
 
-  private void checkAttachmentIsAtEndOfLink(HtmlAnchor link) throws IOException {
+  private String getAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
     UnexpectedPage attachment = (UnexpectedPage) link.click();
     BufferedReader in = new BufferedReader(new InputStreamReader(attachment.getInputStream()));
     try {
-      assertTrue(in.readLine().startsWith("<project name="));
+      return IOUtils.toString(in).trim();
     }
     finally {
       in.close();

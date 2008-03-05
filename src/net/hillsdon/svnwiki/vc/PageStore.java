@@ -83,17 +83,18 @@ public interface PageStore {
    * 
    * @param page The page name.
    * @param storeName The name to store the attachment as.
+   * @param baseRevision TODO
    * @param in Data read from here.
    * @throws PageStoreException If something goes wrong. 
    */
-  void attach(String page, String storeName, InputStream in) throws PageStoreException;
+  void attach(String page, String storeName, long baseRevision, InputStream in) throws PageStoreException;
 
   /**
    * @param page A page name.
    * @return File names of all attachments.
    * @throws PageStoreException If something goes wrong. 
    */
-  Collection<String> attachments(String page) throws PageStoreException;
+  Collection<PageStoreEntry> attachments(String page) throws PageStoreException;
 
   /**
    * @param page Page.

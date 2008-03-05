@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -75,7 +76,12 @@ public class SVNPageStore implements PageStore {
   public Collection<String> list() throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<String>>() {
       public Collection<String> perform(final SVNRepository repository) throws SVNException {
-        return _helper.listFiles("");
+        // Should  we be returning the entries here?
+        List<String> names = new ArrayList<String>();
+        for (PageStoreEntry e : _helper.listFiles("")) {
+          names.add(e.getName());
+        }
+        return names;
       }
     });
   }
@@ -176,15 +182,15 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  public void attach(final String page, final String storeName, final InputStream in) throws PageStoreException {
+  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in) throws PageStoreException {
     String dir = attachmentPath(page);
     ensureDir(dir);
-    set(dir + "/" + storeName, null, PageInfo.UNCOMMITTED, in, "");
+    set(dir + "/" + storeName, null, baseRevision, in, "");
   }
 
-  public Collection<String> attachments(final String page) throws PageStoreException {
-    return _helper.execute(new SVNAction<Collection<String>>() {
-      public Collection<String> perform(final SVNRepository repository) throws SVNException {
+  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
+    return _helper.execute(new SVNAction<Collection<PageStoreEntry>>() {
+      public Collection<PageStoreEntry> perform(final SVNRepository repository) throws SVNException {
         String attachmentPath = attachmentPath(page);
         if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
           return _helper.listFiles(attachmentPath);
@@ -238,7 +244,7 @@ public class SVNPageStore implements PageStore {
     final String path = SVNPathUtil.append(attachmentPath(page), attachment);
     final OutputStream out = new OutputStream() {
       boolean _first = true;
-      public void write(int b) throws IOException {
+      public void write(final int b) throws IOException {
         if (_first) {
           sink.setContentType("application/octet-stream"); 
           sink.setFileName(attachment);

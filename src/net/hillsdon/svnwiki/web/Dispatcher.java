@@ -41,8 +41,10 @@ public class Dispatcher extends HttpServlet {
 
   private void setCurrentHandler() {
     try {
-      if (_configurationHandler == _configurationHandler && _configuration.isComplete()) {
-        _currentHandler = new MainHandler(_configuration);
+      if (_configuration.isComplete()) {
+        if (_currentHandler == _configurationHandler || _currentHandler == null) {
+          _currentHandler = new MainHandler(_configuration);
+        }
       }
       else {
         _currentHandler = _configurationHandler;

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.InvalidInputException;
@@ -21,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 public class UploadAttachment extends PageRequestHandler {
 
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
+  private static final String PARAM_BASE_REVISION = "baseRevision";
 
   public UploadAttachment(final PageStore store) {
     super(store);
@@ -36,14 +38,18 @@ public class UploadAttachment extends PageRequestHandler {
     ServletFileUpload upload = new ServletFileUpload(factory);
     List<FileItem> items = upload.parseRequest(request);
     try {
-      if (items.size() > 2) {
+      if (items.size() > 3) {
         throw new InvalidInputException("One file at a time.");
       }
       String attachmentName = null;
+      Long baseRevision = null;
       FileItem file = null;
       for (FileItem item : items) {
         if (PARAM_ATTACHMENT_NAME.equals(item.getFieldName())) {
           attachmentName = item.getString().trim();
+        }
+        if (PARAM_BASE_REVISION.equals(item.getFieldName())) {
+          baseRevision = RequestParameterReaders.getLong(item.getString().trim(), PARAM_BASE_REVISION);
         }
         if (!item.isFormField()) {
           file = item;
@@ -52,10 +58,13 @@ public class UploadAttachment extends PageRequestHandler {
       if (file == null) {
         throw new InvalidInputException("No file received.");
       }
+      if (baseRevision == null) {
+        baseRevision = PageInfo.UNCOMMITTED;
+      }
       
       InputStream in = file.getInputStream();
       try {
-        store(page, attachmentName, file.getName(), in);
+        store(page, attachmentName, baseRevision, file.getName(), in);
       }
       finally {
         IOUtils.closeQuietly(in);
@@ -70,7 +79,7 @@ public class UploadAttachment extends PageRequestHandler {
     response.sendRedirect(request.getRequestURL().toString());
   }
 
-  private void store(final String page, final String attachmentName, final String fileName, final InputStream in) throws PageStoreException {
+  private void store(final String page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
       storeName = fileName;
@@ -78,7 +87,7 @@ public class UploadAttachment extends PageRequestHandler {
     else if (storeName.indexOf('.') == -1) {
       storeName += fileName.substring(fileName.indexOf('.'));
     }
-    getStore().attach(page, storeName, in);
+    getStore().attach(page, storeName, baseRevision, in);
   }
 
 }
