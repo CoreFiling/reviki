@@ -42,7 +42,6 @@ import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
-import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
  * Stores pages in an SVN repository.
@@ -62,7 +61,7 @@ public class SVNPageStore implements PageStore {
    */
   private static final String UTF8 = "UTF8";
 
-  private final SVNHelper _helper;
+  private final BasicSVNOperations _operations;
 
   private final DeletedRevisionTracker _tracker;
 
@@ -70,19 +69,19 @@ public class SVNPageStore implements PageStore {
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final DeletedRevisionTracker tracker, final SVNRepository repository) {
+  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations) {
     _tracker = tracker;
-    _helper = new SVNHelper(repository);
+    _operations = operations;
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
-    return _helper.log("", limit, false, 0, -1);
+    return _operations.log("", limit, false, 0, -1);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
     final ChangeInfo deletedIn = getChangeThatDeleted(ref);
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
-    List<ChangeInfo> changes = _helper.log(ref.getPath(), -1, true, 0, lastRevision);
+    List<ChangeInfo> changes = _operations.log(ref.getPath(), -1, true, 0, lastRevision);
     if (deletedIn != null) {
       changes.add(0, deletedIn);
     }
@@ -92,7 +91,7 @@ public class SVNPageStore implements PageStore {
   public Collection<PageReference> list() throws PageStoreException {
     // Should we be returning the entries here?
     Set<PageReference> names = new LinkedHashSet<PageReference>();
-    for (PageStoreEntry e : _helper.listFiles("")) {
+    for (PageStoreEntry e : _operations.listFiles("")) {
       names.add(new PageReference(e.getName()));
     }
     return names;
@@ -101,9 +100,9 @@ public class SVNPageStore implements PageStore {
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     HashMap<String, String> properties = new HashMap<String, String>();
-    SVNNodeKind kind = _helper.checkPath(ref.getPath(), revision);
+    SVNNodeKind kind = _operations.checkPath(ref.getPath(), revision);
     if (SVNNodeKind.FILE.equals(kind)) {
-      _helper.getFile(ref.getPath(), revision, properties, baos);
+      _operations.getFile(ref.getPath(), revision, properties, baos);
       long actualRevision = SVNProperty.longValue(properties.get(SVNProperty.REVISION));
       long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
       Date lastChangedDate = SVNTimeUtil.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
@@ -111,8 +110,8 @@ public class SVNPageStore implements PageStore {
       String lockOwner = null;
       String lockToken = null;
       try {
-        if (revision == -1 || _helper.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
-          SVNLock lock = _helper.getLock(ref.getPath());
+        if (revision == -1 || _operations.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
+          SVNLock lock = _operations.getLock(ref.getPath());
           if (lock != null) {
             lockOwner = lock.getOwner();
             lockToken = lock.getID();
@@ -144,7 +143,7 @@ public class SVNPageStore implements PageStore {
   }
 
   private ChangeInfo getChangeThatDeleted(final PageReference ref) throws PageStoreAuthenticationException, PageStoreException {
-    return _tracker.getChangeThatDeleted(_helper, ref.getPath());
+    return _tracker.getChangeThatDeleted(_operations, ref.getPath());
   }
   
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
@@ -157,7 +156,7 @@ public class SVNPageStore implements PageStore {
     }
     final long revision = page.getRevision();
     try {
-      _helper.lock(ref, revision);
+      _operations.lock(ref, revision);
     }
     catch (AlreadyLockedException ex) {
       // Just return, the caller will check whether they've locked the page.
@@ -166,7 +165,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public void unlock(final PageReference path, final String lockToken) throws PageStoreException {
-    _helper.unlock(path, lockToken);
+    _operations.unlock(path, lockToken);
   }
 
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
@@ -177,30 +176,30 @@ public class SVNPageStore implements PageStore {
   }
 
   private long delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    _helper.delete(path, baseRevision, commitMessage, lockToken);
+    _operations.delete(path, baseRevision, commitMessage, lockToken);
     return PageInfo.DELETED;
   }
 
   private long set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
     if (baseRevision < 0) {
-      return _helper.create(path, commitMessage, content);
+      return _operations.create(path, commitMessage, content);
     }
     else {
-      return  _helper.edit(path, baseRevision, commitMessage, lockToken, content);
+      return  _operations.edit(path, baseRevision, commitMessage, lockToken, content);
     }
   }
 
   public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     String dir = attachmentPath(ref);
-    _helper.ensureDir(dir, commitMessage);
+    _operations.ensureDir(dir, commitMessage);
     set(dir + "/" + storeName, null, baseRevision, in, commitMessage);
   }
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
     final String attachmentPath = attachmentPath(ref);
     Collection<ChangeInfo> changed = Collections.emptyList();
-    if (_helper.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-      changed = _helper.log(attachmentPath, -1, false, 0, -1);
+    if (_operations.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
+      changed = _operations.log(attachmentPath, -1, false, 0, -1);
     }
     
     Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
@@ -252,11 +251,11 @@ public class SVNPageStore implements PageStore {
         sink.stream().write(b);
       }
     };
-    _helper.getFile(path, revision, null, out);
+    _operations.getFile(path, revision, null, out);
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    List<ChangeInfo> log = _helper.log("", -1, false, start, end);
+    List<ChangeInfo> log = _operations.log("", -1, false, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {
@@ -267,7 +266,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
-    return _helper.getLatestRevision();
+    return _operations.getLatestRevision();
   }
 
 }

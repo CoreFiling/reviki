@@ -45,12 +45,7 @@ import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
-/**
- * Provides exception translation and low-level functionality.
- * 
- * @author mth
- */
-public class SVNHelper {
+public class SVNHelper implements BasicSVNOperations {
 
   private interface SVNAction<T> {
     T perform(SVNRepository repository) throws SVNException, PageStoreException;
@@ -62,9 +57,6 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  /**
-   * Returns the most recent changes first.
-   */
   public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {

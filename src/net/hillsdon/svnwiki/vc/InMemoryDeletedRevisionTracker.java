@@ -31,7 +31,7 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
   private final Map<String, ChangeInfo> _deletions = new ConcurrentHashMap<String, ChangeInfo>();
   private long _lastTracked;
  
-  private void catchUp(final SVNHelper helper) throws PageStoreAuthenticationException, PageStoreException {
+  private void catchUp(final BasicSVNOperations helper) throws PageStoreAuthenticationException, PageStoreException {
     long latest = helper.getLatestRevision();
     if (latest > _lastTracked) {
       for (ChangeInfo change : reversed(helper.log("", -1, false, _lastTracked, latest))) {
@@ -49,7 +49,7 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
     _lastTracked = latest;
   }
   
-  public ChangeInfo getChangeThatDeleted(final SVNHelper helper, final String path) throws PageStoreAuthenticationException, PageStoreException {
+  public ChangeInfo getChangeThatDeleted(final BasicSVNOperations helper, final String path) throws PageStoreAuthenticationException, PageStoreException {
     catchUp(helper);
     return _deletions.get(path);
   }
