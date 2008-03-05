@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RedirectView implements View {
 
-  private static final long serialVersionUID = 1L;
   private final String _url;
 
   public RedirectView(final String url) {
