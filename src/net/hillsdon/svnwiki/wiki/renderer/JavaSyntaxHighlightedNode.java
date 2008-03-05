@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 

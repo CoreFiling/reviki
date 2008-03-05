@@ -1,5 +1,9 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleLinkContentsSplitter;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkPartsHandler;
+
 
 /**
  * "[["..."]]" links.

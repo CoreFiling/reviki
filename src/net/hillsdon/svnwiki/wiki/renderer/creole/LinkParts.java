@@ -1,7 +1,4 @@
-/**
- * 
- */
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.creole;
 
 public class LinkParts {
   private final String _text;

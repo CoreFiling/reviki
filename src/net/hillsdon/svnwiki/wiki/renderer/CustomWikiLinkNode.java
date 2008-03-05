@@ -4,6 +4,9 @@ import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
 
 import java.util.regex.Matcher;
 
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkPartsHandler;
+
 /**
  * Links like c2:WikiPage and WikiPage but very generous as to
  * what counts as a wiki word.

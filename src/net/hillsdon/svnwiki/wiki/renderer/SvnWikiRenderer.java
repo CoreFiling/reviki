@@ -10,12 +10,15 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleImageNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleRenderer;
+import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
 
-public class CreoleMarkupRenderer implements MarkupRenderer {
+public class SvnWikiRenderer implements MarkupRenderer {
 
   private final CreoleRenderer _creole;
   
-  public CreoleMarkupRenderer(final Configuration configuration, final InternalLinker internalLinker) {
+  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker) {
     final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, internalLinker, configuration);
     final List<Macro> macros = new ArrayList<Macro>();
     _creole = new CreoleRenderer(

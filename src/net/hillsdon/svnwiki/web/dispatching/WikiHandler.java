@@ -23,7 +23,7 @@ import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFacto
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
-import net.hillsdon.svnwiki.wiki.renderer.CreoleMarkupRenderer;
+import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -51,7 +51,7 @@ public class WikiHandler implements RequestHandler {
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
-    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), _internalLinker);
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker);
     _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer);
   }
 

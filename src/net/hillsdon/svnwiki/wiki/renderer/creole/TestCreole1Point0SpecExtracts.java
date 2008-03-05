@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.creole;
 
 import java.io.IOException;
 

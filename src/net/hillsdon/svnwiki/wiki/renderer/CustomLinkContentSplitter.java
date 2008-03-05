@@ -2,6 +2,9 @@ package net.hillsdon.svnwiki.wiki.renderer;
 
 import java.util.regex.MatchResult;
 
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkContentSplitter;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkParts;
+
 public class CustomLinkContentSplitter implements LinkContentSplitter {
 
   public LinkParts split(final MatchResult in) {

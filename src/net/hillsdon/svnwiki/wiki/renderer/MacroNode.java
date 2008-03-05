@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 
 public class MacroNode extends AbstractRegexNode {
 

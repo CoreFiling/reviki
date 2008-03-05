@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.creole;
 
 import java.util.List;
 import java.util.regex.Matcher;

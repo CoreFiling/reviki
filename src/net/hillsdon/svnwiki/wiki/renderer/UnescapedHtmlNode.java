@@ -3,6 +3,7 @@ package net.hillsdon.svnwiki.wiki.renderer;
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 
 /**
  * Obviously this has security issues...

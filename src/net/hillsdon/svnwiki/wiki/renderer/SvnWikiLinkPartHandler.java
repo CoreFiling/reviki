@@ -6,6 +6,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.UnknownWikiException;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.svnwiki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   
