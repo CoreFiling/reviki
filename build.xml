@@ -45,6 +45,7 @@
     <copy todir="${build-classes}">
       <fileset dir="${source}">
         <include name="**/*.json"/>
+        <include name="**/*.jar"/>
         <include name="**/*.xml"/>
         <include name="${prepopulated-pages}"/>
         <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
