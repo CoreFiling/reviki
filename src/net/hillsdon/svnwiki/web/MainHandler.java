@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.web;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +40,7 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _uploadAttachment;
   private final RequestHandler _getAttachment;
 
-  public MainHandler(final InitialConfiguration configuration) {
+  public MainHandler(final InitialConfiguration configuration) throws IOException {
     ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
