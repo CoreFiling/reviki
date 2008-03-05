@@ -1,0 +1,15 @@
+svnwiki
+Copyright 2007 Matthew Hillsdon
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+The diffs for history and recent changes are generated
+using diff_match_patch, which is open source software.  
+The original software and related information is available at
+http://code.google.com/p/google-diff-match-patch/
+
+The Creole renderer is based on a JavaScript implementation
+by Chris Purcell, which is open source software.
+The original software and related information is available at
+http://www.meatballsociety.org/Creole/0.4/
