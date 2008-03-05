@@ -18,6 +18,7 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
  */
 public class PageHandler implements RequestHandler {
 
+  public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
   private final PageRequestHandler _regularPage;
   private final PageRequestHandler _attachments;
 
@@ -40,7 +41,7 @@ public class PageHandler implements RequestHandler {
       return;
     }
     if (pageName.contains("/")) {
-      throw new InvalidInputException(String.format("No '/' characters allowed in a page name.", pageName));
+      throw new InvalidInputException(String.format(PATH_WALK_ERROR_MESSAGE, pageName));
     }
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);

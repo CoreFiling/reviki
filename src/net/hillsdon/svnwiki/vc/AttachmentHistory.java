@@ -29,7 +29,7 @@ public class AttachmentHistory {
     if (_versionsMostRecentFirst.size() < 2) {
       return Collections.emptyList();
     }
-    return _versionsMostRecentFirst.subList(1, _versionsMostRecentFirst.size() - 1);
+    return _versionsMostRecentFirst.subList(1, _versionsMostRecentFirst.size());
   }
 
   /**

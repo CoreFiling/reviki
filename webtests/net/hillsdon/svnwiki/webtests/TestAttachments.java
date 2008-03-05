@@ -47,6 +47,9 @@ public class TestAttachments extends WebTestSupport {
     form.getInputByName("file").setValueAttribute(file2);
     attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
     assertEquals("File 2.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
+
+    HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[starts-with(@href, 'file.txt?revision')]").get(0);
+    assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
   }
 
   private HtmlPage clickAttachmentsLink(final HtmlPage page, final String name) throws IOException {
