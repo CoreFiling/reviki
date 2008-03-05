@@ -60,7 +60,7 @@ public class SVNHelper {
    */
   public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         final String rootPath = getRoot();
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
@@ -74,20 +74,24 @@ public class SVNHelper {
     });
   }
   
-  public Collection<PageStoreEntry> listFiles(final String dir) throws SVNException {
-    final Set<PageStoreEntry> results = new LinkedHashSet<PageStoreEntry>();
-    Collection<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
-    _repository.getDir(dir, -1, null, SVNDirEntry.DIRENT_KIND, entries);
-    for (SVNDirEntry e : entries) {
-      if (SVNNodeKind.FILE.equals(e.getKind())) {
-        results.add(new PageStoreEntry(e.getName(), e.getRevision()));
+  public Collection<PageStoreEntry> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<Collection<PageStoreEntry>>() {
+      public Collection<PageStoreEntry> perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        final Set<PageStoreEntry> results = new LinkedHashSet<PageStoreEntry>();
+        Collection<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
+        _repository.getDir(dir, -1, null, SVNDirEntry.DIRENT_KIND, entries);
+        for (SVNDirEntry e : entries) {
+          if (SVNNodeKind.FILE.equals(e.getKind())) {
+            results.add(new PageStoreEntry(e.getName(), e.getRevision()));
+          }
+        }
+        return results;
       }
-    }
-    return results;
+    });
   }
 
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) throws SVNException {
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (!pathOnly || (changedPath.length() > rootPath.length() && changedPath.substring(rootPath.length() + 1).equals(path))) {
@@ -102,8 +106,12 @@ public class SVNHelper {
     return results;
   }
 
-  public String getRoot() throws SVNException {
-    return _repository.getRepositoryPath("");
+  public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<String>() {
+      public String perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        return _repository.getRepositoryPath("");
+      }
+    });
   }
 
   public <T> T execute(final SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException {

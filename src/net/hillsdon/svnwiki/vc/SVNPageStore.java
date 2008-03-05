@@ -95,16 +95,12 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<PageReference> list() throws PageStoreException {
-    return _helper.execute(new SVNAction<Collection<PageReference>>() {
-      public Collection<PageReference> perform(final SVNRepository repository) throws SVNException {
-        // Should  we be returning the entries here?
-        Set<PageReference> names = new LinkedHashSet<PageReference>();
-        for (PageStoreEntry e : _helper.listFiles("")) {
-          names.add(new PageReference(e.getName()));
-        }
-        return names;
-      }
-    });
+    // Should  we be returning the entries here?
+    Set<PageReference> names = new LinkedHashSet<PageReference>();
+    for (PageStoreEntry e : _helper.listFiles("")) {
+      names.add(new PageReference(e.getName()));
+    }
+    return names;
   }
 
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
