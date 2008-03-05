@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import org.tmatesoft.svn.core.SVNAuthenticationException;
+import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
@@ -79,6 +80,10 @@ public class SVNPageStore implements PageStore {
       throw new PageStoreAuthenticationException(ex);
     }
     catch (SVNException ex) {
+      if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
+        // What to do!
+        throw new InterveningCommitException(ex);
+      }
       throw new PageStoreException(ex);
     }
   }
