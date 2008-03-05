@@ -37,20 +37,20 @@ public class PageHandler implements RequestHandler {
 
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
   private final PageRequestHandler _regularPage;
+  private final PageRequestHandler _findPage;
   private final PageRequestHandler _attachments;
 
   private final RequestHandler _recentChanges;
   private final RequestHandler _allPages;
-  private final RequestHandler _search;
   private final RequestHandler _orphanedPages;
 
   public PageHandler(final ConfigPageCachingPageStore cachingPageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer) {
     WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, searchEngine);
     _recentChanges = new RecentChanges(cachingPageStore);
     _allPages = new AllPages(cachingPageStore);
-    _search = new FindPage(cachingPageStore, searchEngine);
     _attachments = new Attachments(cachingPageStore);
     _regularPage = new RegularPage(cachingPageStore, markupRenderer, wikiGraph);
+    _findPage = new FindPage(cachingPageStore, searchEngine, _regularPage);
     _orphanedPages = new OrphanedPages(wikiGraph);
   }
 
@@ -73,7 +73,7 @@ public class PageHandler implements RequestHandler {
       _allPages.handle(path, request, response);
     }
     else if ("FindPage".equals(pageName)) {
-      _search.handle(path, request, response);
+      _findPage.handlePage(path, request, response, page);
     }
     else if ("OrphanedPages".equals(pageName)) {
       _orphanedPages.handle(path, request, response);

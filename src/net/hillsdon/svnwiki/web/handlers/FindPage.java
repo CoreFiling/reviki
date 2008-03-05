@@ -27,9 +27,8 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
-import net.hillsdon.svnwiki.web.common.RequestHandler;
 
-public class FindPage implements RequestHandler {
+public class FindPage implements PageRequestHandler {
 
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -43,23 +42,26 @@ public class FindPage implements RequestHandler {
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
+  private final PageRequestHandler _regularPage;
 
-  public FindPage(final PageStore store, final SearchEngine searchEngine) {
+  public FindPage(final PageStore store, final SearchEngine searchEngine, final PageRequestHandler regularPage) {
     _store = store;
     _searchEngine = searchEngine;
+    _regularPage = regularPage;
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public void handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
     if ("opensearch.xml".equals(path.next())) {
       response.setContentType("application/opensearchdescription+xml");
       response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(new RequestBasedWikiUrls(request).search())));
       return;
     }
-    
     String query = request.getParameter(PARAM_QUERY);
     if (query == null) {
-      query = "";
+      _regularPage.handlePage(path, request, response, page);
+      return;
     }
+    
     boolean pageExists = _store.list().contains(new PageReference(query));
     if (request.getParameter("force") == null && pageExists) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
