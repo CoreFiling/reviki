@@ -2,17 +2,19 @@
 
 import os.path
 
+SKIP_DIRS = ('.svn', 'external')
 BOILERPLATE = open('BOILERPLATE', 'r').read()
 
 def apply_boilerplate(arg, dirname, fnames):
   for i, name in enumerate(fnames):
-    if name == '.svn':
+    if name in SKIP_DIRS:
       del fnames[i]
     elif name.endswith('.java'):
       path = os.path.join(dirname, name)
       ensure_has_boilerplate(path)
 
 def ensure_has_boilerplate(path):
+  print path
   content = open(path, 'r').read()
   if content.find(BOILERPLATE.strip()) == -1:
     content = BOILERPLATE + content
@@ -21,4 +23,4 @@ def ensure_has_boilerplate(path):
     fout.close()
 
 for dir in ('src', 'webtests'):
-    os.path.walk(dir, apply_boilerplate, None)
+  os.path.walk(dir, apply_boilerplate, None)

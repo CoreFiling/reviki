@@ -32,7 +32,7 @@ public class WikiGraphImpl implements WikiGraph {
       return pages;
     }
     catch (QuerySyntaxException ex) {
-      throw new RuntimeException("Escaping should precude this error.", ex);
+      throw new RuntimeException("Escaping should preclude this error.", ex);
     }
   }
 
