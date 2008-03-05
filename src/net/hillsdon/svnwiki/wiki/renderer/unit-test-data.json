@@ -121,6 +121,11 @@
     "output": "<p>======= Header =</p>"
   },
   {
+    "name":   "h1 no whitespace between = and heading text",
+    "input":  "=Header",
+    "output": "<h1>Header</h1>"
+  },
+  {
     "name":   "Tables",
     "input":  "| A | B |\n| //C// | **D** \\\\ E |",
     "output": "<table><tr><td> A </td><td> B </td></tr><tr><td> <em>C</em> </td><td> <strong>D</strong> <br /> E </td></tr></table>"

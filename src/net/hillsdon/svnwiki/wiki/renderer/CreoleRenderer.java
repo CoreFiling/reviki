@@ -50,7 +50,7 @@ public class CreoleRenderer {
   }
   private static class Heading extends RegexMatchToTag {
     public Heading(final int number) {
-      super(String.format("(^|\\n)[ \\t]*={%d}[ \\t](.+?)[ \\t]*=*\\s*(\\n|$)", number), "h" + number, 2);
+      super(String.format("(^|\\n)[ \\t]*={%d}[ \\t]*(.+?)[ \\t]*=*\\s*(\\n|$)", number), "h" + number, 2);
     }
   }
   private static class ListNode extends RegexMatchToTag {
