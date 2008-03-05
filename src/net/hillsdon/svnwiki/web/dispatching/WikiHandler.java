@@ -69,6 +69,7 @@ public class WikiHandler implements RequestHandler {
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    request.setAttribute("cssUrl", _internalLinker.url("ConfigCss") + "?raw");
     request.setAttribute("internalLinker", _internalLinker);
     try {
       // Handle the lifecycle of the thread-local request dependent page store.

@@ -61,8 +61,9 @@ public class Dispatcher extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     request.setCharacterEncoding("UTF-8");
-    response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
+    response.setContentType("text/html");
+    request.setAttribute("cssUrl", request.getContextPath() + "/resources/default-style.css");
 
     ConsumedPath path = new ConsumedPath(request);
     try {

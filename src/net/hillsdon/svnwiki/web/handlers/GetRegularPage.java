@@ -76,6 +76,16 @@ public class GetRegularPage implements PageRequestHandler {
       request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
       request.getRequestDispatcher("/WEB-INF/templates/ViewDiff.jsp").include(request, response);
     }
+    else if (request.getParameter("raw") != null) {
+      // This is a cludge.  We should represent 'special' pages better.
+      if (page.getPath().equals("ConfigCss")) {
+        response.setContentType("text/css");
+      }
+      else {
+        response.setContentType("text/plain");
+      }
+      response.getWriter().write(main.getContent());
+    }
     else {
       StringWriter writer = new StringWriter();
       _markupRenderer.render(main, main.getContent(), writer);

@@ -39,7 +39,9 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
-      new PageReference("FrontPage"), new PageReference("FindPage")
+      new PageReference("FrontPage"),
+      new PageReference("FindPage"),
+      new PageReference("ConfigCss")
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReference("AllPages"),
@@ -60,8 +62,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     return list;
   }
   
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    PageInfo page = super.get(ref, revision);
+  private PageInfo withContentIfSpecialAndNew(final PageReference ref, PageInfo page) {
     try {
       if (page.isNew() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
         String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
@@ -74,4 +75,17 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     return page;
   }
 
+  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+    PageInfo page = super.get(ref, revision);
+    page = withContentIfSpecialAndNew(ref, page);
+    return page;
+  }
+
+  @Override
+  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
+    PageInfo page = super.tryToLock(ref);
+    page = withContentIfSpecialAndNew(ref, page);
+    return page;
+  }
+  
 }
