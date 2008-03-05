@@ -130,6 +130,12 @@ public class SVNHelper {
     commitEditor.closeDir();
   }
 
+  public void deleteFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision) throws SVNException {
+    commitEditor.openRoot(-1);
+    commitEditor.deleteEntry(filePath, baseRevision);
+    commitEditor.closeDir();
+  }
+  
   public void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final InputStream newData) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.openFile(filePath, baseRevision);
@@ -143,7 +149,7 @@ public class SVNHelper {
 
   private static final Pattern PAGE_PATH = Pattern.compile("[^/]*");
   private static final Pattern ATTACHMENT_PATH = Pattern.compile("([^/]*?)-attachments/(.*)");
-  static ChangeInfo classifiedChange(SVNLogEntry entry, final String rootPath, final String path) {
+  static ChangeInfo classifiedChange(final SVNLogEntry entry, final String rootPath, final String path) {
     StoreKind kind = StoreKind.OTHER;
     String name = path.length() > rootPath.length() ? path.substring(rootPath.length() + 1) : path;
     String page = null;

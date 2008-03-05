@@ -40,7 +40,14 @@ public class TestEditing extends WebTestSupport {
     long revision = Long.parseLong(matcher.group().substring(1));
     return revision;
   }
-  
+
+  public void testClearTextDeletesPage() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    editWikiPage(name, "Initial content", "", true);
+    HtmlPage blanked = editWikiPage(name, "", "", false);
+    assertTrue(blanked.asText().contains("This page is a new page"));
+  }
+
   public void testCancelEditNewPage() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
     editThenCancel(name);

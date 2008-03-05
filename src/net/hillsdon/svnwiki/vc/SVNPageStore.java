@@ -57,7 +57,7 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 public class SVNPageStore implements PageStore {
 
   private static final Predicate<ChangeInfo> CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
-    public Boolean transform(ChangeInfo in) {
+    public Boolean transform(final ChangeInfo in) {
       return in.getKind() == StoreKind.PAGE;
     }
   };
@@ -176,9 +176,37 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage)
-      throws PageStoreException {
+  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    if (content.trim().length() == 0) {
+      return delete(ref.getPath(), lockToken, baseRevision, commitMessage);
+    }
     return set(ref.getPath(), lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
+  }
+
+  private void checkForInterveningCommit(SVNException ex) throws InterveningCommitException {
+    if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
+      // What to do!
+      throw new InterveningCommitException(ex);
+    }
+  }
+
+  private long delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    _helper.execute(new SVNAction<Void>() {
+      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        try {
+          Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
+          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, locks, false, null);
+          _helper.deleteFile(commitEditor, path, baseRevision);
+          commitEditor.closeEdit();
+        }
+        catch (SVNException ex) {
+          checkForInterveningCommit(ex);
+          throw ex;
+        }
+        return null;
+      }
+    });
+    return PageInfo.UNCOMMITTED;
   }
 
   private long set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
@@ -196,10 +224,7 @@ public class SVNPageStore implements PageStore {
           return commitEditor.closeEdit().getNewRevision();
         }
         catch (SVNException ex) {
-          if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
-            // What to do!
-            throw new InterveningCommitException(ex);
-          }
+          checkForInterveningCommit(ex);
           throw ex;
         }
       }
