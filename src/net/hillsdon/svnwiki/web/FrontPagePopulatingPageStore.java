@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.web;
 
+import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
@@ -27,7 +28,7 @@ public class FrontPagePopulatingPageStore implements PageStore {
     return _delegate.list();
   }
 
-  public String[] recentChanges() throws PageStoreException {
+  public ChangeInfo[] recentChanges() throws PageStoreException {
     return _delegate.recentChanges();
   }
 

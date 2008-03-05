@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,21 +48,24 @@ public class SVNPageStore implements PageStore {
   }
 
   @SuppressWarnings("unchecked")
-  public String[] recentChanges() throws PageStoreException {
+  public ChangeInfo[] recentChanges() throws PageStoreException {
     try {
       List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
       _repository.log(new String[] {""}, entries, 0, -1, true, true);
-      Set<String> results = new LinkedHashSet<String>(entries.size());
+      Set<ChangeInfo> results = new LinkedHashSet<ChangeInfo>(entries.size());
       String rootPath = _repository.getRepositoryPath("");
       for (ListIterator<SVNLogEntry> iter = entries.listIterator(entries.size()); iter.hasPrevious();) {
         SVNLogEntry entry = iter.previous();
         for (String path : (Collection<String>) entry.getChangedPaths().keySet()) {
           if (path.length() > rootPath.length()) {
-            results.add(path.substring(rootPath.length() + 1));
+            String name = path.substring(rootPath.length() + 1);
+            String user = entry.getAuthor();
+            Date date = entry.getDate();
+            results.add(new ChangeInfo(name, user, date));
           }
         }
       }
-      return results.toArray(new String[results.size()]);
+      return results.toArray(new ChangeInfo[results.size()]);
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);

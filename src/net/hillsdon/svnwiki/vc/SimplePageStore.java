@@ -25,8 +25,8 @@ public class SimplePageStore implements PageStore {
     return _pages.keySet().toArray(new String[_pages.size()]);
   }
 
-  public String[] recentChanges() throws PageStoreException {
-    return new String[0];
+  public ChangeInfo[] recentChanges() throws PageStoreException {
+    return new ChangeInfo[0];
   }
 
   public void set(final String path, final long baseRevision, final String content) throws PageStoreException {

@@ -17,7 +17,7 @@ public interface PageStore {
    * @return Names of recently changed pages.
    * @throws PageStoreException If something goes wrong.
    */
-  String[] recentChanges() throws PageStoreException;
+  ChangeInfo[] recentChanges() throws PageStoreException;
   
   /**
    * The page info may represent a page that doesn't exist yet,
