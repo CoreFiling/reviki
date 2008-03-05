@@ -15,7 +15,7 @@ public class PageListCachingPageStore extends SimpleDelegatingPageStore {
 
   private Collection<PageReference> _cached = null;
   
-  public PageListCachingPageStore(PageStore delegate) {
+  public PageListCachingPageStore(final PageStore delegate) {
     super(delegate);
   }
 
