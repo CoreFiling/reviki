@@ -11,17 +11,17 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class RegularPage implements PageRequestHandler {
 
-  private final PageRequestHandler _viewRegularPage;
+  private final PageRequestHandler _view;
   private final PageRequestHandler _editor;
   private final PageRequestHandler _set;
   private final PageRequestHandler _history;
 
   public RegularPage(final ConfigPageCachingPageStore cachingPageStore, final MarkupRenderer markupRenderer, final SearchEngine searchEngine) {
-    _viewRegularPage = new GetRegularPage(cachingPageStore, markupRenderer, searchEngine);
+    _view = new GetRegularPage(cachingPageStore, markupRenderer, searchEngine);
     // It is important to use the non-caching page store here.  It is ok to view 
     // something out of date but users must edit the latest revision or else they
     // won't be able to commit.
-    _editor = new EditorForPage(cachingPageStore.getUnderlying());
+    _editor = new EditorForPage(cachingPageStore.getUnderlying(), markupRenderer);
     _set = new SetPage(cachingPageStore);
     _history = new History(cachingPageStore);
   }
@@ -31,7 +31,7 @@ public class RegularPage implements PageRequestHandler {
       _history.handlePage(path, request, response, page);
     }
     else if ("POST".equals(request.getMethod())) {
-      if (request.getParameter(SetPage.PARAM_CONTENT) != null) {
+      if (request.getParameter(SetPage.PARAM_CONTENT) != null && request.getParameter(EditorForPage.PARAM_PREVIEW) == null) {
         _set.handlePage(path, request, response, page);
       }
       else {
@@ -39,7 +39,7 @@ public class RegularPage implements PageRequestHandler {
       }
     }
     else {
-      _viewRegularPage.handlePage(path, request, response, page);
+      _view.handlePage(path, request, response, page);
     }
   }
 

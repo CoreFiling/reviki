@@ -4,12 +4,20 @@
   <tiles:putAttribute name="title"><c:out value="svnwiki - ${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <form name="editForm" action="" method="post">
+    <c:if test="${not empty preview}">
+      <h2>Preview <a href="#editForm">(skip)</a></h2>
+      <div id="wiki-rendering">
+      ${preview}
+      </div>
+    </c:if>
+    
+    <form id="editForm" name="editForm" action="" method="post">
       <textarea rows="25" cols="80" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text"/>
+      <input style="width:5em;" name="preview" type="submit" value="Preview"/>
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>
       <br />

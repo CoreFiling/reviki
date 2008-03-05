@@ -126,6 +126,9 @@ public class SVNPageStore implements PageStore {
     if (page.isNew()) {
       return page;
     }
+    if (page.isLocked()) {
+      return page;
+    }
 
     return _helper.execute(new SVNAction<PageInfo>() {
       public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {

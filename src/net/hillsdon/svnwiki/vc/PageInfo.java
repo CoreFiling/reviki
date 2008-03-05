@@ -11,18 +11,12 @@ public class PageInfo extends PageReference {
 
   public static final long UNCOMMITTED = -2;
 
-  private final String _content;
-
+  private String _content;
   private final long _revision;
-
   private final long _lastChangedRevision;
-  
   private final String _lastChangedAuthor;
-  
   private final Date _lastChangedDate;
-  
   private final String _lockedBy;
-
   private final String _lockToken;
   
   public PageInfo(final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken) {
@@ -34,6 +28,17 @@ public class PageInfo extends PageReference {
     _lastChangedDate = lastChangedDate;
     _lockedBy = lockedBy;
     _lockToken = lockToken;
+  }
+
+  public PageInfo(final PageInfo pageInfo) {
+    super(pageInfo.getPath());
+    _content = pageInfo.getContent();
+    _revision = pageInfo.getRevision();
+    _lastChangedRevision = pageInfo.getLastChangedRevision();
+    _lastChangedAuthor = pageInfo.getLastChangedUser();
+    _lastChangedDate = pageInfo.getLastChangedDate();
+    _lockedBy = pageInfo.getLockedBy();
+    _lockToken = pageInfo.getLockToken();
   }
 
   public String getContent() {
@@ -81,6 +86,12 @@ public class PageInfo extends PageReference {
   
   public Date getLastChangedDate() {
     return _lastChangedDate;
+  }
+  
+  public PageInfo alternativeContent(final String content) {
+    PageInfo other = new PageInfo(this);
+    other._content = content;
+    return other;
   }
   
 }
