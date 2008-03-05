@@ -10,12 +10,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
+import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
@@ -37,6 +37,11 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 public class SVNPageStore implements PageStore {
 
   /**
+   * We don't actually do 'recent' in terms of date as that's less useful.
+   */
+  private static final int RECENT_CHANGES_HISTORY_SIZE = 15;
+
+  /**
    * The assumed encoding of files from the repository.
    */
   private static final String UTF8 = "UTF8";
@@ -55,9 +60,8 @@ public class SVNPageStore implements PageStore {
   @SuppressWarnings("unchecked")
   public ChangeInfo[] recentChanges() throws PageStoreException {
     try {
-      List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
-      _repository.log(new String[] {""}, entries, 0, -1, true, true);
-      Set<ChangeInfo> results = new LinkedHashSet<ChangeInfo>(entries.size());
+      List<SVNLogEntry> entries = limitedLog();
+      List<ChangeInfo> results = new LinkedList<ChangeInfo>();
       String rootPath = _repository.getRepositoryPath("");
       for (ListIterator<SVNLogEntry> iter = entries.listIterator(entries.size()); iter.hasPrevious();) {
         SVNLogEntry entry = iter.previous();
@@ -66,7 +70,7 @@ public class SVNPageStore implements PageStore {
             String name = path.substring(rootPath.length() + 1);
             String user = entry.getAuthor();
             Date date = entry.getDate();
-            results.add(new ChangeInfo(name, user, date));
+            results.add(0, new ChangeInfo(name, user, date));
           }
         }
       }
@@ -78,6 +82,16 @@ public class SVNPageStore implements PageStore {
     catch (SVNException ex) {
       throw new PageStoreException(ex);
     }
+  }
+
+  private List<SVNLogEntry> limitedLog() throws SVNException {
+    final List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
+    _repository.log(new String[]{""}, -1, 0, true, true, RECENT_CHANGES_HISTORY_SIZE, new ISVNLogEntryHandler() {
+      public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
+        entries.add(logEntry);
+      }
+    });
+    return entries;
   }
   
   public String[] list() throws PageStoreException {
@@ -154,7 +168,7 @@ public class SVNPageStore implements PageStore {
     }
   }
   
-  public void unlock(String path, String lockToken) throws PageStoreException {
+  public void unlock(final String path, final String lockToken) throws PageStoreException {
     try {
       _repository.unlock(singletonMap(path, lockToken), false, new ISVNLockHandlerAdapter());
     }
@@ -166,7 +180,7 @@ public class SVNPageStore implements PageStore {
     }
   }
   
-  public void set(final String path, String lockToken, final long baseRevision, final String content) throws PageStoreException  {
+  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException  {
     try {
       Map<String, String> locks = lockToken == null ? Collections.<String, String>emptyMap() : Collections.<String, String>singletonMap(path, lockToken);
       ISVNEditor commitEditor = _repository.getCommitEditor("[automated commit]", locks, false, null);
