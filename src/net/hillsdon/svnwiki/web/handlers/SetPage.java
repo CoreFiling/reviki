@@ -10,37 +10,37 @@ public class SetPage extends PageRequestHandler {
 
   private static final String CRLF = "\r\n";
 
+  private static String getRequiredString(final HttpServletRequest request, final String parameter) throws InvalidInputException {
+    String value = request.getParameter(parameter);
+    if (value == null) {
+      throw new InvalidInputException(String.format("'%s' required.", parameter));
+    }
+    return value;
+  }
+
+  private static long getRequiredLong(final HttpServletRequest request, final String parameter) throws InvalidInputException {
+    String baseRevisionString = getRequiredString(request, parameter);
+    try {
+      return Long.parseLong(baseRevisionString);
+    }
+    catch (NumberFormatException ex) {
+      throw new InvalidInputException(String.format("'%s' invalid.", parameter));
+    }
+  }
+  
   public SetPage(final PageStore store) {
     super(store);
   }
 
   @Override
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
-    String lockToken = request.getParameter("lockToken");
-    if (lockToken == null) {
-      throw new InvalidInputException("'lockToken' required.");
-    }
+    String lockToken = getRequiredString(request, "lockToken");
     if ("Save".equals(request.getParameter("action"))) {
-      String baseRevisionString = request.getParameter("baseRevision");
-      if (baseRevisionString == null) {
-        throw new InvalidInputException("'baseRevision' required.");
-      }
-      long baseRevision;
-      try {
-        baseRevision = Long.parseLong(baseRevisionString);
-      }
-      catch (NumberFormatException ex) {
-        throw new InvalidInputException("'baseRevision' invalid.");
-      }
-
-      String content = request.getParameter("content");
-      if (content == null) {
-        throw new InvalidInputException("'content' required.");
-      }
+      long baseRevision = getRequiredLong(request, "baseRevision");
+      String content = getRequiredString(request, "content");
       if (!content.endsWith(CRLF)) {
         content = content + CRLF;
       }
-
       store.set(page, lockToken, baseRevision, content);
     }
     else {
