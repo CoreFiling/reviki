@@ -90,6 +90,7 @@ public class CreoleRenderer {
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(nonStructural);
+    root.addChildren(customStructural);
     root.addChildren(
         noWiki.addChildren(), 
         horizontalRule,
@@ -107,7 +108,6 @@ public class CreoleRenderer {
         bold.addChildren(nonStructural),
         strikethrough.addChildren(nonStructural)
      );
-    root.addChildren(customStructural);
     _root = root;
   }
   
