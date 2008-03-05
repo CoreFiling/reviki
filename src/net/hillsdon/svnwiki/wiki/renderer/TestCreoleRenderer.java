@@ -11,6 +11,10 @@ public class TestCreoleRenderer extends TestCase {
     _render = new CreoleRenderer();
   }
   
+  public void testLineBreak() {
+    assertEquals("<p>foo<br />bar</p>", _render.render("foo\\bar"));
+  }
+  
   public void testTitles() {
     assertEquals("<h1>Foo</h1>", _render.render("=Foo"));
     assertEquals("<h2>Foo</h2>", _render.render("==Foo"));
@@ -33,8 +37,8 @@ public class TestCreoleRenderer extends TestCase {
   }
   
   public void testLists() {
-    assertEquals("<ul><li>foo</li><li>bar</li></ul>", _render.render("* foo\n* bar"));
-    assertEquals("<ol><li>foo</li><li>bar</li></ol>", _render.render("# foo\n# bar"));
+    assertEquals("<ul><li> foo</li>\n<li> bar</li></ul>", _render.render("* foo\n* bar"));
+    assertEquals("<ol><li>foo</li>\n<li> bar</li></ol>", _render.render("#foo\n# bar"));
   }
   
 }

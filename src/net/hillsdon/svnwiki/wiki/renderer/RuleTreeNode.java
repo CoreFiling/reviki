@@ -12,14 +12,18 @@ public class RuleTreeNode {
   private final List<RuleTreeNode> _children = new ArrayList<RuleTreeNode>();
   private final Pattern _re;
   private final String _tag;
-  private final int _group;
+  private final Integer _contentGroup;
+  private final Pattern _replaceRe;
+  private final String _replaceString;
 
-  public RuleTreeNode(final String re, final String tag) {
-    this(re, tag, 1);
+  public RuleTreeNode(final String re, final String tag, final Integer contentGroup) {
+    this(re, tag, contentGroup, null, null);
   }
-  
-  public RuleTreeNode(final String re, final String tag, int group) {
-    _group = group;
+
+  public RuleTreeNode(final String re, final String tag, final Integer contentGroup, final String replaceRe, final String replaceString) {
+    _contentGroup = contentGroup;
+    _replaceRe = replaceRe == null ? null : Pattern.compile(replaceRe);
+    _replaceString = replaceString;
     _re = Pattern.compile(re);
     _tag = tag;
   }
@@ -66,7 +70,14 @@ public class RuleTreeNode {
   }
 
   private String handle(final RuleTreeNode node, final Matcher matcher) {
-    return "<" + _tag + ">" + node.render(matcher.group(_group)) + "</" + _tag + ">";
+    if (_contentGroup == null) {
+      return "<" + _tag + " />";
+    }
+    String text = matcher.group(_contentGroup);
+    if (_replaceRe != null) {
+      text = _replaceRe.matcher(text).replaceAll(_replaceString);
+    }
+    return "<" + _tag + ">" + node.render(text) + "</" + _tag + ">";
   }
 
   private Matcher matcher(final String text) {
