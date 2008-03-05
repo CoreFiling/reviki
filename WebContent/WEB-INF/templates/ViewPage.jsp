@@ -8,10 +8,13 @@
   <tiles:putAttribute name="menuItems">
     <c:if test="${not(pageInfo.locked) or pageInfo.lockedBy == username}">
       <li class="menu">
-        <form action="" method="post" style="display:inline;">
+        <form id="editTop" name="editTop" action="" method="post" style="display:inline;">
           <input type="submit" value="Edit"/>
         </form>
       </li>
+      <script type="text/javascript">
+        svnwiki.formAsJavaScriptLink("editTop", "Edit");
+      </script>
       <li class="menu" style="margin-right: 0.5em; padding-right: 0.5em; border-right: 1px solid black;">
         <a href="${page.path}/attachments/">Attachments</a>
       </li>
@@ -51,9 +54,12 @@
         </c:choose>
       </c:when>
       <c:otherwise>
-        <form name="editForm" action="" method="post" style="display:inline;">
+        <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
           <input name="editButton" type="submit" value="Edit"/>
         </form><a href="${page.path}/attachments/">Attachments</a>
+        <script type="text/javascript">
+          svnwiki.formAsJavaScriptLink("editBottom", "Edit");
+        </script>
       </c:otherwise>
     </c:choose>
     <c:choose>

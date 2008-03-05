@@ -80,7 +80,7 @@ public abstract class WebTestSupport extends TestCase {
     if (isNew != null) {
       assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
     }
-    page = (HtmlPage) page.getFormByName("editForm").getInputByValue("Edit").click();
+    page = clickEditLink(page);
     HtmlForm editForm = page.getFormByName("editForm");
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
@@ -89,6 +89,9 @@ public abstract class WebTestSupport extends TestCase {
     return page;
   }
 
+  protected HtmlPage clickEditLink(HtmlPage page) throws IOException {
+    return (HtmlPage) page.getAnchorByName("editTopSubmitLink").click();
+  }
   
   private static final Pattern RE_REVISION = Pattern.compile("r[0-9]+");
   

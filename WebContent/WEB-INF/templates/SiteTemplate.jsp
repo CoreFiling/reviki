@@ -17,6 +17,7 @@
     <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link href="${cssUrl}" rel="stylesheet" media="screen" type="text/css" />
+  <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
 </head>
 <body>
   <c:if test="${not empty flash}">
