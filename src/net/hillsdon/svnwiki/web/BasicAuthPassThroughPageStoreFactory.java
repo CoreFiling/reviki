@@ -44,6 +44,23 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
     public String getPassword() {
       return _password;
     }
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof UsernamePassword) {
+        UsernamePassword other = (UsernamePassword) obj;
+        return (_username == null ? other._username == null : _username.equals(other._username))
+           && (_password == null ? other._password == null : _password.equals(other._password));
+      }
+      return false;
+    }
+    @Override
+    public int hashCode() {
+      return (_username == null ? 0 : _username.hashCode()) ^ (_password == null ? 0 : _password.hashCode());
+    }
+    @Override
+    public String toString() {
+      return _username + " " + _password;
+    }
   }
 
   private SVNURL _url;
@@ -61,10 +78,9 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
     }
   }
 
-  UsernamePassword getBasicAuthCredentials(final HttpServletRequest request) {
+  static UsernamePassword getBasicAuthCredentials(String authorization) {
     String username = null;
     String password = null;
-    String authorization = request.getHeader("Authorization");
     if (authorization != null) {
       authorization = authorization.trim();
       if (authorization.toLowerCase(Locale.US).startsWith("basic")) {
@@ -93,7 +109,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
     try {
       DAVRepositoryFactory.setup();
       SVNRepository repository = SVNRepositoryFactory.create(_url);
-      UsernamePassword credentials = getBasicAuthCredentials(request);
+      UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       return new SVNPageStore(repository);
     }
