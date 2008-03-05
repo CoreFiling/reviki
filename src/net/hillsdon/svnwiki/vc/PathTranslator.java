@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.hillsdon.svnwiki.vc;
 
 import java.util.regex.Matcher;
