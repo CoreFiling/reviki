@@ -17,6 +17,7 @@ package net.hillsdon.svnwiki.web.handlers;
 
 import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getString;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,8 +71,24 @@ public class SetPage implements PageRequestHandler {
       _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(request));
     }
     else if (request.getParameter(SUBMIT_COPY) != null) {
-      final String fromPage = getRequiredString(request, PARAM_FROM_PAGE);
-      _store.copy(new PageReference(fromPage), -1, page, createLinkingCommitMessage(request));
+      final String fromPage = getString(request, PARAM_FROM_PAGE);
+      final String toPage = getString(request, PARAM_TO_PAGE);
+      if (!(fromPage == null ^ toPage == null)) {
+        throw new InvalidInputException("'copy' requires one of toPage, fromPage");
+      }
+      final PageReference toRef;
+      final PageReference fromRef;
+      if (fromPage != null) {
+        fromRef = new PageReference(fromPage);
+        toRef = page;
+      }
+      else {
+        fromRef = page;
+        toRef = new PageReference(toPage);
+      }
+      _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
+      response.sendRedirect(new RequestBasedWikiUrls(request).page(toPage));
+      return;
     }
     else if (request.getParameter(SUBMIT_RENAME) != null) {
       final String toPage = getRequiredString(request, PARAM_TO_PAGE);

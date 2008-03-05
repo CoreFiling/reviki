@@ -57,6 +57,14 @@ public class RegularPage implements PageRequestHandler {
       }
     }
     else {
+      if (request.getParameter(SetPage.SUBMIT_RENAME) != null) {
+        request.getRequestDispatcher("/WEB-INF/templates/Rename.jsp").include(request, response);
+        return;
+      }
+      else if (request.getParameter(SetPage.SUBMIT_COPY) != null) {
+        request.getRequestDispatcher("/WEB-INF/templates/Copy.jsp").include(request, response);
+        return;
+      }
       _view.handlePage(path, request, response, page);
     }
   }
