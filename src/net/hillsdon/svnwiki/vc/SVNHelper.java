@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -62,6 +64,8 @@ public class SVNHelper {
     return results;
   }
 
+  private static final Pattern ATTACHMENT_PATH = Pattern.compile(".*/(.*?)-attachments/.*");
+  
   @SuppressWarnings("unchecked")
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
@@ -70,6 +74,10 @@ public class SVNHelper {
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (changedPath.length() > rootPath.length()) {
         String name = changedPath.substring(rootPath.length() + 1);
+        Matcher matcher = ATTACHMENT_PATH.matcher(changedPath);
+        if (matcher.matches()) {
+          name = matcher.group(1);
+        }
         results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
       }
     }
