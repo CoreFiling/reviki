@@ -10,8 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
-
-
+import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
 /**
  * We should probably find a web framework that doesn't suck but this'll do for now.
@@ -36,7 +35,7 @@ public class Dispatcher extends HttpServlet {
     super.init(config);
     try {
       PageStoreFactory psf = new BasicAuthPassThroughPageStoreFactory(URL);
-      _get = new GetPage(psf);
+      _get = new GetPage(psf, new RadeoxMarkupRenderer());
       _editor = new EditorForPage(psf);
       _set = new SetPage(psf);
     }

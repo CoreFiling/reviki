@@ -6,7 +6,7 @@
 </head>
 <body>
   <div id="content">
-    <pre><c:out value="${pageInfo.content}"/></pre>
+  ${renderedContents}
   </div>
   <form action="" method="post">
     <input type="submit" value="Edit"/>

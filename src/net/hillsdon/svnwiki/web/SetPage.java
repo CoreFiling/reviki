@@ -12,7 +12,6 @@ public class SetPage extends PageRequestHandler {
     super(pageStoreFactory);
   }
   
-  
   @Override
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
     String baseRevisionString = request.getParameter("baseRevision");
@@ -30,6 +29,9 @@ public class SetPage extends PageRequestHandler {
     String content = request.getParameter("content");
     if (content == null) {
       throw new InvalidInputException("'content' required.");
+    }
+    if (!content.endsWith("\n")) {
+      content = content + "\n";
     }
     
     store.set(page, baseRevision, content);
