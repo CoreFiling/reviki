@@ -13,7 +13,6 @@ import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetAttachment;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
 import net.hillsdon.svnwiki.web.handlers.History;
-import net.hillsdon.svnwiki.web.handlers.PageRequestHandler;
 import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
