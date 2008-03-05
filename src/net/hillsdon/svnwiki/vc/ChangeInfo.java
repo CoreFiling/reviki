@@ -38,10 +38,6 @@ public class ChangeInfo {
     return _page;
   }
 
-  public String getPath() {
-    return _page;
-  }
-  
   public String getUser() {
     return _user;
   }

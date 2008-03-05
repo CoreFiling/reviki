@@ -294,7 +294,7 @@ public class SVNPageStore implements PageStore {
           Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
           for (ChangeInfo info : log) {
             if (info.getKind() == StoreKind.PAGE) {
-              pages.add(new PageReference(info.getPath()));
+              pages.add(new PageReference(info.getPage()));
             }
           }
           return pages;

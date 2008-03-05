@@ -14,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.vc.StoreKind;
 import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 import org.xml.sax.SAXException;
@@ -70,14 +71,17 @@ public class FeedWriter {
     addLink(handler, wikiUrls.feed(), "self");
     addLink(handler, wikiUrls.root(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
-    for (ChangeInfo change : changes) { 
-      handler.startElement(ATOM_NS, "", "entry", null);
-      addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPath()));
-      addLink(handler, wikiUrls.page(change.getPath()), null);
-      addElement(handler, "id", wikiUrls.page(change.getPath()));
-      addElement(handler, "summary", change.getDescription());
-      addUpdated(handler, change.getDate());
-      handler.endElement(ATOM_NS, "", "entry");
+    for (ChangeInfo change : changes) {
+      // For now.
+      if (change.getKind() == StoreKind.PAGE) {
+        handler.startElement(ATOM_NS, "", "entry", null);
+        addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
+        addLink(handler, wikiUrls.page(change.getPage()), null);
+        addElement(handler, "id", wikiUrls.page(change.getPage()));
+        addElement(handler, "summary", change.getDescription());
+        addUpdated(handler, change.getDate());
+        handler.endElement(ATOM_NS, "", "entry");
+      }
     }
     handler.endElement(ATOM_NS, "", "feed");
     handler.endDocument();

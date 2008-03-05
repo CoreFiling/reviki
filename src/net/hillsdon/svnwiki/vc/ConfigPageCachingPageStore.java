@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
 
+  private static final String CONFIG_PREFIX = "Config";
   private Map<PageReference, PageInfo> _cache = new LinkedHashMap<PageReference, PageInfo>();
 
   public ConfigPageCachingPageStore(final PageStore delegate) {
@@ -25,7 +26,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
       return _cache.get(ref);
     }
     PageInfo pageInfo = super.get(ref, revision);
-    if (isConfigPage(ref)) {
+    if (isConfigPage(ref.getPath())) {
       _cache.put(ref, pageInfo);
     }
     return pageInfo;
@@ -33,14 +34,16 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
 
   @Override
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    if (isConfigPage(ref)) {
+    if (isConfigPage(ref.getPath())) {
       _cache = new LinkedHashMap<PageReference, PageInfo>();
     }
     return super.set(ref, lockToken, baseRevision, content, commitMessage);
   }
 
-  private boolean isConfigPage(final PageReference ref) {
-    return ref.getPath().startsWith("Config");
+  static boolean isConfigPage(final String pageName) {
+    return pageName.startsWith(CONFIG_PREFIX) 
+           && pageName.length() > CONFIG_PREFIX.length()
+           && Character.isUpperCase(pageName.charAt(CONFIG_PREFIX.length()));
   }
   
   public PageStore getUnderlying() {
