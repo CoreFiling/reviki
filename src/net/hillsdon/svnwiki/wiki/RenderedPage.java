@@ -13,7 +13,7 @@ import org.w3c.dom.traversal.NodeIterator;
 
 public class RenderedPage {
 
-  private static final Collection<String> BLOCK_HTML_TAGS = set("P", "DIV", "PRE", "BLOCKQUOTE", "H1", "H2", "H3", "H4", "H5", "H6", "CENTER", "FORM", "HR");
+  private static final Collection<String> BLOCK_HTML_TAGS = set("P", "DIV", "PRE", "BLOCKQUOTE", "H1", "H2", "H3", "H4", "H5", "H6", "CENTER", "FORM", "HR", "UL", "OL", "LI");
   private static boolean isBlock(final String localName) {
     return BLOCK_HTML_TAGS.contains(localName);
   }
