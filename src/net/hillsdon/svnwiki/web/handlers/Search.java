@@ -23,7 +23,7 @@ public class Search implements RequestHandler {
   + "<Url type='text/html' template='%s?query={searchTerms}'/>\n"
   + "</OpenSearchDescription>\n";
   
-  private static final String PARAM_QUERY = "query";
+  static final String PARAM_QUERY = "query";
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
@@ -41,6 +41,9 @@ public class Search implements RequestHandler {
     }
     
     String query = request.getParameter(PARAM_QUERY);
+    if (query == null) {
+      query = "";
+    }
     if (request.getParameter("force") == null && _store.list().contains(new PageReference(query))) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + query));
     }

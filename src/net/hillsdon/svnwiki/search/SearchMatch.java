@@ -1,6 +1,12 @@
 package net.hillsdon.svnwiki.search;
 
-
+/**
+ * A match from a search.
+ * 
+ * Considered equal by page.
+ * 
+ * @author mth
+ */
 public class SearchMatch {
 
   private final String _page;
@@ -11,10 +17,17 @@ public class SearchMatch {
     _htmlExtract = htmlExtract;
   }
 
+  /**
+   * @return The page that matched.
+   */
   public String getPage() {
     return _page;
   }
   
+  /**
+   * @return HTML extract showing match in context if requested and available,
+   *         otherwise null.
+   */
   public String getHtmlExtract() {
     return _htmlExtract;
   }
