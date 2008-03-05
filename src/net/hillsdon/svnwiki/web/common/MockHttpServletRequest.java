@@ -15,6 +15,7 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
 
   private Map<String, Object> _attributes = new LinkedHashMap<String, Object>();
   private Map<String, List<String>> _parameters = new LinkedHashMap<String, List<String>>();
+  private String _requestURI = "";
   private String _requestURL = "";
   private String _contextPath = "";
 
@@ -62,7 +63,7 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
 
   @Override
   public String getRequestURI() {
-    return _requestURL;
+    return _requestURI;
   }
   
   @Override
@@ -72,6 +73,10 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
   
   public void setRequestURL(final String requestURL) {
     _requestURL = requestURL;
+  }
+  
+  public void setRequestURI(final String requestURI) {
+    _requestURI = requestURI;
   }
   
 }

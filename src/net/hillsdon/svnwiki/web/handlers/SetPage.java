@@ -114,7 +114,7 @@ public class SetPage implements PageRequestHandler {
     else {
       throw new InvalidInputException("No action specified.");
     }
-    return new RedirectView(request.getRequestURI());
+    return new RedirectView(request.getRequestURL().toString());
   }
 
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
