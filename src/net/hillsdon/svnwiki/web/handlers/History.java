@@ -16,9 +16,8 @@ public class History extends PageRequestHandler {
   }
 
   @Override
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
-    List<ChangeInfo> changes = store.history(page);
-    request.setAttribute("page", new PageReference(page));
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
+    List<ChangeInfo> changes = getStore().history(page);
     request.setAttribute("changes", changes);
     request.getRequestDispatcher("/WEB-INF/templates/History.jsp").include(request, response);
   }

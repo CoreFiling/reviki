@@ -18,8 +18,8 @@ public class AllPages extends PageRequestHandler {
     super(store);
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
-    List<String> alphabetical = new ArrayList<String>(store.list());
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws PageStoreException, IOException, ServletException {
+    List<String> alphabetical = new ArrayList<String>(getStore().list());
     Collections.sort(alphabetical);
     request.setAttribute("pageList", alphabetical);
     request.getRequestDispatcher("/WEB-INF/templates/AllPages.jsp").include(request, response);

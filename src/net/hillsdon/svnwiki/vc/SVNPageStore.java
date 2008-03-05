@@ -5,6 +5,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -203,14 +204,18 @@ public class SVNPageStore implements PageStore {
   }
 
   public void set(final String path, final String lockToken, final long baseRevision, final String content, String commitMessage) throws PageStoreException {
+    set(path, lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
+  }
+
+  private void set(final String path, final String lockToken, final long baseRevision, final InputStream content, String commitMessage) throws PageStoreException {
     try {
       Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
       ISVNEditor commitEditor = _repository.getCommitEditor(commitMessage, locks, false, null);
       if (baseRevision == PageInfo.UNCOMMITTED) {
-        createFile(commitEditor, path, fromUTF8(content));
+        createFile(commitEditor, path, content);
       }
       else {
-        editFile(commitEditor, path, baseRevision, fromUTF8(content));
+        editFile(commitEditor, path, baseRevision, content);
       }
       commitEditor.closeEdit();
     }
@@ -226,23 +231,23 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  private void createFile(final ISVNEditor commitEditor, final String filePath, final byte[] data) throws SVNException {
+  private void createFile(final ISVNEditor commitEditor, final String filePath, final InputStream data) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.addFile(filePath, null, -1);
     commitEditor.applyTextDelta(filePath, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-    String checksum = deltaGenerator.sendDelta(filePath, new ByteArrayInputStream(data), commitEditor, true);
+    String checksum = deltaGenerator.sendDelta(filePath, data, commitEditor, true);
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
   }
 
-  private void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final byte[] newData) throws SVNException {
+  private void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final InputStream newData) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.openFile(filePath, baseRevision);
     commitEditor.applyTextDelta(filePath, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
     // We don't keep the base around so we can't provide it here.
-    String checksum = deltaGenerator.sendDelta(filePath, new ByteArrayInputStream(newData), commitEditor, true);
+    String checksum = deltaGenerator.sendDelta(filePath, newData, commitEditor, true);
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
   }

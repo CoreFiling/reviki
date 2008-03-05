@@ -20,7 +20,7 @@ public class GetPage extends PageRequestHandler {
     _allPages = new AllPages(pageStore);
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
     if ("RecentChanges".equals(page)) {
       _recentChanges.handle(request, response);
     }

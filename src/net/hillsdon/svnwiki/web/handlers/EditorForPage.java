@@ -17,8 +17,8 @@ public class EditorForPage extends PageRequestHandler {
     super(store);
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
-    PageInfo pageInfo = store.tryToLock(page);
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws PageStoreException, IOException, ServletException {
+    PageInfo pageInfo = getStore().tryToLock(page);
     request.setAttribute("pageInfo", pageInfo);
     if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
       request.setAttribute("flash", "Could not lock the page.");

@@ -33,7 +33,7 @@ public class SetPage extends PageRequestHandler {
   }
 
   @Override
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
     String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
     if ("Save".equals(request.getParameter(PARAM_ACTION))) {
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
@@ -41,12 +41,12 @@ public class SetPage extends PageRequestHandler {
       if (!content.endsWith(CRLF)) {
         content = content + CRLF;
       }
-      store.set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
+      getStore().set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
     }
     else {
       // New pages don't have a lock.
       if (lockToken.length() > 0) {
-        store.unlock(page, lockToken);
+        getStore().unlock(page, lockToken);
       }
     }
     response.sendRedirect(request.getRequestURI());

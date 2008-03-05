@@ -8,11 +8,13 @@ import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.handlers.Attachments;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
 import net.hillsdon.svnwiki.web.handlers.History;
 import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
+import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
 /**
@@ -22,12 +24,14 @@ import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
  */
 public class MainHandler implements RequestHandler {
 
-  private RequestScopedThreadLocalPageStore _pageStore;
-  private RequestHandler _get;
-  private RequestHandler _editor;
-  private RequestHandler _set;
-  private RequestHandler _search;
-  private RequestHandler _history;
+  private final RequestScopedThreadLocalPageStore _pageStore;
+  private final RequestHandler _get;
+  private final RequestHandler _editor;
+  private final RequestHandler _set;
+  private final RequestHandler _search;
+  private final RequestHandler _history;
+  private final RequestHandler _attachments;
+  private final RequestHandler _uploadAttachment;
 
   public MainHandler(final InitialConfiguration configuration) {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
@@ -38,6 +42,8 @@ public class MainHandler implements RequestHandler {
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
     _history = new History(_pageStore);
+    _attachments = new Attachments(_pageStore);
+    _uploadAttachment = new UploadAttachment(_pageStore);
   }
   
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -53,13 +59,19 @@ public class MainHandler implements RequestHandler {
             if (request.getParameter("history") != null) {
               _history.handle(request, response);
             }
+            else if (request.getParameter("attachments") != null) {
+              _attachments.handle(request, response);
+            }
             else {
               _get.handle(request, response);
             }
           }
         }
         else if ("POST".equals(request.getMethod())) {
-          if (request.getParameter("content") == null) {
+          if (request.getParameter("attachments") != null) {
+            _uploadAttachment.handle(request, response);
+          }
+          else if (request.getParameter("content") == null) {
             _editor.handle(request, response);
           }
           else {
