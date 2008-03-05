@@ -16,7 +16,7 @@ public class UnescapedHtmlNode extends AbstractRegexNode {
   }
 
   public String handle(final PageReference page, final Matcher matcher) {
-    return matcher.group(1);
+    return matcher.group(2);
   }
 
 }
