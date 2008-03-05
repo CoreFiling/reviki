@@ -75,7 +75,7 @@ public class CreoleRenderer {
     RenderNode rawUrl = new RawUrlNode();
     RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "tt", 1);
     RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
-    RenderNode[] nonStructural = concat(defaultNonStructural, customNonStructural);
+    RenderNode[] nonStructural = concat(customNonStructural, defaultNonStructural);
 
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
     RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
