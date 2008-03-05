@@ -7,6 +7,14 @@
   <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/pages/RecentChanges/atom.xml"/>" />
   <link rel="search" href="<c:url value="/pages/FindPage/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   <style type="text/css">
+    h1 {
+      margin: 0;
+      clear: both;
+      display: block;
+      border-bottom: 1px solid black;
+      border-top: 1px solid black;
+      font-size: 150%;
+    }
     body {
       font-size: 11pt;
       font-family: Verdana, Arial, sans-serif
@@ -23,6 +31,9 @@
     }
     a.new-page {
       color: #888888;
+    }
+    li.menu {
+      display: inline;
     }
     ul.menu {
       list-style: none;
@@ -51,14 +62,16 @@
   </c:if>
   <div id="sidebar">
     <ul class="menu">
-      <li class="menu"><a href="<c:url value="/pages/FrontPage"/>">Front Page</a></li>
-      <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">Recent Changes</a></li>
-      <li class="menu"><a href="<c:url value="/pages/AllPages"/>">All Pages</a></li>
+      <li class="menu"><a href="<c:url value="/pages/FrontPage"/>">FrontPage</a></li>
+      <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">RecentChanges</a></li>
+      <li class="menu"><a href="<c:url value="/pages/AllPages"/>">AllPages</a></li>
+      <li class="menu">
+        <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/FindPage"/>" method="get">
+          <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
+          <input value="Go" type="submit"/>
+        </form>
+      </li>
     </ul>
-    <form name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/FindPage"/>" method="get">
-      <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
-      <input value="Go" type="submit"/>
-    </form>
   </div>
   <div id="content">
     <tiles:insertAttribute name="content"/>
