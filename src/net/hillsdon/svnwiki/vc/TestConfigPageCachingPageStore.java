@@ -26,4 +26,12 @@ public class TestConfigPageCachingPageStore extends TestCase {
     assertFalse(isConfigPage("ConfiguringStuff"));
   }
   
+  public void testDoesntCacheOldRevisionsOfConfigPages() throws Exception {
+    PageReference ref = new PageReference("ConfigFoo");
+    ConfigPageCachingPageStore store = new ConfigPageCachingPageStore(new SimplePageStore());
+    store.getUnderlying().set(ref, "", 1, "Hey there", "Initial commit");
+    assertFalse(store.get(ref, 2).isNew());
+    assertFalse(store.isCached(ref));
+  }
+  
 }

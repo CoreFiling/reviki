@@ -37,11 +37,14 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
 
   @Override
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    if (revision == -1 && _cache.containsKey(ref)) {
-      return _cache.get(ref);
+    if (revision >= 0 || !isConfigPage(ref.getPath())) {
+      return super.get(ref, revision);
     }
-    PageInfo pageInfo = super.get(ref, revision);
-    if (isConfigPage(ref.getPath())) {
+    
+    // Note the map may be replaced by another thread so we don't reget the page from the cache.
+    PageInfo pageInfo = _cache.get(ref);
+    if (pageInfo == null) {
+      pageInfo = super.get(ref, revision);
       _cache.put(ref, pageInfo);
     }
     return pageInfo;
@@ -61,8 +64,21 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
            && Character.isUpperCase(pageName.charAt(CONFIG_PREFIX.length()));
   }
   
+  /**
+   * @return The underlying page store that non-caching access is delegated to.
+   */
   public PageStore getUnderlying() {
     return getDelegate();
+  }
+
+  /**
+   * Exposed for testing.
+   * 
+   * @param ref A page ref.
+   * @return true if we have a cached copy.
+   */
+  boolean isCached(final PageReference ref) {
+    return _cache.containsKey(ref);
   }
 
 }
