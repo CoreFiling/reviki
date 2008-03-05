@@ -5,6 +5,7 @@ import static net.hillsdon.fij.core.Functional.set;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
@@ -17,6 +18,9 @@ import org.w3c.dom.traversal.NodeIterator;
 
 public class RenderedPage {
 
+  private static final Pattern RE_NEW_PAGE_CLASS = Pattern.compile("(^|\\s)new-page($|\\s)");
+  private static final Pattern RE_EXIST_PAGE_CLASS = Pattern.compile("(^|\\s)existing-page($|\\s)");
+  
   private static final Collection<String> BLOCK_HTML_TAGS = set("P", "DIV", "PRE", "BLOCKQUOTE", "H1", "H2", "H3", "H4", "H5", "H6", "CENTER", "FORM", "HR", "UL", "OL", "LI");
   private static boolean isBlock(final String localName) {
     return BLOCK_HTML_TAGS.contains(localName);
@@ -59,7 +63,7 @@ public class RenderedPage {
     for (int i = 0, len = links.getLength(); i < len; ++i) {
       Element link = (Element) links.item(i);
       String clazz = link.getAttribute("class");
-      if (clazz.matches("(^|\\s)existing-page($|\\s)") || clazz.matches("(^|\\s)new-page($|\\s)")) {
+      if (RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find()) {
         String href = link.getAttribute("href");
         int lastSlash = href.lastIndexOf('/');
         outgoing.add(href.substring(lastSlash + 1));

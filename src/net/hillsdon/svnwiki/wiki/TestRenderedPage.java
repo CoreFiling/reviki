@@ -28,12 +28,12 @@ public class TestRenderedPage extends TestCase {
   }
   
   public void testGetOutgoingLinksExistingPage() throws Exception {
-    RenderedPage existingPage = create("<a href='pages/Foo'>Foo</a> to <a class='existing-page' href='pages/Bar'>Bar description</a>");
+    RenderedPage existingPage = create("<a href='pages/Foo'>Foo</a> to <a class='existing-page other-class' href='pages/Bar'>Bar description</a>");
     assertEquals(asList("Bar"), existingPage.findOutgoingWikiLinks());
   }
 
   public void testGetOutgoingLinksNewPage() throws Exception {
-    RenderedPage newPage = create("<a href='pages/Foo'>Foo</a> to <a class='new-page' href='pages/Bar'>Bar description</a>");
+    RenderedPage newPage = create("<a href='pages/Foo'>Foo</a> to <a class='other-class new-page' href='pages/Bar'>Bar description</a>");
     assertEquals(asList("Bar"), newPage.findOutgoingWikiLinks());
   }
   
