@@ -13,7 +13,12 @@ def apply_boilerplate(arg, dirname, fnames):
       ensure_has_boilerplate(path)
 
 def ensure_has_boilerplate(path):
-  print path
+  content = open(path, 'r').read()
+  if content.find(BOILERPLATE.strip()) == -1:
+    content = BOILERPLATE + content
+    fout = open(path, 'w')
+    fout.write(content)
+    fout.close()
 
 for dir in ('src', 'webtests'):
-    os.path.walk('src', apply_boilerplate, None)
+    os.path.walk(dir, apply_boilerplate, None)
