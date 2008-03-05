@@ -37,13 +37,13 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final PathTranslator translator, final String path, final long limit, final boolean pathOnly, final long startRevision, long endRevision) throws SVNException {
+  public List<ChangeInfo> log(final PathTranslator translator, final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws SVNException {
     final String rootPath = getRoot();
     final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
     // Start and end reversed to get newest changes first.
     _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
       public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.addAll(logEntryToChangeInfos(translator, rootPath, path, logEntry));
+        entries.addAll(logEntryToChangeInfos(translator, rootPath, path, pathOnly, logEntry));
       }
     });
     return entries;
@@ -64,14 +64,16 @@ public class SVNHelper {
 
 
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final PathTranslator translator, final String rootPath, final String path, final SVNLogEntry entry) throws SVNException {
+  private List<ChangeInfo> logEntryToChangeInfos(final PathTranslator translator, final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     String user = entry.getAuthor();
     Date date = entry.getDate();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (changedPath.length() > rootPath.length()) {
-        String name = translator.translate(rootPath, changedPath);
-        results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
+        if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
+          String name = translator.translate(rootPath, changedPath);
+          results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
+        }
       }
     }
     return results;
