@@ -44,7 +44,7 @@ public class TestSvnHelper extends TestCase {
   }
   
   private ChangeInfo changeInfo(final String path) {
-    return SVNHelper.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), "/wiki2", path);
+    return RepositoryBasicSVNOperations.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), "/wiki2", path);
   }
   
 }

@@ -45,7 +45,14 @@ import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
-public class SVNHelper implements BasicSVNOperations {
+/**
+ * The real impl, using an {@link SVNRepository}.
+ * 
+ * Currently some error handling may depend on it being a DAVRepository, this needs review.
+ * 
+ * @author mth
+ */
+public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   private interface SVNAction<T> {
     T perform(SVNRepository repository) throws SVNException, PageStoreException;
@@ -53,7 +60,7 @@ public class SVNHelper implements BasicSVNOperations {
   
   private final SVNRepository _repository;
 
-  public SVNHelper(final SVNRepository repository) {
+  public RepositoryBasicSVNOperations(final SVNRepository repository) {
     _repository = repository;
   }
 
