@@ -26,6 +26,7 @@ public class Dispatcher extends HttpServlet {
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     _configuration = new Configuration();
+    _configuration.load();
     _configurationHandler = new ConfigurationHandler(_configuration);
   }
 

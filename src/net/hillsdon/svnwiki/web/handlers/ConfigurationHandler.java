@@ -22,10 +22,11 @@ public class ConfigurationHandler implements RequestHandler {
     if ("GET".equals(request.getMethod())) {
       showView(request, response);
     }
-    else if ("POST".equals(request.getMethod())){
+    else if ("POST".equals(request.getMethod())) {
       String url = request.getParameter("url");
       try {
         _configuration.setUrl(url);
+        _configuration.save();
         response.sendRedirect(request.getRequestURI());
       }
       catch (IllegalArgumentException ex) {
