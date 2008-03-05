@@ -50,6 +50,13 @@
       text-align: center;
       background-color: yellow;
     }
+    hr {
+      color: black;
+      background-color: black;
+      height: 1px;
+      border: 0px;
+      border-style: solid;
+    }
   </style>
 </head>
 <body>
