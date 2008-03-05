@@ -1,15 +1,23 @@
 package net.hillsdon.svnwiki.web;
 
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNURL;
+
 public class Configuration {
 
-  private String _url = null;
+  private SVNURL _url = null;
 
-  public String getUrl() {
+  public SVNURL getUrl() {
     return _url;
   }
 
-  public void setUrl(final String url) {
-    _url = url;
+  public void setUrl(final String url) throws IllegalArgumentException {
+    try {
+      _url = SVNURL.parseURIDecoded(url);
+    }
+    catch (SVNException e) {
+      throw new IllegalArgumentException("Invalid SVN URL", e);
+    }
   }
 
   public boolean isComplete() {

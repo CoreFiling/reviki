@@ -11,9 +11,16 @@
     The URL should not be the root of the repository unless you really want svnwiki
     to put its files there.
   </p>
+  
   <form action="" method="post">
-    <label for="url">SVN URL </label><input style="width:25em;" id="url" name="url" value="<c:out value="${configuration.url}"/>"/>
-    <input type="submit" value="Save"/>
+    <table>
+      <tr>
+        <td><label for="url">SVN URL </label></td>
+        <td><input style="width:25em;" id="url" name="url" value="<c:out value="${configuration.url}"/>"/></td>
+      </tr>
+      <tr><td colspan="2"><c:out value="${error}"/></td></tr>
+      <tr><td colspan="2"><input type="submit" value="Save"/></td></tr>
+    </table>
   </form> 
 </body>
 </html>

@@ -25,7 +25,7 @@ import sun.misc.BASE64Decoder;
  * 
  * FIXME:
  *   We need to get ourselves a base64 codec as the JDK <strong>still</strong>
- *   doesn't provide one outside of the non-portabl com.sun packages.
+ *   doesn't provide one outside of the non-portable com.sun packages.
  *   
  * @author mth
  */
@@ -34,7 +34,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
   static class UsernamePassword {
     private final String _username;
     private final String _password;
-    public UsernamePassword(String username, String password) {
+    public UsernamePassword(final String username, final String password) {
       _username = username;
       _password = password;
     }
@@ -45,7 +45,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
       return _password;
     }
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
       if (obj instanceof UsernamePassword) {
         UsernamePassword other = (UsernamePassword) obj;
         return (_username == null ? other._username == null : _username.equals(other._username))
@@ -67,15 +67,9 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
   
   /**
    * @param url Repository URL.
-   * @throws PageStoreException If the URL is not valid.
    */
-  public BasicAuthPassThroughPageStoreFactory(String url) throws PageStoreException {
-    try {
-      _url = SVNURL.parseURIDecoded(url);
-    }
-    catch (SVNException e) {
-      throw new PageStoreException(e);
-    }
+  public BasicAuthPassThroughPageStoreFactory(final SVNURL url) {
+    _url = url;
   }
 
   static UsernamePassword getBasicAuthCredentials(String authorization) {

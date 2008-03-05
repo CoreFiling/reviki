@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
-import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
@@ -18,7 +17,7 @@ public class MainHandler implements RequestHandler {
   private RequestHandler _editor;
   private RequestHandler _set;
 
-  public MainHandler(final Configuration configuration) throws PageStoreException {
+  public MainHandler(final Configuration configuration) {
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl());
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     _get = new GetPage(_pageStore, new RadeoxMarkupRenderer(_pageStore));

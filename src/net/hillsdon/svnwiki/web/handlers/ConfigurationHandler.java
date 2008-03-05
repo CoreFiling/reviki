@@ -1,5 +1,8 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,14 +20,24 @@ public class ConfigurationHandler implements RequestHandler {
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if ("GET".equals(request.getMethod())) {
-      request.setAttribute("configuration", _configuration);
-      request.getRequestDispatcher("/WEB-INF/templates/Configuration.jsp").forward(request, response);
+      showView(request, response);
     }
     else if ("POST".equals(request.getMethod())){
       String url = request.getParameter("url");
-      _configuration.setUrl(url);
-      response.sendRedirect(request.getRequestURI());
+      try {
+        _configuration.setUrl(url);
+        response.sendRedirect(request.getRequestURI());
+      }
+      catch (IllegalArgumentException ex) {
+        request.setAttribute("error", ex.getMessage());
+        showView(request, response);
+      }
     }
+  }
+
+  private void showView(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    request.setAttribute("configuration", _configuration);
+    request.getRequestDispatcher("/WEB-INF/templates/Configuration.jsp").forward(request, response);
   }
       
 }
