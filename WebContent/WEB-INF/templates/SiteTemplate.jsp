@@ -6,6 +6,7 @@
   <title>svnwiki - <tiles:insertAttribute name="title"/></title>
   <style type="text/css">
     body {
+      font-size: 11pt;
       font-family: Verdana, Arial, sans-serif
     }
     table {
