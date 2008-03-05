@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -78,16 +79,16 @@ public class SVNPageStore implements PageStore {
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
     List<ChangeInfo> changes = _operations.log(ref.getPath(), -1, true, 0, lastRevision);
     if (deletedIn != null) {
+      changes = new ArrayList<ChangeInfo>(changes);
       changes.add(0, deletedIn);
     }
     return Functional.list((((filter(changes, IS_CHANGE_TO_PAGE)))));
   }
 
-  public Collection<PageReference> list() throws PageStoreException {
-    // Should we be returning the entries here?
+  public Set<PageReference> list() throws PageStoreException {
     Set<PageReference> names = new LinkedHashSet<PageReference>();
-    for (PageStoreEntry e : _operations.listFiles("")) {
-      names.add(new PageReference(e.getName()));
+    for (String page : _operations.listFiles("")) {
+      names.add(new PageReference(page));
     }
     return names;
   }

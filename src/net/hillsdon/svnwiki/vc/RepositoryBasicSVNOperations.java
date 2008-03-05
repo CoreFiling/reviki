@@ -84,15 +84,15 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
   }
   
-  public Collection<PageStoreEntry> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Collection<PageStoreEntry>>() {
-      public Collection<PageStoreEntry> perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        final Set<PageStoreEntry> results = new LinkedHashSet<PageStoreEntry>();
+  public Collection<String> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<Collection<String>>() {
+      public Collection<String> perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        final Set<String> results = new LinkedHashSet<String>();
         Collection<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
         _repository.getDir(dir, -1, null, SVNDirEntry.DIRENT_KIND, entries);
         for (SVNDirEntry e : entries) {
           if (SVNNodeKind.FILE.equals(e.getKind())) {
-            results.add(new PageStoreEntry(e.getName(), e.getRevision()));
+            results.add(e.getName());
           }
         }
         return results;

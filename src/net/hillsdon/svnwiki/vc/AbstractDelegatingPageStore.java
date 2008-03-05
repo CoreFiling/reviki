@@ -18,6 +18,7 @@ package net.hillsdon.svnwiki.vc;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 
@@ -37,7 +38,7 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
     return getDelegate().get(ref, revision);
   }
 
-  public Collection<PageReference> list() throws PageStoreException {
+  public Set<PageReference> list() throws PageStoreException {
     return getDelegate().list();
   }
 

@@ -18,6 +18,7 @@ package net.hillsdon.svnwiki.vc;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A verson control based store of wiki pages with attachments.
@@ -38,9 +39,9 @@ public interface PageStore {
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   
   /**
-   * @return A list of all pages.
+   * @return A all pages.
    */
-  Collection<PageReference> list() throws PageStoreException;
+  Set<PageReference> list() throws PageStoreException;
 
   /**
    * @param limit Maximum number of entries to return.

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
@@ -57,8 +58,8 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
   }
 
   @Override
-  public Collection<PageReference> list() throws PageStoreException {
-    Collection<PageReference> list = super.list();
+  public Set<PageReference> list() throws PageStoreException {
+    Set<PageReference> list = super.list();
     list.addAll(SPECIAL_PAGES_WITH_CONTENT);
     list.addAll(SPECIAL_PAGES_WITHOUT_CONTENT);
     return list;

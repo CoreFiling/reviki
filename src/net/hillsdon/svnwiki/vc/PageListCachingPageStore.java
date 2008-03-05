@@ -15,7 +15,7 @@
  */
 package net.hillsdon.svnwiki.vc;
 
-import java.util.Collection;
+import java.util.Set;
 
 
 /**
@@ -28,14 +28,14 @@ import java.util.Collection;
  */
 public class PageListCachingPageStore extends SimpleDelegatingPageStore {
 
-  private Collection<PageReference> _cached = null;
+  private Set<PageReference> _cached = null;
   
   public PageListCachingPageStore(final PageStore delegate) {
     super(delegate);
   }
 
   @Override
-  public Collection<PageReference> list() throws PageStoreException {
+  public Set<PageReference> list() throws PageStoreException {
     if (_cached == null) {
       _cached = super.list();
     }

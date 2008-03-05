@@ -25,7 +25,7 @@ public interface BasicSVNOperations {
    */
   List<ChangeInfo> log(String path, long limit, boolean pathOnly, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 
-  Collection<PageStoreEntry> listFiles(String dir) throws PageStoreAuthenticationException, PageStoreException;
+  Collection<String> listFiles(String dir) throws PageStoreAuthenticationException, PageStoreException;
   String getRoot() throws PageStoreAuthenticationException, PageStoreException;
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   SVNNodeKind checkPath(String path, long revision) throws PageStoreAuthenticationException, PageStoreException;

@@ -16,12 +16,13 @@
 package net.hillsdon.svnwiki.vc;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Partial implementation suitable for tests.
@@ -41,8 +42,8 @@ public class SimplePageStore implements PageStore {
     return page;
   }
 
-  public Collection<PageReference> list() throws PageStoreException {
-    return new ArrayList<PageReference>(_pages.values());
+  public Set<PageReference> list() throws PageStoreException {
+    return new LinkedHashSet<PageReference>(_pages.values());
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
