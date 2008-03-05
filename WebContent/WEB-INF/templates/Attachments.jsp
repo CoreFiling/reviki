@@ -9,7 +9,7 @@
         <tr><td><a href="<c:url value="${attachment}"/>"><c:out value="${attachment}"/></a></td></tr>
       </c:forEach>
     </table>
-    <form action="" method="post" enctype="multipart/form-data">
+    <form name="attachmentUpload" action="" method="post" enctype="multipart/form-data">
       <table>
         <tr><th style="text-align: right;"><label for="file">File to upload</label></th><td><input id="file" type="file" name="file"/></td></tr>
         <tr><th style="text-align: right;"><label for="attachmentName">Attachment name (optional)</label></th><td><input id="attachmentName" type="text" name="attachmentName"/></td></tr>
