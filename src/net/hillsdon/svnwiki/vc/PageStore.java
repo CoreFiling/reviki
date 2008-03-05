@@ -95,6 +95,8 @@ public interface PageStore {
   /**
    * Edit pages by calling this method.  They don't need to exist yet.
    * 
+   * Setting the page content to the empty string will delete the page.
+   * 
    * @param ref A page name.s
    * @param lockToken  The token for the edit lock, if any, see {@link PageInfo#getLockToken()}.
    * @param baseRevision Used to check the edited copy was the latest.
