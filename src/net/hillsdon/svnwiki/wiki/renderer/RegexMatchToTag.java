@@ -7,32 +7,32 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RuleTreeNode {
+public class RegexMatchToTag {
 
-  private final List<RuleTreeNode> _children = new ArrayList<RuleTreeNode>();
-  private final Pattern _re;
+  private final List<RegexMatchToTag> _children = new ArrayList<RegexMatchToTag>();
+  private final Pattern _matchRe;
   private final String _tag;
   private final Integer _contentGroup;
   private final Pattern _replaceRe;
   private final String _replaceString;
 
-  public RuleTreeNode(final String re, final String tag, final Integer contentGroup) {
-    this(re, tag, contentGroup, null, null);
+  public RegexMatchToTag(final String matchRe, final String tag, final Integer contentGroup) {
+    this(matchRe, tag, contentGroup, null, null);
   }
 
-  public RuleTreeNode(final String re, final String tag, final Integer contentGroup, final String replaceRe, final String replaceString) {
+  public RegexMatchToTag(final String matchRe, final String tag, final Integer contentGroup, final String replaceRe, final String replaceString) {
+    _matchRe = Pattern.compile(matchRe);
+    _tag = tag;
     _contentGroup = contentGroup;
     _replaceRe = replaceRe == null ? null : Pattern.compile(replaceRe);
     _replaceString = replaceString;
-    _re = Pattern.compile(re);
-    _tag = tag;
   }
 
-  public List<RuleTreeNode> getChildren() {
+  public List<RegexMatchToTag> getChildren() {
     return _children;
   }
 
-  public RuleTreeNode setChildren(final RuleTreeNode... rules) {
+  public RegexMatchToTag setChildren(final RegexMatchToTag... rules) {
     _children.clear();
     _children.addAll(asList(rules));
     return this;
@@ -42,10 +42,10 @@ public class RuleTreeNode {
     if (text == null || text.length() == 0) {
       return "";
     }
-    RuleTreeNode earliestRule = null;
+    RegexMatchToTag earliestRule = null;
     Matcher earliestMatch = null;
     int earliestIndex = Integer.MAX_VALUE;
-    for (RuleTreeNode child : _children) {
+    for (RegexMatchToTag child : _children) {
       Matcher matcher = child.matcher(text);
       if (matcher.find()) {
         if (matcher.start() < earliestIndex) {
@@ -58,7 +58,7 @@ public class RuleTreeNode {
     if (earliestRule != null) {
       String result = "";
       // Just output the stuff before the match.
-      result += text.substring(0, earliestMatch.start());
+      result += htmlEscape(text.substring(0, earliestMatch.start()));
       // Handle the match and recurse.
       result += earliestRule.handle(earliestRule, earliestMatch);
       result += render(text.substring(earliestMatch.end()));
@@ -67,7 +67,7 @@ public class RuleTreeNode {
     return htmlEscape(text);
   }
 
-  private String handle(final RuleTreeNode node, final Matcher matcher) {
+  private String handle(final RegexMatchToTag node, final Matcher matcher) {
     if (_contentGroup == null) {
       return "<" + _tag + " />";
     }
@@ -79,7 +79,7 @@ public class RuleTreeNode {
   }
 
   private Matcher matcher(final String text) {
-    return _re.matcher(text);
+    return _matchRe.matcher(text);
   }
   
   /**

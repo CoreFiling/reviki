@@ -33,28 +33,28 @@ package net.hillsdon.svnwiki.wiki.renderer;
  */
 public class CreoleRenderer {
 
-  private static class Heading extends RuleTreeNode {
+  private static class Heading extends RegexMatchToTag {
     public Heading(final int number) {
       super(String.format("(?:^|\n)={%d}(.+?)(?:\n|$)", number), "h" + number, 1);
     }
   }
-  private static class List extends RuleTreeNode {
+  private static class List extends RegexMatchToTag {
     public List(final String match, final String tag) {
       super("(^|\\n)(" + match + "[^*#].*(\\n|$)([*#]{2}.*(\\n|$))*)+", tag, 0, "(^|\\n)[*#]", "$1");
     }
   }
 
-  private static final RuleTreeNode ROOT;
+  private static final RegexMatchToTag ROOT;
   static {
-    RuleTreeNode root = new RuleTreeNode("", "", 0);
-    RuleTreeNode noWiki = new RuleTreeNode("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
-    RuleTreeNode paragraph = new RuleTreeNode("(?:^|\n)(.+?)(?:$|\n\n)", "p", 1);
-    RuleTreeNode italic = new RuleTreeNode("//(.*?)//", "em", 1);
-    RuleTreeNode bold = new RuleTreeNode("[*][*](.*?)[*][*]", "strong", 1);
-    RuleTreeNode lineBreak = new RuleTreeNode("\\\\", "br", null);
-    RuleTreeNode unorderedList = new List("\\*", "ul");
-    RuleTreeNode orderedList = new List("#", "ol");
-    RuleTreeNode listItem = new RuleTreeNode(".+(\\n[*#].+)*", "li", 0)
+    RegexMatchToTag root = new RegexMatchToTag("", "", 0);
+    RegexMatchToTag noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
+    RegexMatchToTag paragraph = new RegexMatchToTag("(?:^|\n)(.+?)(?:$|\n\n)", "p", 1);
+    RegexMatchToTag italic = new RegexMatchToTag("//(.*?)//", "em", 1);
+    RegexMatchToTag bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
+    RegexMatchToTag lineBreak = new RegexMatchToTag("\\\\", "br", null);
+    RegexMatchToTag unorderedList = new List("\\*", "ul");
+    RegexMatchToTag orderedList = new List("#", "ol");
+    RegexMatchToTag listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .setChildren(bold, italic, lineBreak, unorderedList, orderedList);
     root.setChildren(
         noWiki.setChildren(), 

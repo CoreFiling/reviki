@@ -46,7 +46,8 @@ public class TestCreoleRenderer extends TestCase {
   }
   
   public void testHtmlEscaping() {
-    assertEquals("<p><em>&lt;script&gt;</em></p>", _render.render("//<script>//"));
+    assertEquals("Inner text.", "<p><em>&lt;script&gt;</em></p>", _render.render("//<script>//"));
+    assertEquals("Skipped text.", "<p>&lt;script&gt;<em>foo</em></p>", _render.render("<script>//foo//"));
   }
   
 }
