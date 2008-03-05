@@ -5,6 +5,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Recent changes</tiles:putAttribute>
   <tiles:putAttribute name="content">
+    <h1>Recent changes</h1>
     <ul>
       <c:forEach var="change" items="${recentChanges}">
         <li><a href="<c:url value="${change.page}"/>">
