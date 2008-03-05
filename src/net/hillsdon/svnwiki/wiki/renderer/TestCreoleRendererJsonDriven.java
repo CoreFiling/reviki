@@ -9,13 +9,13 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.JavaTypeMapper;
 
-public class TestCreoleRendererExternallyDefinedTests extends TestCase {
+public class TestCreoleRendererJsonDriven extends TestCase {
 
   private List<Map<String, String>> _tests;
   private CreoleRenderer _renderer;
 
   @SuppressWarnings("unchecked")
-  public TestCreoleRendererExternallyDefinedTests() throws Exception {
+  public TestCreoleRendererJsonDriven() throws Exception {
     JsonFactory jf = new JsonFactory();
     _tests = (List<Map<String, String>>) new JavaTypeMapper().read(jf.createJsonParser(getClass().getResource("unit-test-data.json")));
     _renderer = new CreoleRenderer(new RenderNode[0]);

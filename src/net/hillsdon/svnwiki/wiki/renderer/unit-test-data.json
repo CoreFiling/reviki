@@ -56,33 +56,63 @@
     "output": "<pre>\nPreformatted block\n</pre><pre>Block 2</pre>"
   },
   {
-    "name":   "h1",
+    "name":   "h1, trailing =",
     "input":  "= Header =",
     "output": "<h1>Header</h1>"
   },
   {
-    "name":   "h2",
+    "name":   "h2, trailing =",
     "input":  "== Header =",
     "output": "<h2>Header</h2>"
   },
   {
-    "name":   "h3",
+    "name":   "h3, trailing =",
     "input":  "=== Header =",
     "output": "<h3>Header</h3>"
   },
   {
-    "name":   "h4",
+    "name":   "h4, trailing =",
     "input":  "==== Header =",
     "output": "<h4>Header</h4>"
   },
   {
-    "name":   "h5",
+    "name":   "h5, trailing =",
     "input":  "===== Header",
     "output": "<h5>Header</h5>"
   },
   {
-    "name":   "h6",
+    "name":   "h6, trailing =",
     "input":  "====== Header =",
+    "output": "<h6>Header</h6>"
+  },
+  {
+    "name":   "h1, no trailing =",
+    "input":  "= Header",
+    "output": "<h1>Header</h1>"
+  },
+  {
+    "name":   "h2, no trailing =",
+    "input":  "== Header",
+    "output": "<h2>Header</h2>"
+  },
+  {
+    "name":   "h3, no trailing =",
+    "input":  "=== Header",
+    "output": "<h3>Header</h3>"
+  },
+  {
+    "name":   "h4, no trailing =",
+    "input":  "==== Header =",
+    "output": "<h4>Header</h4>"
+  },
+  {
+    "name":   "h5, no trailing =",
+    "input":  "===== Header",
+    "output": "<h5>Header</h5>"
+  },
+  {
+    "name":   "h6, no trailing =",
+    "input":  "====== Header",
     "output": "<h6>Header</h6>"
   },
   {
@@ -151,7 +181,7 @@
     "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
   },
   {
-    "bug":    "I don't see how this can be resolved without hardcoding a list of URI schemes",
+    "bug":    "Just not worth the effort.",
     "name":   "URL/emphasis ambiguity",
     "input":  "This is an //italic// text. This is a url: http://www.wikicreole.org. This is what can go wrong://this should be an italic text//.",
     "output": "<p>This is an <em>italic</em> text. This is a url: <a href='http://www.wikicreole.org'>http://www.wikicreole.org</a>. This is what can go wrong:<em>this should be an italic text</em>.</p>"
