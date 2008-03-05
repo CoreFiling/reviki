@@ -6,6 +6,7 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRequire
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
@@ -18,18 +19,19 @@ public class SetPage implements PageRequestHandler {
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private static final String PARAM_LOCK_TOKEN = "lockToken";
   private static final String PARAM_COMMIT_MESSAGE = "description";
+  private static final String PARAM_MINOR_EDIT = "minorEdit";
   
-  private static final String DEFAULT_COMMIT_MESSAGE = "[svnwiki commit]";
   private static final String CRLF = "\r\n";
   
   private final PageStore _store;
 
   private static String createLinkingCommitMessage(final HttpServletRequest request) {
+    boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
     String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
     if (commitMessage == null || commitMessage.trim().length() == 0) {
-      commitMessage = DEFAULT_COMMIT_MESSAGE;
+      commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    return commitMessage + "\n" + request.getRequestURL();
+    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + request.getRequestURL();
   }
 
   public SetPage(final PageStore store) {

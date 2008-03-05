@@ -12,6 +12,8 @@
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text"/>
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>
+      <br />
+      <label for="minorEdit">Minor edit?</label><input type="checkbox" id="minorEdit" name="minorEdit"/>
     </form>
     <h3>Syntax cheatsheet</h3>
     <table>

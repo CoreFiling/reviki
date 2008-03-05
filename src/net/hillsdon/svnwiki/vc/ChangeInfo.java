@@ -9,6 +9,8 @@ import java.util.Date;
  */
 public class ChangeInfo {
 
+  public static final String NO_COMMENT_MESSAGE_TAG = "[svnwiki commit]";
+  public static final String MINOR_EDIT_MESSAGE_TAG = "[minor edit]\n";
   private final String _path;
   private final String _user;
   private final Date _date;
@@ -46,10 +48,17 @@ public class ChangeInfo {
     return _revision;
   }
 
+  public boolean isMinorEdit() {
+    return stripFinalURL().contains(MINOR_EDIT_MESSAGE_TAG);
+  }
+  
   public String getDescription() {
     String description = stripFinalURL();
-    if (description.startsWith("[") && description.endsWith("]")) {
-      description = "None";
+    if (description.contains(MINOR_EDIT_MESSAGE_TAG)) {
+      return description.substring(MINOR_EDIT_MESSAGE_TAG.length());
+    }
+    if (description.contains(NO_COMMENT_MESSAGE_TAG)) {
+      return "None";
     }
     return description;
   }

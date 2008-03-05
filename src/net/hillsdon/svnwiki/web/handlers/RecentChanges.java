@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public class RecentChanges implements RequestHandler {
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
-  private static final int RECENT_CHANGES_HISTORY_SIZE = 30;
+  private static final int RECENT_CHANGES_HISTORY_SIZE = 100;
 
   private final PageStore _store;
 
@@ -32,13 +33,19 @@ public class RecentChanges implements RequestHandler {
       FeedWriter.writeAtom(new RequestBasedWikiUrls(request), response.getWriter(), getRecentChanges());
       return;
     }
-
+    
     request.setAttribute("recentChanges", getRecentChanges());
     request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
   }
 
   private List<ChangeInfo> getRecentChanges() throws PageStoreException {
-    return _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
+    List<ChangeInfo> majorChanges = new ArrayList<ChangeInfo>();
+    for (ChangeInfo change : _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE)) {
+      if (!change.isMinorEdit()) {
+        majorChanges.add(change);
+      }
+    }
+    return majorChanges;
   }
 
 }
