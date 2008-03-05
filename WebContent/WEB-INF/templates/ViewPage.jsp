@@ -32,7 +32,7 @@
         <sw:wikiLink page="${backlink}"/>
       </c:forEach>
       <c:if test="${backlinksLimited}">
-        <a href="<c:url value="/search?query=${pageInfo.path}&force"/>">...</a>
+        <a href="<sw:wikiUrl page="FindPage"/>query=${pageInfo.path}&force">...</a>
       </c:if>
       </p>
     </c:if>
@@ -53,7 +53,7 @@
       <c:otherwise>
         <form name="editForm" action="" method="post" style="display:inline;">
           <input name="editButton" type="submit" value="Edit"/>
-        </form><a href="${page.path}/attachments/">Attachments</a>
+        </form><<a href="${page.path}/attachments/">Attachments</a>
       </c:otherwise>
     </c:choose>
     <c:if test="${not pageInfo.new}">
