@@ -5,7 +5,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>svnwiki - <tiles:insertAttribute name="title"/></title>
+  <c:set var="titlePrefix">
+    <c:choose>
+      <c:when test="${not empty wikiName}">${wikiName}</c:when>
+      <c:otherwise>svnwiki</c:otherwise>
+    </c:choose>
+  </c:set>
+  <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
   <c:if test="${wikiIsValid != null and wikiIsValid}">
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml"" />
     <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
