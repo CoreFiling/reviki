@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -33,8 +34,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   private synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
     if (_store != null) {
-      for (String page : _store.getChangedAfter(_lastIndexedRevision)) {
-        PageInfo info = _store.get(page, -1);
+      for (PageReference ref : _store.getChangedAfter(_lastIndexedRevision)) {
+        PageInfo info = _store.get(ref, -1);
         _delegate.index(info.getPath(), info.getRevision(), info.getContent());
         _lastIndexedRevision = Math.max(_lastIndexedRevision, info.getRevision());
       }

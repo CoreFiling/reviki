@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
@@ -20,11 +21,11 @@ public class GetPage extends PageRequestHandler {
     _allPages = new AllPages(pageStore);
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
-    if ("RecentChanges".equals(page)) {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+    if ("RecentChanges".equals(page.getPath())) {
       _recentChanges.handle(request, response);
     }
-    else if ("AllPages".equals(page)) {
+    else if ("AllPages".equals(page.getPath())) {
       _allPages.handle(request, response);
     }
     else {

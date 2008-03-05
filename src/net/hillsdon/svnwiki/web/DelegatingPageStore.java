@@ -9,6 +9,7 @@ import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -29,11 +30,11 @@ public class DelegatingPageStore implements PageStore {
     return _delegate;
   }
 
-  public PageInfo get(final String path, final long revision) throws PageStoreException {
-    return _delegate.get(path, revision);
+  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+    return _delegate.get(ref, revision);
   }
 
-  public Collection<String> list() throws PageStoreException {
+  public Collection<PageReference> list() throws PageStoreException {
     return _delegate.list();
   }
 
@@ -41,35 +42,35 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.recentChanges(limit);
   }
 
-  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    return _delegate.set(path, lockToken, baseRevision, content, commitMessage);
+  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    return _delegate.set(ref, lockToken, baseRevision, content, commitMessage);
   }
 
-  public PageInfo tryToLock(final String path) throws PageStoreException {
-    return _delegate.tryToLock(path);
+  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
+    return _delegate.tryToLock(ref);
   }
 
-  public void unlock(final String page, final String lockToken) throws PageStoreException {
-    _delegate.unlock(page, lockToken);
+  public void unlock(final PageReference ref, final String lockToken) throws PageStoreException {
+    _delegate.unlock(ref, lockToken);
   }
 
-  public List<ChangeInfo> history(final String path) throws PageStoreException {
-    return _delegate.history(path);
+  public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
+    return _delegate.history(ref);
   }
 
-  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
-    _delegate.attach(page, storeName, baseRevision, in, commitMessage);
+  public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+    _delegate.attach(ref, storeName, baseRevision, in, commitMessage);
   }
 
-  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
-    return _delegate.attachments(page);
+  public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
+    return _delegate.attachments(ref);
   }
 
-  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
-    _delegate.attachment(page, attachment, revision, sink);
+  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
+    _delegate.attachment(ref, attachment, revision, sink);
   }
 
-  public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
+  public Collection<PageReference> getChangedAfter(final long revision) throws PageStoreException {
     return _delegate.getChangedAfter(revision);
   }
   

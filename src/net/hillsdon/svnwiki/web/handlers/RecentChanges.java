@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -20,7 +21,7 @@ public class RecentChanges extends PageRequestHandler {
     super(pageStore);
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws PageStoreException, IOException, ServletException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException {
     request.setAttribute("recentChanges", getStore().recentChanges(RECENT_CHANGES_HISTORY_SIZE));
     request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
   }

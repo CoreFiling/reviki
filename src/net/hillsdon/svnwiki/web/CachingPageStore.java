@@ -2,6 +2,7 @@ package net.hillsdon.svnwiki.web;
 
 import java.util.Collection;
 
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -15,14 +16,14 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
  */
 public class CachingPageStore extends DelegatingPageStore {
 
-  private Collection<String> _cached = null;
+  private Collection<PageReference> _cached = null;
   
   public CachingPageStore(PageStore delegate) {
     super(delegate);
   }
 
   @Override
-  public Collection<String> list() throws PageStoreException {
+  public Collection<PageReference> list() throws PageStoreException {
     if (_cached == null) {
       _cached = super.list();
     }

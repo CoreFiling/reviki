@@ -6,6 +6,7 @@ import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getRequi
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 
 public class SetPage extends PageRequestHandler {
@@ -33,7 +34,7 @@ public class SetPage extends PageRequestHandler {
   }
 
   @Override
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
     if ("Save".equals(request.getParameter(PARAM_ACTION))) {
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);

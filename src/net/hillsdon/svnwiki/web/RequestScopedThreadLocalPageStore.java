@@ -10,6 +10,7 @@ import net.hillsdon.svnwiki.vc.AttachmentHistory;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -43,11 +44,11 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return _threadLocal.get();
   }
   
-  public PageInfo get(final String path, final long revision) throws PageStoreException {
-    return get().get(path, revision);
+  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+    return get().get(ref, revision);
   }
 
-  public Collection<String> list() throws PageStoreException {
+  public Collection<PageReference> list() throws PageStoreException {
     return get().list();
   }
 
@@ -55,35 +56,35 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().recentChanges(limit);
   }
 
-  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
-    return get().set(path, lockToken, baseRevision, content, commitMessage);
+  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
+    return get().set(ref, lockToken, baseRevision, content, commitMessage);
   }
 
-  public PageInfo tryToLock(final String path) throws PageStoreException {
-    return get().tryToLock(path);
+  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
+    return get().tryToLock(ref);
   }
 
-  public void unlock(final String page, final String lockToken) throws PageStoreException {
-    get().unlock(page, lockToken);
+  public void unlock(final PageReference ref, final String lockToken) throws PageStoreException {
+    get().unlock(ref, lockToken);
   }
 
-  public List<ChangeInfo> history(final String path) throws PageStoreException {
-    return get().history(path);
+  public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
+    return get().history(ref);
   }
 
-  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
-    get().attach(page, storeName, baseRevision, in, commitMessage);
+  public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+    get().attach(ref, storeName, baseRevision, in, commitMessage);
   }
 
-  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
-    return get().attachments(page);
+  public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
+    return get().attachments(ref);
   }
 
-  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
-    get().attachment(page, attachment, revision, sink);
+  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
+    get().attachment(ref, attachment, revision, sink);
   }
 
-  public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
+  public Collection<PageReference> getChangedAfter(final long revision) throws PageStoreException {
     return get().getChangedAfter(revision);
   }
 

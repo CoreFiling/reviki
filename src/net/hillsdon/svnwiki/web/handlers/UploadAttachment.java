@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.InvalidInputException;
@@ -30,7 +31,7 @@ public class UploadAttachment extends PageRequestHandler {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }
@@ -79,7 +80,7 @@ public class UploadAttachment extends PageRequestHandler {
     response.sendRedirect(request.getRequestURL().toString());
   }
 
-  private void store(final String page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
+  private void store(final PageReference page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
       storeName = fileName;

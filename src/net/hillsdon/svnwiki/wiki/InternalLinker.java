@@ -2,6 +2,7 @@ package net.hillsdon.svnwiki.wiki;
 
 import static java.lang.String.format;
 import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -15,7 +16,7 @@ public class InternalLinker {
 
   private boolean exists(final String name) {
     try {
-      return _store.list().contains(name);
+      return _store.list().contains(new PageReference(name));
     }
     catch (PageStoreException e) {
       throw new RuntimeException(e);

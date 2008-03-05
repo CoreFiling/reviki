@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -28,7 +29,7 @@ public class PageStoreConfiguration implements Configuration {
    *         where %s is a placeholder for the page name. 
    */
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {
-    PageInfo page = _store.get("ConfigInterWikiLinks", -1);
+    PageInfo page = _store.get(new PageReference("ConfigInterWikiLinks"), -1);
     InterWikiLinker linker = new InterWikiLinker();
     if (!page.isNew()) {
       parseLinkEntries(linker, page.getContent());

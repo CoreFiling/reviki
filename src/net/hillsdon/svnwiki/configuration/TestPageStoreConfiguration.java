@@ -3,6 +3,7 @@ package net.hillsdon.svnwiki.configuration;
 import java.util.Collections;
 
 import junit.framework.TestCase;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.SimplePageStore;
 
@@ -26,13 +27,13 @@ public class TestPageStoreConfiguration extends TestCase {
   }
   
   public void testAddingPagePopulatesInterWikiLinker() throws Exception  {
-    _store.set("ConfigInterWikiLinks", "", -1, "c2 http://c2.com/cgi/wiki?%s\r\n", "");
+    _store.set(new PageReference("ConfigInterWikiLinks"), "", -1, "c2 http://c2.com/cgi/wiki?%s\r\n", "");
     assertEquals(Collections.singletonMap("c2", "http://c2.com/cgi/wiki?%s"), _configuration.getInterWikiLinker().getWikiToFormatStringMap());
   }
   
   // Currently most things are considered valid, we split on first whitespace...
   public void testInvalidEntryIgnored() throws Exception {
-    _store.set("ConfigInterWikiLinks", "", -1, "nospace\r\n", "");
+    _store.set(new PageReference("ConfigInterWikiLinks"), "", -1, "nospace\r\n", "");
     assertNoInterWikiLinks();
   }
   

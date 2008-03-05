@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.RequestHandler;
 
@@ -23,7 +24,7 @@ public class Search implements RequestHandler {
 
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String query = request.getParameter(PARAM_QUERY);
-    if (request.getParameter("force") == null && _store.list().contains(query)) {
+    if (request.getParameter("force") == null && _store.list().contains(new PageReference(query))) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + query));
     }
     else {

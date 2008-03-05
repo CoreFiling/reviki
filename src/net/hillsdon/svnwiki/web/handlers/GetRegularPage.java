@@ -17,6 +17,7 @@ import net.hillsdon.svnwiki.search.QuerySyntaxException;
 import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.search.SearchMatch;
 import net.hillsdon.svnwiki.vc.PageInfo;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.InvalidInputException;
@@ -45,7 +46,7 @@ public class GetRegularPage extends PageRequestHandler {
     _engine = engine;
   }
 
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
     long revison = RequestParameterReaders.getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
@@ -66,8 +67,8 @@ public class GetRegularPage extends PageRequestHandler {
     }
   }
 
-  private void addBacklinksInformation(final HttpServletRequest request, final String page) throws IOException, QuerySyntaxException, PageStoreException {
-    Set<SearchMatch> backlinks = _engine.search(page);
+  private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
+    Set<SearchMatch> backlinks = _engine.search(page.getPath());
     backlinks.remove(page);
     if (backlinks.size() > BACKLINKS_LIMIT) {
       request.setAttribute("backlinksLimited", true);

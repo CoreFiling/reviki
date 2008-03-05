@@ -31,13 +31,13 @@ public abstract class PageRequestHandler  implements RequestHandler {
     
     PageReference page = new PageReference(URLDecoder.decode(matcher.group(1), "UTF-8"));
     request.setAttribute("page", page);
-    handlePage(request, response, page.getPath());
+    handlePage(request, response, page);
   }
 
   public PageStore getStore() {
     return _store;
   }
   
-  public abstract void handlePage(HttpServletRequest request, HttpServletResponse response, String page) throws Exception;
+  public abstract void handlePage(HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception;
 
 }

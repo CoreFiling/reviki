@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.InvalidInputException;
@@ -24,7 +25,7 @@ public class GetAttachment extends PageRequestHandler {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
     final String attachmentName = URLDecoder.decode(request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/')), "UTF-8");
     getStore().attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
       public void setContentType(final String contentType) {
