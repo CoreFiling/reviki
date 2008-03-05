@@ -158,12 +158,13 @@ public class DBColumn extends DBNamedObject implements HasSqlRepresentation {
       case Types.REF: return "REF";
       case Types.DATALINK: return "DATALINK";
       case Types.BOOLEAN: return "BOOLEAN";
-      case Types.ROWID: return "ROWID";
-      case Types.NCHAR: return "NCHAR";
-      case Types.NVARCHAR: return "NVARCHAR";
-      case Types.LONGNVARCHAR: return "LONGNVARCHAR";
-      case Types.NCLOB: return "NCLOB";
-      case Types.SQLXML: return "SQLXML";
+      // TODO: Enable when we depend on 1.6.
+      //case Types.ROWID: return "ROWID";
+      //case Types.NCHAR: return "NCHAR";
+      //case Types.NVARCHAR: return "NVARCHAR";
+      //case Types.LONGNVARCHAR: return "LONGNVARCHAR";
+      //case Types.NCLOB: return "NCLOB";
+      //case Types.SQLXML: return "SQLXML";
       case Types.OTHER: return "OTHER";
       default:
         throw new IllegalArgumentException("Unknown type: " + _dataType);
