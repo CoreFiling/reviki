@@ -42,8 +42,12 @@ public class RequestBasedWikiUrls implements WikiUrls {
   }
   
   public String root() {
-    String givenWikiName = Escape.url(_configuration.getGivenWikiName() == null ? "" : _configuration.getGivenWikiName());
-    return _base + "/pages/" + givenWikiName + "/";
+    String givenWikiName = _configuration.getGivenWikiName();
+    String result = _base + "/pages/";
+    if (givenWikiName != null) {
+      result += Escape.url(givenWikiName) + "/";
+    }
+    return result;
   }
   
   public String page(final String name) {
