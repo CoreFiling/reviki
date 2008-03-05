@@ -64,9 +64,7 @@ public class RuleTreeNode {
       result += render(text.substring(earliestMatch.end()));
       return result;
     }
-    else {
-      return htmlEscape(text);
-    }
+    return htmlEscape(text);
   }
 
   private String handle(final RuleTreeNode node, final Matcher matcher) {
