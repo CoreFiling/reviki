@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A verson control based store of wiki pages.
+ * A verson control based store of wiki pages with attachments.
  * 
  * All methods throw {@link PageStoreException} if they fail,
  * sometimes more informative subclasses individually documented.

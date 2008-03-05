@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -39,13 +38,13 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, long endRevision) throws SVNException {
+  public List<ChangeInfo> log(final PathTranslator translator, final String path, final long limit, final boolean pathOnly, final long startRevision, long endRevision) throws SVNException {
     final String rootPath = getRoot();
     final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
     // Start and end reversed to get newest changes first.
     _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
       public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry));
+        entries.addAll(logEntryToChangeInfos(translator, rootPath, path, logEntry));
       }
     });
     return entries;
@@ -64,20 +63,15 @@ public class SVNHelper {
     return results;
   }
 
-  private static final Pattern ATTACHMENT_PATH = Pattern.compile(".*/(.*?)-attachments/.*");
-  
+
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final SVNLogEntry entry) throws SVNException {
+  private List<ChangeInfo> logEntryToChangeInfos(final PathTranslator translator, final String rootPath, final String path, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     String user = entry.getAuthor();
     Date date = entry.getDate();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (changedPath.length() > rootPath.length()) {
-        String name = changedPath.substring(rootPath.length() + 1);
-        Matcher matcher = ATTACHMENT_PATH.matcher(changedPath);
-        if (matcher.matches()) {
-          name = matcher.group(1);
-        }
+        String name = translator.translate(rootPath, changedPath);
         results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
       }
     }

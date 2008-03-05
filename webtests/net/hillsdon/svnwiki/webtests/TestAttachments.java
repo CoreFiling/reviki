@@ -36,6 +36,7 @@ public class TestAttachments extends WebTestSupport {
     form.getInputByName("file").setValueAttribute(file1);
     form.getInputByName("attachmentName").setValueAttribute("file");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
+
     assertEquals("File 1.", getAttachmentAtEndOfLink(attachments.getAnchorByHref("file.txt")));
     
     page = editWikiPage(name, "{attached:file.txt}", "Linked to attachment", false);
