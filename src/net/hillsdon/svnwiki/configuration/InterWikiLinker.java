@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.configuration;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,6 +20,10 @@ public class InterWikiLinker {
 
   public void addWiki(final String wikiName, final String formatString) {
     _links.put(wikiName, formatString);
+  }
+  
+  public Map<String, String> getWikiToFormatStringMap() {
+    return Collections.unmodifiableMap(_links);
   }
   
 }
