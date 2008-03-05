@@ -1,10 +1,11 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
+
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.configuration.Configuration;
 import net.hillsdon.svnwiki.text.Escape;
-import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
@@ -36,7 +37,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
   protected boolean confirmMatchFind(final Matcher matcher) {
     String wikiName = matcher.group(1);
     String pageName = matcher.group(2);
-    return wikiName != null || WikiWordUtils.isWikiWord(pageName);
+    return wikiName != null || isWikiWord(pageName);
   }
 
   public String handle(PageReference page, final Matcher result) {
@@ -49,9 +50,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
           wikiName = wikiName.substring(0, wikiName.length() - 1);
         }
         if (wikiName == null) {
-          if (WikiWordUtils.isWikiWord(pageName)) {
-            return _internalLinker.link(pageName);
-          }
+          return _internalLinker.link(pageName);
         }
         else {
           return interWikiLink(wikiName, pageName, matched);

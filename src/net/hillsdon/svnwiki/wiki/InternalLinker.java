@@ -24,9 +24,9 @@ public class InternalLinker {
   
   public String link(final String pageName) {
     if (exists(pageName)) {
-      return format("<a class='new-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
+      return format("<a class='existing-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
     }
-    return format("<a class='existing-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
+    return format("<a class='new-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
   }
   
 }
