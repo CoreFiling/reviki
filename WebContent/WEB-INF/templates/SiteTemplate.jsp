@@ -15,6 +15,12 @@
       border-top: 1px solid black;
       font-size: 150%;
     }
+    h2 {
+      font-size: 150%;
+    }
+    h3 {
+      font-size: 120%;
+    }
     body {
       font-size: 11pt;
       font-family: Verdana, Arial, sans-serif
