@@ -67,6 +67,13 @@ import org.apache.lucene.store.LockObtainFailedException;
  */
 public class LuceneSearcher implements SearchEngine {
 
+  public static class NoQueryPerformedException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+    public NoQueryPerformedException(QuerySyntaxException cause) {
+      super("No query was performed yet got query error", cause);
+    }
+  }
+
   private static final String FIELD_PATH = "path";
   private static final String FIELD_CONTENT = "content";
   /**
@@ -173,24 +180,17 @@ public class LuceneSearcher implements SearchEngine {
     if (_dir == null) {
       return Collections.emptySet();
     }
-    createIndexIfNecessary();
-    IndexReader reader = IndexReader.open(_dir);
     try {
-      Searcher searcher = new IndexSearcher(reader);
-      try {
-        Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, escape(page), false), SearchMatch.TO_PAGE_NAME));
-        results.remove(page);
-        return results;
-      }
-      catch (QuerySyntaxException e) {
-        throw new RuntimeException("Should not happen due to escaping.");
-      }
-      finally {
-        searcher.close();
-      }
+      return doReadOperation(new ReadOperation<Set<String>>() {
+        public Set<String> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
+          Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, escape(page), false), SearchMatch.TO_PAGE_NAME));
+          results.remove(page);
+          return results;
+        }
+      });
     }
-    finally {
-      reader.close();
+    catch (QuerySyntaxException ex) {
+      throw new NoQueryPerformedException(ex);
     }
   }
 
@@ -198,21 +198,47 @@ public class LuceneSearcher implements SearchEngine {
     if (_dir == null) {
       return Collections.emptySet();
     }
+    try {
+      return doReadOperation(new ReadOperation<Set<String>>() {
+        public Set<String> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
+          Hits hits = searcher.search(new TermQuery(new Term(FIELD_PATH, page)));
+          Iterator<?> iterator = hits.iterator();
+          if (iterator.hasNext()) {
+            Hit hit = (Hit) iterator.next();
+            String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
+            Set<String> results = set(outgoingLinks.split("\\s"));
+            results.remove(page);
+            return results;
+          }
+          return Collections.emptySet();
+        }
+      });
+    }
+    catch (QuerySyntaxException ex) {
+      throw new NoQueryPerformedException(ex);
+    }
+  }
+
+  /**
+   * Reusable template that cleans up properly.
+   * 
+   * @param <T> Result type.
+   * @param operation Operation to perform.
+   * @return Result from operation.
+   * @throws IOException On index read error,
+   * @throws QuerySyntaxException If we can't parse a query.
+   */
+  private <T> T doReadOperation(final ReadOperation<T> operation) throws IOException, QuerySyntaxException {
     createIndexIfNecessary();
     IndexReader reader = IndexReader.open(_dir);
     try {
       Searcher searcher = new IndexSearcher(reader);
       try {
-        Hits hits = searcher.search(new TermQuery(new Term(FIELD_PATH, page)));
-        Iterator<?> iterator = hits.iterator();
-        if (iterator.hasNext()) {
-          Hit hit = (Hit) iterator.next();
-          String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
-          Set<String> results = set(outgoingLinks.split("\\s"));
-          results.remove(page);
-          return results;
-        }
-        return Collections.emptySet();
+        Analyzer analyzer = createAnalyzer();
+        return operation.execute(reader, searcher, analyzer);
+      }
+      catch (ParseException ex) {
+        throw new QuerySyntaxException(ex.getMessage(), ex);
       }
       finally {
         searcher.close();
@@ -222,18 +248,13 @@ public class LuceneSearcher implements SearchEngine {
       reader.close();
     }
   }
-
   
   public Set<SearchMatch> search(final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
     }
-    createIndexIfNecessary();
-    IndexReader reader = IndexReader.open(_dir);
-    try {
-      Searcher searcher = new IndexSearcher(reader);
-      try {
-        Analyzer analyzer = createAnalyzer();
+    return doReadOperation(new ReadOperation<Set<SearchMatch>>() {
+      public Set<SearchMatch> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
         LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : new String[] {FIELD_PATH, FIELD_TITLE, FIELD_CONTENT}) {
@@ -241,26 +262,14 @@ public class LuceneSearcher implements SearchEngine {
         }
         return results;
       }
-      finally {
-        searcher.close();
-      }
-    }
-    finally {
-      reader.close();
-    }
+    });
   }
 
   @SuppressWarnings("unchecked")
-  private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
+  private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString, final boolean provideExtracts) throws IOException, ParseException {
     QueryParser parser = new QueryParser(field, analyzer);
     parser.setDefaultOperator(Operator.AND);
-    Query query;
-    try {
-      query = parser.parse(queryString);
-    }
-    catch (ParseException e) {
-      throw new QuerySyntaxException(e.getMessage(), e);
-    }
+    Query query = parser.parse(queryString);
     Highlighter highlighter = null;
     if (provideExtracts) {
       query.rewrite(reader);
@@ -302,23 +311,20 @@ public class LuceneSearcher implements SearchEngine {
     if (_dir == null) {
       return null;
     }
-    IndexReader reader = IndexReader.open(_dir);
     try {
-      Searcher searcher = new IndexSearcher(reader);
-      try {
-        Hits hits = searcher.search(new TermQuery(new Term(FIELD_PROPERTY_KEY, propertyName)));
-        Iterator<?> iterator = hits.iterator();
-        if (iterator.hasNext()) {
-          return ((Hit) iterator.next()).get(FIELD_PROPERTY_VALUE);
+      return doReadOperation(new ReadOperation<String>() {
+        public String execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
+          Hits hits = searcher.search(new TermQuery(new Term(FIELD_PROPERTY_KEY, propertyName)));
+          Iterator<?> iterator = hits.iterator();
+          if (iterator.hasNext()) {
+            return ((Hit) iterator.next()).get(FIELD_PROPERTY_VALUE);
+          }
+          return null;
         }
-        return null;
-      }
-      finally {
-        searcher.close();
-      }
+      });
     }
-    finally {
-      reader.close();
+    catch (QuerySyntaxException ex) {
+      throw new NoQueryPerformedException(ex);
     }
   }
 
