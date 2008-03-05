@@ -12,7 +12,6 @@ public class SimplePageStore implements PageStore {
 
   private Map<String, PageInfo> _pages = new LinkedHashMap<String, PageInfo>();
   
-  
   public PageInfo get(final String path) throws PageStoreException {
     PageInfo page = _pages.get(path);
     if (page == null) {

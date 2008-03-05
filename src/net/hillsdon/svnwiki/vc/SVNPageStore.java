@@ -63,6 +63,9 @@ public class SVNPageStore implements PageStore {
       }
       return results.toArray(new String[results.size()]);
     }
+    catch (SVNAuthenticationException ex) {
+      throw new PageStoreAuthenticationException(ex);
+    }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
     }
@@ -79,6 +82,9 @@ public class SVNPageStore implements PageStore {
         }
       }
       return results.toArray(new String[results.size()]);
+    }
+    catch (SVNAuthenticationException ex) {
+      throw new PageStoreAuthenticationException(ex);
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
