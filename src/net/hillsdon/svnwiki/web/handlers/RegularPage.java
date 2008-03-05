@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
-import net.hillsdon.svnwiki.web.dispatching.JspView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.JspView;
+import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 

@@ -23,10 +23,10 @@ import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.RedirectView;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
-import net.hillsdon.svnwiki.web.dispatching.RedirectView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 

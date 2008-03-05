@@ -26,8 +26,11 @@ import net.hillsdon.svnwiki.configuration.DeploymentConfiguration;
 import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.JspView;
+import net.hillsdon.svnwiki.web.common.RedirectView;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.common.View;
 
 public class WikiChoice implements RequestHandler {
 

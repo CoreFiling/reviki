@@ -15,8 +15,8 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.MockHttpServletRequest;
+import net.hillsdon.svnwiki.web.common.RedirectView;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
-import net.hillsdon.svnwiki.web.dispatching.RedirectView;
 
 /**
  * Test for {@link SetPage}.

@@ -28,9 +28,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.JspView;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
-import net.hillsdon.svnwiki.web.dispatching.JspView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.View;
 
 public class AllPages implements RequestHandler {
 

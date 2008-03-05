@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web.dispatching;
+package net.hillsdon.svnwiki.web.common;
 
 import java.io.IOException;
 

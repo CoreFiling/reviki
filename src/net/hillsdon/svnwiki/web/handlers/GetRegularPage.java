@@ -37,8 +37,8 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
-import net.hillsdon.svnwiki.web.dispatching.JspView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.JspView;
+import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 

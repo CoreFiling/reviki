@@ -27,9 +27,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.RedirectView;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
-import net.hillsdon.svnwiki.web.dispatching.RedirectView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.View;
 
 public class SetPage implements PageRequestHandler {
 

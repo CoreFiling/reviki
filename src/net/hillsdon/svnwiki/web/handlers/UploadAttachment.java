@@ -27,9 +27,9 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.RedirectView;
 import net.hillsdon.svnwiki.web.common.RequestParameterReaders;
-import net.hillsdon.svnwiki.web.dispatching.RedirectView;
-import net.hillsdon.svnwiki.web.dispatching.View;
+import net.hillsdon.svnwiki.web.common.View;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;

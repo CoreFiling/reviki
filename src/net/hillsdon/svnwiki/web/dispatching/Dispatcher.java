@@ -29,6 +29,7 @@ import net.hillsdon.svnwiki.configuration.DeploymentConfiguration;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestAttributes;
+import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.svnwiki.web.handlers.ListWikis;
 

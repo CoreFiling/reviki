@@ -18,7 +18,6 @@ package net.hillsdon.svnwiki.web.common;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.svnwiki.web.dispatching.View;
 
 /**
  * Handles a HTTP request.

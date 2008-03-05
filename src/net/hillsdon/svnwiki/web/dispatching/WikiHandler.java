@@ -36,6 +36,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.web.handlers.PageHandler;
 import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory;
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
