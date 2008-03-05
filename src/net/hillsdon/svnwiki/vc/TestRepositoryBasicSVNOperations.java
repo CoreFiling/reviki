@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 
-public class TestSvnHelper extends TestCase {
+public class TestRepositoryBasicSVNOperations extends TestCase {
 
   public void testAttachmentDir() {
     ChangeInfo changeInfo = changeInfo("/wiki2/AttachmentsTest11969665985340-attachments");
