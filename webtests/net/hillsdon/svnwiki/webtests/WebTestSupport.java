@@ -17,6 +17,8 @@ package net.hillsdon.svnwiki.webtests;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -85,6 +87,16 @@ public abstract class WebTestSupport extends TestCase {
     page = (HtmlPage) editForm.getInputByValue("Save").click();
     assertEquals(pageUrl, page.getWebResponse().getUrl());
     return page;
+  }
+
+  
+  private static final Pattern RE_REVISION = Pattern.compile("r[0-9]+");
+  
+  protected long getRevisionNumberFromTitle(final HtmlPage page) {
+    Matcher matcher = RE_REVISION.matcher(page.getTitleText());
+    assertTrue(matcher.find());
+    long revision = Long.parseLong(matcher.group().substring(1));
+    return revision;
   }
 
 }

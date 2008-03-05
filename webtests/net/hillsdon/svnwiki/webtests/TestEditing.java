@@ -16,15 +16,11 @@
 package net.hillsdon.svnwiki.webtests;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class TestEditing extends WebTestSupport {
-  
-  private static final Pattern RE_REVISION = Pattern.compile("r[0-9]+");
   
   public void testEditPageIncrementsRevision() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
@@ -32,20 +28,6 @@ public class TestEditing extends WebTestSupport {
     long initialRevision = getRevisionNumberFromTitle(initial);
     HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", "", false);
     assertEquals(initialRevision + 1, getRevisionNumberFromTitle(edited));
-  }
-  
-  private long getRevisionNumberFromTitle(final HtmlPage page) {
-    Matcher matcher = RE_REVISION.matcher(page.getTitleText());
-    assertTrue(matcher.find());
-    long revision = Long.parseLong(matcher.group().substring(1));
-    return revision;
-  }
-
-  public void testClearTextDeletesPage() throws Exception {
-    String name = uniqueWikiPageName("EditPageTest");
-    editWikiPage(name, "Initial content", "", true);
-    HtmlPage blanked = editWikiPage(name, "", "", false);
-    assertTrue(blanked.asText().contains("This page is a new page"));
   }
 
   public void testCancelEditNewPage() throws Exception {
@@ -57,17 +39,6 @@ public class TestEditing extends WebTestSupport {
     String name = uniqueWikiPageName("EditPageTest");
     editWikiPage(name, "Whatever", "", true);
     editThenCancel(name);
-  }
-  
-  public void testCanViewDeletedPage() throws Exception {
-    final String content = "Distinctive content";
-    final String name = uniqueWikiPageName("EditPageTest");
-    
-    HtmlPage original = editWikiPage(name, content, "", true);
-    long originalRevision = getRevisionNumberFromTitle(original);
-    editWikiPage(name, "", "Deleted", false);
-    HtmlPage originalByRevision = getWebPage("pages/test/" + name + "?revision=" + originalRevision);
-    assertTrue(originalByRevision.asText().contains(content));
   }
 
   private void editThenCancel(final String name) throws IOException {
