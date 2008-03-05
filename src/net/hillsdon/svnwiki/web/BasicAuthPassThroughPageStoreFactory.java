@@ -10,6 +10,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.vc.SVNPageStore;
 
+import org.apache.commons.codec.binary.Base64;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -17,15 +18,9 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
-import sun.misc.BASE64Decoder;
-
 /**
  * Creates a page store that will authenticate with credentials provided in
  * the given request's 'Authorization' header (for basic auth only).
- * 
- * FIXME:
- *   We need to get ourselves a base64 codec as the JDK <strong>still</strong>
- *   doesn't provide one outside of the non-portable com.sun packages.
  *   
  * @author mth
  */
@@ -83,7 +78,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
           String token = authorization.substring(separator + 1);
           // RFC2617 doesn't seem to mention encoding...
           try {
-            String usernamePassword = new String(new BASE64Decoder().decodeBuffer(token));
+            String usernamePassword = new String(Base64.decodeBase64(token.getBytes("ASCII")));
             int firstColon = usernamePassword.indexOf(':');
             if (firstColon != -1) {
               username = usernamePassword.substring(0, firstColon);
