@@ -13,3 +13,16 @@ The Creole renderer is based on a JavaScript implementation
 by Chris Purcell, which is open source software.
 The original software and related information is available at
 http://www.meatballsociety.org/Creole/0.4/
+
+The SVN integration uses svnkit, which is open source software.
+The original software and related information is available at
+http://svnkit.com/
+
+The following open source third-party libraries are used for 
+testing (i.e. not part of the WAR file):
+
+HTMLUnit htmlunit.sourceforge.net
+EasyMock http://www.easymock.org
+Jackson JSON Processor http://www.cowtowncoder.com/hatchery/jackson/index.html
+
+
