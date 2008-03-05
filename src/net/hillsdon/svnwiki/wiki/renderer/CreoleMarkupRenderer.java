@@ -23,10 +23,12 @@ public class CreoleMarkupRenderer implements MarkupRenderer {
     
     _creole = new CreoleRenderer(
         new RenderNode[] {
-            new CustomWikiLinkNode(internalLinker, configuration),
             new UnescapedHtmlNode(),
             new JavaSyntaxHighlightedNode(),
-            new MacroNode(macros)
+        },
+        new RenderNode[] {
+            new CustomWikiLinkNode(internalLinker, configuration),
+            new MacroNode(macros),
         });
   }
 

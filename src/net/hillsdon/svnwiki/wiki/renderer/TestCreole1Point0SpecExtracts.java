@@ -14,7 +14,7 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) {
-    return new CreoleRenderer(new RenderNode[0]).render(new PageReference(""), input);
+    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageReference(""), input);
   }
   
 }

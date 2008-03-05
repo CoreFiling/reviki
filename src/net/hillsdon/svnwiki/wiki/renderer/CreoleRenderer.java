@@ -39,6 +39,8 @@ import net.hillsdon.svnwiki.vc.PageReference;
  */
 public class CreoleRenderer {
 
+  public static final RenderNode[] NONE = new RenderNode[0];
+
   public static class RawUrlNode extends AbstractRegexNode {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
@@ -59,9 +61,10 @@ public class CreoleRenderer {
     }
   }
 
+
   private final RenderNode _root;
   
-  public CreoleRenderer(final RenderNode[] customNonStructural) {
+  public CreoleRenderer(final RenderNode[] customStructural, final RenderNode[] customNonStructural) {
     RenderNode root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
@@ -104,6 +107,7 @@ public class CreoleRenderer {
         bold.addChildren(nonStructural),
         strikethrough.addChildren(nonStructural)
      );
+    root.addChildren(customStructural);
     _root = root;
   }
   
