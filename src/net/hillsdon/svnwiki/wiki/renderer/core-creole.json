@@ -219,6 +219,7 @@
     "output": "<p>// <a href='http://a'>http://a</a></p>"
   },
   {
+    "bug":     "not so good...",
     "comment": "a variation on #5",
     "name":   "Difficult emphasis #5.1",
     "input":  "//http:// ",
