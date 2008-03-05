@@ -250,4 +250,8 @@ public class SVNPageStore implements PageStore {
     return _operations.copy(from.getPath(), fromRevision, to.getPath(), commitMessage);
   }
 
+  public long rename(PageReference from, PageReference to, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException {
+    return _operations.rename(from.getPath(), to.getPath(), baseRevision, commitMessage);
+  }
+
 }

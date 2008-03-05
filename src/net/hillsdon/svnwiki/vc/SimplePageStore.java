@@ -91,5 +91,9 @@ public class SimplePageStore implements PageStore {
   public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
+
+  public long rename(PageReference from, PageReference to, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException {
+    throw new UnsupportedOperationException();
+  }
   
 }

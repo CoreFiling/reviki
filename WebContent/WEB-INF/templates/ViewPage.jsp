@@ -84,5 +84,12 @@
         <input type="text" name="fromPage" />
       </form>
     </c:if>
+    <c:if test="${not pageInfo.new}">
+      <hr />
+      <form method="post" action="?">
+        <input name="rename" type="submit" value="Rename to"/>
+        <input type="text" name="toPage" />
+      </form>
+    </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

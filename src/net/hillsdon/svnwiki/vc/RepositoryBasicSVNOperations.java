@@ -309,6 +309,22 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       }
     });
   }
+
+  public long rename(final String fromPath, final String toPath, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<Long>() {
+      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        try {
+          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null, false, null);
+          moveFile(commitEditor, fromPath, baseRevision, toPath);
+          return commitEditor.closeEdit().getNewRevision();
+        }
+        catch (SVNException ex) {
+          checkForInterveningCommit(ex);
+          throw ex;
+        }
+      }
+    });
+  }
   
   public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<Long>() {
@@ -353,6 +369,16 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.closeDir();
     commitEditor.closeDir();
   }
+
+  private void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
+    String dir = SVNPathUtil.removeTail(toPath);
+    commitEditor.openRoot(-1);
+    commitEditor.openDir(dir, -1);
+    commitEditor.deleteEntry(fromPath, baseRevision);
+    commitEditor.addFile(toPath, fromPath, baseRevision);
+    commitEditor.closeDir();
+    commitEditor.closeDir();
+  }
   
   private void createFile(final ISVNEditor commitEditor, final String filePath, final String mimeType, final InputStream data) throws SVNException {
     String dir = SVNPathUtil.removeTail(filePath);
@@ -386,5 +412,5 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
   }
-  
+
 }

@@ -25,24 +25,23 @@ import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 
 public class SetPage implements PageRequestHandler {
 
   public static final String SUBMIT_SAVE = "save";
   public static final String SUBMIT_COPY = "copy";
+  public static final String SUBMIT_RENAME = "rename";
   public static final String SUBMIT_UNLOCK = "unlock";
 
-  private static final String PARAM_FROM_PAGE = "fromPage";
-
-  static final String PARAM_CONTENT = "content";
-  private static final String PARAM_BASE_REVISION = "baseRevision";
-  private static final String PARAM_LOCK_TOKEN = "lockToken";
-  static final String PARAM_COMMIT_MESSAGE = "description";
-  private static final String PARAM_MINOR_EDIT = "minorEdit";
-  
-  private static final String CRLF = "\r\n";
-  
-  private final PageStore _store;
+  public static final String PARAM_TO_PAGE = "toPage";
+  public static final String PARAM_FROM_PAGE = "fromPage";
+  public static final String PARAM_CONTENT = "content";
+  public static final String PARAM_BASE_REVISION = "baseRevision";
+  public static final String PARAM_LOCK_TOKEN = "lockToken";
+  public static final String PARAM_COMMIT_MESSAGE = "description";
+  public static final String PARAM_MINOR_EDIT = "minorEdit";
 
   private static String createLinkingCommitMessage(final HttpServletRequest request) {
     boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
@@ -52,6 +51,10 @@ public class SetPage implements PageRequestHandler {
     }
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + request.getRequestURL();
   }
+  
+  private static final String CRLF = "\r\n";
+  
+  private final PageStore _store;
 
   public SetPage(final PageStore store) {
     _store = store;
@@ -60,18 +63,21 @@ public class SetPage implements PageRequestHandler {
   public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (request.getParameter(SUBMIT_SAVE) != null) {
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
-      long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(CRLF)) {
         content = content + CRLF;
       }
-      _store.set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
+      _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(request));
     }
     else if (request.getParameter(SUBMIT_COPY) != null) {
       final String fromPage = getRequiredString(request, PARAM_FROM_PAGE);
-      // Perhaps we'll want to vary this too?
-      final long fromRevision = -1;
-      _store.copy(new PageReference(fromPage), fromRevision, page, createLinkingCommitMessage(request));
+      _store.copy(new PageReference(fromPage), -1, page, createLinkingCommitMessage(request));
+    }
+    else if (request.getParameter(SUBMIT_RENAME) != null) {
+      final String toPage = getRequiredString(request, PARAM_TO_PAGE);
+      _store.rename(page, new PageReference(toPage), -1, createLinkingCommitMessage(request));
+      response.sendRedirect(new RequestBasedWikiUrls(request).page(toPage));
+      return;
     }
     else if (request.getParameter(SUBMIT_UNLOCK) != null) {
       String lockToken = request.getParameter(PARAM_LOCK_TOKEN);
@@ -81,6 +87,10 @@ public class SetPage implements PageRequestHandler {
       }
     }
     response.sendRedirect(request.getRequestURI());
+  }
+
+  private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
+    return getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
   }
 
 }

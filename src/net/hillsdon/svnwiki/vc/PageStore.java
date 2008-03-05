@@ -56,8 +56,6 @@ public interface PageStore {
   List<ChangeInfo> history(PageReference ref) throws PageStoreException;
 
   /**
-   * TODO: Refactor to return ChangeInfo and unify with recentChanges/history somehow.
-   * 
    * @param start Start revision (inclusive). 
    * @param end  End revision (inclusive).
    * @return Pages changed after that revision.
@@ -108,6 +106,18 @@ public interface PageStore {
    */
   long set(PageReference ref, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
 
+  /**
+   * Renames an existing page.
+   * 
+   * @param from The existing page.
+   * @param to The new page.
+   * @param baseRevision Used to check the renamed copy was the latest.
+   * @param commitMessage An optional commit message.
+   * @return The new revision number.
+   * @throws InterveningCommitException If base revision is not the same as the head at the point immediately prior to the commit.
+   */
+  long rename(PageReference from, PageReference to, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException;
+  
   /**
    * Copy from 'from' at 'fromRevision' to the unused page head.
    * 

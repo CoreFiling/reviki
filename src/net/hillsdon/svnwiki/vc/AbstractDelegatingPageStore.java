@@ -74,7 +74,7 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
     getDelegate().attachment(ref, attachment, revision, sink);
   }
 
-  public Collection<PageReference> getChangedBetween(final long start, long end) throws PageStoreException {
+  public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
     return getDelegate().getChangedBetween(start, end);
   }
 
@@ -82,8 +82,12 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
     return getDelegate().getLatestRevision();
   }
 
-  public long copy(PageReference from, long fromRevision, PageReference to, String commitMessage) throws PageStoreException {
+  public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
     return getDelegate().copy(from, fromRevision, to, commitMessage);
+  }
+  
+  public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    return getDelegate().rename(from, to, baseRevision, commitMessage);
   }
   
 }
