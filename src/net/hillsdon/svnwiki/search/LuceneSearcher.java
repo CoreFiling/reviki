@@ -4,6 +4,7 @@ import static net.hillsdon.svnwiki.text.WikiWordUtils.pathToTitle;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -62,7 +64,7 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
     // at a time.  It maintains a lock file but we never want it to
     // fail to take the lock, so serialize writes.
     synchronized (_dir) {
-      IndexWriter writer = new IndexWriter(_dir, new StandardAnalyzer());
+      IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
       try {
         writer.deleteDocuments(new Term(FIELD_PATH, path));
         Document document = new Document();
@@ -87,7 +89,7 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
     try {
       Searcher searcher = new IndexSearcher(reader);
       try {
-        Analyzer analyzer = new StandardAnalyzer();
+        Analyzer analyzer = createAnalyzer();
         // Prefer title matches (match equality is on page name)
         LinkedHashSet<SearchMatch> results = query(reader, analyzer, searcher, new QueryParser(FIELD_TITLE, analyzer), queryString);
         results.addAll(query(reader, analyzer, searcher, new QueryParser(FIELD_CONTENT, analyzer), queryString));
@@ -100,6 +102,15 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
     finally {
       reader.close();
     }
+  }
+
+  private Analyzer createAnalyzer() {
+    Analyzer analyzer = new StandardAnalyzer() {
+      public TokenStream tokenStream(final String fieldName, final Reader reader) {
+        return new PorterStemFilter(super.tokenStream(fieldName, reader));
+      }
+    };
+    return analyzer;
   }
 
   @SuppressWarnings("unchecked")
