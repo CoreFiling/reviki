@@ -1,25 +1,25 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-import net.hillsdon.svnwiki.vc.PageReference;
 
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JavaTypeMapper;
 
-public class TestCreoleRendererJsonDriven extends TestCase {
+public abstract class JsonDrivenRenderingTest extends TestCase {
 
   private List<Map<String, String>> _tests;
-  private CreoleRenderer _renderer;
 
   @SuppressWarnings("unchecked")
-  public TestCreoleRendererJsonDriven() throws Exception {
+  public JsonDrivenRenderingTest(final URL url) throws JsonParseException, IOException {
     JsonFactory jf = new JsonFactory();
-    _tests = (List<Map<String, String>>) new JavaTypeMapper().read(jf.createJsonParser(getClass().getResource("unit-test-data.json")));
-    _renderer = new CreoleRenderer(new RenderNode[0]);
+    _tests = (List<Map<String, String>>) new JavaTypeMapper().read(jf.createJsonParser(url));
   }
   
   public void test() throws Exception {
@@ -30,7 +30,7 @@ public class TestCreoleRendererJsonDriven extends TestCase {
       final String bugExplanation = test.get("bug");
       final String expected = test.get("output");
       final String input = test.get("input");
-      final String actual = _renderer.render(new PageReference(""), input);
+      final String actual = render(input);
       final boolean match = expected.equals(actual);
       if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);
@@ -46,8 +46,10 @@ public class TestCreoleRendererJsonDriven extends TestCase {
       }
     }
     if (errors > 0) {
-      fail("Creole rendering errors, please see stderr.");
+      fail("Rendering errors, please see stderr.");
     }
   }
+
+  protected abstract String render(String input) throws Exception;
   
 }

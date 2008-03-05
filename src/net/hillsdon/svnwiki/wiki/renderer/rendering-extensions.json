@@ -1,0 +1,8 @@
+[
+  {
+    "name":   "URL vs inter-wiki link",
+    "input":  "foo:1234",
+    "output": "<a href='http://www.example.com/foo/Wiki?1234'>foo:1234</a>"
+  }
+]
+
