@@ -219,6 +219,12 @@
     "output": "<p>// <a href='http://a'>http://a</a></p>"
   },
   {
+    "comment": "a variation on #5",
+    "name":   "Difficult emphasis #5.1",
+    "input":  "//http:// ",
+    "output": "<p><em>http:</em></p>"
+  },
+  {
     "comment": "'a' added to make realistic",
     "name":   "Difficult emphasis #6",
     "input":  "// http://a//",
