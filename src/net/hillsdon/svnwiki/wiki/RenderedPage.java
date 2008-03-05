@@ -1,72 +1,72 @@
 package net.hillsdon.svnwiki.wiki;
 
-import static net.hillsdon.fij.core.Functional.set;
-
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.DocumentTraversal;
-import org.w3c.dom.traversal.NodeFilter;
-import org.w3c.dom.traversal.NodeIterator;
+import org.cyberneko.html.parsers.SAXParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class RenderedPage {
 
   private static final Pattern RE_NEW_PAGE_CLASS = Pattern.compile("(^|\\s)new-page($|\\s)");
   private static final Pattern RE_EXIST_PAGE_CLASS = Pattern.compile("(^|\\s)existing-page($|\\s)");
   
-  private static final Collection<String> BLOCK_HTML_TAGS = set("P", "DIV", "PRE", "BLOCKQUOTE", "H1", "H2", "H3", "H4", "H5", "H6", "CENTER", "FORM", "HR", "UL", "OL", "LI");
-  private static boolean isBlock(final String localName) {
-    return BLOCK_HTML_TAGS.contains(localName);
-  }
-  
   private final String _pageName;
-  private final Document _document; 
+  private final String _rendered; 
 
-  public RenderedPage(final String pageName, final Document document) {
+  public RenderedPage(final String pageName, final String rendered) {
     _pageName = pageName;
-    _document = document;
+    _rendered = rendered;
   }
 
   public String getPage() {
     return _pageName;
   }
   
-  public String asText() {
-    StringBuilder writer = new StringBuilder();
-    DocumentTraversal traversal = (DocumentTraversal) _document;
-    NodeIterator iterator = traversal.createNodeIterator(_document.getDocumentElement(), NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null, true);
-    for (Node n = iterator.nextNode(); n != null; n = iterator.nextNode()) {
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-        writer.append(isBlock(n.getNodeName()) ? "\n" : " ");
-      }
-      else {
-        CharacterData data = (CharacterData) n;
-        writer.append(data.getData());
-      }
-    }
-    return writer.toString().trim();
-  }
-
   /**
    * @return outgoing links in document order.
+   * @throws IOException If we fail to parse. 
    */
-  public List<String> findOutgoingWikiLinks() {
+  public List<String> findOutgoingWikiLinks() throws IOException {
     final List<String> outgoing = new ArrayList<String>();
-    final NodeList links = _document.getElementsByTagName("A");
-    for (int i = 0, len = links.getLength(); i < len; ++i) {
-      Element link = (Element) links.item(i);
-      if (hasWikiPageClass(link.getAttribute("class"))) {
-        String href = link.getAttribute("href");
-        int lastSlash = href.lastIndexOf('/');
-        outgoing.add(href.substring(lastSlash + 1));
+    SAXParser parser = new SAXParser();
+    parser.setContentHandler(new DefaultHandler() {
+      public void startElement(final String uri, final String localName, final String name, final Attributes attributes) throws SAXException {
+        if (localName.equals("A")) {
+          boolean wikiPageClass = false;
+          String href = null;
+          for (int i = 0, len = attributes.getLength(); i < len; ++i) {
+            if ("class".equals(attributes.getLocalName(i))) {
+              wikiPageClass = hasWikiPageClass(attributes.getValue(i));
+            }
+            else if ("href".equals(attributes.getLocalName(i))) {
+              href = attributes.getValue(i);
+            }
+          }
+          if (wikiPageClass && href != null) {
+            int lastSlash = href.lastIndexOf('/');
+            outgoing.add(href.substring(lastSlash + 1));
+          }
+        }
       }
+    });
+    try {
+      parser.parse(new InputSource(new StringReader(_rendered)));
+    }
+    catch (final SAXException ex) {
+      throw new IOException("Parse error") {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public Throwable getCause() {
+          return ex;
+        }
+      };
     }
     return outgoing;
   }

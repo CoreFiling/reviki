@@ -126,7 +126,7 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));
     document.add(new Field(FIELD_OUTGOING_LINKS, join(renderedPage.findOutgoingWikiLinks().iterator(), " "), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
-    document.add(new Field(FIELD_CONTENT, renderedPage.asText(), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
     return document;
   }
 
