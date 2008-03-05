@@ -285,15 +285,23 @@ public class SVNPageStore implements PageStore {
   public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<String>>() {
       public Collection<String> perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        List<ChangeInfo> log = _helper.log("", -1, false, revision + 1);
-        Set<String> pages = new LinkedHashSet<String>(log.size());
-        for (ChangeInfo info : log) {
-          // Ick... skipping attachments etc.
-          if (info.getPath().indexOf('/') == -1 && !info.getPath().endsWith("-attachments")) {
-            pages.add(info.getPath());
+        try {
+          List<ChangeInfo> log = _helper.log("", -1, false, revision + 1);
+          Set<String> pages = new LinkedHashSet<String>(log.size());
+          for (ChangeInfo info : log) {
+            // Ick... skipping attachments etc.
+            if (info.getPath().indexOf('/') == -1 && !info.getPath().endsWith("-attachments")) {
+              pages.add(info.getPath());
+            }
           }
+          return pages;
         }
-        return pages;
+        catch (SVNException ex) {
+          if (SVNErrorCode.FS_NO_SUCH_REVISION.equals(ex.getErrorMessage().getErrorCode())) {
+            return Collections.emptySet();
+          }
+          throw ex;
+        }
       }
     });
   }
