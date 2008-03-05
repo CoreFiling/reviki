@@ -11,7 +11,7 @@ public class TestCreoleLinkNode extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-    _node = new CreoleLinkNode(new InternalLinker("/context", "wiki", new SimplePageStore()), new FakeConfiguration());
+    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(new InternalLinker("/context", "wiki", new SimplePageStore()), new FakeConfiguration()));
   }
   
   public void testInternal() {
@@ -19,11 +19,11 @@ public class TestCreoleLinkNode extends TestCase {
   }
 
   public void testInterWiki() {
-    assertEquals("<a href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[foo:FooPage|Tasty]]")));
+    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[foo:FooPage|Tasty]]")));
   }
   
   public void testExternal() {
-    assertEquals("<a href='http://www.example.com'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[http://www.example.com|Tasty]]")));
+    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[http://www.example.com|Tasty]]")));
   }
   
 }
