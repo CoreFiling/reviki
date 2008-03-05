@@ -47,10 +47,10 @@ public class SVNPageStore implements PageStore {
       if (SVNNodeKind.FILE.equals(kind)) {
         _repository.getFile(path, SVNRevision.HEAD.getNumber(), properties, baos);
         long revision = Long.parseLong(properties.get(SVNProperty.REVISION));
-        return new PageInfo(toUTF8(baos.toByteArray()), revision);
+        return new PageInfo(path, toUTF8(baos.toByteArray()), revision);
       }
       else if (SVNNodeKind.NONE.equals(kind)) {
-        return new PageInfo("", PageInfo.UNCOMMITTED);
+        return new PageInfo(path, "", PageInfo.UNCOMMITTED);
       }
       else {
         throw new PageStoreException(String.format("Unexpected node kind '%s' at '%s'", kind, path));

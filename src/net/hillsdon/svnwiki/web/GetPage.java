@@ -17,10 +17,10 @@ public class GetPage extends PageRequestHandler {
     super(pageStoreFactory);
   }
 
-  public void handlePage(HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
     PageInfo pageInfo = store.get(page);
     request.setAttribute("pageInfo", pageInfo);
-    request.getRequestDispatcher("").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").forward(request, response);
   }
 
 }

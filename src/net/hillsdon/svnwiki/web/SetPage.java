@@ -14,7 +14,7 @@ public class SetPage extends PageRequestHandler {
   
   
   @Override
-  public void handlePage(HttpServletRequest request, HttpServletResponse response, PageStore store, String page) throws Exception {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
     String baseRevisionString = request.getParameter("baseRevision");
     if (baseRevisionString == null) {
       throw new InvalidInputException("'baseRevision' required.");

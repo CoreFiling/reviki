@@ -17,10 +17,10 @@ public class EditorForPage extends PageRequestHandler {
     super(pageStoreFactory);
   }
 
-  public void handlePage(HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
+  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
     PageInfo pageInfo = store.get(page);
     request.setAttribute("pageInfo", pageInfo);
-    request.getRequestDispatcher("/templates/EditorForPage.jsp").include(request, response);
+    request.getRequestDispatcher("/WEB-INF/templates/EditPage.jsp").include(request, response);
   }
 
 }
