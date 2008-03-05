@@ -29,14 +29,12 @@ public class Dispatcher extends HttpServlet {
   private RequestHandler _get;
   private RequestHandler _editor;
   private RequestHandler _set;
-  private RequestHandler _recentChanges;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
       PageStoreFactory psf = new BasicAuthPassThroughPageStoreFactory(URL);
-      _recentChanges = new AllPages(psf);
       _get = new GetPage(psf, new RadeoxMarkupRenderer());
       _editor = new EditorForPage(psf);
       _set = new SetPage(psf);
