@@ -52,6 +52,20 @@
     </copy>
   </target>
 
+  <target name="test-plugin">
+    <delete dir="test-plugin/build"/>
+    <mkdir dir="test-plugin/build"/>
+    <javac srcdir="test-plugin/src"
+           destdir="test-plugin/build">
+      <classpath refid="classpath" />
+    </javac>
+    <jar destfile="test-plugin/test-plugin.jar" >
+      <fileset dir="test-plugin/build">
+        <include name="**/*.class"/>
+      </fileset>
+    </jar>
+  </target>
+
   <target name="taglibJar" depends="compile">
     <mkdir dir="${build-classes}/META-INF"/>
     <move file="${build-classes}/net/hillsdon/svnwiki/web/taglib/svnwiki.tld" tofile="${build-classes}/META-INF/svnwiki.tld"/>
