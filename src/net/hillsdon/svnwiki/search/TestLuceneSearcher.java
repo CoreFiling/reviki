@@ -48,23 +48,23 @@ public class TestLuceneSearcher extends TestCase {
   public void testRepeatedAddsForSamePathReplace() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, "the content");
-    assertEquals(singleton(path), _searcher.search("content"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content"));
     _searcher.index(path, "the something else");
     assertEquals(emptySet(), _searcher.search("content"));
     _searcher.index(path, "the content");
-    assertEquals(singleton(path), _searcher.search("content"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content"));
   }
   
   public void testFindsByPath() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, "the content");
-    assertEquals(singleton(path), _searcher.search(path));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search(path));
   }
   
   public void testFindsByTokenizedPath() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, "the content");
-    assertEquals(singleton(path), _searcher.search("path"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("path"));
   }
   
   /**

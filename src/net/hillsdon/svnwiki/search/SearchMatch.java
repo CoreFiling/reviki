@@ -19,4 +19,17 @@ public class SearchMatch {
     return _htmlExtract;
   }
   
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof SearchMatch) {
+      return _page.equals(((SearchMatch) obj)._page);
+    }
+    return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    return _page.hashCode();
+  }
+  
 }
