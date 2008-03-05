@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 public class TestWikiWordUtils extends TestCase { 
 
   public void testIsWikiWord() {
+    assertFalse(isWikiWord("IT"));
     assertTrue(isWikiWord("HTMLParser"));
     assertFalse(isWikiWord("HTML Parser"));
     assertTrue(isWikiWord("HTML"));

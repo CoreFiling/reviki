@@ -40,7 +40,7 @@ public final class WikiWordUtils {
   public static boolean isWikiWord(final String text) {
     return text.split("\\s").length == 1 
            && !isNextLower(text.toCharArray(), -1)
-           && (text.matches("\\p{Lu}+") || splitCamelCase(text).size() > 1); 
+           && (text.matches("\\p{Lu}{3,}") || splitCamelCase(text).size() > 1); 
   }
   
   /**
