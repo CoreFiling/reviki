@@ -35,11 +35,14 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
 
   @Override
   protected boolean confirmMatchFind(final Matcher matcher) {
-    String wikiName = matcher.group(1);
-    String pageName = matcher.group(2);
-    boolean handle = wikiName != null || isWikiWord(pageName);
-    //System.err.println(matcher.group(0) + " => " + handle);
-    return handle;
+    do {
+      String wikiName = matcher.group(1);
+      String pageName = matcher.group(2);
+      if (wikiName != null || isWikiWord(pageName)) {
+        return true;
+      }
+    } while (matcher.find());
+    return false;
   }
 
   public String handle(PageReference page, final Matcher result) {
