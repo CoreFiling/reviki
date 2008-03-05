@@ -22,7 +22,7 @@ public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
   }
 
   public String handle(final PageReference page, final Matcher matcher) {
-    String content = matcher.group(1);
+    String content = matcher.group(2);
     try {
       return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true);
     }
