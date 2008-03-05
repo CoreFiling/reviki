@@ -230,24 +230,6 @@ public class SVNHelper {
     });
   }
 
-  public void delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreException, PageStoreAuthenticationException, InterveningCommitException{
-    execute(new SVNAction<Void>() {
-      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, locks, false, null);
-          deleteFile(commitEditor, path, baseRevision);
-          commitEditor.closeEdit();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
-        return null;
-      }
-    });
-  }
-  
   private void checkForInterveningCommit(final SVNException ex) throws InterveningCommitException {
     if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
       // What to do!
@@ -345,7 +327,7 @@ public class SVNHelper {
     commitEditor.closeDir();
   }
 
-  public void deleteFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision) throws SVNException {
+  private void deleteFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.deleteEntry(filePath, baseRevision);
     commitEditor.closeDir();
