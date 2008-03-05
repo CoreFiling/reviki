@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -75,6 +76,10 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
 
   public Collection<String> attachments(final String page) throws PageStoreException {
     return get().attachments(page);
+  }
+
+  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+    get().attachment(page, attachment, sink);
   }
 
 }

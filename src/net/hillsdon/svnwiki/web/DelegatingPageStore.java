@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
@@ -59,8 +60,12 @@ public class DelegatingPageStore implements PageStore {
     _delegate.attach(page, storeName, in);
   }
 
-  public Collection<String> attachments(String page) throws PageStoreException {
+  public Collection<String> attachments(final String page) throws PageStoreException {
     return _delegate.attachments(page);
+  }
+
+  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+    _delegate.attachment(page, attachment, sink);
   }
   
 }

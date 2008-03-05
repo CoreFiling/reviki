@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.vc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,6 +104,7 @@ public class SVNHelper {
   public void createDir(final ISVNEditor commitEditor, final String dir) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.addDir(dir, null, -1);
+    commitEditor.closeDir();
     commitEditor.closeDir();
   }
 

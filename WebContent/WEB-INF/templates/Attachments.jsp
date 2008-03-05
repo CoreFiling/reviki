@@ -5,9 +5,8 @@
   <tiles:putAttribute name="content">
     <h1><c:out value="${page.title}"/> attachments</h1>
     <table>
-      <tr><th>Name</th></tr>
       <c:forEach var="attachment" items="${attachments}">
-        <tr><td><c:out value="${attachment}"/></td></tr>
+        <tr><td><a href="<c:url value="${attachment}"/>"><c:out value="${attachment}"/></a></td></tr>
       </c:forEach>
     </table>
     <h3>Add a new attachment</h3>

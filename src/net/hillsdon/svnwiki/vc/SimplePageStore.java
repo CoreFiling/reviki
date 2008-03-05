@@ -54,8 +54,12 @@ public class SimplePageStore implements PageStore {
     throw new UnsupportedOperationException();
   }
 
-  public Collection<String> attachments(String page) throws PageStoreException {
+  public Collection<String> attachments(final String page) throws PageStoreException {
     return Collections.emptySet();
+  }
+
+  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+    throw new UnsupportedOperationException();
   }
   
 }

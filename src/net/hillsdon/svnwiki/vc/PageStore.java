@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.vc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -94,4 +95,13 @@ public interface PageStore {
    */
   Collection<String> attachments(String page) throws PageStoreException;
 
+  /**
+   * @param page Page.
+   * @param attachment Attachment on that page.
+   * @param sink Attachment is written here.
+   * @throws PageStoreException On failure.
+   * @throws IOException 
+   */
+  void attachment(String page, String attachment, ContentTypedSink sink) throws PageStoreException;
+  
 }

@@ -5,6 +5,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -54,7 +56,7 @@ public class SVNPageStore implements PageStore {
 
   public List<ChangeInfo> recentChanges() throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(SVNRepository repository) throws SVNException {
+      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
         return _helper.log("", RECENT_CHANGES_HISTORY_SIZE);
       }
     });
@@ -62,7 +64,7 @@ public class SVNPageStore implements PageStore {
 
   public List<ChangeInfo> history(final String path) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(SVNRepository repository) throws SVNException {
+      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
         return _helper.log(path, -1);
       }
     });
@@ -71,7 +73,7 @@ public class SVNPageStore implements PageStore {
 
   public Collection<String> list() throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<String>>() {
-      public Collection<String> perform(SVNRepository repository) throws SVNException {
+      public Collection<String> perform(final SVNRepository repository) throws SVNException {
         return _helper.listFiles("");
       }
     });
@@ -80,7 +82,7 @@ public class SVNPageStore implements PageStore {
 
   public PageInfo get(final String path, final long revision) throws PageStoreException {
     return _helper.execute(new SVNAction<PageInfo>() {
-      public PageInfo perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HashMap<String, String> properties = new HashMap<String, String>();
 
@@ -115,7 +117,7 @@ public class SVNPageStore implements PageStore {
     }
 
     return _helper.execute(new SVNAction<PageInfo>() {
-      public PageInfo perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           long revision = page.getRevision();
           Map<String, Long> pathsToRevisions = singletonMap(path, revision);
@@ -135,7 +137,7 @@ public class SVNPageStore implements PageStore {
 
   public void unlock(final String path, final String lockToken) throws PageStoreException {
     _helper.execute(new SVNAction<Void>() {
-      public Void perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         repository.unlock(singletonMap(path, lockToken), false, new SVNLockHandlerAdapter());
         return null;
       }
@@ -149,7 +151,7 @@ public class SVNPageStore implements PageStore {
 
   private void set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
     _helper.execute(new SVNAction<Void>() {
-      public Void perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
           ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, locks, false, null);
@@ -181,8 +183,12 @@ public class SVNPageStore implements PageStore {
 
   public Collection<String> attachments(final String page) throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<String>>() {
-      public Collection<String> perform(SVNRepository repository) throws SVNException {
-        return _helper.listFiles(attachmentPath(page));
+      public Collection<String> perform(final SVNRepository repository) throws SVNException {
+        String attachmentPath = attachmentPath(page);
+        if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
+          return _helper.listFiles(attachmentPath);
+        }
+        return Collections.emptySet();
       }
     });
   }
@@ -193,7 +199,7 @@ public class SVNPageStore implements PageStore {
 
   private void ensureDir(final String dir) throws PageStoreException {
     _helper.execute(new SVNAction<Void>() {
-      public Void perform(SVNRepository repository) throws SVNException, PageStoreException {
+      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(dir, -1) == SVNNodeKind.NONE) {
           ISVNEditor commitEditor = repository.getCommitEditor("[svnwiki commit] Add attachments dir.", null);
           _helper.createDir(commitEditor, dir);
@@ -220,6 +226,23 @@ public class SVNPageStore implements PageStore {
     catch (UnsupportedEncodingException e) {
       throw new AssertionError("Java supports UTF8.");
     }
+  }
+
+  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+    final String path = SVNPathUtil.append(attachmentPath(page), attachment);
+    sink.setContentType("application/octet-stream"); 
+    sink.setFileName(attachment);
+    _helper.execute(new SVNAction<Void>() {
+      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        try {
+          repository.getFile(path, -1, null, sink.stream());
+        }
+        catch (IOException e) {
+          throw new PageStoreException(e);
+        }
+        return null;
+      }
+    });
   }
 
 }
