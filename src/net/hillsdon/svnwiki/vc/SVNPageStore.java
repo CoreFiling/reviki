@@ -132,6 +132,7 @@ public class SVNPageStore implements PageStore {
             return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
           }
           catch (SVNException ex) {
+            // It was a file at 'revision' but is now deleted so we can't get the lock information.
             SVNErrorMessage error = ex.getErrorMessage();
             if (error.getErrorCode() == SVNErrorCode.RA_DAV_PATH_NOT_FOUND) {
               return createNewOrDeletedPageInfo(ref);
