@@ -42,7 +42,8 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
       new PageReference("FrontPage"),
       new PageReference("FindPage"),
       new PageReference("ConfigCss"),
-      new PageReference("ConfigSideBar")
+      new PageReference("ConfigSideBar"),
+      new PageReference("ConfigInterWikiLinks")
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReference("AllPages"),
