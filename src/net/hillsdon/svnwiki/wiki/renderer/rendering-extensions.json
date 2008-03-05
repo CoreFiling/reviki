@@ -3,6 +3,11 @@
     "name":   "URL vs inter-wiki link",
     "input":  "foo:1234",
     "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?1234'>foo:1234</a></p>"
+  },
+  {
+    "name":   "Raw HTML",
+    "input":  "[<html>]<div class='unusual'></div>[</html>]",
+    "output": "<p><div class='unusual'></div></p>"
   }
 ]
 
