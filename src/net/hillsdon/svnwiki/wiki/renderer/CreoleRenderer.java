@@ -1,5 +1,8 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import java.util.regex.Matcher;
+
+import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 
 // Adapted from the Creole 0.4 implementation in JavaScript available here
@@ -35,6 +38,15 @@ import net.hillsdon.svnwiki.vc.PageReference;
  */
 public class CreoleRenderer {
 
+  public class RawUrlNode extends AbstractRegexNode {
+    public RawUrlNode() {
+      super("\\p{L}+://\\S+(?=\\p{Punct})");
+    }
+    public String handle(final PageReference page, final Matcher matcher) {
+      String escaped = Escape.html(matcher.group(0));
+      return String.format("<a href='%s'>%s</a>", escaped, escaped);
+    }
+  }
   private static class Heading extends RegexMatchToTag {
     public Heading(final int number) {
       super(String.format("(?:^|\n)={%d}(.+?)(?:\n|$)", number), "h" + number, 1);
@@ -59,7 +71,8 @@ public class CreoleRenderer {
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
     RenderNode unorderedList = new ListNode("\\*", "ul");
     RenderNode orderedList = new ListNode("#", "ol");
-    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough};
+    RenderNode rawUrl = new RawUrlNode();
+    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl};
     RenderNode[] nonStructural = new RenderNode[defaultNonStructural.length + customNonStructural.length];
     System.arraycopy(defaultNonStructural, 0, nonStructural, 0, defaultNonStructural.length);
     System.arraycopy(customNonStructural, 0, nonStructural, defaultNonStructural.length, customNonStructural.length);

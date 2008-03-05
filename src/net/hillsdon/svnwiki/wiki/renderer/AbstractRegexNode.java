@@ -64,6 +64,8 @@ public abstract class AbstractRegexNode implements RenderNode {
     return matcher.find() && confirmMatchFind(matcher) ? matcher : null;
   }
 
-  protected abstract boolean confirmMatchFind(final Matcher matcher);
+  protected boolean confirmMatchFind(final Matcher matcher) {
+    return true;
+  }
 
 }

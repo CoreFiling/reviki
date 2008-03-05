@@ -35,11 +35,6 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     }
     return "<" + _tag + ">" +  render(page, text) + "</" + _tag + ">";
   }
-
-  @Override
-  protected boolean confirmMatchFind(final Matcher matcher) {
-    return true;
-  }
   
   @Override
   public String toString() {
