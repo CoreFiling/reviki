@@ -40,7 +40,7 @@ public class RequestBasedWikiUrls implements WikiUrls {
   }
 
   public String feed() {
-    return _base + "/pages/RecentChanges/atom.xml";
+    return page("RecentChanges") + "/atom.xml";
   }
 
   public boolean isAttachment(final String url) {

@@ -14,6 +14,7 @@ import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.web.RequestBasedWikiUrls;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -27,6 +28,9 @@ public class TestFeedWriter extends TestCase {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     Document dom = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(out.toString())));
+    Element selfLink = (Element) dom.getElementsByTagName("link").item(0);
+    assertTrue(selfLink.getAttributeNS(null, "href").endsWith("/atom.xml"));
+    
     NodeList entries = dom.getElementsByTagNameNS(FeedWriter.ATOM_NS, "entry");
     assertEquals(1, entries.getLength());
     // TODO, actually assert something useful.

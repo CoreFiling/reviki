@@ -66,7 +66,7 @@ public class FeedWriter {
     handler.startDocument();
     handler.startElement(ATOM_NS, "", "feed", null);
     addElement(handler, "title", "svnwiki feed");
-    addLink(handler, wikiUrls.page("RecentChanges"), "self");
+    addLink(handler, wikiUrls.feed(), "self");
     addLink(handler, wikiUrls.root(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
     for (ChangeInfo change : changes) { 
