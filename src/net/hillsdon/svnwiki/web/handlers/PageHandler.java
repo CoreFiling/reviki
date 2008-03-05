@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
-import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
@@ -40,8 +39,8 @@ public class PageHandler implements RequestHandler {
       response.sendRedirect(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/FrontPage");
       return;
     }
-    if (!WikiWordUtils.isWikiWord(pageName)) {
-      throw new InvalidInputException(String.format("'%s' is not a WikiWord.", pageName));
+    if (pageName.contains("/")) {
+      throw new InvalidInputException(String.format("No '/' characters allowed in a page name.", pageName));
     }
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);
