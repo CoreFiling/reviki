@@ -9,8 +9,8 @@
       <c:forEach var="change" items="${recentChanges}">
         <li><a href="<c:url value="${change.page}"/>">
           <c:out value="${change.page}"/></a>
-           on <f:formatDate value="${change.date}"/>
-           by <c:out value="${change.user}"/> 
+           on <f:formatDate type="both" value="${change.date}"/>
+           by <c:out value="${change.user}"/>
         </li>
       </c:forEach>
     </ul>
