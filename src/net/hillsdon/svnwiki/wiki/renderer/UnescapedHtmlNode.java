@@ -12,7 +12,7 @@ import net.hillsdon.svnwiki.vc.PageReference;
 public class UnescapedHtmlNode extends AbstractRegexNode {
 
   public UnescapedHtmlNode() {
-    super("(?s)\\[<html>\\](.*?)\\[</html>\\]");
+    super("(?s)(^|\\n)\\[<html>\\](.*?)(^|\\n)\\[</html>\\]");
   }
 
   public String handle(final PageReference page, final Matcher matcher) {
