@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -62,11 +63,17 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
-    return _helper.execute(new SVNAction<List<ChangeInfo>>() {
+    List<ChangeInfo> changes = _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
         return _helper.log(ref.getPath(), -1, true, 0, -1);
       }
     });
+    for (Iterator<ChangeInfo> iter = changes.iterator(); iter.hasNext();) {
+      if (!(iter.next().getKind() == StoreKind.PAGE)) {
+        iter.remove();
+      }
+    }
+    return changes;
   }
 
 
@@ -196,16 +203,14 @@ public class SVNPageStore implements PageStore {
     });
     Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     for (ChangeInfo change : changed) {
-      if (attachmentPath.equals(change.getPath())) {
-        // We don't want changes to the directory, just the files.
-        continue;
+      if (change.getKind() == StoreKind.ATTACHMENT) {
+        AttachmentHistory history = results.get(change.getName());
+        if (history == null) {
+          history = new AttachmentHistory();
+          results.put(change.getName(), history);
+        }
+        history.getVersions().add(change);
       }
-      AttachmentHistory history = results.get(change.getName());
-      if (history == null) {
-        history = new AttachmentHistory();
-        results.put(change.getName(), history);
-      }
-      history.getVersions().add(change);
     }
     return results.values();
   }

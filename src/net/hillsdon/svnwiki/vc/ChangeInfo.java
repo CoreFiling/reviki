@@ -11,15 +11,18 @@ public class ChangeInfo {
 
   public static final String NO_COMMENT_MESSAGE_TAG = "[svnwiki commit]";
   public static final String MINOR_EDIT_MESSAGE_TAG = "[minor edit]\n";
-  private final String _path;
+  
+  private final String _name;
+  private final String _page;
   private final String _user;
   private final Date _date;
   private final long _revision;
   private final String _commitMessage;
   private final StoreKind _kind;
   
-  public ChangeInfo(final String path, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind) {
-    _path = path;
+  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind) {
+    _page = page;
+    _name = name;
     _user = user;
     _date = date;
     _revision = revision;
@@ -27,15 +30,16 @@ public class ChangeInfo {
     _commitMessage = commitMessage.trim();
   }
 
-  /**
-   * @return The last path component.
-   */
   public String getName() {
-    return _path.substring(_path.lastIndexOf('/') + 1);
+    return _name;
+  }
+  
+  public String getPage() {
+    return _page;
   }
 
   public String getPath() {
-    return _path;
+    return _page;
   }
   
   public String getUser() {
@@ -89,6 +93,10 @@ public class ChangeInfo {
   
   public StoreKind getKind() {
     return _kind;
+  }
+  
+  public boolean getIsAttachment() {
+   return getKind() == StoreKind.ATTACHMENT; 
   }
   
 }

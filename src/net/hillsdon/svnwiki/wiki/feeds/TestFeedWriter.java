@@ -23,7 +23,7 @@ public class TestFeedWriter extends TestCase {
 
   public void test() throws Exception {
     StringWriter out = new StringWriter();
-    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE));
+    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE));
     FeedWriter.writeAtom(new RequestBasedWikiUrls("http://www.example.com/svnwiki"), new PrintWriter(out), changes);
 
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

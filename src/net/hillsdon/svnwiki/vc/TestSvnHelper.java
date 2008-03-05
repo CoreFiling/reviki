@@ -18,12 +18,13 @@ public class TestSvnHelper extends TestCase {
     ChangeInfo changeInfo = changeInfo("/wiki2/AttachmentsTest11969665985340-attachments/file.txt");
     assertEquals(StoreKind.ATTACHMENT, changeInfo.getKind());
     assertEquals("file.txt", changeInfo.getName());
+    assertEquals("AttachmentsTest11969665985340", changeInfo.getPage());
   }
 
   public void testPage() {
     ChangeInfo changeInfo = changeInfo("/wiki2/ThisIsAPage");
     assertEquals(StoreKind.PAGE, changeInfo.getKind());
-    assertEquals("ThisIsAPage", changeInfo.getName());
+    assertEquals("ThisIsAPage", changeInfo.getPage());
   }
   
   private ChangeInfo changeInfo(String path) {

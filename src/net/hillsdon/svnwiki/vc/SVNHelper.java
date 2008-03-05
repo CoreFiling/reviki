@@ -131,20 +131,23 @@ public class SVNHelper {
   static ChangeInfo classifiedChange(SVNLogEntry entry, final String rootPath, final String path) {
     StoreKind kind = StoreKind.OTHER;
     String name = path.length() > rootPath.length() ? path.substring(rootPath.length() + 1) : path;
+    String page = null;
     Matcher matcher = PAGE_PATH.matcher(name);
     if (matcher.matches() && !name.endsWith("-attachments")) {
       kind = StoreKind.PAGE;
+      page = name;
     }
     else {
       matcher = ATTACHMENT_PATH.matcher(name);
       if (matcher.matches()) {
         kind = StoreKind.ATTACHMENT;
+        page = matcher.group(1);
         name = matcher.group(2);
       }
     }
     String user = entry.getAuthor();
     Date date = entry.getDate();
-    return new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage(), kind);
+    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind);
   }
 
 }
