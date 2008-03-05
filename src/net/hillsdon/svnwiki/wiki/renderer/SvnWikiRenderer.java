@@ -28,6 +28,7 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
 
 public class SvnWikiRenderer implements MarkupRenderer {

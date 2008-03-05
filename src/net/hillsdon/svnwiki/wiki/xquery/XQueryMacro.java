@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.wiki.renderer.Macro;
+import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;

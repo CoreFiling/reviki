@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
+import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 
 /**
  * Macro

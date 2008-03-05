@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.macro;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 
