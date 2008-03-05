@@ -39,13 +39,13 @@ public class GetRegularPage extends PageRequestHandler {
   }
 
   private long getRevision(final HttpServletRequest request) throws InvalidInputException {
-    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), "revision");
+    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
     return givenRevision == null ? -1 : givenRevision;
   }
     
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException, InvalidInputException {
     long revison = getRevision(request);
-    Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), "diff");
+    Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
 
     PageInfo main = store.get(page, revison);
     request.setAttribute("pageInfo", main);
