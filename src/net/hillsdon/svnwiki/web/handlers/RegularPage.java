@@ -47,8 +47,8 @@ public class RegularPage implements PageRequestHandler {
     }
     else if ("POST".equals(request.getMethod())) {
       if (request.getParameter(SetPage.SUBMIT_SAVE) != null 
-          || request.getParameter(SetPage.SUBMIT_COPY) != null
-          || request.getParameter(SetPage.SUBMIT_UNLOCK) != null) {
+       || request.getParameter(SetPage.SUBMIT_COPY) != null
+       || request.getParameter(SetPage.SUBMIT_UNLOCK) != null) {
         _set.handlePage(path, request, response, page);
       }
       else {
