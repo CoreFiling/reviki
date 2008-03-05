@@ -51,7 +51,13 @@ public class Dispatcher extends HttpServlet {
 
     ConsumedPath path = new ConsumedPath(request);
     try {
-      _choice.handle(path, request, response);
+      String initial = path.next();
+      if ("pages".equals(initial)) {
+        _choice.handle(path, request, response);
+      }
+      else {
+        _list.handle(path, request, response);
+      }
     }
     catch (NotFoundException ex) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);

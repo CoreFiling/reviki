@@ -31,8 +31,10 @@ public class WikiUrlTag extends TagSupport {
   public int doStartTag() throws JspException {
     try {
       InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
-      JspWriter out = pageContext.getOut();
-      out.write(Escape.html(linker.url(getPage())));
+      if (linker != null) {
+        JspWriter out = pageContext.getOut();
+        out.write(Escape.html(linker.url(getPage())));
+      }
     }
     catch (IOException e) {
       throw new JspException(e);

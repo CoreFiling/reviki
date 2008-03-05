@@ -20,7 +20,7 @@ public class ListWikis implements RequestHandler {
   }
   
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
-    request.setAttribute("wikis", _configuration.getWikiNames());
+    request.setAttribute("configuration", _configuration);
     request.getRequestDispatcher("/WEB-INF/templates/ListWikis.jsp").include(request, response);
   }
 

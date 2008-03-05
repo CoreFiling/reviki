@@ -81,18 +81,20 @@
     </div>
   </c:if>
   <div id="topbar">
-    <ul class="menu">
-      <tiles:insertAttribute name="menuItems" ignore="true"/>
-      <li class="menu"><sw:wikiLink page="FrontPage"/></li>
-      <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
-      <li class="menu"><sw:wikiLink page="AllPages"/></li>
-      <li class="menu">
-        <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
-          <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
-          <input value="Go" type="submit"/>
-        </form>
-      </li>
-    </ul>
+    <c:if test="${wikiIsValid}">
+      <ul class="menu">
+        <tiles:insertAttribute name="menuItems" ignore="true"/>
+        <li class="menu"><sw:wikiLink page="FrontPage"/></li>
+        <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
+        <li class="menu"><sw:wikiLink page="AllPages"/></li>
+        <li class="menu">
+          <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
+            <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
+            <input value="Go" type="submit"/>
+          </form>
+        </li>
+      </ul>
+    </c:if>
   </div>
   <div id="content">
     <h1 class="title"><tiles:insertAttribute name="heading"/></h1>

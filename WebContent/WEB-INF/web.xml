@@ -9,11 +9,15 @@
 	  <servlet-name>dispatcher</servlet-name>
 	  <url-pattern>/pages/*</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>dispatcher</servlet-name>
+	  <url-pattern>/list</url-pattern>
+	</servlet-mapping>
     <listener>
       <listener-class>org.apache.tiles.web.startup.TilesListener</listener-class>
     </listener>
     <!-- The JSP redirects to a dynamic entry point. -->
-	<!-- welcome-file-list>
+	<welcome-file-list>
       <welcome-file>index.jsp</welcome-file>
-	</welcome-file-list -->
+	</welcome-file-list>
 </web-app>
