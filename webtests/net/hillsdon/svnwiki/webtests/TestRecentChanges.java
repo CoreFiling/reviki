@@ -39,7 +39,7 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(second.asText(), createdSecond);
     
     HtmlPage recentChanges = getWebPage("pages/test/RecentChanges");
-    recentChanges.asText().contains(descriptionOfChange);
+    assertTrue(recentChanges.asText().contains(descriptionOfChange));
   }
 
   @SuppressWarnings("unchecked")
