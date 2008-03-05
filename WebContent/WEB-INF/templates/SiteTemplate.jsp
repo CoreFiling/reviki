@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>svnwiki - <tiles:insertAttribute name="title"/></title>
+  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/feeds/atom.xml"/>" />
   <style type="text/css">
     body {
       font-size: 11pt;
