@@ -39,7 +39,6 @@ public class MainHandler implements RequestHandler {
           }
           else {
             _set.handle(request, response);
-            response.sendRedirect(request.getRequestURI());
           }
         }
       }

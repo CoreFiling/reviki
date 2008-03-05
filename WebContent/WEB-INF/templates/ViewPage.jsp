@@ -6,6 +6,7 @@
     <div id="content">
     ${renderedContents}
     </div>
+    <hr/>
     <form action="" method="post">
       <input type="submit" value="Edit"/>
     </form> 

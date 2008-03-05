@@ -14,27 +14,30 @@ public class SetPage extends PageRequestHandler {
   
   @Override
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
-    String baseRevisionString = request.getParameter("baseRevision");
-    if (baseRevisionString == null) {
-      throw new InvalidInputException("'baseRevision' required.");
-    }
-    long baseRevision;
-    try {
-      baseRevision = Long.parseLong(baseRevisionString);
-    }
-    catch (NumberFormatException ex) {
-      throw new InvalidInputException("'baseRevision' invalid.");
-    }
-    
-    String content = request.getParameter("content");
-    if (content == null) {
-      throw new InvalidInputException("'content' required.");
-    }
-    if (!content.endsWith("\n")) {
-      content = content + "\n";
-    }
-    
-    store.set(page, baseRevision, content);
+     if ("Save".equals(request.getParameter("action"))) {
+       String baseRevisionString = request.getParameter("baseRevision");
+       if (baseRevisionString == null) {
+         throw new InvalidInputException("'baseRevision' required.");
+       }
+       long baseRevision;
+       try {
+         baseRevision = Long.parseLong(baseRevisionString);
+       }
+       catch (NumberFormatException ex) {
+         throw new InvalidInputException("'baseRevision' invalid.");
+       }
+       
+       String content = request.getParameter("content");
+       if (content == null) {
+         throw new InvalidInputException("'content' required.");
+       }
+       if (!content.endsWith("\n")) {
+         content = content + "\n";
+       }
+       
+       store.set(page, baseRevision, content);
+     }
+    response.sendRedirect(request.getRequestURI());
   }
 
 }
