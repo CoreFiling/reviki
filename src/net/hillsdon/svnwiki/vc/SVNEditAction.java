@@ -33,8 +33,10 @@ public abstract class SVNEditAction implements SVNAction<Long> {
   
   public Long perform(final SVNRepository repository) throws SVNException, PageStoreException, IOException {
     try {
-      ISVNEditor commitEditor = repository.getCommitEditor(_commitMessage, _locks, false, null);
+      final ISVNEditor commitEditor = repository.getCommitEditor(_commitMessage, _locks, false, null);
+      commitEditor.openRoot(-1);
       driveCommitEditor(commitEditor);
+      commitEditor.closeDir();
       return commitEditor.closeEdit().getNewRevision();
     }
     catch (SVNException ex) {
@@ -59,34 +61,35 @@ public abstract class SVNEditAction implements SVNAction<Long> {
 
   
   protected void createDir(final ISVNEditor commitEditor, final String dir) throws SVNException {
-    commitEditor.openRoot(-1);
     commitEditor.addDir(dir, null, -1);
-    commitEditor.closeDir();
     commitEditor.closeDir();
   }
 
   protected void copyFile(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
     String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openRoot(-1);
     commitEditor.openDir(dir, -1);
     commitEditor.addFile(toPath, fromPath, fromRevision);
-    commitEditor.closeDir();
     commitEditor.closeDir();
   }
 
   protected void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
     String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openRoot(-1);
     commitEditor.openDir(dir, -1);
     commitEditor.deleteEntry(fromPath, baseRevision);
     commitEditor.addFile(toPath, fromPath, baseRevision);
     commitEditor.closeDir();
-    commitEditor.closeDir();
   }
 
+  protected void moveDir(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
+    String dir = SVNPathUtil.removeTail(toPath);
+    commitEditor.openDir(dir, -1);
+    commitEditor.deleteEntry(fromPath, baseRevision);
+    commitEditor.addDir(toPath, fromPath, baseRevision);
+    commitEditor.closeDir();
+  }
+  
   protected void createFile(final ISVNEditor commitEditor, final String filePath, final String mimeType, final InputStream data) throws SVNException {
     String dir = SVNPathUtil.removeTail(filePath);
-    commitEditor.openRoot(-1);
     commitEditor.openDir(dir, -1);
     commitEditor.addFile(filePath, null, -1);
     commitEditor.applyTextDelta(filePath, null);
@@ -97,15 +100,8 @@ public abstract class SVNEditAction implements SVNAction<Long> {
     }
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
-    commitEditor.closeDir();
   }
 
-  protected void deleteFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision) throws SVNException {
-    commitEditor.openRoot(-1);
-    commitEditor.deleteEntry(filePath, baseRevision);
-    commitEditor.closeDir();
-  }
-  
   protected void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final InputStream newData) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.openFile(filePath, baseRevision);

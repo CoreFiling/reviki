@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -109,6 +110,22 @@ public abstract class WebTestSupport extends TestCase {
     assertTrue(matcher.find());
     long revision = Long.parseLong(matcher.group().substring(1));
     return revision;
+  }
+
+  public static HtmlPage clickAttachmentsLink(final HtmlPage page, final String name) throws IOException {
+    HtmlAnchor attachmentsLink = page.getAnchorByHref(name + "/attachments/");
+    assertEquals("Attachments", attachmentsLink.asText());
+    HtmlPage attachments = (HtmlPage) attachmentsLink.click();
+    return attachments;
+  }
+
+  public HtmlPage uploadAttachment(final String fileName, String pageName) throws IOException {
+    HtmlPage attachments = clickAttachmentsLink(getWikiPage(pageName), pageName);
+    HtmlForm form = attachments.getFormByName("attachmentUpload");
+    form.getInputByName("file").setValueAttribute(fileName);
+    form.getInputByName("attachmentName").setValueAttribute("file");
+    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+    return attachments;
   }
 
 }

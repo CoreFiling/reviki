@@ -33,6 +33,20 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class TestAttachments extends WebTestSupport {
 
+  public static final String ATTACHMENT_UPLOAD_FILE_1 = "webtests/file1.txt";
+  public static final String ATTACHMENT_UPLOAD_FILE_2 = "webtests/file2.txt";
+
+  public static String getAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
+    UnexpectedPage attachment = (UnexpectedPage) link.click();
+    BufferedReader in = new BufferedReader(new InputStreamReader(attachment.getInputStream()));
+    try {
+      return IOUtils.toString(in).trim();
+    }
+    finally {
+      in.close();
+    }
+  }
+
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
     try {
       getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
@@ -53,16 +67,10 @@ public class TestAttachments extends WebTestSupport {
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {
-    final String file1 = "webtests/file1.txt";
-    final String file2 = "webtests/file2.txt";
-    
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "Content", "", true);
-    HtmlPage attachments = clickAttachmentsLink(page, name);
-    HtmlForm form = attachments.getFormByName("attachmentUpload");
-    form.getInputByName("file").setValueAttribute(file1);
-    form.getInputByName("attachmentName").setValueAttribute("file");
-    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
 
     assertEquals("File 1.", getAttachmentAtEndOfLink(attachments.getAnchorByHref("file.txt")));
     
@@ -70,8 +78,8 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
     
     attachments = clickAttachmentsLink(page, name);
-    form = attachments.getFormByName("replaceAttachmentUpload");
-    form.getInputByName("file").setValueAttribute(file2);
+    HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
+    form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
     attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
     assertEquals("File 2.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
 
@@ -79,22 +87,4 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
   }
 
-  private HtmlPage clickAttachmentsLink(final HtmlPage page, final String name) throws IOException {
-    HtmlAnchor attachmentsLink = page.getAnchorByHref(name + "/attachments/");
-    assertEquals("Attachments", attachmentsLink.asText());
-    HtmlPage attachments = (HtmlPage) attachmentsLink.click();
-    return attachments;
-  }
-
-  private String getAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
-    UnexpectedPage attachment = (UnexpectedPage) link.click();
-    BufferedReader in = new BufferedReader(new InputStreamReader(attachment.getInputStream()));
-    try {
-      return IOUtils.toString(in).trim();
-    }
-    finally {
-      in.close();
-    }
-  }
-  
 }

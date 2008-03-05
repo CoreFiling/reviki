@@ -15,6 +15,8 @@
  */
 package net.hillsdon.svnwiki.webtests;
 
+import static net.hillsdon.svnwiki.webtests.TestAttachments.getAttachmentAtEndOfLink;
+
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -37,20 +39,23 @@ public class TestRename extends WebTestSupport {
     }
   }
   
-  public void testRename() throws Exception {
+  public void testRenameRenamesBothPageAndMovesAttachments() throws Exception {
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     String toPageName = uniqueWikiPageName("RenameTestTo");
     HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "Whatever", true);
+    uploadAttachment(TestAttachments.ATTACHMENT_UPLOAD_FILE_1, fromPageName);
+    
     page = (HtmlPage) page.getAnchorByName("rename").click();
     HtmlForm form = page.getFormByName("renameForm");
     form.getInputByName("toPage").setValueAttribute(toPageName);
     page = (HtmlPage) form.getInputByName("rename").click();
 
-    System.err.println(page.asText());
-    System.err.println(getWikiPage(toPageName).asText());
-    
     assertTrue(page.getWebResponse().getUrl().toURI().getPath().endsWith(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
+    page = clickAttachmentsLink(page, toPageName);
+    System.err.println(page.asXml());
+    assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref("file.txt")));
+    
     editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);
   }
   

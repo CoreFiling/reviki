@@ -31,6 +31,9 @@ import org.tmatesoft.svn.core.io.SVNRepository;
  * This interface insulates the {@link SVNPageStore} from the {@link SVNRepository}
  * to enable testing of the logic in the page store.
  * 
+ * In order to combine multiple operations {@link #execute(SVNAction)} has now
+ * been exposed so it may make sense to change the layering here.
+ * 
  * @author mth
  */
 public interface BasicSVNOperations {
@@ -48,11 +51,14 @@ public interface BasicSVNOperations {
   void getFile(String path, long revision, Map<String, String> properties, OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
   void ensureDir(String dir, String commitMessage) throws PageStoreException;
+
+  <T> T execute(SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException;
+
   long create(String path, String commitMessage, InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
   long edit(String path, long baseRevision, String commitMessage, String lockToken, InputStream content) throws PageStoreAuthenticationException, PageStoreException;
   long delete(String path, long baseRevision, String commitMessage, String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
   long copy(String fromPath, long fromRevision, String toPath, String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
-  long rename(String fromPath, String toPath, long baseRevision, String commitMessage) throws PageStoreAuthenticationException, PageStoreException;
+
 
   void unlock(PageReference ref, String lockToken) throws PageStoreAuthenticationException, PageStoreException;
   void lock(PageReference ref, long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException;

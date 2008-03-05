@@ -115,7 +115,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
   }
 
-  private <T> T execute(final SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException {
+  public <T> T execute(final SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException {
     try {
       return action.perform(_repository);
     }
@@ -265,14 +265,6 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
   }
 
-  public long rename(final String fromPath, final String toPath, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNEditAction(commitMessage) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-        moveFile(commitEditor, fromPath, baseRevision, toPath);
-      }
-    });
-  }
-  
   private Map<String, String> createLocksMap(final String path, final String lockToken) {
     return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
   }
@@ -280,7 +272,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
       protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException {
-        deleteFile(commitEditor, path, baseRevision);
+        commitEditor.deleteEntry(path, baseRevision);
       }
     });
   }

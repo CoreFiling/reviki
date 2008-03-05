@@ -38,11 +38,13 @@ import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.fij.text.Strings;
 
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
+import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
  * Stores pages in an SVN repository.
@@ -250,8 +252,18 @@ public class SVNPageStore implements PageStore {
     return _operations.copy(from.getPath(), fromRevision, to.getPath(), commitMessage);
   }
 
-  public long rename(PageReference from, PageReference to, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException {
-    return _operations.rename(from.getPath(), to.getPath(), baseRevision, commitMessage);
+  public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    final String fromAttachmentDir = attachmentPath(from);
+    final String toAttachmentDir = attachmentPath(to);
+    final boolean needToMoveAttachmentDir =  _operations.checkPath(fromAttachmentDir, baseRevision) == SVNNodeKind.DIR;
+    return _operations.execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+        moveFile(commitEditor, from.getPath(), baseRevision, to.getPath());
+        if (needToMoveAttachmentDir) {
+          moveDir(commitEditor, fromAttachmentDir, baseRevision, toAttachmentDir);
+        }
+      }
+    });
   }
 
 }
