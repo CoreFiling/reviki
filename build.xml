@@ -2,7 +2,8 @@
 
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
-  <property name="build" value="ant-classes-build" />   
+  <property name="build-classes" value="ant-build/classes" />   
+  <property name="build-web" value="ant-build/web" />   
   <property name="war" value="${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/svnwiki/web/vcintegration/prepopulated/**"/>
 
@@ -16,20 +17,29 @@
   </path>    
 
   <target name="init">
-     <mkdir dir="${build}" />
+     <mkdir dir="${build-classes}" />
+     <mkdir dir="${build-web}" />
+     <exec outputproperty="revision" executable="svnversion"/>
   </target>
 
   <target name="clean">
-    <delete dir="${build}" />
+    <delete dir="${build-classes}" />
+    <delete dir="${build-web}" />
     <delete file="${war}"/>
   </target>
 
   <target name="compile" depends="init">
     <javac srcdir="${source}"
-           destdir="${build}">
+           destdir="${build-classes}">
       <classpath refid="classpath" />
     </javac>
-    <copy todir="${build}">
+    <copy todir="${build-web}">
+      <fileset dir="${web}">
+        <include name="*/**"/>
+      </fileset>
+    </copy>
+    <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$BuildRevision$" value="${revision}"/>
+    <copy todir="${build-classes}">
       <fileset dir="${source}">
         <include name="${prepopulated-pages}"/>
         <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
@@ -38,13 +48,13 @@
   </target>
 
   <target name="taglibJar" depends="compile">
-    <mkdir dir="${build}/META-INF"/>
-    <move file="${build}/net/hillsdon/svnwiki/web/taglib/svnwiki.tld" tofile="${build}/META-INF/svnwiki.tld"/>
+    <mkdir dir="${build-classes}/META-INF"/>
+    <move file="${build-classes}/net/hillsdon/svnwiki/web/taglib/svnwiki.tld" tofile="${build-classes}/META-INF/svnwiki.tld"/>
     <jar destfile="WebContent/WEB-INF/lib/svnwiki-tlds.jar" >
-      <fileset dir="${build}">
+      <fileset dir="${build-classes}">
         <include name="net/hillsdon/svnwiki/web/taglib/**/*.class"/>
       </fileset>
-      <metainf dir="${build}/META-INF">
+      <metainf dir="${build-classes}/META-INF">
         <include name="**/*"/>
       </metainf>
     </jar>
@@ -52,13 +62,13 @@
 
   <target name="war" depends="compile, taglibJar">
     <war warfile="${war}"
-         webxml="${web}/WEB-INF/web.xml">
-       <classes dir="${build}">
+         webxml="${build-web}/WEB-INF/web.xml">
+       <classes dir="${build-classes}">
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
        </classes>
-       <fileset dir="${web}" includes="**" />
-       <webinf dir="${web}/WEB-INF" includes="**" />
+       <fileset dir="${build-web}" includes="**" />
+       <webinf dir="${build-web}/WEB-INF" includes="**" />
     </war>
   </target>
 
