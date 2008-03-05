@@ -62,7 +62,7 @@ public class CreoleRenderer {
   
   public CreoleRenderer(final RenderNode[] customNonStructural) {
     RenderNode root = new RegexMatchToTag("", "", 0);
-    RenderNode noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
+    RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
     RenderNode strikethrough = new RegexMatchToTag("--(.+?)--", "del", 1);
@@ -89,7 +89,7 @@ public class CreoleRenderer {
         new Heading(1).addChildren(nonStructural),
         orderedList.addChildren(listItem),
         unorderedList.addChildren(listItem),
-        paragraph.addChildren(orderedList, unorderedList, horizontalRule).addChildren(nonStructural), 
+        paragraph.addChildren(orderedList, unorderedList, noWiki, horizontalRule).addChildren(nonStructural), 
         italic.addChildren(nonStructural), 
         bold.addChildren(nonStructural),
         strikethrough.addChildren(nonStructural)
