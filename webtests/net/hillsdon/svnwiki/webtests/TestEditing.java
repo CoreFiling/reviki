@@ -58,6 +58,17 @@ public class TestEditing extends WebTestSupport {
     editWikiPage(name, "Whatever", "", true);
     editThenCancel(name);
   }
+  
+  public void testCanViewDeletedPage() throws Exception {
+    final String content = "Distinctive content";
+    final String name = uniqueWikiPageName("EditPageTest");
+    
+    HtmlPage original = editWikiPage(name, content, "", true);
+    long originalRevision = getRevisionNumberFromTitle(original);
+    editWikiPage(name, "", "Deleted", false);
+    HtmlPage originalByRevision = getWebPage("pages/test/" + name + "?revision=" + originalRevision);
+    assertTrue(originalByRevision.asText().contains(content));
+  }
 
   private void editThenCancel(final String name) throws IOException {
     final String flagText = "Should not be saved.";
