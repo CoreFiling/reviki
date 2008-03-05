@@ -18,11 +18,11 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
 
   public JavaSyntaxHighlightedNode() {
-    super("(?s)(^|\\n)\\[<java>\\](.*?)(^|\\n)\\[</java>\\]");
+    super("(?s)\\[<java>\\](.*?)\\[</java>\\]");
   }
 
   public String handle(final PageReference page, final Matcher matcher) {
-    String content = matcher.group(2).trim();
+    String content = matcher.group(1).trim();
     try {
       return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true);
     }
