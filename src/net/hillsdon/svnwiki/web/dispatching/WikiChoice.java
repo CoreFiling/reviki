@@ -75,7 +75,7 @@ public class WikiChoice implements RequestHandler {
   }
 
   private RequestHandler getWikiHandler(final PerWikiInitialConfiguration configuration, final ConsumedPath path) throws NotFoundException {
-    RequestHandler wiki = _wikis.get(configuration.getWikiName());
+    RequestHandler wiki = _wikis.get(configuration);
     boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
     if (wiki == null || reconfigure) {
       // At the moment we lazily install wiki handlers.  Fix this when adding a wiki list?
