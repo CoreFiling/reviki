@@ -7,7 +7,7 @@ BOILERPLATE = open('BOILERPLATE', 'r').read()
 def apply_boilerplate(arg, dirname, fnames):
   for i, name in enumerate(fnames):
     if name == '.svn':
-            del fnames[i]
+      del fnames[i]
     elif name.endswith('.java'):
       path = os.path.join(dirname, name)
       ensure_has_boilerplate(path)
