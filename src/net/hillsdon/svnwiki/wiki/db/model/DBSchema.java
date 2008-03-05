@@ -54,5 +54,4 @@ public class DBSchema extends DBCreatableObject {
     return "create schema " + getName();
   }
 
-
 }
