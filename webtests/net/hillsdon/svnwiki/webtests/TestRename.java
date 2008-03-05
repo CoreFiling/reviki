@@ -53,7 +53,6 @@ public class TestRename extends WebTestSupport {
     assertTrue(page.getWebResponse().getUrl().toURI().getPath().endsWith(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = clickAttachmentsLink(page, toPageName);
-    System.err.println(page.asXml());
     assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref("file.txt")));
     
     editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);
