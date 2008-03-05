@@ -11,21 +11,33 @@
       <tr><th>Date</th><th>Page</th><th>User</th><th>Description</th></tr>
       <c:forEach var="change" items="${recentChanges}">
         <tr>
-          <td><f:formatDate type="both" value="${change.date}"/></td>
           <td>
+            <f:formatDate type="both" value="${change.date}"/>
+          </td>
+          <td>
+            <c:set var="link">
+              <c:choose>
+                <c:when test="${change.attachment}">
+                  <a href="<c:url value="${change.page}/attachments/${change.name}"/>"><c:out value="${change.name}"/></a>
+                </c:when>
+                <c:otherwise>
+                  <a href="<c:url value="${change.name}"/>"><c:out value="${change.name}"/></a>
+                </c:otherwise>
+              </c:choose>
+            </c:set>
             <c:choose>
-              <c:when test="${change.isAttachment}">
-                <a href="<c:url value="${change.page}/attachments/${change.name}"/>"><c:out value="${change.name}"/></a>
+              <c:when test="${change.deletion}">
+                <del>${link}</del>
               </c:when>
               <c:otherwise>
-                <a href="<c:url value="${change.name}"/>"><c:out value="${change.name}"/></a>
+                ${link}
               </c:otherwise>
             </c:choose>
           </td>
           <td><c:out value="${change.user}"/></td>
           <td>
             <c:choose>
-              <c:when test="${change.isAttachment}">
+              <c:when test="${change.attachment}">
                 <a href="<sw:wikiUrl page="${change.page}"/>/attachments/"><c:out value="${change.description}"/></a>
               </c:when>
               <c:otherwise>

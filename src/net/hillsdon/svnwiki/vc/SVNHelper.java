@@ -31,6 +31,7 @@ import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
@@ -54,16 +55,20 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws SVNException {
-    final String rootPath = getRoot();
-    final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
-    // Start and end reversed to get newest changes first.
-    _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
-      public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.addAll(logEntryToChangeInfos(rootPath, path, pathOnly, logEntry));
+  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<List<ChangeInfo>>() {
+      public List<ChangeInfo> perform(SVNRepository repository) throws SVNException, PageStoreException {
+        final String rootPath = getRoot();
+        final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
+        // Start and end reversed to get newest changes first.
+        _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
+          public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
+            entries.addAll(logEntryToChangeInfos(rootPath, path, pathOnly, logEntry));
+          }
+        });
+        return entries;
       }
     });
-    return entries;
   }
   
   public Collection<PageStoreEntry> listFiles(final String dir) throws SVNException {
@@ -82,7 +87,7 @@ public class SVNHelper {
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
+      if (!pathOnly || (changedPath.length() > rootPath.length() && changedPath.substring(rootPath.length() + 1).equals(path))) {
         ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
         // something useful with 'other' changes.
@@ -168,7 +173,16 @@ public class SVNHelper {
     }
     String user = entry.getAuthor();
     Date date = entry.getDate();
-    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind);
+    SVNLogEntryPath logForPath = (SVNLogEntryPath) entry.getChangedPaths().get(path);
+    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind, ChangeType.forCode(logForPath.getType()));
   }
 
+  public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNAction<Long>() {
+      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        return repository.getLatestRevision();
+      }
+    });
+  }
+  
 }

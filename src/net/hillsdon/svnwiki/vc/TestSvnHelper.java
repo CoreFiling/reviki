@@ -20,6 +20,7 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 
 public class TestSvnHelper extends TestCase {
 
@@ -42,8 +43,8 @@ public class TestSvnHelper extends TestCase {
     assertEquals("ThisIsAPage", changeInfo.getPage());
   }
   
-  private ChangeInfo changeInfo(String path) {
-    return SVNHelper.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, null), -1, "", null, ""), "/wiki2", path);
+  private ChangeInfo changeInfo(final String path) {
+    return SVNHelper.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), "/wiki2", path);
   }
   
 }

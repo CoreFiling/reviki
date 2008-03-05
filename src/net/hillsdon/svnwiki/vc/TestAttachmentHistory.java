@@ -24,8 +24,8 @@ public class TestAttachmentHistory extends TestCase {
 
   public void testGetPreviousVersions() {
     AttachmentHistory history = new AttachmentHistory();
-    ChangeInfo firstCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Added.", StoreKind.ATTACHMENT);
-    ChangeInfo secondCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Latest edit.", StoreKind.ATTACHMENT);
+    ChangeInfo firstCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Added.", StoreKind.ATTACHMENT, ChangeType.MODIFIED);
+    ChangeInfo secondCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Latest edit.", StoreKind.ATTACHMENT, ChangeType.MODIFIED);
     history.getVersions().add(secondCommit);
     history.getVersions().add(firstCommit);
     assertEquals(secondCommit, history.getLatestVersion());

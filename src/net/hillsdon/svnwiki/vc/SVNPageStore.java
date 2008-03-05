@@ -40,7 +40,6 @@ import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.svnwiki.vc.SVNHelper.SVNAction;
 
 import org.tmatesoft.svn.core.SVNErrorCode;
-import org.tmatesoft.svn.core.SVNErrorMessage;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -70,31 +69,30 @@ public class SVNPageStore implements PageStore {
 
   private final SVNHelper _helper;
 
+  private final DeletionRevisionTracker _tracker;
+
   /**
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final SVNRepository repository) {
+  public SVNPageStore(final DeletionRevisionTracker tracker, final SVNRepository repository) {
+    _tracker = tracker;
     _helper = new SVNHelper(repository);
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
-    return _helper.execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log("", limit, false, 0, -1);
-      }
-    });
+    return _helper.log("", limit, false, 0, -1);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
-    List<ChangeInfo> changes = _helper.execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(ref.getPath(), -1, true, 0, -1);
-      }
-    });
+    final ChangeInfo deletedIn = getChangeThatDeleted(ref, -1);
+    long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
+    List<ChangeInfo> changes = _helper.log(ref.getPath(), -1, true, 0, lastRevision);
+    if (deletedIn != null) {
+      changes.add(0, deletedIn);
+    }
     return Functional.list((((filter(changes, CHANGE_TO_PAGE)))));
   }
-
 
   public Collection<PageReference> list() throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<PageReference>>() {
@@ -109,7 +107,6 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     return _helper.execute(new SVNAction<PageInfo>() {
       public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
@@ -122,38 +119,52 @@ public class SVNPageStore implements PageStore {
           long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
           Date lastChangedDate = SVNTimeUtil.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
           String lastChangedAuthor = properties.get(SVNProperty.LAST_AUTHOR);
+          SVNLock lock = null;
           try {
-            SVNLock lock = null;
             if (revision == -1 || repository.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
               lock = repository.getLock(ref.getPath());
             }
-            String lockOwner = lock == null ? null : lock.getOwner();
-            String lockToken = lock == null ? null : lock.getID();
-            return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
           }
           catch (SVNException ex) {
             // It was a file at 'revision' but is now deleted so we can't get the lock information.
-            SVNErrorMessage error = ex.getErrorMessage();
-            if (error.getErrorCode() == SVNErrorCode.RA_DAV_PATH_NOT_FOUND) {
-              return createNewOrDeletedPageInfo(ref);
+            if (!isPathNotFoundError(ex)) {
+              throw ex;
             }
-            throw ex;
           }
+          String lockOwner = lock == null ? null : lock.getOwner();
+          String lockToken = lock == null ? null : lock.getID();
+          return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
         }
         else if (SVNNodeKind.NONE.equals(kind)) {
-          return createNewOrDeletedPageInfo(ref);
+          long pseudoRevision = PageInfo.UNCOMMITTED;
+          long lastChangedRevision = PageInfo.UNCOMMITTED; 
+          String lastChangedAuthor = null;
+          Date lastChangedDate = null;
+          final ChangeInfo deletingChange = getChangeThatDeleted(ref, revision);
+          if (deletingChange != null) {
+            pseudoRevision = PageInfo.DELETED;
+            lastChangedRevision = deletingChange.getRevision();
+            lastChangedAuthor = deletingChange.getUser();
+            lastChangedDate = deletingChange.getDate();
+          }
+          return new PageInfo(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null);
         }
         else {
           throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
         }
       }
 
-      private PageInfo createNewOrDeletedPageInfo(final PageReference ref) {
-        return new PageInfo(ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
+      private boolean isPathNotFoundError(final SVNException ex) {
+        return ex.getErrorMessage().getErrorCode() == SVNErrorCode.RA_DAV_PATH_NOT_FOUND;
       }
+
     });
   }
 
+  private ChangeInfo getChangeThatDeleted(final PageReference ref, final long maxRevision) throws PageStoreAuthenticationException, PageStoreException {
+    return _tracker.getChangeThatDeleted(_helper, ref.getPath());
+  }
+  
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
     final PageInfo page = get(ref, -1);
     if (page.isNew()) {
@@ -198,7 +209,7 @@ public class SVNPageStore implements PageStore {
     return set(ref.getPath(), lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
   }
 
-  private void checkForInterveningCommit(SVNException ex) throws InterveningCommitException {
+  private void checkForInterveningCommit(final SVNException ex) throws InterveningCommitException {
     if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
       // What to do!
       throw new InterveningCommitException(ex);
@@ -348,34 +359,18 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    return _helper.execute(new SVNAction<Collection<PageReference>>() {
-      public Collection<PageReference> perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          List<ChangeInfo> log = _helper.log("", -1, false, start, end);
-          Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
-          for (ChangeInfo info : log) {
-            if (info.getKind() == StoreKind.PAGE) {
-              pages.add(new PageReference(info.getPage()));
-            }
-          }
-          return pages;
-        }
-        catch (SVNException ex) {
-          if (SVNErrorCode.FS_NO_SUCH_REVISION.equals(ex.getErrorMessage().getErrorCode())) {
-            return Collections.emptySet();
-          }
-          throw ex;
-        }
+    List<ChangeInfo> log = _helper.log("", -1, false, start, end);
+    Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
+    for (ChangeInfo info : log) {
+      if (info.getKind() == StoreKind.PAGE) {
+        pages.add(new PageReference(info.getPage()));
       }
-    });
+    }
+    return pages;
   }
 
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
-    return _helper.execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        return repository.getLatestRevision();
-      }
-    });
+    return _helper.getLatestRevision();
   }
 
 }

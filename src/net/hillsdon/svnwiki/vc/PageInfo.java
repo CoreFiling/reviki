@@ -25,6 +25,7 @@ import java.util.Date;
 public class PageInfo extends PageReference {
 
   public static final long UNCOMMITTED = -2;
+  public static final long DELETED = -3;
 
   private String _content;
   private final long _revision;
@@ -84,7 +85,11 @@ public class PageInfo extends PageReference {
   }
   
   public boolean isNew() {
-    return _revision == UNCOMMITTED;
+    return _revision == UNCOMMITTED || _revision == DELETED;
+  }
+  
+  public boolean isDeleted() {
+    return _revision == DELETED;
   }
 
   public boolean lockedByUserIfNeeded(final String user) {

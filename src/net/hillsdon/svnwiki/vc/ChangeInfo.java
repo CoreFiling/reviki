@@ -34,15 +34,21 @@ public class ChangeInfo {
   private final long _revision;
   private final String _commitMessage;
   private final StoreKind _kind;
+  private final ChangeType _changeType;
   
-  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind) {
+  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType) {
     _page = page;
     _name = name;
     _user = user;
     _date = date;
     _revision = revision;
     _kind = kind;
+    _changeType = changeType;
     _commitMessage = commitMessage.trim();
+  }
+  
+  public ChangeType getChangeType() {
+    return _changeType;
   }
 
   public String getName() {
@@ -106,8 +112,12 @@ public class ChangeInfo {
     return _kind;
   }
   
-  public boolean getIsAttachment() {
-   return getKind() == StoreKind.ATTACHMENT; 
+  public boolean isAttachment() {
+    return getKind() == StoreKind.ATTACHMENT;
+  }
+  
+  public boolean isDeletion() {
+    return getChangeType() == ChangeType.DELETED;
   }
   
 }
