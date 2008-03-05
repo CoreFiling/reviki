@@ -3,7 +3,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">All Pages</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1>All pages</h1>
+    <h1>All Pages</h1>
     <ul>
       <c:forEach var="path" items="${pageList}">
         <li><a href="<c:url value="${path}"/>"><c:out value="${path}"/></a></li>
