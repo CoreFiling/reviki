@@ -40,7 +40,12 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
           // Note we pass 'latest' as the revision here.  At the moment we get
           // back the revision of deleted pages as -2 which isn't such a good
           // thing to set our 'highest indexed revision' to...
-          _delegate.index(info.getPath(), latest, info.getContent());
+          if (info.isNew()) {
+            _delegate.delete(info.getPath(), latest);
+          }
+          else {
+            _delegate.index(info.getPath(), latest, info.getContent());
+          }
         }
       }
     }
@@ -48,6 +53,10 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   public long getHighestIndexedRevision() throws IOException {
     return _delegate.getHighestIndexedRevision();
+  }
+
+  public void delete(final String path, final long revision) throws IOException {
+    _delegate.delete(path, revision);
   }
 
 }

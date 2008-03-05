@@ -100,6 +100,16 @@ public class LuceneSearcher implements SearchEngine {
     return document;
   }
 
+  private void deleteDocument(final String keyField, final String value) throws IOException {
+    IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
+    try {
+      writer.deleteDocuments(new Term(keyField, value));
+    }
+    finally {
+      writer.close();
+    }
+  }
+  
   private void replaceDocument(final String keyField, final Document document) throws CorruptIndexException, LockObtainFailedException, IOException {
     IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
     try {
@@ -119,9 +129,12 @@ public class LuceneSearcher implements SearchEngine {
       return;
     }
     replaceDocument(FIELD_PATH, createWikiPageDocument(path, content));
-    if (revision > getHighestIndexedRevision()) {
-      replaceDocument(FIELD_PROPERTY_KEY, createPropertyDocument(PROPERTY_LAST_INDEXED_REVISION, String.valueOf(revision)));
-    }
+    rememberLastIndexedRevision(revision);
+  }
+  
+  public synchronized void delete(final String path, final long revision) throws IOException {
+    deleteDocument(FIELD_PATH, path);
+    rememberLastIndexedRevision(revision);
   }
   
   public Set<SearchMatch> search(final String queryString) throws IOException, QuerySyntaxException {
@@ -216,6 +229,10 @@ public class LuceneSearcher implements SearchEngine {
     finally {
       reader.close();
     }
+  }
+
+  private void rememberLastIndexedRevision(final long revision) throws CorruptIndexException, LockObtainFailedException, IOException {
+    replaceDocument(FIELD_PROPERTY_KEY, createPropertyDocument(PROPERTY_LAST_INDEXED_REVISION, String.valueOf(revision)));
   }
   
 }

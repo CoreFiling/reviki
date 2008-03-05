@@ -39,5 +39,12 @@ public interface SearchEngine {
    * @throws IOException On error reading from the search index. 
    */
   long getHighestIndexedRevision() throws IOException;
+
+  /**
+   * @param path Page.
+   * @param revision Revision at which we noticed its passing.
+   * @throws IOException 
+   */
+  void delete(String path, long revision) throws IOException;
   
 }
