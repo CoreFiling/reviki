@@ -68,7 +68,12 @@ public class SVNHelper {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
-        results.add(classifiedChange(entry, rootPath, changedPath));
+        ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
+        // Might want to put this at a higher level if we can ever do
+        // something useful with 'other changes.
+        if (change.getKind() != StoreKind.OTHER) {
+          results.add(change);
+        }
       }
     }
     return results;
