@@ -28,7 +28,7 @@
       <p>
       Referenced on:
       <c:forEach var="backlink" items="${backlinks}">
-        <a href="<c:out value="${backlink}"/>"><c:out value="${backlink}"/></a>
+        <a class="backlink" href="<c:out value="${backlink}"/>"><c:out value="${backlink}"/></a>
       </c:forEach>
       <c:if test="${backlinksLimited}">
         <a href="<c:url value="/search?query=${pageInfo.path}&force"/>">...</a>
