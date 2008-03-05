@@ -43,7 +43,7 @@ public class Dispatcher extends HttpServlet {
     try {
       if (_configuration.isComplete()) {
         if (_currentHandler == _configurationHandler || _currentHandler == null) {
-          _currentHandler = new MainHandler(_configuration);
+          _currentHandler = new WikiChoice(_configuration);
         }
       }
       else {
@@ -61,12 +61,13 @@ public class Dispatcher extends HttpServlet {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     setCurrentHandler();
+    ConsumedPath path = new ConsumedPath(request);
     try {
       if ((request.getContextPath() + "/configuration").equals(request.getRequestURI())) {
-        _configurationHandler.handle(request, response);
+        _configurationHandler.handle(path, request, response);
       }
       else {
-        _currentHandler.handle(request, response);
+        _currentHandler.handle(path, request, response);
       }
     }
     catch (NotFoundException ex) {

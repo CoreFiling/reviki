@@ -6,4 +6,7 @@ public class NotFoundException extends PageStoreException {
   public NotFoundException(final Throwable cause) {
     super(cause);
   }
+  public NotFoundException() {
+    super("Not found");
+  }
 }

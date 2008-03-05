@@ -8,12 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
+import net.hillsdon.svnwiki.web.ConsumedPath;
 
 public class SetPage extends PageRequestHandler {
 
   // Value of the submit element, 'Save' or 'Cancel'.
   private static final String PARAM_ACTION = "action";
-  private static final String PARAM_CONTENT = "content";
+  static final String PARAM_CONTENT = "content";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private static final String PARAM_LOCK_TOKEN = "lockToken";
   private static final String PARAM_COMMIT_MESSAGE = "description";
@@ -34,7 +35,7 @@ public class SetPage extends PageRequestHandler {
   }
 
   @Override
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
     if ("Save".equals(request.getParameter(PARAM_ACTION))) {
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);

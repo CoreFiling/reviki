@@ -1,9 +1,11 @@
 package net.hillsdon.svnwiki.wiki;
 
 /**
- * Wikis are rather tied up with the web.
+ * Wikis are rather tied up with the web.  At the moment we assume the public URL
+ * is the servlet container URL which is probably dubious if apache is fronting
+ * tomcat etc.  Probably need a configurable base URL.
  * 
- * These methods take and return fully qualified URLs.
+ * These methods return fully qualified URLs.
  * 
  * @author mth
  */
@@ -14,14 +16,6 @@ public interface WikiUrls {
   String search();
   
   String page(String name);
-
-  boolean isPage(String url);
-
-  String attachment(String page, String name);
-  
-  boolean isAttachmentsDir(String url);
-  
-  boolean isAttachment(String url);
 
   String feed();
   

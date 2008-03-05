@@ -10,6 +10,7 @@ import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
+import net.hillsdon.svnwiki.web.ConsumedPath;
 import net.hillsdon.svnwiki.web.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.RequestHandler;
 
@@ -33,8 +34,8 @@ public class Search implements RequestHandler {
     _searchEngine = searchEngine;
   }
 
-  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    if (request.getRequestURL().toString().endsWith("opensearch.xml")) {
+  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    if ("opensearch.xml".equals(path.next())) {
       response.setContentType("application/opensearchdescription+xml");
       response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(new RequestBasedWikiUrls(request).search())));
       return;

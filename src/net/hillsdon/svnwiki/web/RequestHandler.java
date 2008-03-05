@@ -10,6 +10,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface RequestHandler {
 
-  void handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
+  void handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
   
 }

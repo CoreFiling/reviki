@@ -11,6 +11,7 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.web.ConsumedPath;
 import net.hillsdon.svnwiki.web.InvalidInputException;
 
 import org.apache.commons.fileupload.FileItem;
@@ -31,7 +32,7 @@ public class UploadAttachment extends PageRequestHandler {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
+  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }

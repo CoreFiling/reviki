@@ -19,10 +19,6 @@ public class RequestBasedWikiUrls implements WikiUrls {
     _base = base;
   }
   
-  public boolean isPage(final String url) {
-    return url.startsWith(_base + "/pages/") && !url.contains("/attachments/");
-  }
-
   public String page(final String name) {
     return _base + "/pages/" + Escape.url(name);
   }
@@ -35,20 +31,8 @@ public class RequestBasedWikiUrls implements WikiUrls {
     return _base + "/pages/FindPage";
   }
 
-  public String attachment(final String page, final String name) {
-    return _base + Escape.url(page) + "/" + Escape.url(name);
-  }
-
   public String feed() {
     return page("RecentChanges") + "/atom.xml";
-  }
-
-  public boolean isAttachment(final String url) {
-    return url.startsWith(_base + "/pages/") && url.contains("/attachments/") && !url.endsWith("/attachments/");
-  }
-
-  public boolean isAttachmentsDir(final String url) {
-    return url.startsWith(_base + "/pages/") && url.endsWith("/attachments/");
   }
 
 }

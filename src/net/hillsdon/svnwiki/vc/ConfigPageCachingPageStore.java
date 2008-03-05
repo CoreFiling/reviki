@@ -43,5 +43,9 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
   private boolean isConfigPage(final PageReference ref) {
     return ref.getPath().startsWith("Config");
   }
+  
+  public PageStore getUnderlying() {
+    return getDelegate();
+  }
 
 }

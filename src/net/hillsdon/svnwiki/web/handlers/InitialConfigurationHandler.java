@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.InitialConfiguration;
+import net.hillsdon.svnwiki.web.ConsumedPath;
 import net.hillsdon.svnwiki.web.RequestHandler;
 
 public class InitialConfigurationHandler implements RequestHandler {
@@ -17,7 +18,7 @@ public class InitialConfigurationHandler implements RequestHandler {
     _configuration = configuration;
   }
   
-  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public void handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if ("GET".equals(request.getMethod())) {
       showView(request, response);
     }
