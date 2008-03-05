@@ -1,6 +1,5 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<tiles:initContainer/>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title" value="Configuration"/>
   <tiles:putAttribute name="content">
