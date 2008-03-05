@@ -57,7 +57,7 @@ public class Dispatcher extends HttpServlet {
         }
         else {
           _set.handle(request, response);
-          _get.handle(request, response);
+          response.sendRedirect(request.getRequestURI());
         }
       }
     }
