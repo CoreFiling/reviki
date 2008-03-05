@@ -7,8 +7,13 @@
     <c:choose>
       <c:when test="${not empty results}">
         <ul>
-          <c:forEach var="path" items="${results}">
-            <li><a href="<c:url value="/pages/${path}"/>"><c:out value="${path}"/></a></li>
+          <c:forEach var="match" items="${results}">
+            <li>
+              <a href="<c:url value="/pages/${match.page}"/>"><c:out value="${match.page}"/></a>
+              <p style="margin-top: 0px">
+                ${match.htmlExtract}
+              </p>
+            </li>
           </c:forEach>
         </ul>
       </c:when>

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.external.diff_match_patch.diff_match_patch;
 import net.hillsdon.svnwiki.search.QuerySyntaxException;
 import net.hillsdon.svnwiki.search.SearchEngine;
+import net.hillsdon.svnwiki.search.SearchMatch;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -66,21 +67,21 @@ public class GetRegularPage extends PageRequestHandler {
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final String page) throws IOException, QuerySyntaxException {
-    Set<String> backlinks = _engine.search(page);
+    Set<SearchMatch> backlinks = _engine.search(page);
     backlinks.remove(page);
     if (backlinks.size() > BACKLINKS_LIMIT) {
       request.setAttribute("backlinksLimited", true);
-      Set<String> limited = new LinkedHashSet<String>();
-      int i = 0;
-      for (String backlink : backlinks) {
-        limited.add(backlink);
-        if (++i >= BACKLINKS_LIMIT) {
-          break;
-        }
-      }
-      backlinks = limited;
     }
-    request.setAttribute("backlinks", backlinks);
+    
+    Set<String> pageNames = new LinkedHashSet<String>();
+    int i = 0;
+    for (SearchMatch backlink : backlinks) {
+      pageNames.add(backlink.getPage());
+      if (++i >= BACKLINKS_LIMIT) {
+        break;
+      }
+    }
+    request.setAttribute("backlinks", pageNames);
   }
 
 }
