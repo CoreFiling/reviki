@@ -28,8 +28,9 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class SetPage implements PageRequestHandler {
 
-  static final String SUBMIT_SAVE = "save";
-  static final String SUBMIT_COPY = "copy";
+  public static final String SUBMIT_SAVE = "save";
+  public static final String SUBMIT_COPY = "copy";
+  public static final String SUBMIT_UNLOCK = "unlock";
 
   private static final String PARAM_FROM_PAGE = "fromPage";
 
@@ -72,7 +73,7 @@ public class SetPage implements PageRequestHandler {
       final long fromRevision = -1;
       _store.copy(new PageReference(fromPage), fromRevision, page, createLinkingCommitMessage(request));
     }
-    else if (request.getParameter("unlock") != null) {
+    else if (request.getParameter(SUBMIT_UNLOCK) != null) {
       String lockToken = request.getParameter(PARAM_LOCK_TOKEN);
       // New pages don't have a lock.
       if (lockToken != null && lockToken.length() > 0) {

@@ -35,13 +35,15 @@ public class TestHistory extends WebTestSupport {
     assertEquals(2, historyRows.size());
     HtmlTableRow altered = historyRows.get(0);
     // First column is date/time.
-    assertEquals(getUsername(), altered.getCell(1).asText());
-    assertEquals("s/Initial/Altered", altered.getCell(2).asText());
+    assertEquals(pageName, altered.getCell(1).asText());
+    assertEquals(getUsername(), altered.getCell(2).asText());
+    assertEquals("s/Initial/Altered", altered.getCell(3).asText());
     HtmlTableRow initial = historyRows.get(1);
-    assertEquals(getUsername(), initial.getCell(1).asText());
-    assertEquals("None", initial.getCell(2).asText());
+    assertEquals(pageName, initial.getCell(1).asText());
+    assertEquals(getUsername(), initial.getCell(2).asText());
+    assertEquals("None", initial.getCell(3).asText());
 
-    HtmlAnchor diffLink = (HtmlAnchor) altered.getCell(2).getByXPath("a").iterator().next();
+    HtmlAnchor diffLink = (HtmlAnchor) altered.getCell(3).getByXPath("a").iterator().next();
     HtmlPage diff = (HtmlPage) diffLink.click();
     assertEquals("Altered", ((DomNode) diff.getByXPath("//ins").iterator().next()).asText());
     assertEquals("Initial", ((DomNode) diff.getByXPath("//del").iterator().next()).asText());

@@ -15,13 +15,14 @@
  */
 package net.hillsdon.svnwiki.webtests;
 
-import java.io.IOException;
-
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class TestEditing extends WebTestSupport {
   
+  private static final String ID_EDIT_FORM = "editForm";
+
   public void testEditPageIncrementsRevision() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
     HtmlPage initial = editWikiPage(name, "Initial content", "", true);
@@ -41,13 +42,25 @@ public class TestEditing extends WebTestSupport {
     editThenCancel(name);
   }
 
-  private void editThenCancel(final String name) throws IOException {
+  private void editThenCancel(final String name) throws Exception {
     final String flagText = "Should not be saved.";
     HtmlPage editPage = clickEditLink((HtmlPage) getWebPage("pages/test/" + name));
-    HtmlForm form = editPage.getFormByName("editForm");
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     form.getTextAreaByName("content").setText(flagText);
     HtmlPage viewPage = (HtmlPage) form.getInputByValue("Cancel").click();
     assertFalse(viewPage.asText().contains(flagText));
+    try {
+      viewPage.getFormByName(ID_EDIT_FORM);
+      fail("Should be back to view page, not edit form.");
+    }
+    catch (ElementNotFoundException ignore) {
+    }
+    try {
+      viewPage.getByXPath("id('lockedInfo')");
+      fail("Should not be present.");
+    }
+    catch (ElementNotFoundException ignore) {
+    }
   }
   
 }
