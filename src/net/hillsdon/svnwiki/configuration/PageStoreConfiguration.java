@@ -17,7 +17,7 @@ public class PageStoreConfiguration implements Configuration {
   }
   
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {
-    PageInfo page = _store.get("InterWikiLinks", -1);
+    PageInfo page = _store.get("ConfigInterWikiLinks", -1);
     InterWikiLinker linker = new InterWikiLinker();
     if (!page.isNew()) {
       parseLinkEntries(linker, page.getContent());
