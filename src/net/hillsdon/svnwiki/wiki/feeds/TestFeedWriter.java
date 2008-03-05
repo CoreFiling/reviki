@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ChangeType;
 import net.hillsdon.svnwiki.vc.StoreKind;
-import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
+import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,13 +40,27 @@ public class TestFeedWriter extends TestCase {
   public void test() throws Exception {
     StringWriter out = new StringWriter();
     List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED));
-    FeedWriter.writeAtom(new RequestBasedWikiUrls("http://www.example.com/svnwiki"), new PrintWriter(out), changes);
+    WikiUrls urls = new WikiUrls() {
+      public String feed() {
+        return "feed";
+      }
+      public String page(final String name) {
+        return "page";
+      }
+      public String root() {
+        return "root";
+      }
+      public String search() {
+        return "search";
+      }
+    };
+    FeedWriter.writeAtom(urls, new PrintWriter(out), changes);
     
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     Document dom = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(out.toString())));
     Element selfLink = (Element) dom.getElementsByTagName("link").item(0);
-    assertTrue(selfLink.getAttributeNS(null, "href").endsWith("/atom.xml"));
+    assertEquals(selfLink.getAttributeNS(null, "href"), "feed");
     
     NodeList entries = dom.getElementsByTagNameNS(FeedWriter.ATOM_NS, "entry");
     assertEquals(1, entries.getLength());

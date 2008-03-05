@@ -18,32 +18,40 @@ package net.hillsdon.svnwiki.web.common;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.text.Escape;
+import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 public class RequestBasedWikiUrls implements WikiUrls {
 
+  public static void create(final HttpServletRequest request, final PerWikiInitialConfiguration configuration) {
+    request.setAttribute(RequestBasedWikiUrls.class.getName(), new RequestBasedWikiUrls(request, configuration));
+  }
+  
+  public static WikiUrls get(final HttpServletRequest request) {
+    return (WikiUrls) request.getAttribute(RequestBasedWikiUrls.class.getName());
+  }
+  
   private String _base;
+  private final PerWikiInitialConfiguration _configuration;
 
-  public RequestBasedWikiUrls(final HttpServletRequest request) {
+  public RequestBasedWikiUrls(final HttpServletRequest request, final PerWikiInitialConfiguration configuration) {
+    _configuration = configuration;
     String requestURL = request.getRequestURL().toString();
     String path = request.getRequestURI().substring(request.getContextPath().length());
     _base = requestURL.substring(0, requestURL.length() - path.length());
   }
   
-  public RequestBasedWikiUrls(final String base) {
-    _base = base;
+  public String root() {
+    String givenWikiName = Escape.url(_configuration.getGivenWikiName() == null ? "" : _configuration.getGivenWikiName());
+    return _base + "/pages/" + givenWikiName + "/";
   }
   
   public String page(final String name) {
-    return _base + "/pages/" + Escape.url(name);
-  }
-
-  public String root() {
-    return _base + "/";
+    return root() + Escape.url(name);
   }
 
   public String search() {
-    return _base + "/pages/FindPage";
+    return page("FindPage");
   }
 
   public String feed() {

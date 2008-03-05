@@ -47,7 +47,7 @@ public class RecentChanges implements RequestHandler {
     
     if ("atom.xml".equals(path.next())) {
       response.setContentType("application/atom+xml");
-      FeedWriter.writeAtom(new RequestBasedWikiUrls(request), response.getWriter(), recentChanges);
+      FeedWriter.writeAtom(RequestBasedWikiUrls.get(request), response.getWriter(), recentChanges);
       return;
     }
     

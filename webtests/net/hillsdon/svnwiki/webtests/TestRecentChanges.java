@@ -53,13 +53,13 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(first.asText(), createdFirst);
     assertEquals(second.asText(), createdSecond);
     
-    HtmlPage recentChanges = getWebPage("pages/test/RecentChanges");
+    HtmlPage recentChanges = getWikiPage("RecentChanges");
     assertTrue(recentChanges.asText().contains(descriptionOfChange));
   }
 
   @SuppressWarnings("unchecked")
   private Iterator<HtmlAnchor> getRecentChangesLinks() throws IOException, JaxenException {
-    HtmlPage recentChanges = getWebPage("pages/test/RecentChanges");
+    HtmlPage recentChanges = getWikiPage("RecentChanges");
     Iterator<HtmlAnchor> links = recentChanges.getByXPath("//tr/td[position() = 2]/a").iterator();
     return links;
   }

@@ -29,7 +29,7 @@ public class TestAllPages extends WebTestSupport {
     String name = uniqueWikiPageName("AllPagesTest");
     editWikiPage(name, "Should appear in all pages", "", true);
 
-    HtmlPage allPages = getWebPage("pages/test/AllPages");
+    HtmlPage allPages = getWikiPage("AllPages");
     assertTrue(allPages.getTitleText().endsWith("All Pages"));
     HtmlAnchor link = allPages.getAnchorByHref("/svnwiki/pages/test/" + name);
     assertEquals(name, link.asText());

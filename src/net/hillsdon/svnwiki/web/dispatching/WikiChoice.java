@@ -28,6 +28,7 @@ import net.hillsdon.svnwiki.configuration.DeploymentConfiguration;
 import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 
 public class WikiChoice implements RequestHandler {
@@ -87,7 +88,7 @@ public class WikiChoice implements RequestHandler {
     PerWikiInitialConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
     request.setAttribute(WikiHandler.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
-
+    RequestBasedWikiUrls.create(request, configuration);
     RequestHandler handler = getWikiHandler(configuration, path);
     handler.handle(path, request, response);
   }

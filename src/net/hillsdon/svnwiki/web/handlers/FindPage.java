@@ -53,7 +53,7 @@ public class FindPage implements PageRequestHandler {
   public void handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
     if ("opensearch.xml".equals(path.next())) {
       response.setContentType("application/opensearchdescription+xml");
-      response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(new RequestBasedWikiUrls(request).search())));
+      response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(RequestBasedWikiUrls.get(request).search())));
       return;
     }
     String query = request.getParameter(PARAM_QUERY);

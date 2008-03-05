@@ -4,7 +4,7 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Copy "<c:out value="${page.title}"/>"</tiles:putAttribute>
-  <tiles:putAttribute name="heading">Copy "<c:out value="${page.title}"/>"</tiles:putAttribute>
+  <tiles:putAttribute name="heading">Copy <sw:wikiLink page="${page.path}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>The edit history from the old page will be viewable from the copy.</p>
     <form name="copyForm" method="post" action="">

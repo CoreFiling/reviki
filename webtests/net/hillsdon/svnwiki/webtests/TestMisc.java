@@ -27,7 +27,7 @@ public class TestMisc extends WebTestSupport {
   }
   
   public void testNoBackLinkToSelf() throws Exception {
-    assertTrue(getWebPage("pages/test/FrontPage")
+    assertTrue(getWikiPage("FrontPage")
       .getByXPath("id('backlinks')//a[@href = 'FrontPage']").isEmpty());
   }
   

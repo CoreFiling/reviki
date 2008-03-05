@@ -4,7 +4,7 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Rename "<c:out value="${page.title}"/>"</tiles:putAttribute>
-  <tiles:putAttribute name="heading">Rename "<c:out value="${page.title}"/>"</tiles:putAttribute>
+  <tiles:putAttribute name="heading">Rename <sw:wikiLink page="${page.path}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>Edit history will be retained.  Links to the page will not be updated.</p>
     <form name="renameForm" method="post" action="">

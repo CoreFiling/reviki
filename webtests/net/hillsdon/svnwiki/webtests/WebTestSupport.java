@@ -60,6 +60,15 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage getWebPage(final String path) throws IOException {
     return (HtmlPage) _client.getPage(getUrl(path));
   }
+  
+  /**
+   * @param name Name of page.
+   * @return That page in the 'test' wiki.
+   * @throws IOException On error.
+   */
+  protected HtmlPage getWikiPage(final String name) throws IOException {
+    return getWebPage("pages/test/" + name);
+  }
 
   private int _counter = 0;
   protected String uniqueWikiPageName(final String prefix) {
@@ -75,7 +84,7 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On failure.
    */
   public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws IOException {
-    HtmlPage page = getWebPage("pages/test/" + name);
+    HtmlPage page = getWikiPage(name);
     URL pageUrl = page.getWebResponse().getUrl();
     if (isNew != null) {
       assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));

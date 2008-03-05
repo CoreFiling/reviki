@@ -27,7 +27,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 public class TestSearch extends WebTestSupport {
 
   public void testLinkToOpenSearchAvailableFromRegularPages() throws Exception {
-    HtmlPage results = getWebPage("pages/test/FrontPage");
+    HtmlPage results = getWikiPage("FrontPage");
     HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
     // Session crap on the end.
     assertTrue(link.getHrefAttribute().startsWith("/svnwiki/pages/test/FindPage/opensearch.xml"));
@@ -37,7 +37,7 @@ public class TestSearch extends WebTestSupport {
   
   public void testSearchOffersToCreateWikiPageThatDoesntExistWhenWeSearchForAWikiWord() throws Exception {
     String name = uniqueWikiPageName("ThisDoesNotExist");
-    HtmlPage results = search(getWebPage("pages/test/FrontPage"), name);
+    HtmlPage results = search(getWikiPage("FrontPage"), name);
     assertTrue(results.asText().contains("Create new page " + name));
     results.getAnchorByHref("/svnwiki/pages/test/" + name);
   }

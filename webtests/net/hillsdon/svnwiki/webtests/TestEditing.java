@@ -44,7 +44,7 @@ public class TestEditing extends WebTestSupport {
 
   private void editThenCancel(final String name) throws Exception {
     final String flagText = "Should not be saved.";
-    HtmlPage editPage = clickEditLink((HtmlPage) getWebPage("pages/test/" + name));
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     form.getTextAreaByName("content").setText(flagText);
     HtmlPage viewPage = (HtmlPage) form.getInputByValue("Cancel").click();

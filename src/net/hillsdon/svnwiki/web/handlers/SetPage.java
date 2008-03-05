@@ -87,13 +87,13 @@ public class SetPage implements PageRequestHandler {
         toRef = new PageReference(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
-      response.sendRedirect(new RequestBasedWikiUrls(request).page(toPage));
+      response.sendRedirect(RequestBasedWikiUrls.get(request).page(toPage));
       return;
     }
     else if (request.getParameter(SUBMIT_RENAME) != null) {
       final String toPage = getRequiredString(request, PARAM_TO_PAGE);
       _store.rename(page, new PageReference(toPage), -1, createLinkingCommitMessage(request));
-      response.sendRedirect(new RequestBasedWikiUrls(request).page(toPage));
+      response.sendRedirect(RequestBasedWikiUrls.get(request).page(toPage));
       return;
     }
     else if (request.getParameter(SUBMIT_UNLOCK) != null) {
