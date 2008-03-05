@@ -46,14 +46,16 @@ public abstract class AbstractRegexNode implements RenderNode {
       }
     }
     if (earliestRule != null) {
+      String beforeMatch = text.substring(0, earliestMatch.start());
+      String afterMatch = text.substring(earliestMatch.end());
       String result = "";
-      // Just output the stuff before the match.
-      result += Escape.html(text.substring(0, earliestMatch.start()));
-      // Handle the match and recurse.
+      result += Escape.html(beforeMatch);
+      //System.err.println("Matched by " + earliestRule + ": " + earliestMatch.group(0));
       result += earliestRule.handle(page, earliestMatch);
-      result += render(page, text.substring(earliestMatch.end()));
+      result += render(page, afterMatch);
       return result;
     }
+    //System.err.println("No match using " + _children + ", test:\n" + text);
     return Escape.html(text);
   }
 

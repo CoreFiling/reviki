@@ -41,4 +41,9 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     return true;
   }
   
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "<" + _tag + ">";
+  }
+  
 }

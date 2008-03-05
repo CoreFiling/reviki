@@ -28,7 +28,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
   private final Configuration _configuration;
   
   public CustomWikiLinkNode(final InternalLinker internalLinker, final Configuration configuration) {
-    super("([\\p{L}\\d]+:)?([\\p{L}\\d]+)");
+    super("(\\p{Alnum}+:)?(\\p{Alnum}+)");
     _internalLinker = internalLinker;
     _configuration = configuration;
   }
@@ -37,7 +37,9 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
   protected boolean confirmMatchFind(final Matcher matcher) {
     String wikiName = matcher.group(1);
     String pageName = matcher.group(2);
-    return wikiName != null || isWikiWord(pageName);
+    boolean handle = wikiName != null || isWikiWord(pageName);
+    //System.err.println(matcher.group(0) + " => " + handle);
+    return handle;
   }
 
   public String handle(PageReference page, final Matcher result) {
@@ -70,4 +72,9 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
     return String.format("<a class='inter-wiki' href='%s'>%s</a>", href, Escape.html(matched));
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
+  }
+  
 }
