@@ -92,6 +92,10 @@
     </ul>
   </div>
   <div id="content">
+    <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
+    <div id="sidebar" style="float:right">
+    ${sidebar}
+    </div>
     <tiles:insertAttribute name="content"/>
   </div>
 </body>

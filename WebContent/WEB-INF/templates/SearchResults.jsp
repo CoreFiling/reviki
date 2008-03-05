@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Search results</tiles:putAttribute>
+  <tiles:putAttribute name="heading">Search results for '<c:out value="${param.query}"/>'</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title">Search results for '<c:out value="${param.query}"/>'</h1>
     <c:choose>
       <c:when test="${not empty results}">
         <ul>

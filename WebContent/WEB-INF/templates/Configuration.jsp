@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title" value="Configuration"/>
+  <tiles:putAttribute name="heading" value="Configuration"/>
   <tiles:putAttribute name="content">
-    <h1 class="title">Configuration</h1>
     <p>
       The wiki will store pages at the directory pointed to by the given SVN URL.
       The URL should not be the root of the repository unless you really want svnwiki

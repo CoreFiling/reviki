@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
+  <tiles:putAttribute name="heading"><a href="?"><c:out value="${pageInfo.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title"><a href="?"><c:out value="${pageInfo.title}"/></a></h1>
     <div id="wiki-rendering">
     ${markedUpDiff}
     </div>

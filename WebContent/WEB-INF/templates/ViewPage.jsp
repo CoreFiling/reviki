@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
+  <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="menuItems">
     <c:if test="${not(pageInfo.locked) or pageInfo.lockedBy == username}">
       <li class="menu">
@@ -16,7 +17,6 @@
     </c:if>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title"><c:out value="${pageInfo.title}"/></h1>
     <div id="wiki-rendering">
     ${renderedContents}
     </div>

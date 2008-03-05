@@ -4,8 +4,8 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Recent Changes</tiles:putAttribute>
+  <tiles:putAttribute name="heading">Recent Changes</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title">Recent Changes</h1>
     <table>
       <tr><th>Date</th><th>Page</th><th>User</th><th>Description</th></tr>
       <c:forEach var="change" items="${recentChanges}">

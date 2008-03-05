@@ -4,8 +4,8 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">History for <c:out value="${page.title}"/></tiles:putAttribute>
+  <tiles:putAttribute name="heading">History for <a href="<c:url value="${page.path}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title">History for <a href="<c:url value="${page.path}"/>"><c:out value="${page.title}"/></a></h1>
     <table>
       <tr><th>Date</th><th>User</th><th>Description</th></tr>
       <c:forEach var="change" items="${changes}">

@@ -1,6 +1,7 @@
 package net.hillsdon.svnwiki.web;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +10,7 @@ import net.hillsdon.svnwiki.configuration.InitialConfiguration;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.handlers.Attachments;
@@ -38,14 +40,15 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _attachments;
   private final RequestHandler _uploadAttachment;
   private final RequestHandler _getAttachment;
+  private MarkupRenderer _renderer;
 
   public MainHandler(final InitialConfiguration configuration) throws IOException {
     ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
-    MarkupRenderer renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_pageStore));
-    _get = new GetPage(_pageStore, searchEngine, renderer);
+    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_pageStore));
+    _get = new GetPage(_pageStore, searchEngine, _renderer);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
     _history = new History(_pageStore);
@@ -62,6 +65,12 @@ public class MainHandler implements RequestHandler {
         WikiUrls urls = new RequestBasedWikiUrls(request);
         boolean isPost = request.getMethod().equals("POST");
         String requestURL = request.getRequestURL().toString();
+        
+        PageReference sidebar = new PageReference("ConfigSideBar");
+        StringWriter sidebarHtml = new StringWriter();
+        _renderer.render(sidebar, _pageStore.get(sidebar, -1).getContent(), sidebarHtml);
+        request.setAttribute("sidebar", sidebarHtml.toString());
+        
         if (urls.isPage(requestURL)) {
           if (!isPost) {
             if (request.getParameter("history") != null) {

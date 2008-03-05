@@ -3,8 +3,8 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${page.title}"/> attachments</tiles:putAttribute>
+  <tiles:putAttribute name="heading"><a href="<c:url value="../../${page.path}"/>"><c:out value="${page.title}"/></a> attachments</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1 class="title"><a href="<c:url value="../../${page.path}"/>"><c:out value="${page.title}"/></a> attachments</h1>
     <c:choose>
       <c:when test="${not empty attachments}">
       <h4>Current attachments</h4>
