@@ -2,11 +2,15 @@ package net.hillsdon.svnwiki.wiki;
 
 import static net.hillsdon.fij.core.Functional.set;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.NodeIterator;
@@ -44,6 +48,24 @@ public class RenderedPage {
       }
     }
     return writer.toString().trim();
+  }
+
+  /**
+   * @return outgoing links in document order.
+   */
+  public List<String> findOutgoingWikiLinks() {
+    final List<String> outgoing = new ArrayList<String>();
+    final NodeList links = _document.getElementsByTagName("A");
+    for (int i = 0, len = links.getLength(); i < len; ++i) {
+      Element link = (Element) links.item(i);
+      String clazz = link.getAttribute("class");
+      if (clazz.matches("(^|\\s)existing-page($|\\s)") || clazz.matches("(^|\\s)new-page($|\\s)")) {
+        String href = link.getAttribute("href");
+        int lastSlash = href.lastIndexOf('/');
+        outgoing.add(href.substring(lastSlash + 1));
+      }
+    }
+    return outgoing;
   }
 
 }
