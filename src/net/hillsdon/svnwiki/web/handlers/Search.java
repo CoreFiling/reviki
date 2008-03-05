@@ -45,11 +45,12 @@ public class Search implements RequestHandler {
     if (query == null) {
       query = "";
     }
-    if (request.getParameter("force") == null && _store.list().contains(new PageReference(query))) {
+    boolean pageExists = _store.list().contains(new PageReference(query));
+    if (request.getParameter("force") == null && pageExists) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
     }
     else {
-      if (isWikiWord(query)) {
+      if (isWikiWord(query) && !pageExists) {
         request.setAttribute("suggestCreate", query);
       }
       request.setAttribute("results", _searchEngine.search(query));
