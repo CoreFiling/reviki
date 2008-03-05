@@ -67,7 +67,7 @@ public class CreoleRenderer {
     RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
     RenderNode strikethrough = new RegexMatchToTag("--(.+?)--", "del", 1);
     RenderNode bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
-    RenderNode lineBreak = new RegexMatchToTag("\\\\", "br", null);
+    RenderNode lineBreak = new RegexMatchToTag("\\\\\\\\", "br", null);
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
     RenderNode unorderedList = new ListNode("\\*", "ul");
     RenderNode orderedList = new ListNode("#", "ol");

@@ -37,7 +37,7 @@ public abstract class AbstractRegexNode implements RenderNode {
     int earliestIndex = Integer.MAX_VALUE;
     for (RenderNode child : _children) {
       Matcher matcher = child.find(text);
-      if (matcher != null) {
+      if (matcher != null && matcher.group(0).length() > 0) {
         if (matcher.start() < earliestIndex) {
           earliestIndex = matcher.start();
           earliestMatch = matcher;
