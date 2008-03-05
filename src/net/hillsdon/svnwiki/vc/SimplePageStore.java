@@ -29,7 +29,7 @@ public class SimplePageStore implements PageStore {
     return _pages.keySet();
   }
 
-  public List<ChangeInfo> recentChanges() throws PageStoreException {
+  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
     return Collections.emptyList();
   }
 
@@ -54,11 +54,11 @@ public class SimplePageStore implements PageStore {
     throw new UnsupportedOperationException();
   }
 
-  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
+  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
     return Collections.emptySet();
   }
 
-  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
   

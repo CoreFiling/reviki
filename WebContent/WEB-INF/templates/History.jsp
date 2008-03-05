@@ -12,7 +12,7 @@
         <tr>
           <td><f:formatDate type="both" value="${change.date}"/></td>
           <td><c:out value="${change.user}"/></td>
-          <td><a href="<c:url value="${change.page}?revision=${change.revision}&diff=${change.revision - 1}"/>"><c:out value="${change.description}"/></a></td>
+          <td><a href="<c:url value="${change.name}?revision=${change.revision}&diff=${change.revision - 1}"/>"><c:out value="${change.description}"/></a></td>
         </tr>
       </c:forEach>
     </table>

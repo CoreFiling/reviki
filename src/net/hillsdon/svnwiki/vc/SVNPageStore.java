@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +38,6 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 public class SVNPageStore implements PageStore {
 
   /**
-   * We don't actually do 'recent' in terms of date as that's less useful.
-   */
-  private static final int RECENT_CHANGES_HISTORY_SIZE = 15;
-
-  /**
    * The assumed encoding of files from the repository.
    */
   private static final String UTF8 = "UTF8";
@@ -56,10 +52,10 @@ public class SVNPageStore implements PageStore {
     _helper = new SVNHelper(repository);
   }
 
-  public List<ChangeInfo> recentChanges() throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log("", RECENT_CHANGES_HISTORY_SIZE);
+        return _helper.log("", limit, false);
       }
     });
   }
@@ -67,7 +63,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> history(final String path) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(path, -1);
+        return _helper.log(path, -1, true);
       }
     });
   }
@@ -188,18 +184,32 @@ public class SVNPageStore implements PageStore {
     set(dir + "/" + storeName, null, baseRevision, in, commitMessage);
   }
 
-  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
-    return _helper.execute(new SVNAction<Collection<PageStoreEntry>>() {
-      public Collection<PageStoreEntry> perform(final SVNRepository repository) throws SVNException {
-        String attachmentPath = attachmentPath(page);
+  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
+    final String attachmentPath = attachmentPath(page);
+    List<ChangeInfo> changed = _helper.execute(new SVNAction<List<ChangeInfo>>() {
+      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-          return _helper.listFiles(attachmentPath);
+          return _helper.log(attachmentPath, -1, false);
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
       }
     });
+    Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
+    for (ChangeInfo change : changed) {
+      if (attachmentPath.equals(change.getPath())) {
+        // We don't want changes to the directory, just the files.
+        continue;
+      }
+      AttachmentHistory history = results.get(change.getName());
+      if (history == null) {
+        history = new AttachmentHistory();
+        results.put(change.getName(), history);
+      }
+      history.getVersions().add(change);
+    }
+    return results.values();
   }
-
+  
   private String attachmentPath(final String page) {
     return page + "-attachments";
   }
@@ -240,7 +250,7 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
+  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(attachmentPath(page), attachment);
     final OutputStream out = new OutputStream() {
       boolean _first = true;
@@ -257,9 +267,10 @@ public class SVNPageStore implements PageStore {
     _helper.execute(new SVNAction<Void>() {
       public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
-          repository.getFile(path, -1, null, out);
+          repository.getFile(path, revision, null, out);
         }
         catch (SVNException ex) {
+          // FIXME: Presumably this code would be different for non-http repositories.
           if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(ex.getErrorMessage().getErrorCode())) {
             throw new NotFoundException(ex);
           }

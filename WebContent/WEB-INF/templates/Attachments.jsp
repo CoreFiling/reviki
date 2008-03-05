@@ -1,25 +1,49 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${page.title}"/> attachments</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <h1><a href="<c:url value="../../${page.path}"/>"><c:out value="${page.title}"/></a> attachments</h1>
-    <h4>Current attachments</h4>
-    <table>
-      <c:forEach var="attachment" items="${attachments}">
-        <tr>
-          <td><a href="<c:url value="${attachment.name}"/>"><c:out value="${attachment.name}"/></a></td>
-          <td>
-            <form name="replaceAttachmentUpload" action="" method="post" enctype="multipart/form-data">
-              <input id="file" type="file" name="file"/>
-              <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>"/>
-              <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"/>
-              <input type="submit" value="Upload new version"/>
-            </form>
-          </td>
-        </tr>
-      </c:forEach>
-    </table>
+    <c:choose>
+      <c:when test="${not empty attachments}">
+      <h4>Current attachments</h4>
+      <table>
+        <c:forEach var="attachment" items="${attachments}">
+          <tr>
+            <td>
+              <a href="<c:url value="${attachment.name}"/>"><c:out value="${attachment.name}"/></a>
+              <c:if test="${not empty attachment.previousVersions}">
+               (latest)
+              </c:if>
+           </td>
+            <td>
+              <form name="replaceAttachmentUpload" action="" method="post" enctype="multipart/form-data">
+                <input id="file" type="file" name="file"/>
+                <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>"/>
+                <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"/>
+                <input type="submit" value="Upload new version"/>
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+                <c:forEach var="version" items="${attachment.previousVersions}">
+                  <li>
+                    <a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})"/></a>
+                  </li>
+                </c:forEach>
+              </ul>
+            </td>
+          </tr>
+        </c:forEach>
+      </table>
+    </c:when>
+    <c:otherwise>
+      <h4>No attachments yet.</h4>
+    </c:otherwise>
+    </c:choose>
     <h4>Upload a new attachment</h4>
     <form name="attachmentUpload" action="" method="post" enctype="multipart/form-data">
       <table>

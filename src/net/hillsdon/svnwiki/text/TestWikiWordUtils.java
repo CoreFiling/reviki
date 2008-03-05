@@ -20,6 +20,12 @@ public class TestWikiWordUtils extends TestCase {
     assertFalse(isWikiWord("parserGenerator"));
   }
   
+  public void testOddCharacters() {
+    String happyu = "JürgenHabermas";
+    assertEquals(asList("Jürgen", "Habermas"), splitCamelCase(happyu));
+    assertEquals("Jürgen Habermas", pathToTitle(happyu).toString());
+  }
+  
   public void testLabel() {
     assertEquals("My First Property", pathToTitle("MyFirstProperty").toString());
     assertEquals("my First Property", pathToTitle("object/myFirstProperty").toString());

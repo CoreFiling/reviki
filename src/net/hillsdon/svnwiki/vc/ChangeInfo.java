@@ -9,24 +9,31 @@ import java.util.Date;
  */
 public class ChangeInfo {
 
-  private final String _page;
+  private final String _path;
   private final String _user;
   private final Date _date;
   private final long _revision;
   private final String _commitMessage;
   
-  public ChangeInfo(final String page, final String user, final Date date, final long revision, final String commitMessage) {
-    _page = page;
+  public ChangeInfo(final String path, final String user, final Date date, final long revision, final String commitMessage) {
+    _path = path;
     _user = user;
     _date = date;
     _revision = revision;
     _commitMessage = commitMessage.trim();
   }
 
-  public String getPage() {
-    return _page;
+  /**
+   * @return The last path component.
+   */
+  public String getName() {
+    return _path.substring(_path.lastIndexOf('/') + 1);
   }
 
+  public String getPath() {
+    return _path;
+  }
+  
   public String getUser() {
     return _user;
   }

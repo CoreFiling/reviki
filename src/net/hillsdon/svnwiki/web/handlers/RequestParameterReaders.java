@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getLong;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.web.InvalidInputException;
@@ -31,8 +33,15 @@ final class RequestParameterReaders {
       throw new InvalidInputException(String.format("'%s' invalid.", parameter));
     }
   }
+
+  public static final String PARAM_REVISION = "revision";
   
   private RequestParameterReaders() {
+  }
+
+  public static long getRevision(final HttpServletRequest request) throws InvalidInputException {
+    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
+    return givenRevision == null ? -1 : givenRevision;
   }
 
 }

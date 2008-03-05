@@ -1,6 +1,5 @@
 package net.hillsdon.svnwiki.vc;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -19,14 +18,15 @@ public interface PageStore {
   Collection<String> list() throws PageStoreException;
 
   /**
+   * @param limit Maximum number of entries to return.
    * @return Names of recently changed pages.
    * @throws PageStoreException If something goes wrong.
    */
-  List<ChangeInfo> recentChanges() throws PageStoreException;
+  List<ChangeInfo> recentChanges(int limit) throws PageStoreException;
 
   /**
    * @param path The path.
-   * @return Changes, in most recent first.
+   * @return Changes, most recent first.
    * @throws PageStoreException If something goes wrong.
    */
   List<ChangeInfo> history(String path) throws PageStoreException;
@@ -36,7 +36,7 @@ public interface PageStore {
    * check the revision number.
    * 
    * @param path A page name.
-   * @param revisoin Revision, -1 for head.
+   * @param revision Revision, -1 for head.
    * @return Information (including current content) for the page.
    * @throws PageStoreException If something goes wrong.
    */
@@ -59,7 +59,7 @@ public interface PageStore {
 
   /**
    * @param page Page.
-   * @param lockToken TODO
+   * @param lockToken The token for the lock, see {@link PageInfo#getLockToken()}. 
    * @return Information (including current content) for the page.
    * @throws PageStoreException If something goes wrong.
    */
@@ -69,10 +69,10 @@ public interface PageStore {
    * Edit pages by calling this method.  They don't need to exist yet.
    * 
    * @param path A page name.s
-   * @param lockToken TODO
+   * @param lockToken  The token for the edit lock, if any, see {@link PageInfo#getLockToken()}.
    * @param baseRevision Used to check the edited copy was the latest.
    * @param content The new content.
-   * @param commitMessage TODO
+   * @param commitMessage An optional commit message.
    * @throws InterveningCommitException If base revision is not the same as the head at the point immediately prior to the commit.
    * @throws PageStoreException If something else goes wrong.
    */
@@ -83,27 +83,30 @@ public interface PageStore {
    * 
    * @param page The page name.
    * @param storeName The name to store the attachment as.
-   * @param baseRevision TODO
+   * @param baseRevision The base revision.
    * @param in Data read from here.
-   * @param commitMessage TODO
+   * @param commitMessage An optional commit message.
    * @throws PageStoreException If something goes wrong. 
    */
   void attach(String page, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
 
   /**
+   * All attachments for the given page, with information on previous versions of the same.
+   * 
    * @param page A page name.
    * @return File names of all attachments.
    * @throws PageStoreException If something goes wrong. 
    */
-  Collection<PageStoreEntry> attachments(String page) throws PageStoreException;
+  Collection<AttachmentHistory> attachments(String page) throws PageStoreException;
 
   /**
    * @param page Page.
    * @param attachment Attachment on that page.
+   * @param revision The revision to fetch, -1 for head.
    * @param sink Attachment is written here.
-   * @throws PageStoreException On failure.
-   * @throws IOException 
+   * @throws NotFoundException If the attachment is not present in the given revision. 
+   * @throws PageStoreException On other failure.
    */
-  void attachment(String page, String attachment, ContentTypedSink sink) throws PageStoreException, NotFoundException;
+  void attachment(String page, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
   
 }

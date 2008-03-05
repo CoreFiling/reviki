@@ -1,7 +1,10 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getRevision;
+
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +15,6 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.InvalidInputException;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.tmatesoft.svn.core.internal.util.SVNEncodingUtil;
 
 public class GetAttachment extends PageRequestHandler {
 
@@ -23,8 +25,8 @@ public class GetAttachment extends PageRequestHandler {
   @Override
   @SuppressWarnings("unchecked")
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
-    final String attachmentName = SVNEncodingUtil.uriDecode(request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/')));
-    getStore().attachment(page, attachmentName, new ContentTypedSink() {
+    final String attachmentName = URLDecoder.decode(request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/')), "UTF-8");
+    getStore().attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
       public void setContentType(final String contentType) {
         response.setContentType(contentType);
       }

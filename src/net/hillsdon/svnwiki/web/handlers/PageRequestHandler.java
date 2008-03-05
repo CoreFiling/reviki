@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ import net.hillsdon.svnwiki.web.RequestHandler;
  */
 public abstract class PageRequestHandler  implements RequestHandler {
 
-  private static final Pattern PAGE_FROM_URL = Pattern.compile("/pages/([\\p{L}\\d]+)");
+  private static final Pattern PAGE_FROM_URL = Pattern.compile("/pages/(.+?)(?:\\z|[/?])");
   private PageStore _store;
 
   public PageRequestHandler(final PageStore store) {
@@ -28,7 +29,7 @@ public abstract class PageRequestHandler  implements RequestHandler {
     Matcher matcher = PAGE_FROM_URL.matcher(request.getRequestURI());
     matcher.find();
     
-    PageReference page = new PageReference(matcher.group(1));
+    PageReference page = new PageReference(URLDecoder.decode(matcher.group(1), "UTF-8"));
     request.setAttribute("page", page);
     handlePage(request, response, page.getPath());
   }

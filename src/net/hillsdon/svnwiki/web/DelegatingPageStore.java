@@ -4,12 +4,12 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
+import net.hillsdon.svnwiki.vc.AttachmentHistory;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.vc.PageStoreEntry;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
 /**
@@ -37,8 +37,8 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.list();
   }
 
-  public List<ChangeInfo> recentChanges() throws PageStoreException {
-    return _delegate.recentChanges();
+  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
+    return _delegate.recentChanges(limit);
   }
 
   public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
@@ -61,12 +61,12 @@ public class DelegatingPageStore implements PageStore {
     _delegate.attach(page, storeName, baseRevision, in, commitMessage);
   }
 
-  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
+  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
     return _delegate.attachments(page);
   }
 
-  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
-    _delegate.attachment(page, attachment, sink);
+  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
+    _delegate.attachment(page, attachment, revision, sink);
   }
   
 }

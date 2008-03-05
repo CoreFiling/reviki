@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.hillsdon.svnwiki.vc.AttachmentHistory;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.PageInfo;
@@ -51,8 +52,8 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().list();
   }
 
-  public List<ChangeInfo> recentChanges() throws PageStoreException {
-    return get().recentChanges();
+  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
+    return get().recentChanges(limit);
   }
 
   public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
@@ -75,12 +76,12 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     get().attach(page, storeName, baseRevision, in, commitMessage);
   }
 
-  public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
+  public Collection<AttachmentHistory> attachments(final String page) throws PageStoreException {
     return get().attachments(page);
   }
 
-  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
-    get().attachment(page, attachment, sink);
+  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
+    get().attachment(page, attachment, revision, sink);
   }
 
 }

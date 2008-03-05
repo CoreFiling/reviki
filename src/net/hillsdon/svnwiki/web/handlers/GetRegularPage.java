@@ -23,7 +23,6 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class GetRegularPage extends PageRequestHandler {
 
-  private static final String PARAM_REVISION = "revision";
   private static final String PARAM_DIFF_REVISION = "diff";
   private static final int BACKLINKS_LIMIT = 15;
 
@@ -45,13 +44,8 @@ public class GetRegularPage extends PageRequestHandler {
     _engine = engine;
   }
 
-  private long getRevision(final HttpServletRequest request) throws InvalidInputException {
-    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
-    return givenRevision == null ? -1 : givenRevision;
-  }
-    
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
-    long revison = getRevision(request);
+    long revison = RequestParameterReaders.getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
 

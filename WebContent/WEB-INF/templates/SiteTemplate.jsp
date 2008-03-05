@@ -12,6 +12,9 @@
     table {
       border-collapse: collapse;
     }
+    th {
+      text-align: left;
+    }
     th, td {
       padding-left: 0.4em;
       padding-right: 0.4em;
