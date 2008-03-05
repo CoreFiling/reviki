@@ -28,8 +28,10 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class SetPage implements PageRequestHandler {
 
+  static final String SUBMIT_SAVE = "save";
+  static final String SUBMIT_COPY = "copy";
+
   private static final String PARAM_FROM_PAGE = "fromPage";
-  private static final String PARAM_FROM_REVISION = "fromRevision";
 
   static final String PARAM_CONTENT = "content";
   private static final String PARAM_BASE_REVISION = "baseRevision";
@@ -55,7 +57,7 @@ public class SetPage implements PageRequestHandler {
   }
 
   public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    if (request.getParameter("save") != null) {
+    if (request.getParameter(SUBMIT_SAVE) != null) {
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
       String content = getRequiredString(request, PARAM_CONTENT);
@@ -64,9 +66,10 @@ public class SetPage implements PageRequestHandler {
       }
       _store.set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
     }
-    else if (request.getParameter("copy") != null) {
+    else if (request.getParameter(SUBMIT_COPY) != null) {
       final String fromPage = getRequiredString(request, PARAM_FROM_PAGE);
-      final long fromRevision = getLong(PARAM_FROM_REVISION, getRequiredString(request, PARAM_FROM_REVISION));
+      // Perhaps we'll want to vary this too?
+      final long fromRevision = -1;
       _store.copy(new PageReference(fromPage), fromRevision, page, createLinkingCommitMessage(request));
     }
     else if (request.getParameter("unlock") != null) {

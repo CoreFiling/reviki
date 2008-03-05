@@ -77,5 +77,12 @@
         </p>
       </c:when>
     </c:choose>
+    <c:if test="${pageInfo.new and empty pageInfo.content}">
+      <hr />
+      <form method="post" action="?">
+        <input name="copy" type="submit" value="Create as clone of"/>
+        <input type="text" name="fromPage" />
+      </form>
+    </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

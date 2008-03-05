@@ -44,7 +44,7 @@ public class TestSVNPageStore extends TestCase {
     final String path = "ThePage";
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED);
     expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(null);
-    expect(_operations.log(path, -1, true, 0, -1)).andReturn(asList(previousEdit));
+    expect(_operations.log(path, -1, true, false, 0, -1)).andReturn(asList(previousEdit));
     replay();
     assertEquals(asList(previousEdit), _store.history(new PageReference(path)));
     verify();
@@ -55,7 +55,7 @@ public class TestSVNPageStore extends TestCase {
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED);
     final ChangeInfo deleteChange = new ChangeInfo(path, path, "mth", new Date(), 7, "Deleted", StoreKind.PAGE, ChangeType.DELETED);
     expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(deleteChange);
-    expect(_operations.log(path, -1, true, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
+    expect(_operations.log(path, -1, true, false, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
     replay();
     List<ChangeInfo> history = _store.history(new PageReference(path));
     assertEquals(asList(deleteChange, previousEdit), history);

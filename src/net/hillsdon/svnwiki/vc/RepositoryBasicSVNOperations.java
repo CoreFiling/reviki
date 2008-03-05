@@ -68,13 +68,13 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
+  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         final String rootPath = getRoot();
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
-        _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
+        _repository.log(new String[] {path}, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
           public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
             entries.addAll(logEntryToChangeInfos(rootPath, path, pathOnly, logEntry));
           }
@@ -104,13 +104,11 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (!pathOnly || (changedPath.length() > rootPath.length() && changedPath.substring(rootPath.length() + 1).equals(path))) {
-        ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
-        // Might want to put this at a higher level if we can ever do
-        // something useful with 'other' changes.
-        if (change.getKind() != StoreKind.OTHER) {
-          results.add(change);
-        }
+      ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
+      // Might want to put this at a higher level if we can ever do
+      // something useful with 'other' changes.
+      if (change.getKind() != StoreKind.OTHER) {
+        results.add(change);
       }
     }
     return results;

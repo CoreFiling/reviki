@@ -34,7 +34,7 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
   private void catchUp(final BasicSVNOperations helper) throws PageStoreAuthenticationException, PageStoreException {
     long latest = helper.getLatestRevision();
     if (latest > _lastTracked) {
-      for (ChangeInfo change : reversed(helper.log("", -1, false, _lastTracked, latest))) {
+      for (ChangeInfo change : reversed(helper.log("", -1, false, true, _lastTracked, latest))) {
         final String page = change.getPage();
         if (page != null) {
           if (change.getChangeType() == ChangeType.DELETED) {

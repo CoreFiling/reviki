@@ -71,13 +71,13 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
-    return _operations.log("", limit, false, 0, -1);
+    return _operations.log("", limit, false, true, 0, -1);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
     final ChangeInfo deletedIn = getChangeThatDeleted(ref);
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
-    List<ChangeInfo> changes = _operations.log(ref.getPath(), -1, true, 0, lastRevision);
+    List<ChangeInfo> changes = _operations.log(ref.getPath(), -1, true, false, 0, lastRevision);
     if (deletedIn != null) {
       changes = new ArrayList<ChangeInfo>(changes);
       changes.add(0, deletedIn);
@@ -195,9 +195,8 @@ public class SVNPageStore implements PageStore {
     final String attachmentPath = attachmentPath(ref);
     Collection<ChangeInfo> changed = Collections.emptyList();
     if (_operations.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-      changed = _operations.log(attachmentPath, -1, false, 0, -1);
+      changed = _operations.log(attachmentPath, -1, false, false, 0, -1);
     }
-    
     Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     for (ChangeInfo change : changed) {
       if (change.getKind() == StoreKind.ATTACHMENT) {
@@ -233,7 +232,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    List<ChangeInfo> log = _operations.log("", -1, false, start, end);
+    List<ChangeInfo> log = _operations.log("", -1, false, true, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {
