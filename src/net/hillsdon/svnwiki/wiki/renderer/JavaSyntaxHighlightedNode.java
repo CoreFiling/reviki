@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
 
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
@@ -39,7 +40,7 @@ public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
               : "(?s)\\[<java>\\](.*?)\\[</java>\\]");
   }
 
-  public String handle(final PageReference page, final Matcher matcher) {
+  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     String content = matcher.group(1).trim();
     try {
       return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true);

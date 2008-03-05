@@ -43,7 +43,7 @@ public abstract class AbstractRegexNode implements RenderNode {
     return this;
   }
 
-  public String render(final PageReference page, final String text) {
+  public String render(final PageReference page, final String text, final RenderNode parent) {
     if (text == null || text.length() == 0) {
       return "";
     }
@@ -66,8 +66,8 @@ public abstract class AbstractRegexNode implements RenderNode {
       String result = "";
       result += Escape.html(beforeMatch);
       //System.err.println("Matched by " + earliestRule + ": " + earliestMatch.group(0));
-      result += earliestRule.handle(page, earliestMatch);
-      result += render(page, afterMatch);
+      result += earliestRule.handle(page, earliestMatch, this);
+      result += render(page, afterMatch, parent);
       return result;
     }
     //System.err.println("No match using " + _children + ", test:\n" + text);

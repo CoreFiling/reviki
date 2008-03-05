@@ -41,9 +41,10 @@ public interface RenderNode {
    * Render starting from this node.
    * @param page TODO
    * @param text Input text.
+   * @param parent TODO
    * @return Rendered HTML.
    */
-  String render(PageReference page, String text);
+  String render(PageReference page, String text, RenderNode parent);
   
   /**
    * Test for a match in the given text.
@@ -56,8 +57,9 @@ public interface RenderNode {
   /**
    * @param page TODO
    * @param matcher A matcher that found a match using our find method and we were deemed the best.
+   * @param parent TODO
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
-  String handle(PageReference page, Matcher matcher);
+  String handle(PageReference page, Matcher matcher, RenderNode parent);
 
 }

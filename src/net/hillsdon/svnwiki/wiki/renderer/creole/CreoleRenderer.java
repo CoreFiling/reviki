@@ -60,7 +60,7 @@ public class CreoleRenderer {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
-    public String handle(final PageReference page, final Matcher matcher) {
+    public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
       String escaped = Escape.html(matcher.group(0));
       return String.format("<a href='%s'>%s</a>", escaped, escaped);
     }
@@ -127,7 +127,7 @@ public class CreoleRenderer {
   }
   
   public String render(final PageReference page, final String in) {
-    return _root.render(page, in.replaceAll("\r", ""));
+    return _root.render(page, in.replaceAll("\r", ""), null);
   }
   
   @SuppressWarnings("unchecked")

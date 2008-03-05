@@ -26,7 +26,7 @@ public class BackLinkListMacro implements Macro {
   public String handle(final PageReference page, final String remainder) throws Exception {
     List<String> backlinks = new ArrayList<String>(_wikiGraph.getBacklinks(remainder));
     sort(backlinks);
-    return join(backlinks.iterator(), "  * ", "", "");
+    return join(backlinks.iterator(), "  * ", "\n", "");
   }
 
   public ResultFormat getResultFormat() {

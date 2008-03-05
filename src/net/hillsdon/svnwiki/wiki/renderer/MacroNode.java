@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 
 import org.apache.commons.logging.Log;
@@ -57,7 +58,7 @@ public class MacroNode extends AbstractRegexNode {
     return matcher.group(1).trim();
   }
 
-  public String handle(final PageReference page, final Matcher matcher) {
+  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     Macro macro = _macros.get(getMacroName(matcher));
     try {
       String content = macro.handle(page, matcher.group(2));
@@ -65,7 +66,9 @@ public class MacroNode extends AbstractRegexNode {
         case XHTML:
           return content;
         case WIKI:
-          return render(page, content);
+          // Use the parent as renderer if possible as that has the appropriate child nodes.
+          RenderNode renderer = parent != null ? parent : this;
+          return renderer.render(page, content, this);
         default:
           return Escape.html(content);
       }

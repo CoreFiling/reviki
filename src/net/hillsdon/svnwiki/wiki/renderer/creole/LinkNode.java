@@ -30,7 +30,7 @@ public class LinkNode extends AbstractRegexNode {
     _handler = handler;
   }
 
-  public final String handle(final PageReference page, final Matcher matcher) {
+  public final String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     return _handler.handle(page, this, _parser.split(matcher));
   }
 

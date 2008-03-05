@@ -40,7 +40,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     _replaceString = replaceString;
   }
 
-  public String handle(final PageReference page, final Matcher matcher) {
+  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     if (_contentGroup == null) {
       return "<" + _tag + " />";
     }
@@ -48,7 +48,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return "<" + _tag + ">" +  render(page, text) + "</" + _tag + ">";
+    return "<" + _tag + ">" +  render(page, text, this) + "</" + _tag + ">";
   }
   
   @Override

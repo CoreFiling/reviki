@@ -28,7 +28,7 @@ public class SearchMacro implements Macro {
   public String handle(final PageReference page, final String remainder) throws Exception {
     List<String> pages = list(map(_searchEngine.search(_searchEngine.escape(remainder), false), SearchMatch.TO_PAGE_NAME));
     sort(pages);
-    return join(pages.iterator(), "  * ", "", "");
+    return join(pages.iterator(), "  * ", "\n", "");
   }
 
   public ResultFormat getResultFormat() {
