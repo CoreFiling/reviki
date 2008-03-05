@@ -10,7 +10,7 @@
       <c:forEach var="wikiName" items="${configuration.wikiNames}">
         <li>
           <a href="<c:url value="/pages/${wikiName}/FrontPage"/>"><c:out value="${wikiName}"/></a>
-          <c:if test="${wikiName == configuration.defaultWiki}"><a href="<c:url value="/pages/FrontPage"/>">(also available at default location)</a></c:if>
+          <c:if test="${wikiName == configuration.defaultWiki}">(also available at the <a href="<c:url value="/pages/FrontPage"/>">default location</a>)</c:if>
         </li>
       </c:forEach>
     </ul>
