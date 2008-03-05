@@ -92,7 +92,7 @@ public class CreoleRenderer {
                               .addChildren(unorderedList, orderedList).addChildren(nonStructural);
     root.addChildren(customStructural);
     root.addChildren(
-        noWiki.addChildren(), 
+        noWiki, 
         horizontalRule,
         table,
         new Heading(6).addChildren(nonStructural),
