@@ -8,6 +8,11 @@
     "name":   "Raw HTML",
     "input":  "[<html>]\n<div class='unusual'></div>\n[</html>]",
     "output": "\n<div class='unusual'></div>\n"
+  },
+  {
+    "name":   "Image link vs no wiki",
+    "input":  "Hello {{{//there//}}}.",
+    "output": "<p>Hello <tt>there</tt></p>"
   }
 ]
 
