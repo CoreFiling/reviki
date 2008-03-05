@@ -15,7 +15,7 @@ public class SimplePageStore implements PageStore {
 
   private Map<String, PageInfo> _pages = new LinkedHashMap<String, PageInfo>();
   
-  public PageInfo get(final String path) throws PageStoreException {
+  public PageInfo get(final String path, long revision) throws PageStoreException {
     PageInfo page = _pages.get(path);
     if (page == null) {
       page = new PageInfo(path, "", PageInfo.UNCOMMITTED, null, null);
@@ -38,7 +38,7 @@ public class SimplePageStore implements PageStore {
   }
 
   public PageInfo tryToLock(String path) throws PageStoreException {
-    return get(path);
+    return get(path, -1);
   }
 
   public void unlock(String page, String lockToken) {

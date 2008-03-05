@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.vc;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 
 import java.io.ByteArrayInputStream;
@@ -117,26 +118,27 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  public PageInfo get(final String path) throws PageStoreException {
+  public PageInfo get(final String path, long revision) throws PageStoreException {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       HashMap<String, String> properties = new HashMap<String, String>();
       
       // We really want (kind, revision) back to avoid a race here...
-      SVNNodeKind kind = _repository.checkPath(path, SVNRevision.HEAD.getNumber());
+      SVNNodeKind kind = _repository.checkPath(path, revision);
       if (SVNNodeKind.FILE.equals(kind)) {
-        _repository.getFile(path, SVNRevision.HEAD.getNumber(), properties, baos);
-        long revision = Long.parseLong(properties.get(SVNProperty.REVISION));
+        _repository.getFile(path, revision, properties, baos);
+        long actualRevision = Long.parseLong(properties.get(SVNProperty.REVISION));
         SVNLock lock = _repository.getLock(path);
         String lockOwner = lock == null ? null : lock.getOwner();
         String lockToken = lock == null ? null : lock.getID();
-        return new PageInfo(path, toUTF8(baos.toByteArray()), revision, lockOwner, lockToken);
+        return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lockOwner, lockToken);
       }
       else if (SVNNodeKind.NONE.equals(kind)) {
+        // Distinguishing between 'uncommitted' and 'deleted' would be useful for history.
         return new PageInfo(path, "", PageInfo.UNCOMMITTED, null, null);
       }
       else {
-        throw new PageStoreException(String.format("Unexpected node kind '%s' at '%s'", kind, path));
+        throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, path));
       }
     }
     catch (SVNAuthenticationException ex) {
@@ -148,7 +150,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public PageInfo tryToLock(final String path) throws PageStoreException {
-    PageInfo page = get(path);
+    PageInfo page = get(path, -1);
     if (page.isNew()) {
       return page;
     }
@@ -157,7 +159,7 @@ public class SVNPageStore implements PageStore {
       long revision = page.getRevision();
       Map<String, Long> pathsToRevisions = singletonMap(path, revision);
       _repository.lock(pathsToRevisions, "Locked by svnwiki.", false, new ISVNLockHandlerAdapter());
-      return get(path);
+      return get(path, revision);
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);
@@ -165,7 +167,7 @@ public class SVNPageStore implements PageStore {
     catch (SVNException ex) {
       if (SVNErrorCode.FS_PATH_ALREADY_LOCKED.equals(ex.getErrorMessage().getErrorCode())) {
         // The caller will check getLockedBy().
-        return get(path);
+        return get(path, -1);
       }
       throw new PageStoreException(ex);
     }

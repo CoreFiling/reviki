@@ -32,8 +32,8 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return _threadLocal.get();
   }
   
-  public PageInfo get(final String path) throws PageStoreException {
-    return get().get(path);
+  public PageInfo get(final String path, long revision) throws PageStoreException {
+    return get().get(path, revision);
   }
 
   public Collection<String> list() throws PageStoreException {

@@ -26,8 +26,8 @@ public class DelegatingPageStore implements PageStore {
     return _delegate;
   }
 
-  public PageInfo get(String path) throws PageStoreException {
-    return _delegate.get(path);
+  public PageInfo get(String path, long revision) throws PageStoreException {
+    return _delegate.get(path, revision);
   }
 
   public Collection<String> list() throws PageStoreException {

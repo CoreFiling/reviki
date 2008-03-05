@@ -27,10 +27,11 @@ public interface PageStore {
    * check the revision number.
    * 
    * @param path A page name.
+   * @param revisoin Revision, -1 for head.
    * @return Information (including current content) for the page.
    * @throws PageStoreException If something goes wrong.
    */
-  PageInfo get(String path) throws PageStoreException;
+  PageInfo get(String path, long revision) throws PageStoreException;
   
   /**
    * The page info may represent a page that doesn't exist yet,

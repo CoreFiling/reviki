@@ -12,8 +12,8 @@ public class FrontPagePopulatingPageStore extends DelegatingPageStore {
     super(delegate);
   }
 
-  public PageInfo get(final String path) throws PageStoreException {
-    PageInfo page = super.get(path);
+  public PageInfo get(final String path, long revision) throws PageStoreException {
+    PageInfo page = super.get(path, revision);
     if ("FrontPage".equals(path) && page.isNew()) {
       page = new PageInfo(page.getPath(), FRONT_PAGE_CONTENT, PageInfo.UNCOMMITTED, page.getLockedBy(), page.getLockToken());
     }
