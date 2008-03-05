@@ -2,6 +2,7 @@ package net.hillsdon.svnwiki.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.hillsdon.svnwiki.vc.AbstractDelegatingPageStore;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;

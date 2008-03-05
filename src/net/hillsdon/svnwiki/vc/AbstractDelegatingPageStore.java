@@ -1,18 +1,9 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.vc;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
-import net.hillsdon.svnwiki.vc.AttachmentHistory;
-import net.hillsdon.svnwiki.vc.ChangeInfo;
-import net.hillsdon.svnwiki.vc.ContentTypedSink;
-import net.hillsdon.svnwiki.vc.InterveningCommitException;
-import net.hillsdon.svnwiki.vc.PageInfo;
-import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
-import net.hillsdon.svnwiki.vc.PageStoreException;
 
 
 /**

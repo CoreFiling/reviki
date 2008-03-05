@@ -1,7 +1,6 @@
 package net.hillsdon.svnwiki.vc;
 
 
-import net.hillsdon.svnwiki.web.AbstractDelegatingPageStore;
 
 /**
  * A delegating page store that delegates to a given page store.
