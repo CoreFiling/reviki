@@ -48,16 +48,18 @@ public class CreoleRenderer {
   static {
     RegexMatchToTag root = new RegexMatchToTag("", "", 0);
     RegexMatchToTag noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
-    RegexMatchToTag paragraph = new RegexMatchToTag("(?:^|\n)(.+?)(?:$|\n\n)", "p", 1);
+    RegexMatchToTag paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RegexMatchToTag italic = new RegexMatchToTag("//(.*?)//", "em", 1);
     RegexMatchToTag bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
     RegexMatchToTag lineBreak = new RegexMatchToTag("\\\\", "br", null);
+    RegexMatchToTag horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
     RegexMatchToTag unorderedList = new List("\\*", "ul");
     RegexMatchToTag orderedList = new List("#", "ol");
     RegexMatchToTag listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .setChildren(bold, italic, lineBreak, unorderedList, orderedList);
     root.setChildren(
         noWiki.setChildren(), 
+        horizontalRule,
         new Heading(5).setChildren(bold, italic),
         new Heading(4).setChildren(bold, italic), 
         new Heading(3).setChildren(bold, italic), 
@@ -65,7 +67,7 @@ public class CreoleRenderer {
         new Heading(1).setChildren(bold, italic),
         orderedList.setChildren(listItem),
         unorderedList.setChildren(listItem),
-        paragraph.setChildren(bold, italic, lineBreak, orderedList, unorderedList), 
+        paragraph.setChildren(bold, italic, lineBreak, orderedList, unorderedList, horizontalRule), 
         italic.setChildren(bold, italic, lineBreak), 
         bold.setChildren(bold, italic, lineBreak));
     ROOT = root;

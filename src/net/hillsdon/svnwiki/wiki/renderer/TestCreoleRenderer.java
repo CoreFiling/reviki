@@ -10,6 +10,10 @@ public class TestCreoleRenderer extends TestCase {
   protected void setUp() throws Exception {
     _render = new CreoleRenderer();
   }
+
+  public void testHorizontalRule() {
+    assertEquals("<p>foo<hr />bar</p>", _render.render("foo\n ---- \nbar"));
+  }
   
   public void testLineBreak() {
     assertEquals("<p>foo<br />bar</p>", _render.render("foo\\bar"));
@@ -24,7 +28,7 @@ public class TestCreoleRenderer extends TestCase {
   }
   
   public void testParagraphs() {
-    assertEquals("<p>foo</p><p>bar</p>", _render.render("foo\n\nbar"));
+    assertEquals("<p>foo\n</p><p>\nbar</p>", _render.render("foo\n\nbar"));
   }
   
   public void testNoWikiBlock() {
