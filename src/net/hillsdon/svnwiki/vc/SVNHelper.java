@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -37,13 +39,13 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final PathTranslator translator, final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws SVNException {
+  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws SVNException {
     final String rootPath = getRoot();
     final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
     // Start and end reversed to get newest changes first.
     _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
       public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.addAll(logEntryToChangeInfos(translator, rootPath, path, pathOnly, logEntry));
+        entries.addAll(logEntryToChangeInfos(rootPath, path, pathOnly, logEntry));
       }
     });
     return entries;
@@ -61,18 +63,12 @@ public class SVNHelper {
     return results;
   }
 
-
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final PathTranslator translator, final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) throws SVNException {
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
-    String user = entry.getAuthor();
-    Date date = entry.getDate();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (changedPath.length() > rootPath.length()) {
-        if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
-          String name = translator.translate(rootPath, changedPath);
-          results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
-        }
+      if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
+        results.add(classifiedChange(entry, rootPath, changedPath));
       }
     }
     return results;
@@ -123,6 +119,27 @@ public class SVNHelper {
     String checksum = deltaGenerator.sendDelta(filePath, newData, commitEditor, true);
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
+  }
+
+  private static final Pattern PAGE_PATH = Pattern.compile("[^/]*");
+  private static final Pattern ATTACHMENT_PATH = Pattern.compile("([^/]*?)-attachments/(.*)");
+  static ChangeInfo classifiedChange(SVNLogEntry entry, final String rootPath, final String path) {
+    StoreKind kind = StoreKind.OTHER;
+    String name = path.length() > rootPath.length() ? path.substring(rootPath.length() + 1) : path;
+    Matcher matcher = PAGE_PATH.matcher(name);
+    if (matcher.matches() && !name.endsWith("-attachments")) {
+      kind = StoreKind.PAGE;
+    }
+    else {
+      matcher = ATTACHMENT_PATH.matcher(name);
+      if (matcher.matches()) {
+        kind = StoreKind.ATTACHMENT;
+        name = matcher.group(2);
+      }
+    }
+    String user = entry.getAuthor();
+    Date date = entry.getDate();
+    return new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage(), kind);
   }
 
 }

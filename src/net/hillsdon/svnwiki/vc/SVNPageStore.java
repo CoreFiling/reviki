@@ -56,7 +56,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(PathTranslator.ATTACHMENT_TO_PAGE, "", limit, false, 0, -1);
+        return _helper.log("", limit, false, 0, -1);
       }
     });
   }
@@ -64,7 +64,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(PathTranslator.ATTACHMENT_TO_PAGE, ref.getPath(), -1, true, 0, -1);
+        return _helper.log(ref.getPath(), -1, true, 0, -1);
       }
     });
   }
@@ -189,7 +189,7 @@ public class SVNPageStore implements PageStore {
     List<ChangeInfo> changed = _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-          return _helper.log(PathTranslator.RELATIVE, attachmentPath, -1, false, 0, -1);
+          return _helper.log(attachmentPath, -1, false, 0, -1);
         }
         return Collections.emptyList();
       }
@@ -285,11 +285,10 @@ public class SVNPageStore implements PageStore {
     return _helper.execute(new SVNAction<Collection<PageReference>>() {
       public Collection<PageReference> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
-          List<ChangeInfo> log = _helper.log(PathTranslator.ATTACHMENT_TO_PAGE, "", -1, false, start, end);
+          List<ChangeInfo> log = _helper.log("", -1, false, start, end);
           Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
           for (ChangeInfo info : log) {
-            // Ick... skipping attachments etc.
-            if (info.getPath().indexOf('/') == -1 && !info.getPath().endsWith("-attachments")) {
+            if (info.getKind() == StoreKind.PAGE) {
               pages.add(new PageReference(info.getPath()));
             }
           }

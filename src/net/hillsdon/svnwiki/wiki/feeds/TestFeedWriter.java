@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.vc.StoreKind;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 
 import org.w3c.dom.Document;
@@ -22,7 +23,7 @@ public class TestFeedWriter extends TestCase {
 
   public void test() throws Exception {
     StringWriter out = new StringWriter();
-    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "mth", new Date(0), 123, "Change description"));
+    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE));
     FeedWriter.writeAtom(new RequestBasedWikiUrls("http://www.example.com/svnwiki"), new PrintWriter(out), changes);
 
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

@@ -16,12 +16,14 @@ public class ChangeInfo {
   private final Date _date;
   private final long _revision;
   private final String _commitMessage;
+  private final StoreKind _kind;
   
-  public ChangeInfo(final String path, final String user, final Date date, final long revision, final String commitMessage) {
+  public ChangeInfo(final String path, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind) {
     _path = path;
     _user = user;
     _date = date;
     _revision = revision;
+    _kind = kind;
     _commitMessage = commitMessage.trim();
   }
 
@@ -83,6 +85,10 @@ public class ChangeInfo {
   
   public String getCommitMessage() {
     return _commitMessage;
+  }
+  
+  public StoreKind getKind() {
+    return _kind;
   }
   
 }
