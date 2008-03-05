@@ -28,9 +28,26 @@ public class TestCustomWikiLinkFilter extends TestCase {
     assertEquals("This has a <a class='new-page' href='WikiWord'>WikiWord</a>.", _filter.filter("This has a WikiWord.", _context));
     assertEquals("This has an <a class='existing-page' href='ExistingWikiWord'>ExistingWikiWord</a>.", _filter.filter("This has an ExistingWikiWord.", _context));
   }
+
+  // We have a bias towards being a wiki word...
+  public void testMoreUnusualMatches() {
+    assertEquals("<a class='new-page' href='Bug123'>Bug123</a>", _filter.filter("Bug123", _context));
+    assertEquals("<a class='new-page' href='123Bug'>123Bug</a>", _filter.filter("123Bug", _context));
+    assertEquals("<a class='new-page' href='HTML'>HTML</a>", _filter.filter("HTML", _context));
+  }
+  
+  public void testNotWikiWords() {
+    assertEquals("Foo", _filter.filter("Foo", _context));
+    assertEquals("Foo-Bar", _filter.filter("Foo-Bar", _context));
+    assertEquals("Foo_Bar", _filter.filter("Foo_Bar", _context));
+  }
   
   public void testInterWikiLinks() {
     assertEquals("<a class='inter-wiki' href='http://c2.com/cgi/wiki?WikiEngines'>c2:WikiEngines</a>", _filter.filter("c2:WikiEngines", _context));
+  }
+
+  public void testNumberIsntEnoughForALink() {
+    assertEquals("1234", _filter.filter("1234", _context));
   }
   
 }

@@ -14,7 +14,7 @@ public class TestWikiWordUtils extends TestCase {
   public void testIsWikiWord() {
     assertTrue(isWikiWord("HTMLParser"));
     assertFalse(isWikiWord("HTML Parser"));
-    assertFalse(isWikiWord("HTML"));
+    assertTrue(isWikiWord("HTML"));
     assertFalse(isWikiWord("parser"));
     assertFalse(isWikiWord("parserGenerator"));
   }

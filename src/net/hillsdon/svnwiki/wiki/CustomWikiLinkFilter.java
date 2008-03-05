@@ -15,7 +15,7 @@ public class CustomWikiLinkFilter extends RegexTokenFilter {
   private final InterWikiLinker _interwikiLinker;
 
   public CustomWikiLinkFilter(final InterWikiLinker interwikiLinker) {
-    super("(\\w+:)?(\\w+)");
+    super("([\\p{L}\\d]+:)?([\\p{L}\\d]+)");
     _interwikiLinker = interwikiLinker;
   }
   

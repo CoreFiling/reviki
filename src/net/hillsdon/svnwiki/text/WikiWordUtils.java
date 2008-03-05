@@ -44,7 +44,9 @@ public final class WikiWordUtils {
    * @return true if it looks like a wiki word.
    */
   public static boolean isWikiWord(final String text) {
-    return text.split("\\s").length == 1 && !isNextLower(text.toCharArray(), -1) && splitCamelCase(text).size() > 1; 
+    return text.split("\\s").length == 1 
+           && !isNextLower(text.toCharArray(), -1)
+           && (text.matches("\\p{Lu}+") || splitCamelCase(text).size() > 1); 
   }
   
   /**
