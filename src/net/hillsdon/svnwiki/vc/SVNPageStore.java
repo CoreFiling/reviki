@@ -3,11 +3,18 @@ package net.hillsdon.svnwiki.vc;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.tmatesoft.svn.core.SVNAuthenticationException;
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.io.ISVNEditor;
@@ -36,6 +43,41 @@ public class SVNPageStore implements PageStore {
    */
   public SVNPageStore(final SVNRepository repository) {
     _repository = repository;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public String[] recentChanges() throws PageStoreException {
+    try {
+      List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
+      _repository.log(new String[] {""}, entries, 0, -1, true, true);
+      Set<String> results = new LinkedHashSet<String>(entries.size());
+      for (SVNLogEntry e : entries) {
+        results.addAll((Collection<String>) e.getChangedPaths().keySet());
+      }
+      return results.toArray(new String[results.size()]);
+    }
+    catch (SVNException ex) {
+      throw new PageStoreException(ex);
+    }
+  }
+  
+  @Override
+  public String[] list() throws PageStoreException {
+    try {
+      List<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
+      _repository.getDir("", -1, false, entries);
+      List<String> results = new ArrayList<String>(entries.size());
+      for (SVNDirEntry e : entries) {
+        if (SVNNodeKind.FILE.equals(e.getKind())) {
+          results.add(e.getName());
+        }
+      }
+      return results.toArray(new String[results.size()]);
+    }
+    catch (SVNException ex) {
+      throw new PageStoreException(ex);
+    }
   }
 
   public PageInfo get(final String path) throws PageStoreException {
