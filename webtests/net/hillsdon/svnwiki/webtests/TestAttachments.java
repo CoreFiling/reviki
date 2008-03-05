@@ -32,7 +32,6 @@ public class TestAttachments extends WebTestSupport {
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "", "", true);
     HtmlPage attachments = clickAttachmentsLink(page, name);
-    System.err.println(attachments.asXml());
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     form.getInputByName("file").setValueAttribute(file1);
     form.getInputByName("attachmentName").setValueAttribute("file");
