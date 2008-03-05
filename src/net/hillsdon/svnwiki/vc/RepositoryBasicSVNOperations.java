@@ -17,6 +17,8 @@ package net.hillsdon.svnwiki.vc;
 
 import static java.util.Collections.singletonMap;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -40,7 +42,9 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
+import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
@@ -55,7 +59,7 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   private interface SVNAction<T> {
-    T perform(SVNRepository repository) throws SVNException, PageStoreException;
+    T perform(SVNRepository repository) throws SVNException, PageStoreException, IOException;
   }
   
   private final SVNRepository _repository;
@@ -124,10 +128,13 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     try {
       return action.perform(_repository);
     }
+    catch (PageStoreException ex) {
+      throw ex;
+    }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);
     }
-    catch (SVNException ex) {
+    catch (Exception ex) {
       throw new PageStoreException(ex);
     }
   }
@@ -244,12 +251,25 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
   }
 
+  static String detectMimeType(final BufferedInputStream bis) throws IOException {
+    // Currently they analyse 1024 bytes, let's be cautious in case this changes.
+    bis.mark(4086);
+    try {
+      return SVNFileUtil.detectMimeType(bis);
+    }
+    finally {
+      bis.reset();
+    }
+  }
+  
   public long create(final String path, final String commitMessage, final InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException, IOException {
         try {
+          BufferedInputStream bis = new BufferedInputStream(content);
+          String mimeType = detectMimeType(bis);
           ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null, false, null);
-          createFile(commitEditor, path, content);
+          createFile(commitEditor, path, mimeType, bis);
           return commitEditor.closeEdit().getNewRevision();
         }
         catch (SVNException ex) {
@@ -313,7 +333,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.closeDir();
   }
 
-  private void createFile(final ISVNEditor commitEditor, final String filePath, final InputStream data) throws SVNException {
+  private void createFile(final ISVNEditor commitEditor, final String filePath, final String mimeType, final InputStream data) throws SVNException {
     String dir = SVNPathUtil.removeTail(filePath);
     commitEditor.openRoot(-1);
     commitEditor.openDir(dir, -1);
@@ -321,6 +341,9 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.applyTextDelta(filePath, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
     String checksum = deltaGenerator.sendDelta(filePath, data, commitEditor, true);
+    if (mimeType != null) {
+      commitEditor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, mimeType);
+    }
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
     commitEditor.closeDir();

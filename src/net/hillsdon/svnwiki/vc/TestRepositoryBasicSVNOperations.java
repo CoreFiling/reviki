@@ -15,14 +15,25 @@
  */
 package net.hillsdon.svnwiki.vc;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 
 import junit.framework.TestCase;
 
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 
 public class TestRepositoryBasicSVNOperations extends TestCase {
+
+  public void testDetectMimeTypeResetsInputStream() throws Exception {
+    BufferedInputStream stream = new BufferedInputStream(new ByteArrayInputStream(new byte[] {0}));
+    String mimeType = RepositoryBasicSVNOperations.detectMimeType(stream);
+    assertEquals(SVNFileUtil.BINARY_MIME_TYPE, mimeType);
+    assertEquals(0, stream.read());
+    assertEquals(-1, stream.read());
+  }
 
   public void testAttachmentDir() {
     ChangeInfo changeInfo = changeInfo("/wiki2/AttachmentsTest11969665985340-attachments");
@@ -46,5 +57,6 @@ public class TestRepositoryBasicSVNOperations extends TestCase {
   private ChangeInfo changeInfo(final String path) {
     return RepositoryBasicSVNOperations.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), "/wiki2", path);
   }
+  
   
 }
