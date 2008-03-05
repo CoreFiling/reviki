@@ -33,7 +33,10 @@ public class CustomWikiLinkFilter extends RegexTokenFilter {
    * @return True if we're in the middle of a URL.
    */
   private boolean inURL(final StringBuffer buffer) {
-    int lastWs = buffer.lastIndexOf(" ");
+    int lastWs = buffer.length() - 1;
+    while (lastWs >= 0 && !Character.isWhitespace(buffer.charAt(lastWs))) {
+      lastWs--;
+    }
     int lastUrl = Math.max(Math.max(buffer.lastIndexOf("http"), buffer.lastIndexOf("href=")), buffer.lastIndexOf("src="));
     int lastAttached = buffer.lastIndexOf("{attached|");
     if (lastUrl > lastWs || lastAttached > lastWs) {
