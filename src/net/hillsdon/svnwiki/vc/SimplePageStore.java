@@ -29,14 +29,15 @@ public class SimplePageStore implements PageStore {
     return _pages.keySet();
   }
 
-  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return Collections.emptyList();
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
+  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
     long revision = baseRevision + 1;
     PageInfo page = new PageInfo(path, content, revision, revision, null, null, null, null);
     _pages.put(path, page);
+    return revision;
   }
 
   public PageInfo tryToLock(final String path) throws PageStoreException {
@@ -50,7 +51,7 @@ public class SimplePageStore implements PageStore {
     return Collections.emptyList();
   }
 
-  public void attach(final String page, final String storeName, long baseRevision, final InputStream in, String commitMessage) throws PageStoreException {
+  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
 
@@ -58,7 +59,11 @@ public class SimplePageStore implements PageStore {
     return Collections.emptySet();
   }
 
-  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
+  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
+    throw new UnsupportedOperationException();
+  }
+
+  public Collection<String> getChangedAfter(final long revision) {
     throw new UnsupportedOperationException();
   }
   

@@ -59,7 +59,7 @@ public class LuceneSearcher implements SearchEngine {
     _dir = dir;
   }
   
-  public void  index(final String path, final String content) throws IOException {
+  public void  index(final String path, final long revision, final String content) throws IOException {
     if (_dir == null) {
       return;
     }

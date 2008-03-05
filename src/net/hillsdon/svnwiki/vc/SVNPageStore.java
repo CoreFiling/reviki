@@ -15,8 +15,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.hillsdon.svnwiki.vc.SVNHelper.SVNAction;
 
@@ -55,7 +57,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log("", limit, false);
+        return _helper.log("", limit, false, 0);
       }
     });
   }
@@ -63,7 +65,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> history(final String path) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(path, -1, true);
+        return _helper.log(path, -1, true, 0);
       }
     });
   }
@@ -147,14 +149,14 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage)
+  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage)
       throws PageStoreException {
-    set(path, lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
+    return set(path, lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
   }
 
-  private void set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
-    _helper.execute(new SVNAction<Void>() {
-      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
+  private long set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
+    return _helper.execute(new SVNAction<Long>() {
+      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
           ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, locks, false, null);
@@ -164,7 +166,7 @@ public class SVNPageStore implements PageStore {
           else {
             _helper.editFile(commitEditor, path, baseRevision, content);
           }
-          commitEditor.closeEdit();
+          return commitEditor.closeEdit().getNewRevision();
         }
         catch (SVNException ex) {
           if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
@@ -173,7 +175,6 @@ public class SVNPageStore implements PageStore {
           }
           throw ex;
         }
-        return null;
       }
     });
   }
@@ -189,7 +190,7 @@ public class SVNPageStore implements PageStore {
     List<ChangeInfo> changed = _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-          return _helper.log(attachmentPath, -1, false);
+          return _helper.log(attachmentPath, -1, false, 0);
         }
         return Collections.emptyList();
       }
@@ -277,6 +278,22 @@ public class SVNPageStore implements PageStore {
           throw ex;
         }
         return null;
+      }
+    });
+  }
+
+  public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
+    return _helper.execute(new SVNAction<Collection<String>>() {
+      public Collection<String> perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        List<ChangeInfo> log = _helper.log("", -1, false, revision + 1);
+        Set<String> pages = new LinkedHashSet<String>(log.size());
+        for (ChangeInfo info : log) {
+          // Ick... skipping attachments etc.
+          if (info.getPath().indexOf('/') == -1 && !info.getPath().endsWith("-attachments")) {
+            pages.add(info.getPath());
+          }
+        }
+        return pages;
       }
     });
   }

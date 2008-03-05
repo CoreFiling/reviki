@@ -37,12 +37,12 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.list();
   }
 
-  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return _delegate.recentChanges(limit);
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    _delegate.set(path, lockToken, baseRevision, content, commitMessage);
+  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    return _delegate.set(path, lockToken, baseRevision, content, commitMessage);
   }
 
   public PageInfo tryToLock(final String path) throws PageStoreException {
@@ -57,7 +57,7 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.history(path);
   }
 
-  public void attach(final String page, final String storeName, long baseRevision, final InputStream in, String commitMessage) throws PageStoreException {
+  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     _delegate.attach(page, storeName, baseRevision, in, commitMessage);
   }
 
@@ -65,8 +65,12 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.attachments(page);
   }
 
-  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
+  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
     _delegate.attachment(page, attachment, revision, sink);
+  }
+
+  public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
+    return _delegate.getChangedAfter(revision);
   }
   
 }

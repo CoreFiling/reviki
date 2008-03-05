@@ -73,10 +73,11 @@ public interface PageStore {
    * @param baseRevision Used to check the edited copy was the latest.
    * @param content The new content.
    * @param commitMessage An optional commit message.
+   * @return TODO
    * @throws InterveningCommitException If base revision is not the same as the head at the point immediately prior to the commit.
    * @throws PageStoreException If something else goes wrong.
    */
-  void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
+  long set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
 
   /**
    * Add an attachment to a page.
@@ -108,5 +109,12 @@ public interface PageStore {
    * @throws PageStoreException On other failure.
    */
   void attachment(String page, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
+
+  /**
+   * @param revision A revision. 
+   * @return Pages changed after that revision.
+   * @throws PageStoreException 
+   */
+  Collection<String> getChangedAfter(long revision) throws PageStoreException;
   
 }

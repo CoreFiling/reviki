@@ -51,12 +51,12 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().list();
   }
 
-  public List<ChangeInfo> recentChanges(int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return get().recentChanges(limit);
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
-    get().set(path, lockToken, baseRevision, content, commitMessage);
+  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
+    return get().set(path, lockToken, baseRevision, content, commitMessage);
   }
 
   public PageInfo tryToLock(final String path) throws PageStoreException {
@@ -71,7 +71,7 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().history(path);
   }
 
-  public void attach(final String page, final String storeName, long baseRevision, final InputStream in, String commitMessage) throws PageStoreException {
+  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     get().attach(page, storeName, baseRevision, in, commitMessage);
   }
 
@@ -79,8 +79,12 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().attachments(page);
   }
 
-  public void attachment(final String page, final String attachment, long revision, final ContentTypedSink sink) throws PageStoreException {
+  public void attachment(final String page, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
     get().attachment(page, attachment, revision, sink);
+  }
+
+  public Collection<String> getChangedAfter(final long revision) throws PageStoreException {
+    return get().getChangedAfter(revision);
   }
 
 }

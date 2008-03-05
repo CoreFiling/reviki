@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.InitialConfiguration;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
+import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -38,12 +39,13 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _getAttachment;
 
   public MainHandler(final InitialConfiguration configuration) {
-    LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
-    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
+    ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
+    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
+    searchEngine.setPageStore(_pageStore);
     MarkupRenderer renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_pageStore));
-    _get = new GetPage(_pageStore, searcher, renderer);
-    _search = new Search(_pageStore, searcher);
+    _get = new GetPage(_pageStore, searchEngine, renderer);
+    _search = new Search(_pageStore, searchEngine);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
     _history = new History(_pageStore);

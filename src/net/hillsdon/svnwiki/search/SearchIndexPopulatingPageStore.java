@@ -27,14 +27,15 @@ public class SearchIndexPopulatingPageStore extends DelegatingPageStore {
   }
 
   @Override
-  public void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException {
-    super.set(path, lockToken, baseRevision, content, commitMessage);
+  public long set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    long newRevision = super.set(path, lockToken, baseRevision, content, commitMessage);
     try {
-      _indexer.index(path, content);
+      _indexer.index(path, newRevision, content);
     }
     catch (IOException e) {
        LOG.error("Error adding to search index, skipping page: " + path, e);
     }
+    return newRevision;
   }
   
 }
