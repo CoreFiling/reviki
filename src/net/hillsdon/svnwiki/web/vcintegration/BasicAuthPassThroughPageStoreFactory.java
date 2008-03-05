@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.search.SearchIndexPopulatingPageStore;
-import net.hillsdon.svnwiki.vc.DeletionRevisionTracker;
+import net.hillsdon.svnwiki.vc.InMemoryDeletedRevisionTracker;
 import net.hillsdon.svnwiki.vc.PageListCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -80,7 +80,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
 
   private final SVNURL _url;
   private final SearchEngine _indexer;
-  private final DeletionRevisionTracker _tracker;
+  private final InMemoryDeletedRevisionTracker _tracker;
   
   /**
    * @param url Repository URL.
@@ -88,7 +88,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
   public BasicAuthPassThroughPageStoreFactory(final SVNURL url, final SearchEngine indexer) {
     _url = url;
     _indexer = indexer;
-    _tracker = new DeletionRevisionTracker();
+    _tracker = new InMemoryDeletedRevisionTracker();
   }
 
   static UsernamePassword getBasicAuthCredentials(String authorization) {

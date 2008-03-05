@@ -69,13 +69,13 @@ public class SVNPageStore implements PageStore {
 
   private final SVNHelper _helper;
 
-  private final DeletionRevisionTracker _tracker;
+  private final DeletedRevisionTracker _tracker;
 
   /**
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final DeletionRevisionTracker tracker, final SVNRepository repository) {
+  public SVNPageStore(final DeletedRevisionTracker tracker, final SVNRepository repository) {
     _tracker = tracker;
     _helper = new SVNHelper(repository);
   }
