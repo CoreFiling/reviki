@@ -12,7 +12,7 @@ public class MacroNode extends AbstractRegexNode {
   private final Map<String, Macro> _macros;
 
   public MacroNode(final Collection<Macro> macros) {
-    super("[{](.+?):(.+?)[}]");
+    super("[{](\\p{Alnum}+?):(.+?)[}]");
     _macros = new LinkedHashMap<String, Macro>();
     for (Macro macro : macros) {
       _macros.put(macro.getName(), macro);
