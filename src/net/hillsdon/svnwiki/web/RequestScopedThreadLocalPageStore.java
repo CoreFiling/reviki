@@ -28,22 +28,18 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return _threadLocal.get();
   }
   
-  @Override
   public PageInfo get(String path) throws PageStoreException {
     return get().get(path);
   }
 
-  @Override
   public String[] list() throws PageStoreException {
     return get().list();
   }
 
-  @Override
   public String[] recentChanges() throws PageStoreException {
     return get().recentChanges();
   }
 
-  @Override
   public void set(String path, long baseRevision, String content) throws PageStoreException {
     get().set(path, baseRevision, content);
   }

@@ -46,7 +46,6 @@ public class SVNPageStore implements PageStore {
     _repository = repository;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public String[] recentChanges() throws PageStoreException {
     try {
@@ -69,7 +68,6 @@ public class SVNPageStore implements PageStore {
     }
   }
   
-  @Override
   public String[] list() throws PageStoreException {
     try {
       List<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();

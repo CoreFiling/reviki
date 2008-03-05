@@ -25,7 +25,6 @@ public class MainHandler implements RequestHandler {
     _set = new SetPage(_pageStore);
   }
   
-  @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     try {
       // Handle the lifecycle of the thread-local request dependent page store.

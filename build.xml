@@ -1,0 +1,43 @@
+<project name="svnwiki" default="war" basedir=".">
+
+  <property name="source" value="src" />   
+  <property name="web" value="WebContent" />   
+  <property name="build" value="ant-classes-build" />   
+  <property name="war" value="${ant.project.name}.war" />   
+
+  <path id="classpath">
+     <fileset dir="lib">
+        <include name="*.jar" />
+     </fileset>
+     <fileset dir="${web}/WEB-INF/lib">
+        <include name="*.jar" />
+     </fileset>
+  </path>    
+
+  <target name="init">
+     <mkdir dir="${build}" />
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete file="${war}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${source}"
+           destdir="${build}">
+      <classpath refid="classpath" />
+    </javac>
+  </target>
+
+  <target name="war" depends="compile">
+    <war warfile="${war}"
+         webxml="${web}/WEB-INF/web.xml">
+       <classes dir="${build}" includes="**/*.class" />
+       <fileset dir="${web}" includes="*" />
+       <webinf dir="${web}/WEB-INF" includes="**" />
+    </war>
+  </target>
+
+</project>
+

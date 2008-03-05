@@ -19,7 +19,6 @@ public abstract class PageRequestHandler  implements RequestHandler {
     _store = store;
   }
   
-  @Override
   public final void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String uri = request.getRequestURI();
     String page = uri.substring(uri.lastIndexOf('/') + 1);

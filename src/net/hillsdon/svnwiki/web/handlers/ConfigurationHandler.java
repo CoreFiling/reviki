@@ -17,7 +17,6 @@ public class ConfigurationHandler implements RequestHandler {
     _configuration = configuration;
   }
   
-  @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if ("GET".equals(request.getMethod())) {
       showView(request, response);

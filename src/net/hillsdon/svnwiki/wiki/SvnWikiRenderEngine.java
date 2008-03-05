@@ -22,7 +22,6 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
     _store = store;
   }
 
-  @Override
   public boolean exists(final String name) {
     try {
       // TODO: make this more efficient!
@@ -33,22 +32,18 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
     }
   }
   
-  @Override
   public void appendCreateLink(final StringBuffer buffer, final String name, final String view) {
     buffer.append(String.format("<a class='new-page' href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
   }
 
-  @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view) {
     buffer.append(String.format("<a class='existing-page' href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
   }
 
-  @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view, final String anchor) {
     buffer.append(String.format("<a class='existing-page' href='%s#%s'>%s</a>", Encoder.escape(name), Encoder.escape(anchor), Encoder.escape(view)));
   }
 
-  @Override
   public boolean showCreate() {
     return true;
   }
