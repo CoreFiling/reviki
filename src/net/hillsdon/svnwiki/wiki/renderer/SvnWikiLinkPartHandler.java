@@ -7,7 +7,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 
-public class SvnWikiLinkPartHandler implements LinkPartHandler {
+public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   
   private final InternalLinker _internalLinker;
   private final Configuration _configuration;

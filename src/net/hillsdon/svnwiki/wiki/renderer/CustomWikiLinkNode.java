@@ -10,9 +10,9 @@ import java.util.regex.Matcher;
  * 
  * @author mth
  */
-public class CustomWikiLinkNode extends AbstractLinkNode {
+public class CustomWikiLinkNode extends LinkNode {
   
-  public CustomWikiLinkNode(final LinkPartHandler handler) {
+  public CustomWikiLinkNode(final LinkPartsHandler handler) {
     super("(\\p{Alnum}+:)?(\\p{Alnum}+)", new CustomLinkContentSplitter(), handler);
   }
 

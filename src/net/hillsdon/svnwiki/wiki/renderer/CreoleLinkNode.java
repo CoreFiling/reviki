@@ -6,9 +6,9 @@ package net.hillsdon.svnwiki.wiki.renderer;
  * 
  * @author mth
  */
-public class CreoleLinkNode extends AbstractLinkNode {
+public class CreoleLinkNode extends LinkNode {
 
-  public CreoleLinkNode(final LinkPartHandler handler) {
+  public CreoleLinkNode(final LinkPartsHandler handler) {
     super("\\[\\[(.*?)\\]\\]", new CreoleLinkContentsSplitter(), handler);
   }
   

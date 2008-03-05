@@ -4,12 +4,12 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 
-public abstract class AbstractLinkNode extends AbstractRegexNode {
+public class LinkNode extends AbstractRegexNode {
 
   private final LinkContentSplitter _parser;
-  private final LinkPartHandler _handler;
+  private final LinkPartsHandler _handler;
 
-  public AbstractLinkNode(final String regex, final LinkContentSplitter parser, final LinkPartHandler handler) {
+  public LinkNode(final String regex, final LinkContentSplitter parser, final LinkPartsHandler handler) {
     super(regex);
     _parser = parser;
     _handler = handler;
