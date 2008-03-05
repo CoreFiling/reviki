@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.configuration.InitialConfiguration;
 import net.hillsdon.svnwiki.web.handlers.InitialConfigurationHandler;
 
 import org.apache.commons.logging.Log;
