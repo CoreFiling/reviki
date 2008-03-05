@@ -61,9 +61,13 @@ public class LuceneSearcher implements SearchEngine {
   /**
    * @param dir The search index lives here.  
    *            If null is passed the search will behave as a null implemenation.
+   * @throws IOException If we fail to create the index.
    */
-  public LuceneSearcher(final File dir) {
+  public LuceneSearcher(final File dir) throws IOException {
     _dir = dir;
+    if (dir != null && !IndexReader.indexExists(dir)) {
+      new IndexWriter(dir, createAnalyzer(), true).close();
+    }
   }
 
   private Analyzer createAnalyzer() {
