@@ -17,7 +17,7 @@ package net.hillsdon.svnwiki.wiki.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.hillsdon.svnwiki.configuration.Configuration;
@@ -28,6 +28,7 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
 
 public class SvnWikiRenderer implements MarkupRenderer {
 
@@ -35,7 +36,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
   
   public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker) {
     final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, internalLinker, configuration);
-    final List<Macro> macros = new ArrayList<Macro>();
+    final List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro());
     _creole = new CreoleRenderer(
         new RenderNode[] {
             new UnescapedHtmlNode(true),

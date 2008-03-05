@@ -32,6 +32,7 @@ import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.StoreKind;
 import net.hillsdon.svnwiki.wiki.WikiUrls;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -42,22 +43,24 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class FeedWriter {
 
-  static final String ATOM_NS = "http://www.w3.org/2005/Atom";
+  public static final String ATOM_NS = "http://www.w3.org/2005/Atom";
+  
+  private static final Attributes NO_ATTRIBUTES = new AttributesImpl();
 
   private static void addElement(final TransformerHandler handler, final String name, final String content) throws SAXException {
-    handler.startElement(ATOM_NS, "", name, null);
+    handler.startElement(ATOM_NS, name, name, NO_ATTRIBUTES);
     handler.characters(content.toCharArray(), 0, content.length());
-    handler.endElement(ATOM_NS, "", name);
+    handler.endElement(ATOM_NS, name, name);
   }
 
   private static void addLink(final TransformerHandler handler, final String href, final String rel) throws SAXException {
     AttributesImpl attrs = new AttributesImpl();
-    attrs.addAttribute("", "", "href", null, href);
+    attrs.addAttribute("", "href", "href", "CDATA", href);
     if (rel != null) {
-      attrs.addAttribute("", "", "rel", null, rel);
+      attrs.addAttribute("", "rel", "rel", "CDATA", rel);
     }
-    handler.startElement(ATOM_NS, "", "link", attrs);
-    handler.endElement(ATOM_NS, "", "link");
+    handler.startElement(ATOM_NS, "link", "link", attrs);
+    handler.endElement(ATOM_NS, "link", "link");
   }
 
   private static void addUpdated(TransformerHandler handler, Date date) throws SAXException {
@@ -67,7 +70,7 @@ public class FeedWriter {
   public static void writeAtom(final WikiUrls wikiUrls, final PrintWriter out, final Collection<ChangeInfo> changes) throws TransformerConfigurationException, SAXException {
     StreamResult streamResult = new StreamResult(out);
     SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-
+    
     TransformerHandler handler = tf.newTransformerHandler();
     Transformer serializer = handler.getTransformer();
     try {
@@ -81,7 +84,9 @@ public class FeedWriter {
       
     handler.setResult(streamResult);
     handler.startDocument();
-    handler.startElement(ATOM_NS, "", "feed", null);
+    handler.startPrefixMapping("", ATOM_NS);
+    handler.endPrefixMapping("");
+    handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
     addElement(handler, "title", "svnwiki feed");
     addLink(handler, wikiUrls.feed(), "self");
     addLink(handler, wikiUrls.root(), null);
@@ -89,16 +94,16 @@ public class FeedWriter {
     for (ChangeInfo change : changes) {
       // For now.
       if (change.getKind() == StoreKind.PAGE) {
-        handler.startElement(ATOM_NS, "", "entry", null);
+        handler.startElement(ATOM_NS, "entry", "entry", NO_ATTRIBUTES);
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
         addLink(handler, wikiUrls.page(change.getPage()), null);
         addElement(handler, "id", wikiUrls.page(change.getPage()));
         addElement(handler, "summary", change.getDescription());
         addUpdated(handler, change.getDate());
-        handler.endElement(ATOM_NS, "", "entry");
+        handler.endElement(ATOM_NS, "entry", "entry");
       }
     }
-    handler.endElement(ATOM_NS, "", "feed");
+    handler.endElement(ATOM_NS, "feed", "feed");
     handler.endDocument();
   }
 

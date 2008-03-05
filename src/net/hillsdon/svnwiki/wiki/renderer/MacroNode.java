@@ -23,12 +23,17 @@ import java.util.regex.Matcher;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 
+/**
+ * Macro
+ * 
+ * @author mth
+ */
 public class MacroNode extends AbstractRegexNode {
 
   private final Map<String, Macro> _macros;
 
   public MacroNode(final Collection<Macro> macros) {
-    super("[{]([\\p{Digit}\\p{L}]+?):(.+?)[}]");
+    super("(?s)<<([\\p{Digit}\\p{L}]+?):(.+?)>>");
     _macros = new LinkedHashMap<String, Macro>();
     for (Macro macro : macros) {
       _macros.put(macro.getName(), macro);
