@@ -4,6 +4,7 @@
   <property name="web" value="WebContent" />   
   <property name="build" value="ant-classes-build" />   
   <property name="war" value="${ant.project.name}.war" />   
+  <property name="prepopulated-pages" value="net/hillsdon/svnwiki/web/vcintegration/prepopulated/**"/>
 
   <path id="classpath">
      <fileset dir="lib">
@@ -28,12 +29,20 @@
            destdir="${build}">
       <classpath refid="classpath" />
     </javac>
+    <copy todir="${build}">
+      <fileset dir="${source}">
+        <include name="${preopulated-pages}"/>
+      </fileset>
+    </copy>
   </target>
 
   <target name="war" depends="compile">
     <war warfile="${war}"
          webxml="${web}/WEB-INF/web.xml">
-       <classes dir="${build}" includes="**/*.class" />
+       <classes dir="${build}">
+         <include name="**/*.class"/>
+         <include name="${prepopulated-pages}"/>
+       </classes>
        <fileset dir="${web}" includes="*" />
        <webinf dir="${web}/WEB-INF" includes="**" />
     </war>
