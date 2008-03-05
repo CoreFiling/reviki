@@ -33,4 +33,11 @@ public class PageInfo {
     return _revision;
   }
 
+  public String getRevisionName() {
+    if (_revision == UNCOMMITTED) {
+      return "New";
+    }
+    return "r" + _revision;
+  }
+  
 }
