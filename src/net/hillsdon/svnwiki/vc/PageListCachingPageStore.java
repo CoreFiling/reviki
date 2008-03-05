@@ -2,7 +2,7 @@ package net.hillsdon.svnwiki.vc;
 
 import java.util.Collection;
 
-import net.hillsdon.svnwiki.web.DelegatingPageStore;
+import net.hillsdon.svnwiki.web.SimpleDelegatingPageStore;
 
 /**
  * Caches the set of pages forever.  This makes it only
@@ -12,7 +12,7 @@ import net.hillsdon.svnwiki.web.DelegatingPageStore;
  * 
  * @author mth
  */
-public class PageListCachingPageStore extends DelegatingPageStore {
+public class PageListCachingPageStore extends SimpleDelegatingPageStore {
 
   private Collection<PageReference> _cached = null;
   

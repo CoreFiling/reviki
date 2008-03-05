@@ -37,10 +37,11 @@ public class SVNHelper {
     _repository = repository;
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision) throws SVNException {
+  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, long endRevision) throws SVNException {
     final String rootPath = getRoot();
     final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
-    _repository.log(new String[] {path}, -1, startRevision, true, true, limit, new ISVNLogEntryHandler() {
+    // Start and end reversed to get newest changes first.
+    _repository.log(new String[] {path}, endRevision, startRevision, true, true, limit, new ISVNLogEntryHandler() {
       public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
         entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry));
       }

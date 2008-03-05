@@ -3,7 +3,7 @@ package net.hillsdon.svnwiki.vc;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.hillsdon.svnwiki.web.DelegatingPageStore;
+import net.hillsdon.svnwiki.web.SimpleDelegatingPageStore;
 
 /**
  * The configuration pages are often accessed, e.g. ConfigSideBar,
@@ -12,7 +12,7 @@ import net.hillsdon.svnwiki.web.DelegatingPageStore;
  * 
  * @author mth
  */
-public class ConfigPageCachingPageStore extends DelegatingPageStore {
+public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
 
   private Map<PageReference, PageInfo> _cache = new LinkedHashMap<PageReference, PageInfo>();
 

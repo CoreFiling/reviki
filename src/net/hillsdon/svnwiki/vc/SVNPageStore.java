@@ -57,7 +57,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log("", limit, false, 0);
+        return _helper.log("", limit, false, 0, -1);
       }
     });
   }
@@ -65,7 +65,7 @@ public class SVNPageStore implements PageStore {
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
     return _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException {
-        return _helper.log(ref.getPath(), -1, true, 0);
+        return _helper.log(ref.getPath(), -1, true, 0, -1);
       }
     });
   }
@@ -190,7 +190,7 @@ public class SVNPageStore implements PageStore {
     List<ChangeInfo> changed = _helper.execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-          return _helper.log(attachmentPath, -1, false, 0);
+          return _helper.log(attachmentPath, -1, false, 0, -1);
         }
         return Collections.emptyList();
       }
@@ -282,11 +282,11 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  public Collection<PageReference> getChangedAfter(final long revision) throws PageStoreException {
+  public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
     return _helper.execute(new SVNAction<Collection<PageReference>>() {
       public Collection<PageReference> perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
-          List<ChangeInfo> log = _helper.log("", -1, false, revision + 1);
+          List<ChangeInfo> log = _helper.log("", -1, false, start, end);
           Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
           for (ChangeInfo info : log) {
             // Ick... skipping attachments etc.
@@ -302,6 +302,14 @@ public class SVNPageStore implements PageStore {
           }
           throw ex;
         }
+      }
+    });
+  }
+
+  public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
+    return _helper.execute(new SVNAction<Long>() {
+      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
+        return repository.getLatestRevision();
       }
     });
   }

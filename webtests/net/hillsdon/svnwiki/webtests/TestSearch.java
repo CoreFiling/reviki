@@ -16,6 +16,7 @@ public class TestSearch extends WebTestSupport {
     HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
     // Session crap on the end.
     assertTrue(link.getHrefAttribute().startsWith("/svnwiki/pages/FindPage/opensearch.xml"));
+    @SuppressWarnings("unused")
     XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
   }
   

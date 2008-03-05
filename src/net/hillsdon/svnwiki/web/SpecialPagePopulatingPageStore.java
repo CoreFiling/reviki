@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author mth
  */
-public class SpecialPagePopulatingPageStore extends DelegatingPageStore {
+public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(

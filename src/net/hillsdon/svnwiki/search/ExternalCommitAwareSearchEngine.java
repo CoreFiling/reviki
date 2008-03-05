@@ -32,9 +32,16 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   private synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
     if (_store != null) {
-      for (PageReference ref : _store.getChangedAfter(_delegate.getHighestIndexedRevision())) {
-        PageInfo info = _store.get(ref, -1);
-        _delegate.index(info.getPath(), info.getRevision(), info.getContent());
+      long latest = _store.getLatestRevision();
+      long highestIndexed = _delegate.getHighestIndexedRevision();
+      if (latest > highestIndexed) {
+        for (PageReference ref : _store.getChangedBetween(highestIndexed + 1, latest)) {
+          PageInfo info = _store.get(ref, latest);
+          // Note we pass 'latest' as the revision here.  At the moment we get
+          // back the revision of deleted pages as -2 which isn't such a good
+          // thing to set our 'highest indexed revision' to...
+          _delegate.index(info.getPath(), latest, info.getContent());
+        }
       }
     }
   }

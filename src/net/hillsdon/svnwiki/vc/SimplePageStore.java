@@ -64,7 +64,11 @@ public class SimplePageStore implements PageStore {
     throw new UnsupportedOperationException();
   }
 
-  public Collection<PageReference> getChangedAfter(final long revision) {
+  public Collection<PageReference> getChangedBetween(final long start, long end) {
+    throw new UnsupportedOperationException();
+  }
+
+  public long getLatestRevision() {
     throw new UnsupportedOperationException();
   }
   
