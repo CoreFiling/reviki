@@ -19,6 +19,8 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRequire
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +33,8 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestAttributes;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class EditorForPage implements PageRequestHandler {
@@ -45,23 +49,23 @@ public class EditorForPage implements PageRequestHandler {
     _renderer = renderer;
   }
 
-  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException {
     PageInfo pageInfo = _store.tryToLock(page);
-    request.setAttribute("pageInfo", pageInfo);
+    Map<String, Object> data = new LinkedHashMap<String, Object>();
+    data.put("pageInfo", pageInfo);
     if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
-      request.setAttribute("flash", "Could not lock the page.");
-      request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").include(request, response);
-      return;
+      data.put("flash", "Could not lock the page.");
+      return new JspView("ViewPage", data);
     }
     else {
       if (request.getParameter(EditorForPage.PARAM_PREVIEW) != null) {
         pageInfo = pageInfo.alternativeContent(getRequiredString(request, SetPage.PARAM_CONTENT));
-        request.setAttribute("pageInfo", pageInfo);
+        data.put("pageInfo", pageInfo);
         StringWriter out = new StringWriter();
         _renderer.render(pageInfo, pageInfo.getContent(), out);
         request.setAttribute("preview", out.toString());
       }
-      request.getRequestDispatcher("/WEB-INF/templates/EditPage.jsp").include(request, response);
+      return new JspView("EditPage", data);
     }
   }
 

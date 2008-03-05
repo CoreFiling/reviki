@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 public class CopyPage implements PageRequestHandler {
@@ -41,13 +43,13 @@ public class CopyPage implements PageRequestHandler {
     _urls = urls;
   }
 
-  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     final String fromPage = getRequiredString(request, PARAM_FROM_PAGE);
     final long fromRevision = getLong(PARAM_FROM_REVISION, getRequiredString(request, PARAM_FROM_REVISION));
     final String toPage = getRequiredString(request, PARAM_TO_PAGE);
     final String commitMessage = getRequiredString(request, PARAM_COMMIT_MESSAGE);
     _store.copy(new PageReference(fromPage), fromRevision, new PageReference(toPage), commitMessage);
-    response.sendRedirect(_urls.page(toPage));
+    return new RedirectView(_urls.page(toPage));
   }
 
 }

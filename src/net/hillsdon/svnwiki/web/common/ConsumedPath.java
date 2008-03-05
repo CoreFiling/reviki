@@ -18,6 +18,7 @@ package net.hillsdon.svnwiki.web.common;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
@@ -26,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ConsumedPath {
 
+  public static ConsumedPath EMPTY = new ConsumedPath(Collections.<String>emptyList());
+  
   private ListIterator<String> _iterator;
   private List<String> _list;
 
@@ -34,21 +37,34 @@ public class ConsumedPath {
   }
 
   public ConsumedPath(final String requestURI, final String contextPath) {
+    this(createPartList(requestURI, contextPath));
+  }
+  
+  /**
+   * Suitable for testing.
+   * @param parts The remaining parts.
+   */
+  public ConsumedPath(final List<String> parts) {
+    _list = parts;
+    _iterator = parts.listIterator();
+  }
+
+  private static List<String> createPartList(final String requestURI, final String contextPath) {
     String path = requestURI.substring(contextPath.length() + 1);
     int query = path.lastIndexOf('?');
     if (query != -1) {
       path = path.substring(0, query);
     }
-    _list = new ArrayList<String>();
+    List<String> parts = new ArrayList<String>();
     for (String part : path.split("/")) {
       try {
-        _list.add(URLDecoder.decode(part, "UTF-8"));
+        parts.add(URLDecoder.decode(part, "UTF-8"));
       }
       catch (UnsupportedEncodingException ex) {
-        _list.add(part);
+        parts.add(part);
       }
     }
-    _iterator = _list.listIterator();
+    return parts;
   }
 
   public String peek() {

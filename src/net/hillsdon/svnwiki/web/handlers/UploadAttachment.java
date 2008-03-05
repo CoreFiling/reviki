@@ -28,6 +28,8 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestParameterReaders;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -50,7 +52,7 @@ public class UploadAttachment implements PageRequestHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public View handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }
@@ -81,14 +83,13 @@ public class UploadAttachment implements PageRequestHandler {
       
       if (file == null || file.getSize() == 0) {
         request.setAttribute("flash", ERROR_NO_FILE);
-        _listAttachments.handlePage(path, request, response, page);
-        return;
+        return _listAttachments.handlePage(path, request, response, page);
       }
       else {
         InputStream in = file.getInputStream();
         try {
           store(page, attachmentName, baseRevision, file.getName(), in);
-          response.sendRedirect(request.getRequestURL().toString());
+          return new RedirectView(request.getRequestURL().toString());
         }
         finally {
           IOUtils.closeQuietly(in);

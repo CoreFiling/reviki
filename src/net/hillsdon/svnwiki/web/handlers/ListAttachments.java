@@ -15,12 +15,16 @@
  */
 package net.hillsdon.svnwiki.web.handlers;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class ListAttachments implements PageRequestHandler {
 
@@ -30,9 +34,8 @@ public class ListAttachments implements PageRequestHandler {
     _store = store;
   }
 
-  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    request.setAttribute("attachments", _store.attachments(page));
-    request.getRequestDispatcher("/WEB-INF/templates/Attachments.jsp").include(request, response);
+  public View handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+    return new JspView("Attachments", Collections.<String, Object>singletonMap("attachments", _store.attachments(page)));
   }
 
 }

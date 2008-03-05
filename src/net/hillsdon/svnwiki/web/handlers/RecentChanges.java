@@ -16,7 +16,9 @@
 package net.hillsdon.svnwiki.web.handlers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,8 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.feeds.FeedWriter;
 
 public class RecentChanges implements RequestHandler {
@@ -42,17 +46,18 @@ public class RecentChanges implements RequestHandler {
     _store = store;
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
-    
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     if ("atom.xml".equals(path.next())) {
-      response.setContentType("application/atom+xml");
-      FeedWriter.writeAtom(RequestBasedWikiUrls.get(request), response.getWriter(), recentChanges);
-      return;
+      return new View() {
+        public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
+          response.setContentType("application/atom+xml");
+          FeedWriter.writeAtom(RequestBasedWikiUrls.get(request), response.getWriter(), recentChanges);
+        }
+      };
     }
-    
-    request.setAttribute("recentChanges", recentChanges);
-    request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
+    Map<String, Object> data = Collections.<String, Object>singletonMap("recentChanges", recentChanges);
+    return new JspView("RecentChanges", data);
   }
 
   private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {

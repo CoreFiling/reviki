@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class OrphanedPages implements RequestHandler {
@@ -37,11 +39,10 @@ public class OrphanedPages implements RequestHandler {
     _graph = graph;
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
     List<String> alphabetical = new ArrayList<String>(_graph.isolatedPages());
     Collections.sort(alphabetical);
-    request.setAttribute("pageList", alphabetical);
-    request.getRequestDispatcher("/WEB-INF/templates/OrphanedPages.jsp").include(request, response);
+    return new JspView("OrphanedPages", Collections.<String, Object>singletonMap("pageList", alphabetical));
   }
 
 }

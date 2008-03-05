@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class Attachments implements PageRequestHandler {
 
@@ -34,16 +35,16 @@ public class Attachments implements PageRequestHandler {
     _get = new GetAttachment(pageStore);
   }
 
-  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (path.hasNext()) {
-      _get.handlePage(path, request, response, page);
+      return _get.handlePage(path, request, response, page);
     }
     else {
       if (request.getMethod().equals("POST")) {
-        _upload.handlePage(path, request, response, page);
+        return _upload.handlePage(path, request, response, page);
       }
       else {
-        _list.handlePage(path, request, response, page);
+        return _list.handlePage(path, request, response, page);
       }
     }
   }

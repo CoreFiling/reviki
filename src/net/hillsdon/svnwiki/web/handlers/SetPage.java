@@ -28,6 +28,8 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class SetPage implements PageRequestHandler {
 
@@ -61,8 +63,16 @@ public class SetPage implements PageRequestHandler {
     _store = store;
   }
 
-  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    if (request.getParameter(SUBMIT_SAVE) != null) {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+    final boolean hasSaveParam = request.getParameter(SUBMIT_SAVE) != null;
+    final boolean hasCopyParam = request.getParameter(SUBMIT_COPY) != null;
+    final boolean hasRenameParam = request.getParameter(SUBMIT_RENAME) != null;
+    final boolean hasUnlockParam = request.getParameter(SUBMIT_UNLOCK) != null;
+    if (!(hasSaveParam ^ hasCopyParam ^ hasRenameParam ^ hasUnlockParam)) {
+      throw new InvalidInputException("Exactly one action must be specified.");
+    }
+    
+    if (hasSaveParam) {
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(CRLF)) {
@@ -70,7 +80,7 @@ public class SetPage implements PageRequestHandler {
       }
       _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(request));
     }
-    else if (request.getParameter(SUBMIT_COPY) != null) {
+    else if (hasCopyParam) {
       final String fromPage = getString(request, PARAM_FROM_PAGE);
       final String toPage = getString(request, PARAM_TO_PAGE);
       if (!(fromPage == null ^ toPage == null)) {
@@ -87,23 +97,24 @@ public class SetPage implements PageRequestHandler {
         toRef = new PageReference(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
-      response.sendRedirect(RequestBasedWikiUrls.get(request).page(toPage));
-      return;
+      return new RedirectView(RequestBasedWikiUrls.get(request).page(toPage));
     }
-    else if (request.getParameter(SUBMIT_RENAME) != null) {
+    else if (hasRenameParam) {
       final String toPage = getRequiredString(request, PARAM_TO_PAGE);
       _store.rename(page, new PageReference(toPage), -1, createLinkingCommitMessage(request));
-      response.sendRedirect(RequestBasedWikiUrls.get(request).page(toPage));
-      return;
+      return new RedirectView(RequestBasedWikiUrls.get(request).page(toPage));
     }
-    else if (request.getParameter(SUBMIT_UNLOCK) != null) {
+    else if (hasUnlockParam) {
       String lockToken = request.getParameter(PARAM_LOCK_TOKEN);
       // New pages don't have a lock.
       if (lockToken != null && lockToken.length() > 0) {
         _store.unlock(page, lockToken);
       }
     }
-    response.sendRedirect(request.getRequestURI());
+    else {
+      throw new InvalidInputException("No action specified.");
+    }
+    return new RedirectView(request.getRequestURI());
   }
 
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {

@@ -18,6 +18,8 @@ package net.hillsdon.svnwiki.web.common;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.web.dispatching.View;
+
 /**
  * Handles a HTTP request.
  * 
@@ -25,6 +27,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface RequestHandler {
 
-  void handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
+  View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
   
 }

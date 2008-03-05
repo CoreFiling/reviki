@@ -29,6 +29,8 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class AllPages implements RequestHandler {
 
@@ -38,11 +40,10 @@ public class AllPages implements RequestHandler {
     _store = store;
   }
 
-  public void handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
+  public View handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
     List<PageReference> alphabetical = new ArrayList<PageReference>(_store.list());
     Collections.sort(alphabetical);
-    request.setAttribute("pageList", alphabetical);
-    request.getRequestDispatcher("/WEB-INF/templates/AllPages.jsp").include(request, response);
+    return new JspView("AllPages", Collections.<String, Object>singletonMap("pageList", alphabetical));
   }
 
 }

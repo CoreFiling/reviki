@@ -23,7 +23,10 @@ import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
@@ -52,11 +55,10 @@ public class PageHandler implements RequestHandler {
     _orphanedPages = new OrphanedPages(wikiGraph);
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String pageName = path.next();
     if (pageName == null || "".equals(pageName)) {
-      response.sendRedirect(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/FrontPage");
-      return;
+      return new RedirectView(RequestBasedWikiUrls.get(request).page("FrontPage"));
     }
     if (pageName.contains("/")) {
       throw new InvalidInputException(String.format(PATH_WALK_ERROR_MESSAGE, pageName));
@@ -66,22 +68,22 @@ public class PageHandler implements RequestHandler {
 
     if ("attachments".equals(path.peek())) {
       path.next();
-      _attachments.handlePage(path, request, response, page);
+      return _attachments.handlePage(path, request, response, page);
     }
     else if ("RecentChanges".equals(pageName)) {
-      _recentChanges.handle(path, request, response);
+      return _recentChanges.handle(path, request, response);
     }
     else if ("AllPages".equals(pageName)) {
-      _allPages.handle(path, request, response);
+      return _allPages.handle(path, request, response);
     }
     else if ("FindPage".equals(pageName)) {
-      _findPage.handlePage(path, request, response, page);
+      return _findPage.handlePage(path, request, response, page);
     }
     else if ("OrphanedPages".equals(pageName)) {
-      _orphanedPages.handle(path, request, response);
+      return _orphanedPages.handle(path, request, response);
     }
     else {
-      _regularPage.handlePage(path, request, response, page);
+      return _regularPage.handlePage(path, request, response, page);
     }
   }
 

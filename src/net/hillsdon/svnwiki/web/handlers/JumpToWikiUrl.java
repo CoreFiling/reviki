@@ -28,12 +28,14 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class JumpToWikiUrl implements RequestHandler {
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
     String name = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");
-    response.sendRedirect(request.getContextPath() + "/pages/" + name + "/FrontPage");
+    return new RedirectView(request.getContextPath() + "/pages/" + name + "/FrontPage");
   }
 
 }

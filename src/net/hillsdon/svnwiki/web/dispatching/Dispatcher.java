@@ -71,15 +71,17 @@ public class Dispatcher extends HttpServlet {
     ConsumedPath path = new ConsumedPath(request);
     try {
       String initial = path.next();
+      View view;
       if ("pages".equals(initial)) {
-        _choice.handle(path, request, response);
+        view = _choice.handle(path, request, response);
       }
       else if ("jump".equals(initial)) {
-        _jump.handle(path, request, response);
+        view = _jump.handle(path, request, response);
       }
       else {
-        _list.handle(path, request, response);
+        view = _list.handle(path, request, response);
       }
+      view.render(request, response);
     }
     catch (NotFoundException ex) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);

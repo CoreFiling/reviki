@@ -16,6 +16,8 @@
 package net.hillsdon.svnwiki.web.handlers;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,8 @@ import net.hillsdon.svnwiki.configuration.DeploymentConfiguration;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class ListWikis implements RequestHandler {
 
@@ -34,9 +38,9 @@ public class ListWikis implements RequestHandler {
     _configuration = configuration;
   }
   
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
-    request.setAttribute("configuration", _configuration);
-    request.getRequestDispatcher("/WEB-INF/templates/ListWikis.jsp").include(request, response);
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
+    Map<String, Object> data = Collections.<String, Object>singletonMap("configuration", _configuration);
+    return new JspView("ListWikis", data);
   }
 
 }

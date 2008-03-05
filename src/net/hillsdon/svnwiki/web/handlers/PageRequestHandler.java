@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 /**
  * Interface for request handling relating to a specific wiki page.
@@ -28,6 +29,6 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
  */
 public interface PageRequestHandler {
 
-  void handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception;
+  View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception;
 
 }

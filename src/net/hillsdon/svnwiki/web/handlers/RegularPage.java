@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
@@ -41,31 +43,29 @@ public class RegularPage implements PageRequestHandler {
     _history = new History(cachingPageStore);
   }
   
-  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (request.getParameter("history") != null) {
-      _history.handlePage(path, request, response, page);
+      return _history.handlePage(path, request, response, page);
     }
     else if ("POST".equals(request.getMethod())) {
       if (request.getParameter(SetPage.SUBMIT_SAVE) != null 
        || request.getParameter(SetPage.SUBMIT_COPY) != null
        || request.getParameter(SetPage.SUBMIT_RENAME) != null
        || request.getParameter(SetPage.SUBMIT_UNLOCK) != null) {
-        _set.handlePage(path, request, response, page);
+        return _set.handlePage(path, request, response, page);
       }
       else {
-        _editor.handlePage(path, request, response, page);
+        return _editor.handlePage(path, request, response, page);
       }
     }
     else {
       if (request.getParameter(SetPage.SUBMIT_RENAME) != null) {
-        request.getRequestDispatcher("/WEB-INF/templates/Rename.jsp").include(request, response);
-        return;
+        return new JspView("Rename");
       }
       else if (request.getParameter(SetPage.SUBMIT_COPY) != null) {
-        request.getRequestDispatcher("/WEB-INF/templates/Copy.jsp").include(request, response);
-        return;
+        return new JspView("Copy");
       }
-      _view.handlePage(path, request, response, page);
+      return _view.handlePage(path, request, response, page);
     }
   }
 

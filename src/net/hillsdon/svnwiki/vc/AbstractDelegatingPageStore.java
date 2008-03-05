@@ -33,61 +33,74 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
    * @return The delegate to use.  This is called for each delegation.
    */
   protected abstract PageStore getDelegate();
+  
+  /**
+   * With bonus null check.
+   * 
+   * @return The page store.
+   */
+  private PageStore getDelegateInternal() {
+    PageStore delegate = getDelegate();
+    if (delegate == null) {
+      throw new IllegalStateException("No delegate available!");
+    }
+    return delegate;
+  }
 
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    return getDelegate().get(ref, revision);
+    return getDelegateInternal().get(ref, revision);
   }
 
   public Set<PageReference> list() throws PageStoreException {
-    return getDelegate().list();
+    return getDelegateInternal().list();
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
-    return getDelegate().recentChanges(limit);
+    return getDelegateInternal().recentChanges(limit);
   }
 
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    return getDelegate().set(ref, lockToken, baseRevision, content, commitMessage);
+    return getDelegateInternal().set(ref, lockToken, baseRevision, content, commitMessage);
   }
 
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
-    return getDelegate().tryToLock(ref);
+    return getDelegateInternal().tryToLock(ref);
   }
 
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreException {
-    getDelegate().unlock(ref, lockToken);
+    getDelegateInternal().unlock(ref, lockToken);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
-    return getDelegate().history(ref);
+    return getDelegateInternal().history(ref);
   }
 
   public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
-    getDelegate().attach(ref, storeName, baseRevision, in, commitMessage);
+    getDelegateInternal().attach(ref, storeName, baseRevision, in, commitMessage);
   }
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
-    return getDelegate().attachments(ref);
+    return getDelegateInternal().attachments(ref);
   }
 
   public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
-    getDelegate().attachment(ref, attachment, revision, sink);
+    getDelegateInternal().attachment(ref, attachment, revision, sink);
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    return getDelegate().getChangedBetween(start, end);
+    return getDelegateInternal().getChangedBetween(start, end);
   }
 
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().getLatestRevision();
+    return getDelegateInternal().getLatestRevision();
   }
 
   public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
-    return getDelegate().copy(from, fromRevision, to, commitMessage);
+    return getDelegateInternal().copy(from, fromRevision, to, commitMessage);
   }
   
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    return getDelegate().rename(from, to, baseRevision, commitMessage);
+    return getDelegateInternal().rename(from, to, baseRevision, commitMessage);
   }
   
 }

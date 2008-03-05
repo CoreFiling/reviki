@@ -15,12 +15,11 @@
  */
 package net.hillsdon.svnwiki.web.dispatching;
 
-import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,11 +44,10 @@ public class WikiChoice implements RequestHandler {
       _perWikiConfiguration = perWikiConfiguration;
     }
 
-    public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-      if ("GET".equals(request.getMethod())) {
-        showView(request, response);
-      }
-      else if ("POST".equals(request.getMethod())) {
+    public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+      final Map<String, Object> data = new LinkedHashMap<String, Object>();
+      data.put("configuration", _perWikiConfiguration);
+      if ("POST".equals(request.getMethod())) {
         String url = request.getParameter("url");
         try {
           _perWikiConfiguration.setUrl(url);
@@ -57,18 +55,16 @@ public class WikiChoice implements RequestHandler {
           if (_perWikiConfiguration.isComplete()) {
             addWiki(_perWikiConfiguration);
           }
-          response.sendRedirect(request.getRequestURI());
+          return new RedirectView(request.getRequestURI());
         }
         catch (IllegalArgumentException ex) {
-          request.setAttribute("error", ex.getMessage());
-          showView(request, response);
+          data.put("error", ex.getMessage());
+          return new JspView("Configuration", data);
         }
       }
-    }
-    
-    private void showView(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-      request.setAttribute("configuration", _perWikiConfiguration);
-      request.getRequestDispatcher("/WEB-INF/templates/Configuration.jsp").include(request, response);
+      else {
+        return new JspView("Configuration", data);
+      }
     }
     
   }
@@ -84,13 +80,13 @@ public class WikiChoice implements RequestHandler {
     return handler;
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     PerWikiInitialConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
     request.setAttribute(WikiHandler.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
     RequestBasedWikiUrls.create(request, configuration);
     RequestHandler handler = getWikiHandler(configuration, path);
-    handler.handle(path, request, response);
+    return handler.handle(path, request, response);
   }
 
   private RequestHandler getWikiHandler(final PerWikiInitialConfiguration configuration, final ConsumedPath path) throws NotFoundException {

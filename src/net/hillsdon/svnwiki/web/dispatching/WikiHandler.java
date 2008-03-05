@@ -59,6 +59,13 @@ import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
  */
 public class WikiHandler implements RequestHandler {
 
+  private static final class RequestAuthenticationView implements View {
+    public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+      response.setHeader("WWW-Authenticate", "Basic realm=\"Wiki login\"");
+      response.sendError(401);
+    }
+  }
+
   static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
   
   private final RequestScopedThreadLocalPageStore _pageStore;
@@ -72,7 +79,7 @@ public class WikiHandler implements RequestHandler {
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
-      public void render(PageReference page, String in, Writer out) throws IOException, PageStoreException {
+      public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
         _renderer.render(page, in, out);
       }
     })));
@@ -88,7 +95,7 @@ public class WikiHandler implements RequestHandler {
     _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
   }
 
-  public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     request.setAttribute("cssUrl", _internalLinker.url("ConfigCss") + "?raw");
     request.setAttribute("internalLinker", _internalLinker);
     try {
@@ -97,19 +104,21 @@ public class WikiHandler implements RequestHandler {
       try {
         _searchEngine.syncWithExternalCommits();
         addSideBarEtcToRequest(request);
-        _handler.handle(path, request, response);
+        // We need to complete the rendering here, so the view can call back into the page store.
+        _handler.handle(path, request, response).render(request, response);
+        return View.NULL;
       }
       finally {
         _pageStore.destroy();
       }
     }
     catch (PageStoreAuthenticationException ex) {
-      requestAuthentication(response);
+      return new RequestAuthenticationView();
     }
     catch (Exception ex) {
       // Rather horrible, needed at the moment for auth failures during rendering (linking).
       if (ex.getCause() instanceof PageStoreAuthenticationException) {
-        requestAuthentication(response);
+        return new RequestAuthenticationView();
       }
       else {
         // Don't try to show wiki header/footer.
@@ -127,11 +136,6 @@ public class WikiHandler implements RequestHandler {
       _renderer.render(ref, page.getContent(), html);
       request.setAttribute(requestVarName, html.toString());
     }
-  }
-
-  private void requestAuthentication(final HttpServletResponse response) throws IOException {
-    response.setHeader("WWW-Authenticate", "Basic realm=\"Wiki login\"");
-    response.sendError(401);
   }
 
 }

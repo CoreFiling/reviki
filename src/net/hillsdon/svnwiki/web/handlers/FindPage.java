@@ -21,6 +21,8 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
+import net.hillsdon.svnwiki.web.dispatching.JspView;
+import net.hillsdon.svnwiki.web.dispatching.RedirectView;
+import net.hillsdon.svnwiki.web.dispatching.View;
 
 public class FindPage implements PageRequestHandler {
 
@@ -58,46 +63,51 @@ public class FindPage implements PageRequestHandler {
     _regularPage = regularPage;
   }
 
-  public void handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if ("opensearch.xml".equals(path.next())) {
-      response.setContentType("application/opensearchdescription+xml");
-      response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(RequestBasedWikiUrls.get(request).search())));
-      return;
+      return new View() {
+        public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+          response.setContentType("application/opensearchdescription+xml");
+          response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(RequestBasedWikiUrls.get(request).search())));
+        }
+      };
     }
     String query = request.getParameter(PARAM_QUERY);
     if (query == null) {
       request.getParameter(PARAM_QUERY_ALTERNATE);
     }
     if (query == null) {
-      _regularPage.handlePage(path, request, response, page);
-      return;
+      return _regularPage.handlePage(path, request, response, page);
     }
     
     boolean pageExists = _store.list().contains(new PageReference(query));
     if (request.getParameter("force") == null && pageExists) {
-      response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
-      return;
+      return new RedirectView(RequestBasedWikiUrls.get(request).page(query));
     }
     
-    Set<SearchMatch> results = _searchEngine.search(query, true);
+    final Set<SearchMatch> results = _searchEngine.search(query, true);
     Long limit = getLong(request.getParameter("limit"), "limit");
     if (limit != null) {
       results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));
     }
     if ("txt".equals(request.getParameter("ctype"))) {
-      response.setContentType("text/plain");
-      PrintWriter writer = response.getWriter();
-      for (SearchMatch matcher : results) {
-        writer.println(matcher.getPage());
-      }
-      return;
+      return new View() {
+        public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
+          response.setContentType("text/plain");
+          PrintWriter writer = response.getWriter();
+          for (SearchMatch matcher : results) {
+            writer.println(matcher.getPage());
+          }
+        }
+      };
     }
     else {
+      Map<String, Object> data = new LinkedHashMap<String, Object>();
       if (!pageExists && isWikiWord(query)) {
-        request.setAttribute("suggestCreate", query);
+        data.put("suggestCreate", query);
       }
-      request.setAttribute("results", results);
-      request.getRequestDispatcher("/WEB-INF/templates/SearchResults.jsp").include(request, response);
+      data.put("results", results);
+      return new JspView("SearchResults", data);
     }
   }
 
