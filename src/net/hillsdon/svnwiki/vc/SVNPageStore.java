@@ -41,7 +41,7 @@ public class SVNPageStore implements PageStore {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       HashMap<String, String> properties = new HashMap<String, String>();
-      _repository.getFile("Foo.wiki", SVNRevision.HEAD.getNumber(), properties, baos);
+      _repository.getFile(path, SVNRevision.HEAD.getNumber(), properties, baos);
       long revision = Long.parseLong(properties.get(SVNProperty.REVISION));
       return new PageInfo(toUTF8(baos.toByteArray()), revision);
     }
