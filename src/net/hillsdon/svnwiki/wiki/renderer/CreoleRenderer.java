@@ -38,7 +38,7 @@ import net.hillsdon.svnwiki.vc.PageReference;
  */
 public class CreoleRenderer {
 
-  public class RawUrlNode extends AbstractRegexNode {
+  public static class RawUrlNode extends AbstractRegexNode {
     public RawUrlNode() {
       super("\\p{L}+://\\S+(?=\\p{Punct})");
     }
