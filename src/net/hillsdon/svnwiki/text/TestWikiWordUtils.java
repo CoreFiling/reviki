@@ -23,13 +23,13 @@ public class TestWikiWordUtils extends TestCase {
   public void testOddCharacters() {
     String happyu = "JürgenHabermas";
     assertEquals(asList("Jürgen", "Habermas"), splitCamelCase(happyu));
-    assertEquals("Jürgen Habermas", pathToTitle(happyu).toString());
+    assertEquals("Jürgen Habermas", pathToTitle(happyu));
   }
   
   public void testLabel() {
-    assertEquals("My First Property", pathToTitle("MyFirstProperty").toString());
-    assertEquals("my First Property", pathToTitle("object/myFirstProperty").toString());
-    assertEquals("lemon Cheesecake", pathToTitle("lemonCheesecake").toString());
+    assertEquals("My First Property", pathToTitle("MyFirstProperty"));
+    assertEquals("my First Property", pathToTitle("object/myFirstProperty"));
+    assertEquals("lemon Cheesecake", pathToTitle("lemonCheesecake"));
   }
   
   public void testDegenerate() {

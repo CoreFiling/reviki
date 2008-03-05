@@ -11,6 +11,7 @@ import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.handlers.AtomRecentChanges;
 import net.hillsdon.svnwiki.web.handlers.Attachments;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetAttachment;
@@ -39,6 +40,7 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _attachments;
   private final RequestHandler _uploadAttachment;
   private final RequestHandler _getAttachment;
+  private final RequestHandler _atom;
 
   public MainHandler(final InitialConfiguration configuration) throws IOException {
     ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
@@ -54,6 +56,7 @@ public class MainHandler implements RequestHandler {
     _attachments = new Attachments(_pageStore);
     _uploadAttachment = new UploadAttachment(_pageStore);
     _getAttachment = new GetAttachment(_pageStore);
+    _atom = new AtomRecentChanges(_pageStore);
   }
   
   private boolean isPost(final HttpServletRequest request) {
@@ -67,7 +70,10 @@ public class MainHandler implements RequestHandler {
       try {
         String requestURI = request.getRequestURI();
         String path = requestURI.substring(request.getContextPath().length());
-        if (path.startsWith("/pages/")) {
+        if (path.equals("/pages/atom.xml")) {
+          _atom.handle(request, response);
+        }
+        else if (path.startsWith("/pages/")) {
           if (isPost(request)) {
             if (path.contains("/attachments/")) {
               _uploadAttachment.handle(request, response);

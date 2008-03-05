@@ -23,7 +23,7 @@ public class TestSearch extends WebTestSupport {
     String name = uniqueWikiPageName("SearchIndexTest");
     HtmlPage page = editWikiPage(name, "Should be found by search", "", true);
     assertSearchFindsPageUsingQuery(page, name, "found by search");
-    assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name).toString());
+    assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name));
     HtmlPage searchResult = search(page, name);
     // Goes directly to the page.
     assertEquals(page.getWebResponse().getUrl(), searchResult.getWebResponse().getUrl());

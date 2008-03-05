@@ -87,7 +87,7 @@ public class LuceneSearcher implements SearchEngine {
   private Document createWikiPageDocument(final String path, final String content) {
     Document document = new Document();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
-    document.add(new Field(FIELD_TITLE, pathToTitle(path).toString(), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
     return document;

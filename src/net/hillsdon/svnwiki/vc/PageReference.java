@@ -11,7 +11,7 @@ public class PageReference implements Comparable<PageReference> {
   }
 
   public String getTitle() {
-    return WikiWordUtils.pathToTitle(getPath()).toString();
+    return WikiWordUtils.pathToTitle(getPath());
   }
   
   public String getPath() {
