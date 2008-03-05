@@ -22,7 +22,7 @@ public class MainHandler implements RequestHandler {
   private RequestHandler _search;
   private RequestHandler _history;
 
-  public MainHandler(final Configuration configuration) {
+  public MainHandler(final InitialConfiguration configuration) {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);

@@ -12,9 +12,12 @@ import org.tmatesoft.svn.core.SVNURL;
 /**
  * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
  * 
+ * Additional run-time configuration options are stored in SVN rather than
+ * on the file-system so that they benefit from versioning and backup.
+ * 
  * @author mth
  */
-public class Configuration {
+public class InitialConfiguration {
 
   private static final String DEFAULT_CONFIG_DIR_NAME = "svnwiki-data";
   private static final String CONFIG_FILE_NAME = "svnwiki.properties";

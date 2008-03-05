@@ -6,14 +6,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.svnwiki.web.Configuration;
+import net.hillsdon.svnwiki.web.InitialConfiguration;
 import net.hillsdon.svnwiki.web.RequestHandler;
 
-public class ConfigurationHandler implements RequestHandler {
+public class InitialConfigurationHandler implements RequestHandler {
 
-  private final Configuration _configuration;
+  private final InitialConfiguration _configuration;
 
-  public ConfigurationHandler(final Configuration configuration) {
+  public InitialConfigurationHandler(final InitialConfiguration configuration) {
     _configuration = configuration;
   }
   

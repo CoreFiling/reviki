@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.svnwiki.web.handlers.ConfigurationHandler;
+import net.hillsdon.svnwiki.web.handlers.InitialConfigurationHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,16 +25,16 @@ public class Dispatcher extends HttpServlet {
   private static final Log LOG = LogFactory.getLog(Dispatcher.class);
   
   private static final long serialVersionUID = 1L;
-  private Configuration _configuration;
+  private InitialConfiguration _configuration;
   private RequestHandler _currentHandler;
   private RequestHandler _configurationHandler;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    _configuration = new Configuration();
+    _configuration = new InitialConfiguration();
     _configuration.load();
-    _configurationHandler = new ConfigurationHandler(_configuration);
+    _configurationHandler = new InitialConfigurationHandler(_configuration);
   }
 
   private void setCurrentHandler() {
