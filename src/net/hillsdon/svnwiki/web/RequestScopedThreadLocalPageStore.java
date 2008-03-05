@@ -1,5 +1,8 @@
 package net.hillsdon.svnwiki.web;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.vc.ChangeInfo;
@@ -33,11 +36,11 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return get().get(path);
   }
 
-  public String[] list() throws PageStoreException {
+  public Collection<String> list() throws PageStoreException {
     return get().list();
   }
 
-  public ChangeInfo[] recentChanges() throws PageStoreException {
+  public List<ChangeInfo> recentChanges() throws PageStoreException {
     return get().recentChanges();
   }
 

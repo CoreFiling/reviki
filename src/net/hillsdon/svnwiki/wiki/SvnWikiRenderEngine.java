@@ -1,7 +1,5 @@
 package net.hillsdon.svnwiki.wiki;
 
-import java.util.Arrays;
-
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -24,8 +22,7 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
 
   public boolean exists(final String name) {
     try {
-      // TODO: make this more efficient!
-      return Arrays.asList(_store.list()).contains(name);
+      return _store.list().contains(name);
     }
     catch (PageStoreException e) {
       throw new RuntimeException(e);

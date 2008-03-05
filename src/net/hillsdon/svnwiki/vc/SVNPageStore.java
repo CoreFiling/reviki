@@ -10,10 +10,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -58,7 +60,7 @@ public class SVNPageStore implements PageStore {
   }
 
   @SuppressWarnings("unchecked")
-  public ChangeInfo[] recentChanges() throws PageStoreException {
+  public List<ChangeInfo> recentChanges() throws PageStoreException {
     try {
       List<SVNLogEntry> entries = limitedLog();
       List<ChangeInfo> results = new LinkedList<ChangeInfo>();
@@ -74,7 +76,7 @@ public class SVNPageStore implements PageStore {
           }
         }
       }
-      return results.toArray(new ChangeInfo[results.size()]);
+      return results;
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);
@@ -94,17 +96,18 @@ public class SVNPageStore implements PageStore {
     return entries;
   }
   
-  public String[] list() throws PageStoreException {
+  public Collection<String> list() throws PageStoreException {
     try {
       List<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
       _repository.getDir("", -1, false, entries);
-      List<String> results = new ArrayList<String>(entries.size());
+      // Need order, contains() is a reasonable operation however.
+      Set<String> results = new LinkedHashSet<String>(entries.size());
       for (SVNDirEntry e : entries) {
         if (SVNNodeKind.FILE.equals(e.getKind())) {
           results.add(e.getName());
         }
       }
-      return results.toArray(new String[results.size()]);
+      return results;
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);

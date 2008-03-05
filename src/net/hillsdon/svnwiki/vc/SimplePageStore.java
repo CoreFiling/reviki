@@ -1,6 +1,9 @@
 package net.hillsdon.svnwiki.vc;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,12 +24,12 @@ public class SimplePageStore implements PageStore {
     return page;
   }
 
-  public String[] list() throws PageStoreException {
-    return _pages.keySet().toArray(new String[_pages.size()]);
+  public Collection<String> list() throws PageStoreException {
+    return _pages.keySet();
   }
 
-  public ChangeInfo[] recentChanges() throws PageStoreException {
-    return new ChangeInfo[0];
+  public List<ChangeInfo> recentChanges() throws PageStoreException {
+    return Collections.emptyList();
   }
 
   public void set(final String path, String lockToken, final long baseRevision, final String content) throws PageStoreException {

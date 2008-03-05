@@ -1,5 +1,8 @@
 package net.hillsdon.svnwiki.vc;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * A verson control based store of wiki pages.
  * 
@@ -11,13 +14,13 @@ public interface PageStore {
    * @return A list of all pages.
    * @throws PageStoreException If something goes wrong.
    */
-  String[] list() throws PageStoreException;
+  Collection<String> list() throws PageStoreException;
 
   /**
    * @return Names of recently changed pages.
    * @throws PageStoreException If something goes wrong.
    */
-  ChangeInfo[] recentChanges() throws PageStoreException;
+  List<ChangeInfo> recentChanges() throws PageStoreException;
   
   /**
    * The page info may represent a page that doesn't exist yet,

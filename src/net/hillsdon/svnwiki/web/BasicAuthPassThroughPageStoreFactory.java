@@ -106,7 +106,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
       UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new FrontPagePopulatingPageStore(new SVNPageStore(repository));
+      return new FrontPagePopulatingPageStore(new CachingPageStore(new SVNPageStore(repository)));
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
