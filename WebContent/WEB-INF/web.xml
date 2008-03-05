@@ -17,6 +17,10 @@
 	  <servlet-name>dispatcher</servlet-name>
 	  <url-pattern>/search</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>dispatcher</servlet-name>
+	  <url-pattern>/feeds/*</url-pattern>
+	</servlet-mapping>
     <listener>
       <listener-class>org.apache.tiles.web.startup.TilesListener</listener-class>
     </listener>

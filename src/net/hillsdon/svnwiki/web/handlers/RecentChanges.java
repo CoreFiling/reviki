@@ -15,7 +15,7 @@ public class RecentChanges extends PageRequestHandler {
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
-  private static final int RECENT_CHANGES_HISTORY_SIZE = 30;
+  static final int RECENT_CHANGES_HISTORY_SIZE = 30;
 
   public RecentChanges(final PageStore pageStore) {
     super(pageStore);

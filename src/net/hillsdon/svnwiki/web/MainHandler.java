@@ -22,6 +22,7 @@ import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.WikiUrls;
 import net.hillsdon.svnwiki.wiki.renderer.CreoleMarkupRenderer;
 
 /**
@@ -59,49 +60,41 @@ public class MainHandler implements RequestHandler {
     _atom = new AtomRecentChanges(_pageStore);
   }
   
-  private boolean isPost(final HttpServletRequest request) {
-    return "POST".equals(request.getMethod());
-  }
-  
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     try {
       // Handle the lifecycle of the thread-local request dependent page store.
-      _pageStore.create(request); 
+      _pageStore.create(request);
       try {
-        String requestURI = request.getRequestURI();
-        String path = requestURI.substring(request.getContextPath().length());
-        if (path.equals("/pages/atom.xml")) {
-          _atom.handle(request, response);
-        }
-        else if (path.startsWith("/pages/")) {
-          if (isPost(request)) {
-            if (path.contains("/attachments/")) {
-              _uploadAttachment.handle(request, response);
-            }
-            else if (request.getParameter("content") == null) {
-              _editor.handle(request, response);
-            }
-            else {
-              _set.handle(request, response);
-            }
-          }
-          else {
-            if (path.endsWith("/attachments/")) {
-              _attachments.handle(request, response);
-            }
-            else if (path.contains("/attachments/")) {
-              _getAttachment.handle(request, response);
-            }
-            else if (request.getParameter("history") != null) {
+        WikiUrls urls = new RequestBasedWikiUrls(request);
+        boolean isPost = request.getMethod().equals("POST");
+        String requestURL = request.getRequestURL().toString();
+        if (urls.isPage(requestURL)) {
+          if (!isPost) {
+            if (request.getParameter("history") != null) {
               _history.handle(request, response);
             }
             else {
               _get.handle(request, response);
             }
           }
+          else if (request.getParameter("content") == null) {
+            _editor.handle(request, response);
+          }
+          else {
+            _set.handle(request, response);
+          }
         }
-        else if (path.startsWith("/search")) {
+        else if (urls.isAttachmentsDir(requestURL)) {
+          (isPost ? _uploadAttachment : _attachments).handle(request, response);
+        }
+        else if (urls.isAttachment(requestURL)) {
+          _getAttachment.handle(request, response);
+        }
+        else if (urls.search().equals(requestURL)) {
           _search.handle(request, response);
+        }
+        else if (urls.feed().equals(requestURL)) {
+          _atom.handle(request, response);
         }
       }
       finally {
