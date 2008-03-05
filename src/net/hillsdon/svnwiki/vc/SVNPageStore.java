@@ -40,6 +40,7 @@ import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.svnwiki.vc.SVNHelper.SVNAction;
 
 import org.tmatesoft.svn.core.SVNErrorCode;
+import org.tmatesoft.svn.core.SVNErrorMessage;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -114,7 +115,6 @@ public class SVNPageStore implements PageStore {
       public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HashMap<String, String> properties = new HashMap<String, String>();
-
         SVNNodeKind kind = repository.checkPath(ref.getPath(), revision);
         if (SVNNodeKind.FILE.equals(kind)) {
           repository.getFile(ref.getPath(), revision, properties, baos);
@@ -122,19 +122,34 @@ public class SVNPageStore implements PageStore {
           long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
           Date lastChangedDate = SVNTimeUtil.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
           String lastChangedAuthor = properties.get(SVNProperty.LAST_AUTHOR);
-          SVNLock lock = repository.getLock(ref.getPath());
-          String lockOwner = lock == null ? null : lock.getOwner();
-          String lockToken = lock == null ? null : lock.getID();
-          return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
+          try {
+            SVNLock lock = null;
+            if (revision == -1 || repository.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
+              lock = repository.getLock(ref.getPath());
+            }
+            String lockOwner = lock == null ? null : lock.getOwner();
+            String lockToken = lock == null ? null : lock.getID();
+            return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
+          }
+          catch (SVNException ex) {
+            SVNErrorMessage error = ex.getErrorMessage();
+            System.err.println(error.getErrorCode().getDescription());
+            if (error.getErrorCode() == SVNErrorCode.RA_DAV_PATH_NOT_FOUND) {
+              return createNewOrDeletedPageInfo(ref);
+            }
+            throw ex;
+          }
         }
         else if (SVNNodeKind.NONE.equals(kind)) {
-          // Distinguishing between 'uncommitted' and 'deleted' would be useful
-          // for history.
-          return new PageInfo(ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
+          return createNewOrDeletedPageInfo(ref);
         }
         else {
           throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
         }
+      }
+
+      private PageInfo createNewOrDeletedPageInfo(final PageReference ref) {
+        return new PageInfo(ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
       }
     });
   }
