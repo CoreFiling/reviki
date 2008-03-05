@@ -44,7 +44,7 @@ import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class GetRegularPage implements PageRequestHandler {
 
-  private static final int BACKLINKS_LIMIT = 15;
+  public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
   public static final String PARAM_DIFF_REVISION = "diff";
 
@@ -52,6 +52,7 @@ public class GetRegularPage implements PageRequestHandler {
   public static final String ATTR_BACKLINKS = "backlinks";
   public static final String ATTR_BACKLINKS_LIMITED = "backlinksLimited";
   public static final String ATTR_RENDERED_CONTENTS = "renderedContents";
+  public static final String ATTR_MARKED_UP_DIFF = "markedUpDiff";
 
   @SuppressWarnings("unchecked") // Diff library is odd...
   private static String getDiffMarkup(final PageInfo head, final PageInfo base) {
@@ -72,7 +73,7 @@ public class GetRegularPage implements PageRequestHandler {
     _graph = graph;
   }
 
-  public View handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
+  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
     long revison = getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
@@ -81,22 +82,11 @@ public class GetRegularPage implements PageRequestHandler {
     request.setAttribute(ATTR_PAGE_INFO, main);
     if (diffRevision != null) {
       PageInfo base = _store.get(page, diffRevision);
-      request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
+      request.setAttribute(ATTR_MARKED_UP_DIFF, getDiffMarkup(main, base));
       return new JspView("ViewDiff");
     }
     else if (request.getParameter("raw") != null) {
-      return new View() {
-        public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
-          // This is a cludge.  We should represent 'special' pages better.
-          if (page.getPath().equals("ConfigCss")) {
-            response.setContentType("text/css");
-          }
-          else {
-            response.setContentType("text/plain");
-          }
-          response.getWriter().write(main.getContent());
-        }
-      };
+      return new RawPageView(main);
     }
     else {
       StringWriter writer = new StringWriter();
@@ -109,8 +99,8 @@ public class GetRegularPage implements PageRequestHandler {
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
     List<String> pageNames = new ArrayList<String>(_graph.incomingLinks(page.getPath()));
     Collections.sort(pageNames);
-    if (pageNames.size() > BACKLINKS_LIMIT) {
-      pageNames = pageNames.subList(0, BACKLINKS_LIMIT - 1);
+    if (pageNames.size() > MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY) {
+      pageNames = pageNames.subList(0, MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY);
       request.setAttribute(ATTR_BACKLINKS_LIMITED, true);
     }
     request.setAttribute(ATTR_BACKLINKS, pageNames);

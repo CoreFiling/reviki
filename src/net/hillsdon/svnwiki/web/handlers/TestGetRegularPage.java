@@ -1,7 +1,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import static net.hillsdon.fij.core.Functional.set;
+import static net.hillsdon.svnwiki.web.handlers.GetRegularPage.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -9,9 +9,9 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
@@ -19,7 +19,9 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.JspView;
 import net.hillsdon.svnwiki.web.common.MockHttpServletRequest;
+import net.hillsdon.svnwiki.web.common.RequestParameterReaders;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
@@ -38,7 +40,7 @@ public class TestGetRegularPage extends TestCase {
   private MarkupRenderer _renderer;
   private WikiGraph _graph;
 
-  private HttpServletRequest _request;
+  private MockHttpServletRequest _request;
   private HttpServletResponse _response;
   
   private GetRegularPage _page;
@@ -52,18 +54,57 @@ public class TestGetRegularPage extends TestCase {
     _graph = createMock(WikiGraph.class);
     _page = new GetRegularPage(_store, _renderer, _graph);
   }
-  
+
+  /**
+   * The usual case of viewing an existing page.
+   */
   public void testNoRevisionNoDiffViewsHead() throws Exception {
-    expect(_graph.incomingLinks(THE_PAGE.getPath())).andReturn(singleton("IncomingLinkToThePage")).once();
-    expect(_store.get(THE_PAGE, -1)).andReturn(new PageInfo(THE_PAGE.getPath(), "Content", -1, -1, "", new Date(), "", ""));
-    _renderer.render(eq(THE_PAGE), eq("Content"), isA(Writer.class));
-    expectLastCall().once();
+    // We should get all the links.
+    expectGetIncomingLinks(getCountIncomingLinks(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY));
+    PageInfo expectedPageInfo = expectGetContent();
+    expectRenderContent();
     replay();
-    _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    JspView view = (JspView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    assertEquals("ViewPage", view.getName());
     // Check data provided to view.
     assertNotNull(_request.getAttribute(GetRegularPage.ATTR_RENDERED_CONTENTS));
-    assertEquals(asList("IncomingLinkToThePage"), _request.getAttribute(GetRegularPage.ATTR_BACKLINKS));
+    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(GetRegularPage.ATTR_BACKLINKS)).size());
+    assertNull(_request.getAttribute(GetRegularPage.ATTR_BACKLINKS_LIMITED));
+    assertSame(expectedPageInfo, _request.getAttribute(GetRegularPage.ATTR_PAGE_INFO));
     verify();
+  }
+
+  public void testLimitsBacklinksIfMoreThanBackLinkLimitAndAddsAttributeToRequestIndicatingTheLimitWasReached() throws Exception {
+    expectGetIncomingLinks(getCountIncomingLinks(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY + 1));
+    expectGetContent();
+    expectRenderContent();
+    replay();
+    _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(GetRegularPage.ATTR_BACKLINKS)).size());
+    assertNotNull(_request.getAttribute(GetRegularPage.ATTR_BACKLINKS_LIMITED));
+    verify();
+  }
+
+  public void testProvideRevisionAndDiffViewsDiffBetweenTheRevisions() throws Exception {
+    _request.setParameter(RequestParameterReaders.PARAM_REVISION, "6");
+    _request.setParameter(GetRegularPage.PARAM_DIFF_REVISION, "4");
+    expectGetIncomingLinks();
+    expectGetContent(6, "Content at revision six.");
+    expectGetContent(4, "Content at revision four.");
+    // We don't render anything.
+    replay();
+    JspView view = (JspView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    assertEquals("ViewDiff", view.getName());
+    assertNotNull(_request.getAttribute(GetRegularPage.ATTR_MARKED_UP_DIFF));
+    verify();
+  }
+  
+  private String[] getCountIncomingLinks(final int count) {
+    String[] incomingLinks = new String[count];
+    for (int i = 0; i < incomingLinks.length; ++i) {
+      incomingLinks[i] = "IncomingLink" + (i + 1);
+    }
+    return incomingLinks;
   }
   
   private void verify() {
@@ -72,6 +113,25 @@ public class TestGetRegularPage extends TestCase {
 
   private void replay() {
     EasyMock.replay(_store, _renderer, _graph);
+  }
+  
+  private void expectRenderContent() throws Exception  {
+    _renderer.render(eq(THE_PAGE), eq("Content"), isA(Writer.class));
+    expectLastCall().once();
+  }
+
+  private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {
+    expect(_graph.incomingLinks(THE_PAGE.getPath())).andReturn(set(returnedPages)).once();
+  }
+
+  private PageInfo expectGetContent() throws Exception  {
+    return expectGetContent(-1, "Content");
+  }
+  
+  private PageInfo expectGetContent(final int revision, final String content) throws Exception  {
+    PageInfo pageInfo = new PageInfo(THE_PAGE.getPath(), content, revision, revision, "", new Date(), "", "");
+    expect(_store.get(THE_PAGE, revision)).andReturn(pageInfo).once();
+    return pageInfo;
   }
   
 }

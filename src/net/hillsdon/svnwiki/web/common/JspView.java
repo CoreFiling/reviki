@@ -19,6 +19,10 @@ public class JspView implements View {
     _name = name;
   }
   
+  public String getName() {
+    return _name;
+  }
+  
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     request.getRequestDispatcher("/WEB-INF/templates/" + _name + ".jsp").include(request, response);
   }
