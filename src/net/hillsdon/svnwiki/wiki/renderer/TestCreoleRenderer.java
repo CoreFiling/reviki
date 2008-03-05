@@ -54,7 +54,7 @@ public class TestCreoleRenderer extends TestCase {
   }
   
   public void testNestedLists() {
-    assertEquals("<ul><li>Outer<ul>\n<li>Inner</li></ul></li></ul>", _render.render(_page, "*Outer\n**Inner"));
+    assertEquals("<ul><li>Outer<ul><li>Inner</li></ul></li></ul>", _render.render(_page, "*Outer\n**Inner"));
   }
   
   public void testHtmlEscaping() {

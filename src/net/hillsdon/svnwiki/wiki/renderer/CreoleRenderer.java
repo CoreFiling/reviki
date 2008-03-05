@@ -54,7 +54,7 @@ public class CreoleRenderer {
   }
   private static class ListNode extends RegexMatchToTag {
     public ListNode(final String match, final String tag) {
-      super("(^|\\n)(" + match + "[^*#].*(\\n|$)([*#]{2}.*(\\n|$))*)+", tag, 0, "(^|\\n)[*#]", "$1");
+      super("(^|\\n)(\\s*?" + match + "[^*#].*(\\n|$)([*#]{2}.*(\\n|$))*)+", tag, 0, "(^|\\n)\\s*?[*#]", "$1");
     }
   }
 
