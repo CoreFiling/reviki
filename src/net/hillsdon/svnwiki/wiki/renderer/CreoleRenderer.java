@@ -44,17 +44,17 @@ public class CreoleRenderer {
     }
   }
 
-  private static final RegexMatchToTag ROOT;
+  private static final RenderNode ROOT;
   static {
-    RegexMatchToTag root = new RegexMatchToTag("", "", 0);
-    RegexMatchToTag noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
-    RegexMatchToTag paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
-    RegexMatchToTag italic = new RegexMatchToTag("//(.*?)//", "em", 1);
-    RegexMatchToTag strikethrough = new RegexMatchToTag("--(.*?)--", "del", 1);
+    RenderNode root = new RegexMatchToTag("", "", 0);
+    RenderNode noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
+    RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
+    RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
+    RenderNode strikethrough = new RegexMatchToTag("--(.*?)--", "del", 1);
     RegexMatchToTag bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
-    RegexMatchToTag lineBreak = new RegexMatchToTag("\\\\", "br", null);
-    RegexMatchToTag horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
-    RegexMatchToTag unorderedList = new List("\\*", "ul");
+    RenderNode lineBreak = new RegexMatchToTag("\\\\", "br", null);
+    RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
+    RenderNode unorderedList = new List("\\*", "ul");
     RegexMatchToTag orderedList = new List("#", "ol");
     RegexMatchToTag listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .setChildren(bold, italic, lineBreak, unorderedList, orderedList);

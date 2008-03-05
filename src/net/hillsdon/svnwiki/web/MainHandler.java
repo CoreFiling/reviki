@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.InitialConfiguration;
-import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -16,8 +15,8 @@ import net.hillsdon.svnwiki.web.handlers.History;
 import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
+import net.hillsdon.svnwiki.wiki.CreoleMarkupRenderer;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
-import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
 /**
  * All requests come through here if we're correctly configured.
@@ -40,8 +39,8 @@ public class MainHandler implements RequestHandler {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
-    MarkupRenderer renderer = new RadeoxMarkupRenderer(new PageStoreConfiguration(_pageStore), _pageStore);
-    //MarkupRenderer renderer = new CreoleMarkupRenderer();
+    //MarkupRenderer renderer = new RadeoxMarkupRenderer(new PageStoreConfiguration(_pageStore), _pageStore);
+    MarkupRenderer renderer = new CreoleMarkupRenderer();
     _get = new GetPage(_pageStore, searcher, renderer);
     _search = new Search(_pageStore, searcher);
     _editor = new EditorForPage(_pageStore);

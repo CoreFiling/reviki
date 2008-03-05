@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegexMatchToTag {
+public class RegexMatchToTag implements RenderNode {
 
-  private final List<RegexMatchToTag> _children = new ArrayList<RegexMatchToTag>();
+  private final List<RenderNode> _children = new ArrayList<RenderNode>();
   private final Pattern _matchRe;
   private final String _tag;
   private final Integer _contentGroup;
@@ -28,11 +28,11 @@ public class RegexMatchToTag {
     _replaceString = replaceString;
   }
 
-  public List<RegexMatchToTag> getChildren() {
+  public List<RenderNode> getChildren() {
     return _children;
   }
 
-  public RegexMatchToTag setChildren(final RegexMatchToTag... rules) {
+  public RegexMatchToTag setChildren(final RenderNode... rules) {
     _children.clear();
     _children.addAll(asList(rules));
     return this;
@@ -42,12 +42,12 @@ public class RegexMatchToTag {
     if (text == null || text.length() == 0) {
       return "";
     }
-    RegexMatchToTag earliestRule = null;
+    RenderNode earliestRule = null;
     Matcher earliestMatch = null;
     int earliestIndex = Integer.MAX_VALUE;
-    for (RegexMatchToTag child : _children) {
-      Matcher matcher = child.matcher(text);
-      if (matcher.find()) {
+    for (RenderNode child : _children) {
+      Matcher matcher = child.find(text);
+      if (matcher != null) {
         if (matcher.start() < earliestIndex) {
           earliestIndex = matcher.start();
           earliestMatch = matcher;
@@ -67,7 +67,7 @@ public class RegexMatchToTag {
     return htmlEscape(text);
   }
 
-  private String handle(final RegexMatchToTag node, final Matcher matcher) {
+  public String handle(final RenderNode node, final Matcher matcher) {
     if (_contentGroup == null) {
       return "<" + _tag + " />";
     }
@@ -78,8 +78,9 @@ public class RegexMatchToTag {
     return "<" + _tag + ">" +  node.render(text) + "</" + _tag + ">";
   }
 
-  private Matcher matcher(final String text) {
-    return _matchRe.matcher(text);
+  public Matcher find(final String text) {
+    Matcher matcher = _matchRe.matcher(text);
+    return matcher.find() ? matcher : null;
   }
   
   /**
