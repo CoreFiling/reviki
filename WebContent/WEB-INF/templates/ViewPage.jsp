@@ -43,9 +43,12 @@
       <c:when test="${pageInfo.locked}">
         <c:choose>
           <c:when test="${pageInfo.lockedBy == username}">
-            <form action="" method="post">
+            <form id="editBottom" name="editBottom" action="" method="post">
               <input type="submit" value="Edit"/>
             </form> 
+            <script type="text/javascript">
+              svnwiki.formAsJavaScriptLink("editBottom", "Edit");
+            </script>
             <p>You have locked this page.</p>
           </c:when>
           <c:otherwise>
