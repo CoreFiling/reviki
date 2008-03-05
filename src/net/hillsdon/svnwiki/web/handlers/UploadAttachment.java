@@ -15,11 +15,9 @@
  */
 package net.hillsdon.svnwiki.web.handlers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,7 +31,6 @@ import net.hillsdon.svnwiki.web.common.RequestParameterReaders;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -43,13 +40,15 @@ public class UploadAttachment implements PageRequestHandler {
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private final PageStore _store;
+  private final PageRequestHandler _listAttachments;
 
-  public UploadAttachment(final PageStore store) {
+  public UploadAttachment(final PageStore store, final PageRequestHandler _list) {
     _store = store;
+    _listAttachments = _list;
   }
 
   @SuppressWarnings("unchecked")
-  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException, ServletException {
+  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }
@@ -80,7 +79,8 @@ public class UploadAttachment implements PageRequestHandler {
       
       if (file == null || file.getSize() == 0) {
         request.setAttribute("flash", "Please browse to a non-empty file to upload.");
-        request.getRequestDispatcher("/WEB-INF/templates/Attachments.jsp").include(request, response);
+        _listAttachments.handlePage(path, request, response, page);
+        return;
       }
       else {
         InputStream in = file.getInputStream();

@@ -30,7 +30,7 @@ public class Attachments implements PageRequestHandler {
 
   public Attachments(final PageStore pageStore) {
     _list = new ListAttachments(pageStore);
-    _upload = new UploadAttachment(pageStore);
+    _upload = new UploadAttachment(pageStore, _list);
     _get = new GetAttachment(pageStore);
   }
 
