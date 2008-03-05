@@ -66,6 +66,7 @@
       height: 1px;
       border: 0px;
       border-style: solid;
+      clear: both;
     }
   </style>
 </head>

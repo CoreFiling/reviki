@@ -10,6 +10,8 @@ import net.hillsdon.svnwiki.configuration.InitialConfiguration;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
+import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
+import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -41,22 +43,31 @@ public class MainHandler implements RequestHandler {
   private final RequestHandler _uploadAttachment;
   private final RequestHandler _getAttachment;
   private MarkupRenderer _renderer;
+  private ConfigPageCachingPageStore _cachingPageStore;
 
   public MainHandler(final InitialConfiguration configuration) throws IOException {
+    // The search engine is informed of page changes by a delegating page store.
+    // A delegating search engine checks it is up-to-date using the page store
+    // so we have a circularity here, but a useful one.
     ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
-    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_pageStore));
-    _get = new GetPage(_pageStore, searchEngine, _renderer);
+    _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
+    
+    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_cachingPageStore), new InternalLinker(_cachingPageStore));
+    _get = new GetPage(_cachingPageStore, searchEngine, _renderer);
+    // It is important to use the non-caching page store here.  It is ok to view 
+    // something out of date but users must edit the latest revision or else they
+    // won't be able to commit.
     _editor = new EditorForPage(_pageStore);
-    _set = new SetPage(_pageStore);
-    _history = new History(_pageStore);
-    _attachments = new Attachments(_pageStore);
-    _uploadAttachment = new UploadAttachment(_pageStore);
-    _getAttachment = new GetAttachment(_pageStore);
+    _set = new SetPage(_cachingPageStore);
+    _history = new History(_cachingPageStore);
+    _attachments = new Attachments(_cachingPageStore);
+    _uploadAttachment = new UploadAttachment(_cachingPageStore);
+    _getAttachment = new GetAttachment(_cachingPageStore);
   }
-  
+
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     try {
       // Handle the lifecycle of the thread-local request dependent page store.
@@ -68,7 +79,8 @@ public class MainHandler implements RequestHandler {
         
         PageReference sidebar = new PageReference("ConfigSideBar");
         StringWriter sidebarHtml = new StringWriter();
-        _renderer.render(sidebar, _pageStore.get(sidebar, -1).getContent(), sidebarHtml);
+        PageInfo configSideBar = _cachingPageStore.get(sidebar, -1);
+        _renderer.render(sidebar, configSideBar.getContent(), sidebarHtml);
         request.setAttribute("sidebar", sidebarHtml.toString());
         
         if (urls.isPage(requestURL)) {
@@ -99,9 +111,22 @@ public class MainHandler implements RequestHandler {
       }
     }
     catch (PageStoreAuthenticationException ex) {
-      response.setHeader("WWW-Authenticate", "Basic realm=\"Wiki login\"");
-      response.sendError(401);
+      requestAuthentication(response);
     }
+    catch (Exception ex) {
+      // Rather horrible, needed at the moment for auth failures during rendering (linking).
+      if (ex.getCause() instanceof PageStoreAuthenticationException) {
+        requestAuthentication(response);
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+
+  private void requestAuthentication(final HttpServletResponse response) throws IOException {
+    response.setHeader("WWW-Authenticate", "Basic realm=\"Wiki login\"");
+    response.sendError(401);
   }
 
 }

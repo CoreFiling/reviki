@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.search.SearchIndexPopulatingPageStore;
+import net.hillsdon.svnwiki.vc.PageListCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -105,7 +106,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
       UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new SearchIndexPopulatingPageStore(_indexer, new FrontPagePopulatingPageStore(new CachingPageStore(new SVNPageStore(repository))));
+      return new SearchIndexPopulatingPageStore(_indexer, new FrontPagePopulatingPageStore(new PageListCachingPageStore(new SVNPageStore(repository))));
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);

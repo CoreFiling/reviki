@@ -3,6 +3,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Error</tiles:putAttribute>
   <tiles:putAttribute name="heading">An error has occurred</tiles:putAttribute>
+  <tiles:putAttribute name="content">
     <p><c:out value="${exception.message}"/></p>
   </tiles:putAttribute>
 </tiles:insertTemplate>

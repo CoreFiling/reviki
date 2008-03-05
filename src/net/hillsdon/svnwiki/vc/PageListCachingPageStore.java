@@ -1,10 +1,8 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.vc;
 
 import java.util.Collection;
 
-import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.web.DelegatingPageStore;
 
 /**
  * Caches the set of pages forever.  This makes it only
@@ -14,11 +12,11 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
  * 
  * @author mth
  */
-public class CachingPageStore extends DelegatingPageStore {
+public class PageListCachingPageStore extends DelegatingPageStore {
 
   private Collection<PageReference> _cached = null;
   
-  public CachingPageStore(PageStore delegate) {
+  public PageListCachingPageStore(PageStore delegate) {
     super(delegate);
   }
 
