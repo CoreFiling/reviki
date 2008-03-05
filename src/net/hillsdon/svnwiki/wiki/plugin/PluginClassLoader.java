@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.wiki.plugin;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,7 +9,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -26,18 +29,28 @@ import org.apache.commons.io.IOUtils;
  */
 public class PluginClassLoader extends URLClassLoader {
 
+  private final List<Class<?>> _contributedClasses;
+
   public PluginClassLoader(final URL jarUrl, final ClassLoader parent) throws InvalidPluginException {
     super(new URL[] {jarUrl}, parent);
+    InputStream manifestInputStream = null;
     try {
-      URL last = getManifestURL(jarUrl);
+      final URL manifestUrl = getManifestURL(jarUrl);
+      manifestInputStream = manifestUrl.openStream();
+      final Manifest manifest = new Manifest(manifestInputStream);
       
-      Manifest manifest = new Manifest(last.openStream());
-      Attributes attrs = manifest.getMainAttributes();
+      final Attributes attrs = manifest.getMainAttributes();
+      final String classPath = attrs.getValue("Class-Path");
+      if (classPath == null) {
+        throw new InvalidPluginException("No Class-Path specified in plugin manifest.");
+      }
+      cacheClassPathEntries(jarUrl, classPath);
       
-      String[] classPathEntries = attrs.getValue("Class-Path").split("\\s");
-      cacheClassPathEntries(jarUrl, classPathEntries);
-      String[] pluginContributions = attrs.getValue("Plugin-Contributions").split("\\s");
-      loadPluginContributionClasses(pluginContributions);
+      String pluginContributions = attrs.getValue("Plugin-Contributions");
+      if (pluginContributions == null) {
+        pluginContributions = "";
+      }
+      _contributedClasses = unmodifiableList(loadPluginContributionClasses(pluginContributions));
     }
     catch (URISyntaxException ex) {
       throw new InvalidPluginException(ex);
@@ -45,13 +58,31 @@ public class PluginClassLoader extends URLClassLoader {
     catch (IOException ex) {
       throw new InvalidPluginException(ex);
     }
+    catch (ClassNotFoundException ex) {
+      throw new InvalidPluginException(ex);
+    }
+    finally {
+      IOUtils.closeQuietly(manifestInputStream);
+    }
   }
 
-  private void loadPluginContributionClasses(final String[] pluginContributions) {
+  /**
+   * @return Contributed classes in contribution order.
+   */
+  public List<Class<?>> getContributedClasses() {
+    return _contributedClasses;
+  }
+  
+  private List<Class<?>> loadPluginContributionClasses(final String pluginContributions) throws ClassNotFoundException {
+    List<Class<?>> classes = new ArrayList<Class<?>>();
+    for (String className : pluginContributions.split("\\s")) {
+      classes.add(findClass(className));
+    }
+    return classes;
   }
 
-  private void cacheClassPathEntries(final URL jarUrl, final String[] classPathEntries) throws IOException {
-    for (String entry : classPathEntries) {
+  private void cacheClassPathEntries(final URL jarUrl, final String classPath) throws IOException {
+    for (String entry : classPath.split("\\s")) {
       URL entryUrl = new URL("jar:" + jarUrl.toString() + "!/" + entry);
       File file = File.createTempFile("cached-", entry);
       file.deleteOnExit();
@@ -70,15 +101,12 @@ public class PluginClassLoader extends URLClassLoader {
   }
 
   private URL getManifestURL(final URL jarUrl) throws IOException, URISyntaxException, InvalidPluginException {
-    Enumeration<URL> enumeration = getResources("META-INF/MANIFEST.MF");
-    URL last = null;
-    while (enumeration.hasMoreElements()) {
-      last = enumeration.nextElement();
-    }
-    if (last == null) {
+    // Note this has no parent, ensuring we get the correct manifest for our jar.
+    URL url = new URLClassLoader(new URL[] {jarUrl}, null).getResource("META-INF/MANIFEST.MF");
+    if (url == null) {
       throw new InvalidPluginException("No manifest found in given jar.");
     }
-    return last;
+    return url;
   }
 
 }
