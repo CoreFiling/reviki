@@ -76,12 +76,21 @@ public class CreoleRenderer {
     RenderNode[] nonStructural = new RenderNode[defaultNonStructural.length + customNonStructural.length];
     System.arraycopy(customNonStructural, 0, nonStructural, 0, customNonStructural.length);
     System.arraycopy(defaultNonStructural, 0, nonStructural, customNonStructural.length, defaultNonStructural.length);
+
+    RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
+    RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
+    RenderNode tableHeading = new RegexMatchToTag("[|]+=([^|]*)", "th", 1);
+    RenderNode tableCell = new RegexMatchToTag("[|]+([^|]*)", "td", 1);
+    table.addChildren(tableRow);
+    tableRow.addChildren(tableHeading, tableCell);
+    tableCell.addChildren(nonStructural);
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(nonStructural);
     root.addChildren(
         noWiki.addChildren(), 
         horizontalRule,
+        table,
         new Heading(5).addChildren(nonStructural),
         new Heading(4).addChildren(nonStructural), 
         new Heading(3).addChildren(nonStructural), 
@@ -89,7 +98,7 @@ public class CreoleRenderer {
         new Heading(1).addChildren(nonStructural),
         orderedList.addChildren(listItem),
         unorderedList.addChildren(listItem),
-        paragraph.addChildren(orderedList, unorderedList, noWiki, horizontalRule).addChildren(nonStructural), 
+        paragraph.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule).addChildren(nonStructural), 
         italic.addChildren(nonStructural), 
         bold.addChildren(nonStructural),
         strikethrough.addChildren(nonStructural)
