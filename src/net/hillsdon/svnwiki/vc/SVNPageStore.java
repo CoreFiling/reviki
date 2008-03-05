@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -36,6 +35,7 @@ import java.util.Set;
 
 import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.core.Predicate;
+import net.hillsdon.fij.text.Strings;
 
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -55,11 +55,6 @@ public class SVNPageStore implements PageStore {
       return in.getKind() == StoreKind.PAGE;
     }
   };
-
-  /**
-   * The assumed encoding of files from the repository.
-   */
-  private static final String UTF8 = "UTF8";
 
   private final BasicSVNOperations _operations;
 
@@ -121,7 +116,7 @@ public class SVNPageStore implements PageStore {
       catch (NotFoundException ex) {
         // It was a file at 'revision' but is now deleted so we can't get the lock information.
       }
-      return new PageInfo(ref.getPath(), toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
+      return new PageInfo(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
     }
     else if (SVNNodeKind.NONE.equals(kind)) {
       long pseudoRevision = PageInfo.UNCOMMITTED;
@@ -172,7 +167,7 @@ public class SVNPageStore implements PageStore {
     if (content.trim().length() == 0) {
       return delete(ref.getPath(), lockToken, baseRevision, commitMessage);
     }
-    return set(ref.getPath(), lockToken, baseRevision, new ByteArrayInputStream(fromUTF8(content)), commitMessage);
+    return set(ref.getPath(), lockToken, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)), commitMessage);
   }
 
   private long delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
@@ -185,7 +180,7 @@ public class SVNPageStore implements PageStore {
       return _operations.create(path, commitMessage, content);
     }
     else {
-      return  _operations.edit(path, baseRevision, commitMessage, lockToken, content);
+      return _operations.edit(path, baseRevision, commitMessage, lockToken, content);
     }
   }
 
@@ -218,24 +213,6 @@ public class SVNPageStore implements PageStore {
   
   private String attachmentPath(final PageReference ref) {
     return ref.getPath() + "-attachments";
-  }
-
-  private static String toUTF8(final byte[] bytes) {
-    try {
-      return new String(bytes, UTF8);
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new AssertionError("Java supports UTF8.");
-    }
-  }
-
-  private static byte[] fromUTF8(final String string) {
-    try {
-      return string.getBytes(UTF8);
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new AssertionError("Java supports UTF8.");
-    }
   }
 
   public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {

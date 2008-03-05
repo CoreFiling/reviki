@@ -15,12 +15,16 @@
  */
 package net.hillsdon.fij.text;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
+
 
 /**
  * As Collections is to Collection so Strings is to String... 
  */
 public class Strings {
+
+  private static final String UTF8_ENCODING = "UTF8";
   
   public static String join(final Iterator<?> iter, final String between) {
     return join(iter, null, null, between);
@@ -47,6 +51,24 @@ public class Strings {
       }
     }
     return sb.toString();
+  }
+
+  public static String toUTF8(final byte[] bytes) {
+    try {
+      return new String(bytes, Strings.UTF8_ENCODING);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new AssertionError("Java supports UTF8.");
+    }
+  }
+
+  public static byte[] fromUTF8(final String string) {
+    try {
+      return string.getBytes(Strings.UTF8_ENCODING);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new AssertionError("Java supports UTF8.");
+    }
   }
   
 }
