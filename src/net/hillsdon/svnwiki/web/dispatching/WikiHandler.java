@@ -32,6 +32,7 @@ import net.hillsdon.svnwiki.wiki.renderer.CreoleMarkupRenderer;
  */
 public class WikiHandler implements RequestHandler {
 
+  private final PerWikiInitialConfiguration _configuration;
   private final RequestScopedThreadLocalPageStore _pageStore;
   private final MarkupRenderer _renderer;
   private final ConfigPageCachingPageStore _cachingPageStore;
@@ -40,6 +41,7 @@ public class WikiHandler implements RequestHandler {
   private final InternalLinker _internalLinker;
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
+    _configuration = configuration;
     // The search engine is informed of page changes by a delegating page store.
     // A delegating search engine checks it is up-to-date using the page store
     // so we have a circularity here, but a useful one.
@@ -54,6 +56,8 @@ public class WikiHandler implements RequestHandler {
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    request.setAttribute("wikiName", _configuration.getWikiName());
+    request.setAttribute("wikiIsValid", _configuration.isComplete());
     request.setAttribute("internalLinker", _internalLinker);
     try {
       // Handle the lifecycle of the thread-local request dependent page store.
@@ -75,6 +79,8 @@ public class WikiHandler implements RequestHandler {
         requestAuthentication(response);
       }
       else {
+        // Don't try to show wiki header/footer.
+        request.setAttribute("wikiIsValid", false);
         throw ex;
       }
     }
