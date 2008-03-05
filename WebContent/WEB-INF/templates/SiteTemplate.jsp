@@ -55,6 +55,9 @@
       </ul>
     </c:if>
   </div>
+  <script type="text/javascript">
+    $("#query").focus();
+  </script>
   <div id="header">
   ${renderedHeader}
   </div>
