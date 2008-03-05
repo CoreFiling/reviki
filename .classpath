@@ -13,6 +13,7 @@
 	<classpathentry kind="lib" path="lib/nekohtml-0.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/xmlParserAPIs-2.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-0.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-6-sun-1.6.0.00"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

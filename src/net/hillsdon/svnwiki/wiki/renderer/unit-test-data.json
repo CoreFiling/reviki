@@ -1,0 +1,234 @@
+[
+  {
+    "name":   "Basic paragraph markup",
+    "input":  "Basic paragraph test with <, >, & and \"",
+    "output": "<p>Basic paragraph test with &lt;, &gt;, &amp; and &quot;</p>"
+  },
+  {
+    "name":   "Simple unordered list",
+    "input":  "* list item\n*list item 2",
+    "output": "<ul><li> list item</li>\n<li>list item 2</li></ul>"
+  },
+  {
+    "name":   "Simple ordered list",
+    "input":  "# list item\n#list item 2",
+    "output": "<ol><li> list item</li>\n<li>list item 2</li></ol>"
+  },
+  { "comment": "Test an ul item with a sublist",
+    "name":   "Unordered item with unordered sublist",
+    "input":  "* Item\n** Subitem",
+    "output": "<ul><li> Item<ul>\n<li> Subitem</li></ul></li></ul>"
+  },
+  { "comment": "Test a sublist without an initial tag (should not make a list)",
+    "name":   "Unordered sublist without initial tag",
+    "input":  "** Sublist item",
+    "output": "<p>** Sublist item</p>"
+  },
+  { "comment": "Test an ol item with a sublist",
+    "name":   "Ordered item with ordered sublist",
+    "input":  "# Item\n## Subitem",
+    "output": "<ol><li> Item<ol>\n<li> Subitem</li></ol></li></ol>"
+  },
+  { "comment": "Test a sublist without an initial tag (should not make a list)",
+    "name":   "Ordered sublist without initial tag",
+    "input":  "## Sublist item",
+    "output": "<p>## Sublist item</p>"
+  },
+  { "comment": "Test an unordered list with an ordered sublist",
+    "name":   "Unordered item with ordered sublist",
+    "input":  "* Item\n*# Subitem",
+    "output": "<ul><li> Item<ol>\n<li> Subitem</li></ol></li></ul>"
+  },
+  {
+    "name":   "Horizontal rule",
+    "input":  "Some text\n----\nSome more text",
+    "output": "<p>Some text</p><hr /><p>Some more text</p>"
+  },
+  {
+    "name":   "Preformatted block",
+    "input":  "{{{\nPreformatted block\n}}}",
+    "output": "<pre>Preformatted block\n</pre>"
+  },
+  {
+    "name":   "Two preformatted blocks",
+    "input":  "{{{\nPreformatted block\n}}}\n{{{Block 2}}}",
+    "output": "<pre>Preformatted block\n</pre><pre>Block 2</pre>"
+  },
+  {
+    "name":   "h1",
+    "input":  "= Header =",
+    "output": "<h1>Header</h1>"
+  },
+  {
+    "name":   "h2",
+    "input":  "== Header =",
+    "output": "<h2>Header</h2>"
+  },
+  {
+    "name":   "h3",
+    "input":  "=== Header =",
+    "output": "<h3>Header</h3>"
+  },
+  {
+    "name":   "h4",
+    "input":  "==== Header =",
+    "output": "<h4>Header</h4>"
+  },
+  {
+    "name":   "h5",
+    "input":  "===== Header",
+    "output": "<h5>Header</h5>"
+  },
+  {
+    "name":   "h6",
+    "input":  "====== Header =",
+    "output": "<h6>Header</h6>"
+  },
+  {
+    "name":   ">h6",
+    "input":  "======= Header =",
+    "output": "<p>======= Header =</p>"
+  },
+  {
+    "name":   "Tables",
+    "input":  "| A | B |\n| //C// | **D** \\\\ E |",
+    "output": "<table><tr><td> A </td><td> B </td></tr><tr><td> <em>C</em> </td><td> <strong>D</strong> <br /> E </td></tr></table>"
+  },
+  {
+    "name":   "Raw URL",
+    "input":  "http://example.com/examplepage",
+    "output": "<p><a href=\"http://example.com/examplepage\">http://example.com/examplepage</a></p>"
+  },
+  {
+    "name":   "Unnamed URL",
+    "input":  "[[http://example.com/examplepage]]",
+    "output": "<p><a href=\"http://example.com/examplepage\">http://example.com/examplepage</a></p>"
+  },
+  {
+    "name":   "Named URL",
+    "input":  "[[http://example.com/examplepage|Example Page]]",
+    "output": "<p><a href=\"http://example.com/examplepage\">Example Page</a></p>"
+  },
+  {
+    "name":   "Unnamed link",
+    "input":  "[[MyPage]]",
+    "output": "<p><a href=\"MyPage\">MyPage</a></p>"
+  },
+  {
+    "name":   "Named link",
+    "input":  "[[MyPage|My page]]",
+    "output": "<p><a href=\"MyPage\">My page</a></p>"
+  },
+  {
+    "name":   "Image",
+    "input":  "{{image.gif|my image}}",
+    "output": "<p><img src=\"image.gif\" alt=\"my image\"/></p>"
+  },
+  {
+    "name":   "Inline tt",
+    "input":  "Inline {{{tt}}} example {{{here}}}!",
+    "output": "<p>Inline <tt>tt</tt> example <tt>here</tt>!</p>"
+  },
+  {
+    "name":   "Strong",
+    "input":  "**Strong**",
+    "output": "<p><strong>Strong</strong></p>"
+  },
+  {
+    "name":   "Emphasis",
+    "input":  "//Emphasis//",
+    "output": "<p><em>Emphasis</em></p>"
+  },
+  {
+    "name":   "Multi-line emphasis",
+    "input":  "Bold and italics should //be\nable// to cross lines.\n\nBut, should //not be...\n\n...able// to cross paragraphs.",
+    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
+  },
+  {
+    "name":   "URL/emphasis ambiguity",
+    "input":  "This is an //italic// text. This is a url: http://www.wikicreole.org. This is what can go wrong://this should be an italic text//.",
+    "output": "<p>This is an <em>italic</em> text. This is a url: <a href=\"http://www.wikicreole.org\">http://www.wikicreole.org</a>. This is what can go wrong:<em>this should be an italic text</em>.</p>"
+  },
+
+  {
+    "name":   "Difficult emphasis #1",
+    "input":  "// http://www.link.org //",
+    "output": "<p><em> <a href=\"http://www.link.org\">http://www.link.org</a> </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #2",
+    "input":  "// http //",
+    "output": "<p><em> http </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #3",
+    "input":  "// httphpthtpht //",
+    "output": "<p><em> httphpthtpht </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #4",
+    "input":  "// http: //",
+    "output": "<p><em> http: </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #5",
+    "input":  "// http://",
+    "output": "<p>// <a href=\"http://\">http://</a></p>"
+  },
+  {
+    "name":   "Difficult emphasis #6",
+    "input":  "// http:////",
+    "output": "<p><em> <a href=\"http://\">http://</a></em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #7",
+    "input":  "//httphpthtphtt//",
+    "output": "<p><em>httphpthtphtt</em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #8",
+    "input":  "//http://link.org//",
+    "output": "<p><em><a href=\"http://link.org\">http://link.org</a></em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #9",
+    "input":  "// ftp://www.link.org //",
+    "output": "<p><em> <a href=\"ftp://www.link.org\">ftp://www.link.org</a> </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #10",
+    "input":  "// ftp //",
+    "output": "<p><em> ftp </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #11",
+    "input":  "// fttpfptftpft //",
+    "output": "<p><em> fttpfptftpft </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #12",
+    "input":  "// ftp: //",
+    "output": "<p><em> ftp: </em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #13",
+    "input":  "// ftp://",
+    "output": "<p>// <a href=\"ftp://\">ftp://</a></p>"
+  },
+  {
+    "name":   "Difficult emphasis #14",
+    "input":  "// ftp:////",
+    "output": "<p><em> <a href=\"ftp://\">ftp://</a></em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #15",
+    "input":  "//fttpfptftpftt//",
+    "output": "<p><em>fttpfptftpftt</em></p>"
+  },
+  {
+    "name":   "Difficult emphasis #16",
+    "input":  "//ftp://link.org//",
+    "output": "<p><em><a href=\"ftp://link.org\">ftp://link.org</a></em></p>"
+  }
+]
+
