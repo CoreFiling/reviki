@@ -12,7 +12,6 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   private PageStore _store;
   private final SearchEngine _delegate;
-  private long _lastIndexedRevision = 0;
 
   public ExternalCommitAwareSearchEngine(final SearchEngine delegate) {
     _delegate = delegate;
@@ -24,7 +23,6 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
   
   public synchronized void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
     _delegate.index(path, revision, content);
-    _lastIndexedRevision = revision;
   }
 
   public Set<SearchMatch> search(final String query) throws IOException, QuerySyntaxException, PageStoreException {
@@ -34,12 +32,15 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   private synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
     if (_store != null) {
-      for (PageReference ref : _store.getChangedAfter(_lastIndexedRevision)) {
+      for (PageReference ref : _store.getChangedAfter(_delegate.getHighestIndexedRevision())) {
         PageInfo info = _store.get(ref, -1);
         _delegate.index(info.getPath(), info.getRevision(), info.getContent());
-        _lastIndexedRevision = Math.max(_lastIndexedRevision, info.getRevision());
       }
     }
+  }
+
+  public long getHighestIndexedRevision() throws IOException {
+    return _delegate.getHighestIndexedRevision();
   }
 
 }

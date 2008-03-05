@@ -33,5 +33,11 @@ public interface SearchEngine {
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
   void index(String path, long revision, String content) throws IOException, PageStoreException;
+
+  /**
+   * @return The highest revision number indexed (as passed to index).
+   * @throws IOException On error reading from the search index. 
+   */
+  long getHighestIndexedRevision() throws IOException;
   
 }

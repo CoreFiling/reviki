@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -30,10 +31,12 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+import org.apache.lucene.store.LockObtainFailedException;
 
 /**
  * Uses lucene to provide search capabilities.
@@ -49,6 +52,10 @@ public class LuceneSearcher implements SearchEngine {
    */
   private static final String FIELD_TITLE = "title";
   
+  private static final String FIELD_PROPERTY_KEY = "property";
+  private static final String FIELD_PROPERTY_VALUE = "property-value";
+  private static final String PROPERTY_LAST_INDEXED_REVISION = "last-indexed-revision";
+  
   private final File _dir;
 
   /**
@@ -58,32 +65,61 @@ public class LuceneSearcher implements SearchEngine {
   public LuceneSearcher(final File dir) {
     _dir = dir;
   }
+
+  private Analyzer createAnalyzer() {
+    Analyzer text = new StandardAnalyzer() {
+      public TokenStream tokenStream(final String fieldName, final Reader reader) {
+        return new PorterStemFilter(super.tokenStream(fieldName, reader));
+      }
+    };
+    KeywordAnalyzer id = new KeywordAnalyzer();
+    PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(text);
+    perField.addAnalyzer(FIELD_PATH, id);
+    perField.addAnalyzer(FIELD_PROPERTY_KEY, id);
+    perField.addAnalyzer(FIELD_PROPERTY_VALUE, id);
+    return perField;
+  }
   
-  public void  index(final String path, final long revision, final String content) throws IOException {
+  private Document createWikiPageDocument(final String path, final String content) {
+    Document document = new Document();
+    document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    document.add(new Field(FIELD_TITLE, pathToTitle(path).toString(), Field.Store.YES, Field.Index.TOKENIZED));
+    // We store the content in order to show matching extracts.
+    document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
+    return document;
+  }
+
+  private Document createPropertyDocument(final String property, final String value) {
+    Document document = new Document();
+    document.add(new Field(FIELD_PROPERTY_KEY, property, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    document.add(new Field(FIELD_PROPERTY_VALUE, value, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    return document;
+  }
+
+  private void replaceDocument(final String keyField, final Document document) throws CorruptIndexException, LockObtainFailedException, IOException {
+    IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
+    try {
+      writer.deleteDocuments(new Term(keyField, document.get(keyField)));
+      writer.addDocument(document);
+      writer.optimize();
+    }
+    finally {
+      writer.close();
+    }
+  }
+  
+  // Lucene allows multiple non-deleting readers and at most one writer at a time.
+  // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
+  public synchronized void index(final String path, final long revision, final String content) throws IOException {
     if (_dir == null) {
       return;
     }
-    // Lucene allows multiple non-deleting readers and at most one writer
-    // at a time.  It maintains a lock file but we never want it to
-    // fail to take the lock, so serialize writes.
-    synchronized (_dir) {
-      IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
-      try {
-        writer.deleteDocuments(new Term(FIELD_PATH, path));
-        Document document = new Document();
-        document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
-        document.add(new Field(FIELD_TITLE, pathToTitle(path).toString(), Field.Store.YES, Field.Index.TOKENIZED));
-        // We store the content in order to show matching extracts.
-        document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
-        writer.addDocument(document);
-        writer.optimize();
-      }
-      finally {
-        writer.close();
-      }
+    replaceDocument(FIELD_PATH, createWikiPageDocument(path, content));
+    if (revision > getHighestIndexedRevision()) {
+      replaceDocument(FIELD_PROPERTY_KEY, createPropertyDocument(PROPERTY_LAST_INDEXED_REVISION, String.valueOf(revision)));
     }
   }
-
+  
   public Set<SearchMatch> search(final String queryString) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
@@ -141,15 +177,41 @@ public class LuceneSearcher implements SearchEngine {
     return results;
   }
 
-  private Analyzer createAnalyzer() {
-    Analyzer text = new StandardAnalyzer() {
-      public TokenStream tokenStream(final String fieldName, final Reader reader) {
-        return new PorterStemFilter(super.tokenStream(fieldName, reader));
+  public long getHighestIndexedRevision() throws IOException {
+    String property = getProperty(PROPERTY_LAST_INDEXED_REVISION);
+    try {
+      if (property != null) {
+        return Long.valueOf(property);
       }
-    };
-    PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(text);
-    perField.addAnalyzer(FIELD_PATH, new KeywordAnalyzer());
-    return perField;
+    }
+    catch (NumberFormatException ex) {
+      // Fallthrough to default.
+    }
+    return 0;
+  }
+
+  private String getProperty(final String propertyName) throws IOException {
+    if (_dir == null) {
+      return null;
+    }
+    IndexReader reader = IndexReader.open(_dir);
+    try {
+      Searcher searcher = new IndexSearcher(reader);
+      try {
+        Hits hits = searcher.search(new TermQuery(new Term(FIELD_PROPERTY_KEY, propertyName)));
+        Iterator<?> iterator = hits.iterator();
+        if (iterator.hasNext()) {
+          return ((Hit) iterator.next()).get(FIELD_PROPERTY_VALUE);
+        }
+        return null;
+      }
+      finally {
+        searcher.close();
+      }
+    }
+    finally {
+      reader.close();
+    }
   }
   
 }
