@@ -1,6 +1,6 @@
 svnwiki = {};
 /**
- * POST the sensible way to do non-idempotent operations
+ * POST is a sensible way to do non-idempotent operations
  * but form buttons look ugly so this will replace a form
  * with a JavaScript link.
  */
