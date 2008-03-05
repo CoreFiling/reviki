@@ -327,7 +327,12 @@ public class FSRepository extends SVNRepository implements ISVNReporter {
         return dirEntry;
     }
 
-    public long getDir(String path, long revision, Map properties, ISVNDirEntryHandler handler) throws SVNException {
+    public long getDir(String path, long revision, final Map properties, final ISVNDirEntryHandler handler) throws SVNException {
+        return getDir(path, revision, properties, SVNDirEntry.DIRENT_ALL, handler);
+    }
+    
+    // entryFields ignored for now.
+    public long getDir(String path, long revision, Map properties, int entryFields, ISVNDirEntryHandler handler) throws SVNException {
         try {
             openRepository();
             if (!SVNRepository.isValidRevision(revision)) {

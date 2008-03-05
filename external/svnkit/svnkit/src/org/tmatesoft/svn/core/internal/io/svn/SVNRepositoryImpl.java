@@ -290,7 +290,12 @@ public class SVNRepositoryImpl extends SVNRepository implements ISVNReporter {
         }
     }
 
-    public long getDir(String path, long revision, Map properties, final ISVNDirEntryHandler handler) throws SVNException {
+    public long getDir(String path, long revision, final Map properties, final ISVNDirEntryHandler handler) throws SVNException {
+        return getDir(path, revision, properties, SVNDirEntry.DIRENT_ALL, handler);
+    }
+
+    // entryFields ignored for now
+    public long getDir(String path, long revision, Map properties, int entryFields, final ISVNDirEntryHandler handler) throws SVNException {
         Long rev = getRevisionObject(revision);
         try {
             openConnection();

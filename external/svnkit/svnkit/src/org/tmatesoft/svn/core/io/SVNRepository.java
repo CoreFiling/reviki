@@ -127,6 +127,7 @@ import org.tmatesoft.svn.util.SVNDebugLog;
  * @see         <a target="_top" href="http://svnkit.com/kb/examples/">Examples</a>
  */
 public abstract class SVNRepository {
+    public static final long INVALID_REVISION = -1;
         
     protected String myRepositoryUUID;
     protected SVNURL myRepositoryRoot;
@@ -587,7 +588,9 @@ public abstract class SVNRepository {
      * @see                 org.tmatesoft.svn.core.SVNDirEntry
      */
     public abstract long getDir(String path, long revision, Map properties, ISVNDirEntryHandler handler) throws SVNException; 
-
+    
+    public abstract long getDir(String path, long revision, Map properties, int entryFields, ISVNDirEntryHandler handler) throws SVNException; 
+    
     /**
      * Retrieves interesting file revisions for the specified file. 
 	 * 
@@ -874,7 +877,6 @@ public abstract class SVNRepository {
         getFileRevisions(path, sRevision, eRevision, handler);
         return result;
     }
-    
     /**
      * Fetches the contents and properties of a directory located at the specified path
      * in a particular revision. Information of each directory 
@@ -890,9 +892,9 @@ public abstract class SVNRepository {
      *                      directory properties (including non-tweakable ones)
      *                      will be put into this map (where keys are property names
      *                      and mappings are property values)
-     * @param  dirEntries 	if not <span class="javakeyword">null</span> then this
+     * @param  dirEntries   if not <span class="javakeyword">null</span> then this
      *                      collection receives fetched dir entries (<b>SVNDirEntry</b> objects)
-     * @return 				a collection containing fetched directory entries (<b>SVNDirEntry</b> objects)
+     * @return              a collection containing fetched directory entries (<b>SVNDirEntry</b> objects)
      * @throws SVNException in the following cases:
      *                      <ul>
      *                      <li><code>path</code> not found in the specified <code>revision</code>
@@ -906,6 +908,10 @@ public abstract class SVNRepository {
      * @see                 org.tmatesoft.svn.core.SVNDirEntry
      */
     public Collection getDir(String path, long revision, Map properties, Collection dirEntries) throws SVNException {
+        return getDir(path, revision, properties, SVNDirEntry.DIRENT_ALL, dirEntries);
+    }
+
+    public Collection getDir(String path, long revision, Map properties, int entryFields, Collection dirEntries) throws SVNException {
         final Collection result = dirEntries != null ? dirEntries : new LinkedList();
         ISVNDirEntryHandler handler;
         handler = new ISVNDirEntryHandler() {
@@ -913,7 +919,7 @@ public abstract class SVNRepository {
                 result.add(dirEntry);
             }
         };
-        getDir(path, revision, properties, handler);
+        getDir(path, revision, properties, entryFields, handler);
         return result;
     }
     
