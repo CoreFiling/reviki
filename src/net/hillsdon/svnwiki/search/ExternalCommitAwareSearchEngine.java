@@ -17,6 +17,9 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
     _delegate = delegate;
   }
   
+  /**
+   * Setter to avoid circularity.  If set we'll notice external commits otherwise just delegate.
+   */
   public void setPageStore(final PageStore store) {
     _store = store;
   }
