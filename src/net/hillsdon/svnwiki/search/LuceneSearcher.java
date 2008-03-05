@@ -49,22 +49,27 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
     _dir = dir;
   }
   
-  public void index(final String path, final String content) throws IOException {
+  public void  index(final String path, final String content) throws IOException {
     if (_dir == null) {
       return;
     }
-    IndexWriter writer = new IndexWriter(_dir, new StandardAnalyzer());
-    try {
-      writer.deleteDocuments(new Term(FIELD_PATH, path));
-      Document document = new Document();
-      document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
-      document.add(new Field(FIELD_TITLE, pathToTitle(path).toString(), Field.Store.YES, Field.Index.TOKENIZED));
-      document.add(new Field(FIELD_CONTENT, new StringReader(content)));
-      writer.addDocument(document);
-      writer.optimize();
-    }
-    finally {
-      writer.close();
+    // Lucene allows multiple non-deleting readers and at most one writer
+    // at a time.  It maintains a lock file but we never want it to
+    // fail to take the lock, so serialize writes.
+    synchronized (_dir) {
+      IndexWriter writer = new IndexWriter(_dir, new StandardAnalyzer());
+      try {
+        writer.deleteDocuments(new Term(FIELD_PATH, path));
+        Document document = new Document();
+        document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
+        document.add(new Field(FIELD_TITLE, pathToTitle(path).toString(), Field.Store.YES, Field.Index.TOKENIZED));
+        document.add(new Field(FIELD_CONTENT, new StringReader(path + "\n" + content)));
+        writer.addDocument(document);
+        writer.optimize();
+      }
+      finally {
+        writer.close();
+      }
     }
   }
 
