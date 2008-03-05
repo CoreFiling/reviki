@@ -15,7 +15,7 @@ public class SimplePageStore implements PageStore {
   public PageInfo get(final String path) throws PageStoreException {
     PageInfo page = _pages.get(path);
     if (page == null) {
-      page = new PageInfo(path, "", PageInfo.UNCOMMITTED);
+      page = new PageInfo(path, "", PageInfo.UNCOMMITTED, null, null);
       _pages.put(path, page);
     }
     return page;
@@ -29,9 +29,16 @@ public class SimplePageStore implements PageStore {
     return new ChangeInfo[0];
   }
 
-  public void set(final String path, final long baseRevision, final String content) throws PageStoreException {
-    PageInfo page = new PageInfo(path, content, baseRevision + 1);
+  public void set(final String path, String lockToken, final long baseRevision, final String content) throws PageStoreException {
+    PageInfo page = new PageInfo(path, content, baseRevision + 1, null, null);
     _pages.put(path, page);
+  }
+
+  public PageInfo tryToLock(String path) throws PageStoreException {
+    return get(path);
+  }
+
+  public void unlock(String page, String lockToken) {
   }
   
 }

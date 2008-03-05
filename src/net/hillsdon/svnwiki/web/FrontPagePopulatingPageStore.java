@@ -19,7 +19,7 @@ public class FrontPagePopulatingPageStore implements PageStore {
   public PageInfo get(final String path) throws PageStoreException {
     PageInfo page = _delegate.get(path);
     if ("FrontPage".equals(path) && page.isNew()) {
-      page = new PageInfo(page.getPath(), FRONT_PAGE_CONTENT, PageInfo.UNCOMMITTED);
+      page = new PageInfo(page.getPath(), FRONT_PAGE_CONTENT, PageInfo.UNCOMMITTED, page.getLockedBy(), page.getLockToken());
     }
     return page;
   }
@@ -32,8 +32,16 @@ public class FrontPagePopulatingPageStore implements PageStore {
     return _delegate.recentChanges();
   }
 
-  public void set(final String path, final long baseRevision, final String content) throws InterveningCommitException, PageStoreException {
-    _delegate.set(path, baseRevision, content);
+  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws InterveningCommitException, PageStoreException {
+    _delegate.set(path, lockToken, baseRevision, content);
+  }
+
+  public PageInfo tryToLock(final String path) throws PageStoreException {
+    return _delegate.tryToLock(path);
+  }
+
+  public void unlock(final String page, String lockToken) throws PageStoreException {
+    _delegate.unlock(page, lockToken);
   }
   
 }

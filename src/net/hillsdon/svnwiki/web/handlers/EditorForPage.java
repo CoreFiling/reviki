@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.web.RequestAttributes;
 
 public class EditorForPage extends PageRequestHandler {
 
@@ -17,9 +18,16 @@ public class EditorForPage extends PageRequestHandler {
   }
 
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
-    PageInfo pageInfo = store.get(page);
+    PageInfo pageInfo = store.tryToLock(page);
     request.setAttribute("pageInfo", pageInfo);
-    request.getRequestDispatcher("/WEB-INF/templates/EditPage.jsp").include(request, response);
+    if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
+      request.setAttribute("flash", "Could not lock the page.");
+      request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").include(request, response);
+      return;
+    }
+    else {
+      request.getRequestDispatcher("/WEB-INF/templates/EditPage.jsp").include(request, response);
+    }
   }
 
 }

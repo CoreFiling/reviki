@@ -13,11 +13,11 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
   private final ThreadLocal<PageStore> _threadLocal = new ThreadLocal<PageStore>();
   private final PageStoreFactory _factory;
   
-  public RequestScopedThreadLocalPageStore(PageStoreFactory factory) {
+  public RequestScopedThreadLocalPageStore(final PageStoreFactory factory) {
     _factory = factory;
   }
   
-  public void create(HttpServletRequest request) throws PageStoreException {
+  public void create(final HttpServletRequest request) throws PageStoreException {
     _threadLocal.set(_factory.newInstance(request));
   }
   
@@ -29,7 +29,7 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return _threadLocal.get();
   }
   
-  public PageInfo get(String path) throws PageStoreException {
+  public PageInfo get(final String path) throws PageStoreException {
     return get().get(path);
   }
 
@@ -41,8 +41,16 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return get().recentChanges();
   }
 
-  public void set(String path, long baseRevision, String content) throws PageStoreException {
-    get().set(path, baseRevision, content);
+  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException {
+    get().set(path, lockToken, baseRevision, content);
+  }
+
+  public PageInfo tryToLock(final String path) throws PageStoreException {
+    return get().tryToLock(path);
+  }
+
+  public void unlock(final String page, String lockToken) throws PageStoreException {
+    get().unlock(page, lockToken);
   }
 
 }

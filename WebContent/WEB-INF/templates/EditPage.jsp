@@ -7,6 +7,7 @@
     <form action="" method="post">
       <textarea rows="25" cols="80" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
+      <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>

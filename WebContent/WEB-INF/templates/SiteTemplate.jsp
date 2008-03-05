@@ -26,9 +26,20 @@
     #sidebar {
       float: right;
     }
+    #flash {
+      text-align: center;
+      background-color: yellow;
+    }
   </style>
 </head>
 <body>
+  <c:if test="${not empty flash}">
+    <div id="flash">
+      <p>
+        <c:out value="${flash}"/>
+      </p>
+    </div>
+  </c:if>
   <div id="sidebar">
     <ul class="menu">
       <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">Recent changes</a></li>

@@ -8,8 +8,25 @@
     ${renderedContents}
     </div>
     <hr/>
-    <form action="" method="post">
-      <input type="submit" value="Edit"/>
-    </form> 
+    <c:choose>
+      <c:when test="${pageInfo.locked}">
+        <c:choose>
+          <c:when test="${pageInfo.lockedBy == username}">
+            <form action="" method="post">
+              <input type="submit" value="Edit"/>
+            </form> 
+            <p>You have locked this page.</p>
+          </c:when>
+          <c:otherwise>
+            <p>Locked for editing by <c:out value="${pageInfo.lockedBy}"/>.</p>
+          </c:otherwise>
+        </c:choose>
+      </c:when>
+      <c:otherwise>
+        <form action="" method="post">
+          <input type="submit" value="Edit"/>
+        </form> 
+      </c:otherwise>
+    </c:choose>
   </tiles:putAttribute>
 </tiles:insertTemplate>
