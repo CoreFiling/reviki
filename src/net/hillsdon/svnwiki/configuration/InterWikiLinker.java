@@ -46,9 +46,5 @@ public class InterWikiLinker {
   Map<String, String> getWikiToFormatStringMap() {
     return Collections.unmodifiableMap(_links);
   }
-
-  public boolean hasWiki(final String name) {
-    return _links.keySet().contains(name);
-  }
   
 }
