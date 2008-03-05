@@ -9,6 +9,13 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class TestSearch extends WebTestSupport {
 
+  public void testSearchOffersToCreateWikiPageThatDoesntExistWhenWeSearchForAWikiWord() throws Exception {
+    String name = uniqueWikiPageName("ThisDoesNotExist");
+    HtmlPage results = search(getWebPage(""), name);
+    assertTrue(results.asText().contains("Create new page " + name));
+    results.getAnchorByHref("/svnwiki/pages/" + name);
+  }
+  
   /**
    * Search by WikiWord and Wiki Word.
    */
