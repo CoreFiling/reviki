@@ -50,6 +50,7 @@ public class CreoleRenderer {
     RegexMatchToTag noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
     RegexMatchToTag paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RegexMatchToTag italic = new RegexMatchToTag("//(.*?)//", "em", 1);
+    RegexMatchToTag strikethrough = new RegexMatchToTag("--(.*?)--", "del", 1);
     RegexMatchToTag bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
     RegexMatchToTag lineBreak = new RegexMatchToTag("\\\\", "br", null);
     RegexMatchToTag horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
@@ -60,16 +61,18 @@ public class CreoleRenderer {
     root.setChildren(
         noWiki.setChildren(), 
         horizontalRule,
-        new Heading(5).setChildren(bold, italic),
-        new Heading(4).setChildren(bold, italic), 
-        new Heading(3).setChildren(bold, italic), 
-        new Heading(2).setChildren(bold, italic), 
-        new Heading(1).setChildren(bold, italic),
+        new Heading(5).setChildren(bold, italic, lineBreak, strikethrough),
+        new Heading(4).setChildren(bold, italic, lineBreak, strikethrough), 
+        new Heading(3).setChildren(bold, italic, lineBreak, strikethrough), 
+        new Heading(2).setChildren(bold, italic, lineBreak, strikethrough), 
+        new Heading(1).setChildren(bold, italic, lineBreak, strikethrough),
         orderedList.setChildren(listItem),
         unorderedList.setChildren(listItem),
-        paragraph.setChildren(bold, italic, lineBreak, orderedList, unorderedList, horizontalRule), 
-        italic.setChildren(bold, italic, lineBreak), 
-        bold.setChildren(bold, italic, lineBreak));
+        paragraph.setChildren(orderedList, unorderedList, horizontalRule, bold, italic, lineBreak, strikethrough), 
+        italic.setChildren(bold, italic, lineBreak, strikethrough), 
+        bold.setChildren(bold, italic, lineBreak, strikethrough),
+        strikethrough.setChildren(bold, italic, lineBreak, strikethrough)
+     );
     ROOT = root;
   }
   

@@ -11,6 +11,10 @@ public class TestCreoleRenderer extends TestCase {
     _render = new CreoleRenderer();
   }
 
+  public void testStrikethrough() {
+    assertEquals("<p><del>stuff</del></p>", _render.render("--stuff--"));
+  }
+
   public void testHorizontalRule() {
     assertEquals("<p>foo<hr />bar</p>", _render.render("foo\n ---- \nbar"));
   }
