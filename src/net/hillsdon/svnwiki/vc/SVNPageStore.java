@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -52,8 +53,14 @@ public class SVNPageStore implements PageStore {
       List<SVNLogEntry> entries = new ArrayList<SVNLogEntry>();
       _repository.log(new String[] {""}, entries, 0, -1, true, true);
       Set<String> results = new LinkedHashSet<String>(entries.size());
-      for (SVNLogEntry e : entries) {
-        results.addAll((Collection<String>) e.getChangedPaths().keySet());
+      String rootPath = _repository.getRepositoryPath("");
+      for (ListIterator<SVNLogEntry> iter = entries.listIterator(entries.size()); iter.hasPrevious();) {
+        SVNLogEntry entry = iter.previous();
+        for (String path : (Collection<String>) entry.getChangedPaths().keySet()) {
+          if (path.length() > rootPath.length()) {
+            results.add(path.substring(rootPath.length() + 1));
+          }
+        }
       }
       return results.toArray(new String[results.size()]);
     }
