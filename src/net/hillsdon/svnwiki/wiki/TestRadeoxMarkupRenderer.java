@@ -10,7 +10,8 @@ public class TestRadeoxMarkupRenderer extends TestCase {
   private static final String EXAMPLE = "~~Hello~~";
 
   public void test() throws IOException {
-    MarkupRenderer renderer = new RadeoxMarkupRenderer();
+    // FIXME!
+    MarkupRenderer renderer = new RadeoxMarkupRenderer(null);
     StringWriter writer = new StringWriter();
     renderer.render(EXAMPLE, writer);
     assertEquals("<i class=\"italic\">Hello</i>", writer.toString());

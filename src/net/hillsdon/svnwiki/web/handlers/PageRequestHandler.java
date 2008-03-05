@@ -1,25 +1,24 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.handlers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.RequestHandler;
 
 public abstract class PageRequestHandler  implements RequestHandler {
 
-  private PageStoreFactory _pageStoreFactory;
+  private PageStore _store;
 
-  public PageRequestHandler(final PageStoreFactory pageStoreFactory) {
-    _pageStoreFactory = pageStoreFactory;
+  public PageRequestHandler(final PageStore store) {
+    _store = store;
   }
   
   @Override
   public final void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    PageStore store = _pageStoreFactory.newInstance(request);
     String uri = request.getRequestURI();
     String page = uri.substring(uri.lastIndexOf('/') + 1);
-    handlePage(request, response, store, page);
+    handlePage(request, response, _store, page);
   }
 
   public abstract void handlePage(HttpServletRequest request, HttpServletResponse response, PageStore store, String page) throws Exception;

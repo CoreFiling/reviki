@@ -1,15 +1,15 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.handlers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.InvalidInputException;
 
 public class SetPage extends PageRequestHandler {
 
-  public SetPage(final PageStoreFactory pageStoreFactory) {
-    super(pageStoreFactory);
+  public SetPage(final PageStore store) {
+    super(store);
   }
   
   @Override

@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.handlers;
 
 import java.io.IOException;
 
@@ -8,16 +8,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
 
-public class RecentChanges extends PageRequestHandler {
+public class AllPages extends PageRequestHandler {
 
-  public RecentChanges(final PageStoreFactory pageStoreFactory) {
-    super(pageStoreFactory);
+  public AllPages(final PageStore store) {
+    super(store);
   }
 
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
-    request.setAttribute("pageList", store.recentChanges());
+    request.setAttribute("pageList", store.list());
     request.getRequestDispatcher("/WEB-INF/templates/PageList.jsp").forward(request, response);
   }
 

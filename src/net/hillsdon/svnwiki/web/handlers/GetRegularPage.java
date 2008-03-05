@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.handlers;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,15 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class GetRegularPage extends PageRequestHandler {
 
   private final MarkupRenderer _markupRenderer;
 
-  public GetRegularPage(final PageStoreFactory pageStoreFactory, final MarkupRenderer markupRenderer) {
-    super(pageStoreFactory);
+  public GetRegularPage(final PageStore pageStore, final MarkupRenderer markupRenderer) {
+    super(pageStore);
     _markupRenderer = markupRenderer;
   }
 

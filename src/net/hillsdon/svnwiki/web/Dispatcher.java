@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.handlers.EditorForPage;
+import net.hillsdon.svnwiki.web.handlers.GetPage;
+import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
 /**
@@ -26,6 +29,7 @@ public class Dispatcher extends HttpServlet {
    */
   private static final String URL = "http://localhost/svn/usr/mth/wiki/";
   
+  private RequestScopedThreadLocalPageStore _pageStore;
   private RequestHandler _get;
   private RequestHandler _editor;
   private RequestHandler _set;
@@ -34,10 +38,11 @@ public class Dispatcher extends HttpServlet {
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
-      PageStoreFactory psf = new BasicAuthPassThroughPageStoreFactory(URL);
-      _get = new GetPage(psf, new RadeoxMarkupRenderer());
-      _editor = new EditorForPage(psf);
-      _set = new SetPage(psf);
+      PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(URL);
+      _pageStore = new RequestScopedThreadLocalPageStore(factory);
+      _get = new GetPage(_pageStore, new RadeoxMarkupRenderer(_pageStore));
+      _editor = new EditorForPage(_pageStore);
+      _set = new SetPage(_pageStore);
     }
     catch (Exception ex) {
       throw new ServletException("Configuraton problem.", ex);
@@ -47,17 +52,24 @@ public class Dispatcher extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     try {
-      if ("GET".equals(request.getMethod())) {
-        _get.handle(request, response);
+      // Handle the lifecycle of the thread-local request dependent page store.
+      _pageStore.create(request);
+      try {
+        if ("GET".equals(request.getMethod())) {
+          _get.handle(request, response);
+        }
+        else if ("POST".equals(request.getMethod())) {
+          if (request.getParameter("content") == null) {
+            _editor.handle(request, response);
+          }
+          else {
+            _set.handle(request, response);
+            response.sendRedirect(request.getRequestURI());
+          }
+        }
       }
-      else if ("POST".equals(request.getMethod())) {
-        if (request.getParameter("content") == null) {
-          _editor.handle(request, response);
-        }
-        else {
-          _set.handle(request, response);
-          response.sendRedirect(request.getRequestURI());
-        }
+      finally {
+        _pageStore.destroy();
       }
     }
     catch (PageStoreAuthenticationException ex) {
