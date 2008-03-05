@@ -2,6 +2,7 @@ package net.hillsdon.svnwiki.wiki;
 
 import static java.lang.String.format;
 import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -36,7 +37,11 @@ public class InternalLinker {
   }
   
   public String link(final String pageName) {
-    String cssClass = exists(pageName) ? "existing-page" : "new-page";
+    boolean exists = exists(pageName);
+    if (!exists && WikiWordUtils.isAcronym(pageName)) {
+      return Escape.html(pageName);
+    }
+    String cssClass = exists ? "existing-page" : "new-page";
     return format("<a class='%s' href='%s'>%s</a>",
       cssClass,
       Escape.html(url(pageName)),

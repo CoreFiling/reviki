@@ -1,6 +1,8 @@
 package net.hillsdon.svnwiki.web.common;
 
-import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
@@ -22,7 +24,15 @@ public class ConsumedPath {
     if (query != -1) {
       path = path.substring(0, query);
     }
-    _list = Arrays.asList(path.split("/"));
+    _list = new ArrayList<String>();
+    for (String part : path.split("/")) {
+      try {
+        _list.add(URLDecoder.decode(part, "UTF-8"));
+      }
+      catch (UnsupportedEncodingException ex) {
+        _list.add(part);
+      }
+    }
     _iterator = _list.listIterator();
   }
 

@@ -74,12 +74,16 @@ public final class WikiWordUtils {
     return result;
   }
 
-  private static boolean isNextLower(char[] chars, int currentPos) {
+  private static boolean isNextLower(final char[] chars, final int currentPos) {
     if (currentPos + 1 < chars.length) {
       char c = chars[currentPos + 1];
       return  Character.isLowerCase(c);
     }
     return false;
+  }
+
+  public static boolean isAcronym(final String pageName) {
+    return pageName != null && pageName.matches("\\p{Lu}+");
   }
 
 }
