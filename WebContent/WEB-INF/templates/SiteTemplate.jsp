@@ -72,6 +72,38 @@
       border-style: solid;
       clear: both;
     }
+    
+    /* JHighlighter styles */
+    code {
+      color: rgb(0,0,0); font-family: monospace; font-size: 12px; white-space: nowrap;
+    }
+    .java_type {
+      color: rgb(0,44,221);
+    }
+    .java_comment {
+      color: rgb(147,147,147); background-color: rgb(247,247,247);
+    }
+    .java_operator {
+      color: rgb(0,124,31);
+    }
+    .java_separator {
+      color: rgb(0,33,255);
+    }
+    .java_plain {
+      color: rgb(0,0,0);
+    }
+    .java_javadoc_comment {
+      color: rgb(147,147,147); background-color: rgb(247,247,247); font-style: italic;
+    }
+    .java_keyword {
+      color: rgb(0,0,0); font-weight: bold;
+    }
+    .java_literal {
+      color: rgb(188,0,0);
+    }
+    .java_javadoc_tag {
+      color: rgb(147,147,147); background-color: rgb(247,247,247); font-style: italic; font-weight: bold;
+    }
   </style>
 </head>
 <body>
