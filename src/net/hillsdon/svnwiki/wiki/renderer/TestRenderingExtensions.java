@@ -17,12 +17,14 @@ package net.hillsdon.svnwiki.wiki.renderer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.SimplePageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.renderer.creole.JsonDrivenRenderingTest;
+import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 
 import org.codehaus.jackson.JsonParseException;
 
@@ -34,7 +36,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
-    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker("", "mywiki", new SimplePageStore()), null, null);
+    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker("", "mywiki", new SimplePageStore()), Collections.<Macro>emptyList());
     final StringWriter out = new StringWriter();
     renderer.render(new PageReference(""), input, out);
     return out.toString();

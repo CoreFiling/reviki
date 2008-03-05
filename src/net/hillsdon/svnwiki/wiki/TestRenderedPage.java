@@ -1,9 +1,6 @@
 package net.hillsdon.svnwiki.wiki;
 
-import java.util.Date;
-
 import junit.framework.TestCase;
-import net.hillsdon.svnwiki.vc.PageInfo;
 
 public class TestRenderedPage extends TestCase {
 
@@ -15,12 +12,12 @@ public class TestRenderedPage extends TestCase {
   }
   
   private RenderedPage create(String content) throws Exception {
-    return _factory.create(new PageInfo("FrontPage", content, -1, -1, "mth", new Date(), null, null));
+    return _factory.create("FrontPage", content);
   }
 
   public void testGetPage() throws Exception {
     RenderedPage rendered = create("");
-    rendered.getPage().getPath().equals("FrontPage");
+    rendered.getPage().equals("FrontPage");
   }
   
   public void testAsText() throws Exception {

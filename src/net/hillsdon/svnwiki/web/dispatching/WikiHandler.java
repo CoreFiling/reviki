@@ -17,6 +17,9 @@ package net.hillsdon.svnwiki.web.dispatching;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,9 +41,14 @@ import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFacto
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
 import net.hillsdon.svnwiki.wiki.WikiGraph;
 import net.hillsdon.svnwiki.wiki.WikiGraphImpl;
+import net.hillsdon.svnwiki.wiki.macros.BackLinkListMacro;
+import net.hillsdon.svnwiki.wiki.macros.SearchMacro;
 import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
+import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
+import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -52,24 +60,28 @@ public class WikiHandler implements RequestHandler {
   static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
   
   private final RequestScopedThreadLocalPageStore _pageStore;
-  private final MarkupRenderer _renderer;
+  private final SvnWikiRenderer _renderer;
   private final ConfigPageCachingPageStore _cachingPageStore;
   
   private final PageHandler _handler;
   private final InternalLinker _internalLinker;
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
-    // The search engine is informed of page changes by a delegating page store.
-    // A delegating search engine checks it is up-to-date using the page store
-    // so we have a circularity here, but a useful one.
-    ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory()));
+    // There are some fairly messed-up cycles here...
+    ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
+      public void render(PageReference page, String in, Writer out) throws IOException, PageStoreException {
+        _renderer.render(page, in, out);
+      }
+    })));
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
     WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, searchEngine);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, wikiGraph, searchEngine);
+    
+    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(searchEngine));
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, macros);
     _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer, wikiGraph);
   }
 

@@ -4,9 +4,6 @@ import static net.hillsdon.fij.core.Functional.set;
 
 import java.util.Collection;
 
-import net.hillsdon.svnwiki.vc.PageInfo;
-import net.hillsdon.svnwiki.vc.PageReference;
-
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -21,16 +18,16 @@ public class RenderedPage {
     return BLOCK_HTML_TAGS.contains(localName);
   }
   
-  private final PageInfo _page;
+  private final String _pageName;
   private final Document _document; 
 
-  public RenderedPage(PageInfo page, Document document) {
-    _page = page;
+  public RenderedPage(String pageName, Document document) {
+    _pageName = pageName;
     _document = document;
   }
 
-  public PageReference getPage() {
-    return _page;
+  public String getPage() {
+    return _pageName;
   }
   
   public String asText() {

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Collections;
 
 import junit.framework.TestCase;
+import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
 
 public class TestLuceneSearcher extends TestCase {
   
@@ -52,7 +54,7 @@ public class TestLuceneSearcher extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _dir = createTempDir();
-    _searcher = new LuceneSearcher(_dir);
+    _searcher = new LuceneSearcher(_dir, new RenderedPageFactory(MarkupRenderer.AS_IS));
   }
 
   @Override

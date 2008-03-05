@@ -15,9 +15,6 @@
  */
 package net.hillsdon.svnwiki.webtests;
 
-
-
-
 public class TestMisc extends WebTestSupport {
 
   public void testAppRootRedirectsToWikiList() throws Exception {

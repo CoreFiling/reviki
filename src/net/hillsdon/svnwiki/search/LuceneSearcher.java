@@ -26,6 +26,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.wiki.RenderedPage;
+import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
@@ -72,13 +76,15 @@ public class LuceneSearcher implements SearchEngine {
   private static final String PROPERTY_LAST_INDEXED_REVISION = "last-indexed-revision";
   
   private final File _dir;
+  private final RenderedPageFactory _renderedPageFactory;
 
   /**
    * @param dir The search index lives here.  
    *            If null is passed the search will behave as a null implemenation.
    */
-  public LuceneSearcher(final File dir) {
+  public LuceneSearcher(final File dir, final RenderedPageFactory renderedPageFactory) {
     _dir = dir;
+    _renderedPageFactory = renderedPageFactory;
   }
 
   private void createIndexIfNecessary() throws IOException {
@@ -101,12 +107,14 @@ public class LuceneSearcher implements SearchEngine {
     return perField;
   }
   
-  private Document createWikiPageDocument(final String path, final String content) {
+  private Document createWikiPageDocument(final String path, final String content) throws IOException, PageStoreException {
+    RenderedPage renderedPage = _renderedPageFactory.create(path, content);
+
     Document document = new Document();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
-    document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_CONTENT, renderedPage.asText(), Field.Store.YES, Field.Index.TOKENIZED));
     return document;
   }
 
@@ -141,7 +149,7 @@ public class LuceneSearcher implements SearchEngine {
   
   // Lucene allows multiple non-deleting readers and at most one writer at a time.
   // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
-  public synchronized void index(final String path, final long revision, final String content) throws IOException {
+  public synchronized void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
     if (_dir == null) {
       return;
     }

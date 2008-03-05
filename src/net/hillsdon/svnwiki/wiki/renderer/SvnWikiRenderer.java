@@ -17,31 +17,28 @@ package net.hillsdon.svnwiki.wiki.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.List;
 
 import net.hillsdon.svnwiki.configuration.Configuration;
-import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
-import net.hillsdon.svnwiki.wiki.WikiGraph;
-import net.hillsdon.svnwiki.wiki.macros.BackLinkListMacro;
-import net.hillsdon.svnwiki.wiki.macros.SearchMacro;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
-import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
 
 public class SvnWikiRenderer implements MarkupRenderer {
 
-  private final CreoleRenderer _creole;
+  private final Configuration _configuration;
+  private final InternalLinker _internalLinker;
+  private CreoleRenderer _creole;
   
-  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker, final WikiGraph wikiGraph, final SearchEngine searchEngine) {
-    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, internalLinker, configuration);
-    final List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(searchEngine));
+  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker, final List<Macro> macros) {
+    _configuration = configuration;
+    _internalLinker = internalLinker;
+    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, _internalLinker, _configuration);
     _creole = new CreoleRenderer(
         new RenderNode[] {
             new UnescapedHtmlNode(true),
@@ -51,13 +48,13 @@ public class SvnWikiRenderer implements MarkupRenderer {
         new RenderNode[] {
             new JavaSyntaxHighlightedNode(false),
             new UnescapedHtmlNode(false),
-            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, internalLinker, configuration)),
+            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, _internalLinker, _configuration)),
             new CreoleLinkNode(linkHandler),
             new CustomWikiLinkNode(linkHandler),
             new MacroNode(macros, false),
         });
   }
-
+  
   public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
     out.write(_creole.render(page, in));
   }
