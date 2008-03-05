@@ -7,7 +7,7 @@
   {
     "name":   "Raw HTML",
     "input":  "[<html>]\n<div class='unusual'></div>\n[</html>]",
-    "output": "<p>\n<div class='unusual'></div>\n</p>"
+    "output": "\n<div class='unusual'></div>\n"
   }
 ]
 
