@@ -39,6 +39,7 @@ import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.web.handlers.PageHandler;
 import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory;
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
+import net.hillsdon.svnwiki.web.vcintegration.SpecialPagePopulatingPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
@@ -95,7 +96,7 @@ public class WikiHandler implements RequestHandler {
       _pageStore.create(request);
       try {
         _searchEngine.syncWithExternalCommits();
-        addSideBarToRequest(request);
+        addSideBarEtcToRequest(request);
         _handler.handle(path, request, response);
       }
       finally {
@@ -118,12 +119,14 @@ public class WikiHandler implements RequestHandler {
     }
   }
 
-  private void addSideBarToRequest(final HttpServletRequest request) throws PageStoreException, IOException {
-    PageReference sidebar = new PageReference("ConfigSideBar");
-    StringWriter sidebarHtml = new StringWriter();
-    PageInfo configSideBar = _cachingPageStore.get(sidebar, -1);
-    _renderer.render(sidebar, configSideBar.getContent(), sidebarHtml);
-    request.setAttribute("sidebar", sidebarHtml.toString());
+  private void addSideBarEtcToRequest(final HttpServletRequest request) throws PageStoreException, IOException {
+    for (PageReference ref : SpecialPagePopulatingPageStore.COMPLIMENTARY_CONTENT_PAGES) {
+      final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
+      StringWriter html = new StringWriter();
+      PageInfo page = _cachingPageStore.get(ref, -1);
+      _renderer.render(ref, page.getContent(), html);
+      request.setAttribute(requestVarName, html.toString());
+    }
   }
 
   private void requestAuthentication(final HttpServletResponse response) throws IOException {

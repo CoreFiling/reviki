@@ -30,7 +30,11 @@
   <div id="topbar">
     <c:if test="${wikiIsValid != null and wikiIsValid}">
       <ul class="menu">
-        <tiles:insertAttribute name="menuItems" ignore="true"/>
+        <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
+        ${menuItems}
+        <c:if test="${not empty menuItems}">
+          <li class="menu menu-separator"></li>
+        </c:if>
         <li class="menu"><sw:wikiLink page="FrontPage"/></li>
         <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
         <li class="menu"><sw:wikiLink page="AllPages"/></li>
@@ -43,13 +47,19 @@
       </ul>
     </c:if>
   </div>
+  <div id="header">
+  ${renderedHeader}
+  </div>
   <div id="content">
     <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
     <div id="sidebar" style="float:right">
-    ${sidebar}
+    ${renderedSideBar}
     </div>
     <tiles:insertAttribute name="content"/>
   </div>
-  <p id="build-details">Built from r$BuildRevision$.</p>
+  <div id="footer">
+  ${renderedFooter}
+    <p id="build-details">Built from r$BuildRevision$.</p>
+  </div>
 </body>
 </html>

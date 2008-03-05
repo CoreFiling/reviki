@@ -22,7 +22,7 @@
         <li class="menu">
           <a name="rename" href="?rename">Rename</a>
         </li>
-        <li class="menu" style="margin-right: 0.5em; padding-right: 0.5em; border-right: 1px solid black;">
+        <li class="menu">
           <a name="copy" href="?copy">Copy</a>
         </li>
       </c:if>

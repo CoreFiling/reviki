@@ -15,6 +15,9 @@
  */
 package net.hillsdon.svnwiki.web.vcintegration;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableCollection;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,19 +41,28 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
+  private static final PageReference PAGE_SIDEBAR = new PageReference("ConfigSideBar");
+  private static final PageReference PAGE_HEADER = new PageReference("ConfigHeader");
+  private static final PageReference PAGE_FOOTER = new PageReference("ConfigFooter");
+  
+  public static final Collection<PageReference> COMPLIMENTARY_CONTENT_PAGES = unmodifiableCollection(asList(PAGE_SIDEBAR, PAGE_HEADER, PAGE_FOOTER));
+  
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       new PageReference("FrontPage"),
       new PageReference("FindPage"),
       new PageReference("ConfigCss"),
-      new PageReference("ConfigSideBar"),
+      PAGE_SIDEBAR,
       new PageReference("ConfigInterWikiLinks")
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReference("AllPages"),
       new PageReference("ConfigSvnLocation"),
       new PageReference("OrphanedPages"),
-      new PageReference("RecentChanges") 
+      new PageReference("RecentChanges"), 
+      new PageReference("RecentChanges"),
+      PAGE_HEADER,
+      PAGE_FOOTER
     );
   
   public SpecialPagePopulatingPageStore(final PageStore delegate) {
