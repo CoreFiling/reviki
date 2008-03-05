@@ -67,7 +67,10 @@
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
        </classes>
-       <fileset dir="${build-web}" includes="**" />
+       <fileset dir="${build-web}">
+         <include name="**/*"/>
+         <exclude name="WEB-INF/**/*"/>
+       </fileset>
        <webinf dir="${build-web}/WEB-INF" includes="**" />
     </war>
   </target>
