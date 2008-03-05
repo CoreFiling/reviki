@@ -53,13 +53,20 @@ public class ChangeInfo {
   }
   
   public String getDescription() {
+    // TODO: generalize the idea of tagging commits.
     String description = stripFinalURL();
-    if (description.contains(MINOR_EDIT_MESSAGE_TAG)) {
-      return description.substring(MINOR_EDIT_MESSAGE_TAG.length());
-    }
-    if (description.contains(NO_COMMENT_MESSAGE_TAG)) {
+    int minorEdit = description.indexOf(MINOR_EDIT_MESSAGE_TAG);
+    int noMessage = description.indexOf(NO_COMMENT_MESSAGE_TAG);
+    if (noMessage != -1) {
       return "None";
     }
+    if (minorEdit > noMessage) {
+      return description.substring(minorEdit + MINOR_EDIT_MESSAGE_TAG.length());
+    }
+    if (noMessage > minorEdit) {
+      return description.substring(noMessage + NO_COMMENT_MESSAGE_TAG.length());
+    }
+    
     return description;
   }
 

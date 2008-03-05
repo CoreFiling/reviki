@@ -28,19 +28,26 @@ public class RecentChanges implements RequestHandler {
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
+    
     if ("atom.xml".equals(path.next())) {
       response.setContentType("application/atom+xml");
-      FeedWriter.writeAtom(new RequestBasedWikiUrls(request), response.getWriter(), getRecentChanges());
+      FeedWriter.writeAtom(new RequestBasedWikiUrls(request), response.getWriter(), recentChanges);
       return;
     }
     
-    request.setAttribute("recentChanges", getRecentChanges());
+    request.setAttribute("recentChanges", recentChanges);
     request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
   }
 
-  private List<ChangeInfo> getRecentChanges() throws PageStoreException {
+  private List<ChangeInfo> getRecentChanges(boolean showMinor) throws PageStoreException {
+    List<ChangeInfo> allChanges = _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
+    if (showMinor) {
+      return allChanges;
+    }
+    
     List<ChangeInfo> majorChanges = new ArrayList<ChangeInfo>();
-    for (ChangeInfo change : _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE)) {
+    for (ChangeInfo change : allChanges) {
       if (!change.isMinorEdit()) {
         majorChanges.add(change);
       }
