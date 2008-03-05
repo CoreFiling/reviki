@@ -12,7 +12,7 @@
     </c:if>
     
     <form id="editForm" name="editForm" action="" method="post">
-      <textarea rows="25" cols="80" name="content"><c:out value="${pageInfo.content}"/></textarea>
+      <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
@@ -24,7 +24,11 @@
       <label for="minorEdit">Minor edit?</label><input type="checkbox" id="minorEdit" name="minorEdit"/>
     </form>
     <c:if test="${empty preview}">
-      <script type='text/javascript'>document.editForm.content.focus();</script>
+      <script type='text/javascript'>
+      $(document).ready(function() {
+        $("#content").focus();
+      });
+      </script>
     </c:if>
     <jsp:include page="cheatsheet.html"></jsp:include>
   </tiles:putAttribute>

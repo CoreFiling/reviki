@@ -47,7 +47,7 @@
         <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
         <li class="menu"><sw:wikiLink page="AllPages"/></li>
         <li class="menu">
-          <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
+          <form style="display: inline;" id="searchForm" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
             <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
             <input value="Go" type="submit"/>
           </form>
@@ -56,7 +56,10 @@
     </c:if>
   </div>
   <script type="text/javascript">
-    $("#query").focus();
+    // Don't focus immediately or autosuggest won't properly turn of autocomplete. 
+    $(document).ready(function() {
+      $("#query").focus();
+    });
   </script>
   <div id="header">
   ${renderedHeader}

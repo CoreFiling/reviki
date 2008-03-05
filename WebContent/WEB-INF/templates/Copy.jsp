@@ -8,9 +8,13 @@
   <tiles:putAttribute name="content">
     <p>The edit history from the old page will be viewable from the copy.</p>
     <form name="copyForm" method="post" action="">
-      <label for="toPage">New page name </label><input name="toPage" type="text" value=""/>
+      <label for="toPage">New page name </label><input id="toPage" name="toPage" type="text" value=""/>
       <input name="copy" type="submit" value="Copy"/>
     </form>
-    <script type='text/javascript'>document.copyForm.toPage.focus();</script>
+    <script type='text/javascript'>
+      $(document).ready(function() {
+        $("#toPage").focus();
+      });
+    </script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

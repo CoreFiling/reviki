@@ -18,15 +18,15 @@ svnwiki.formAsJavaScriptLink = function(formId, linkText) {
   parent.insertBefore(a, space);
 }
 svnwiki.configureAutoSuggest = function() {
-  if ($("#query")) {
-    $(function() {
-      $("#query").suggest(svnwiki.BASE_URL + "FindPage?ctype=txt&force", {
-        param: "query",
-        onSelect: function() {
-          window.location = svnwiki.BASE_URL + this.value;
-        }
-      });
+  var queryInput = $("#query");
+  if (queryInput) {
+    queryInput.attr["autocomplete"] = "off";
+    queryInput.suggest(svnwiki.BASE_URL + "FindPage?ctype=txt&limit=20&force", {
+      param: "query",
+      onSelect: function() {
+        $("#searchForm").submit();
+      }
     });
-  }  
+  }
 }
 $(document).ready(svnwiki.configureAutoSuggest);

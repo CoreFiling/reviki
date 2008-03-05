@@ -17,8 +17,10 @@ package net.hillsdon.svnwiki.web.handlers;
 
 import static java.lang.String.format;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,6 +80,10 @@ public class FindPage implements PageRequestHandler {
     }
     
     Set<SearchMatch> results = _searchEngine.search(query, true);
+    Long limit = getLong(request.getParameter("limit"), "limit");
+    if (limit != null) {
+      results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));
+    }
     if ("txt".equals(request.getParameter("ctype"))) {
       response.setContentType("text/plain");
       PrintWriter writer = response.getWriter();
