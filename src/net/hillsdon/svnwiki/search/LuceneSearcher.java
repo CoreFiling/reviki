@@ -240,5 +240,9 @@ public class LuceneSearcher implements SearchEngine {
   private void rememberLastIndexedRevision(final long revision) throws CorruptIndexException, LockObtainFailedException, IOException {
     replaceDocument(FIELD_PROPERTY_KEY, createPropertyDocument(PROPERTY_LAST_INDEXED_REVISION, String.valueOf(revision)));
   }
+
+  public String escape(final String in) {
+    return QueryParser.escape(in);
+  }
   
 }

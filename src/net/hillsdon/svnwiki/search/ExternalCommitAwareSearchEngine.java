@@ -62,4 +62,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
     _delegate.delete(path, revision);
   }
 
+  public String escape(final String in) {
+    return _delegate.escape(in);
+  }
+
 }

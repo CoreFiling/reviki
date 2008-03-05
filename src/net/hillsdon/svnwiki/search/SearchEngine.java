@@ -46,5 +46,11 @@ public interface SearchEngine {
    * @throws IOException 
    */
   void delete(String path, long revision) throws IOException;
+
+  /**
+   * @param in A string.
+   * @return A quoted version that escapes any characters that have special significance in the search syntax.
+   */
+  String escape(String in);
   
 }
