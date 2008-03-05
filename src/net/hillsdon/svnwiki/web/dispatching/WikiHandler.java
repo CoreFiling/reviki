@@ -47,6 +47,8 @@ import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
  */
 public class WikiHandler implements RequestHandler {
 
+  static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
+  
   private final RequestScopedThreadLocalPageStore _pageStore;
   private final MarkupRenderer _renderer;
   private final ConfigPageCachingPageStore _cachingPageStore;
@@ -92,7 +94,7 @@ public class WikiHandler implements RequestHandler {
       }
       else {
         // Don't try to show wiki header/footer.
-        request.setAttribute("wikiIsValid", false);
+        request.setAttribute(ATTRIBUTE_WIKI_IS_VALID, false);
         throw ex;
       }
     }

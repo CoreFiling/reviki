@@ -86,7 +86,7 @@ public class WikiChoice implements RequestHandler {
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     PerWikiInitialConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
-    request.setAttribute("wikiIsValid", configuration.isComplete());
+    request.setAttribute(WikiHandler.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
 
     RequestHandler handler = getWikiHandler(configuration, path);
     handler.handle(path, request, response);
