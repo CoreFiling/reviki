@@ -71,7 +71,7 @@ public class RenderedPage {
     return outgoing;
   }
 
-  private boolean hasWikiPageClass(String clazz) {
+  private boolean hasWikiPageClass(final String clazz) {
     return RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find();
   }
 
