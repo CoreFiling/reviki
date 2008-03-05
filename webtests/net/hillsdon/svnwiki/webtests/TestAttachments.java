@@ -1,6 +1,7 @@
 package net.hillsdon.svnwiki.webtests;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -31,7 +32,14 @@ public class TestAttachments extends WebTestSupport {
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     form.getInputByName("file").setValueAttribute("build.xml");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
-    UnexpectedPage attachment = (UnexpectedPage) attachments.getAnchorByHref("build.xml").click();
+    checkAttachmentIsAtEndOfLink(attachments.getAnchorByHref("build.xml"));
+    
+    page = editWikiPage(name, "{attached:build.xml}", "Linked to attachment", false);
+    checkAttachmentIsAtEndOfLink(page.getAnchorByHref(name + "/attachments/build.xml"));
+  }
+
+  private void checkAttachmentIsAtEndOfLink(HtmlAnchor link) throws IOException {
+    UnexpectedPage attachment = (UnexpectedPage) link.click();
     BufferedReader in = new BufferedReader(new InputStreamReader(attachment.getInputStream()));
     try {
       assertTrue(in.readLine().startsWith("<project name="));
