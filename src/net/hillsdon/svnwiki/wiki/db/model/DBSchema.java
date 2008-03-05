@@ -26,7 +26,7 @@ public class DBSchema extends DBCreatableObject {
 
   private TransformMap<String, DBTable> _tables = new DelegatingTransformMap<String, DBTable>(DBNamedObject.TO_NAME);
   
-  public DBSchema(String name) {
+  public DBSchema(final String name) {
     super(name);
   }
 
@@ -35,10 +35,15 @@ public class DBSchema extends DBCreatableObject {
   }
   
   @Override
-  public boolean exists(Connection connection) throws SQLException {
-    ResultSet schemas = connection.getMetaData().getSchemas(null, getName());
+  public boolean exists(final Connection connection) throws SQLException {
+    ResultSet schemas = connection.getMetaData().getSchemas();
     try {
-      return schemas.next();
+      while (schemas.next()) {
+        if (schemas.getString("TABLE_SCHEM").equalsIgnoreCase(getName())) {
+          return true;
+        }
+      }
+      return false;
     }
     finally {
       schemas.close();
