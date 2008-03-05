@@ -19,9 +19,9 @@ public class SearchIndexPopulatingPageStore extends DelegatingPageStore {
 
   private static final Log LOG = LogFactory.getLog(SearchIndexPopulatingPageStore.class);
 
-  private final SearchIndexer _indexer;
+  private final SearchEngine _indexer;
 
-  public SearchIndexPopulatingPageStore(final SearchIndexer indexer, final PageStore delegate) {
+  public SearchIndexPopulatingPageStore(final SearchEngine indexer, final PageStore delegate) {
     super(delegate);
     _indexer = indexer;
   }

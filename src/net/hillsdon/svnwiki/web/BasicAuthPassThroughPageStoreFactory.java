@@ -5,8 +5,8 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.search.SearchIndexPopulatingPageStore;
-import net.hillsdon.svnwiki.search.SearchIndexer;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -61,12 +61,12 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
   }
 
   private final SVNURL _url;
-  private final SearchIndexer _indexer;
+  private final SearchEngine _indexer;
   
   /**
    * @param url Repository URL.
    */
-  public BasicAuthPassThroughPageStoreFactory(final SVNURL url, final SearchIndexer indexer) {
+  public BasicAuthPassThroughPageStoreFactory(final SVNURL url, final SearchEngine indexer) {
     _url = url;
     _indexer = indexer;
   }

@@ -40,7 +40,7 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
  * 
  * @author mth
  */
-public class LuceneSearcher implements SearchEngine, SearchIndexer {
+public class LuceneSearcher implements SearchEngine {
 
   private static final String FIELD_PATH = "path";
   private static final String FIELD_CONTENT = "content";
