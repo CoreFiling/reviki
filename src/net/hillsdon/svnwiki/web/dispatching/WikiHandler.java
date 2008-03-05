@@ -38,6 +38,8 @@ import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFacto
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.WikiGraphImpl;
 import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
 
 /**
@@ -66,8 +68,9 @@ public class WikiHandler implements RequestHandler {
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker);
-    _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer);
+    WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, searchEngine);
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, wikiGraph, searchEngine);
+    _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer, wikiGraph);
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {

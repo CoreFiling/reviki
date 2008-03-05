@@ -15,6 +15,8 @@
  */
 package net.hillsdon.svnwiki.search;
 
+import net.hillsdon.fij.core.Transform;
+
 /**
  * A match from a search.
  * 
@@ -24,6 +26,12 @@ package net.hillsdon.svnwiki.search;
  */
 public class SearchMatch {
 
+  public static final Transform<SearchMatch, String> TO_PAGE_NAME = new Transform<SearchMatch, String>() {
+    public String transform(SearchMatch in) {
+      return in.getPage();
+    }
+  };
+  
   private final String _page;
   private final String _htmlExtract;
 

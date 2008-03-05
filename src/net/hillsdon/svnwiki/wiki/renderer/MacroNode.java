@@ -20,9 +20,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Macro
@@ -31,6 +35,8 @@ import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
  */
 public class MacroNode extends AbstractRegexNode {
 
+  private static final Log LOG = LogFactory.getLog(MacroNode.class);
+  
   private final Map<String, Macro> _macros;
 
   public MacroNode(final Collection<Macro> macros, final boolean block) {
@@ -53,7 +59,21 @@ public class MacroNode extends AbstractRegexNode {
 
   public String handle(final PageReference page, final Matcher matcher) {
     Macro macro = _macros.get(getMacroName(matcher));
-    return macro.handle(page, matcher.group(2));
+    try {
+      String content = macro.handle(page, matcher.group(2));
+      switch (macro.getResultFormat()) {
+        case XHTML:
+          return content;
+        case WIKI:
+          return render(page, content);
+        default:
+          return Escape.html(content);
+      }
+    }
+    catch (Exception e) {
+      LOG.error("Error handling macro on: " + page.getPath(), e);
+      return String.format("<p>Error evaluating macro '%s': %s</p>", Escape.html(macro.getName()), Escape.html(e.getMessage()));
+    }
   }
 
 }

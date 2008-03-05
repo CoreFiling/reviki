@@ -26,7 +26,6 @@ import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.WikiGraph;
-import net.hillsdon.svnwiki.wiki.WikiGraphImpl;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.
@@ -44,8 +43,7 @@ public class PageHandler implements RequestHandler {
   private final RequestHandler _allPages;
   private final RequestHandler _orphanedPages;
 
-  public PageHandler(final ConfigPageCachingPageStore cachingPageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer) {
-    WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, searchEngine);
+  public PageHandler(final ConfigPageCachingPageStore cachingPageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
     _recentChanges = new RecentChanges(cachingPageStore);
     _allPages = new AllPages(cachingPageStore);
     _attachments = new Attachments(cachingPageStore);

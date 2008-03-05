@@ -21,10 +21,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.hillsdon.svnwiki.configuration.Configuration;
+import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.macros.BackLinkListMacro;
+import net.hillsdon.svnwiki.wiki.macros.SearchMacro;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
@@ -35,9 +39,9 @@ public class SvnWikiRenderer implements MarkupRenderer {
 
   private final CreoleRenderer _creole;
   
-  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker) {
+  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker, final WikiGraph wikiGraph, final SearchEngine searchEngine) {
     final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, internalLinker, configuration);
-    final List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro());
+    final List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(searchEngine));
     _creole = new CreoleRenderer(
         new RenderNode[] {
             new UnescapedHtmlNode(true),

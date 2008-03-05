@@ -34,7 +34,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
-    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker("", "mywiki", new SimplePageStore()));
+    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker("", "mywiki", new SimplePageStore()), null, null);
     final StringWriter out = new StringWriter();
     renderer.render(new PageReference(""), input, out);
     return out.toString();

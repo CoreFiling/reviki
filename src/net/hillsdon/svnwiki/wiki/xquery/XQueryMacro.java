@@ -19,10 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
+import net.hillsdon.svnwiki.wiki.renderer.macro.ResultFormat;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
@@ -62,6 +62,10 @@ public class XQueryMacro implements Macro {
     catch (UnsupportedEncodingException e) {
       throw new RuntimeException("Java supports UTF-8!", e);
     }
+  }
+
+  public ResultFormat getResultFormat() {
+    return ResultFormat.XHTML;
   }
 
 }

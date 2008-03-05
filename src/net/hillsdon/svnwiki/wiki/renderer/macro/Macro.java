@@ -28,6 +28,8 @@ public interface Macro {
 
   String getName();
 
-  String handle(PageReference page, String remainder);
+  ResultFormat getResultFormat();
+  
+  String handle(PageReference page, String remainder) throws Exception;
   
 }
