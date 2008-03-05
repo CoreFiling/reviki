@@ -13,6 +13,29 @@
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>
     </form>
+    <h3>Syntax cheatsheet</h3>
+    <table>
+    <tr><td colspan="2">
+    <pre>
+= Main heading
+== Sub-heading
+=== Sub-sub heading
+</pre></td></tr>
+    <tr><td><pre>//italic//</pre></td><td><pre>**bold**</pre></td></tr>
+    <tr><td><pre>--strikethrough--</pre></td><td><pre>---- (horizontal rule)</pre></td>
+    <tr><td><pre>WikiWord c2:InterWiki</pre></td><td><pre>{attached:file.txt} {image:file.jpg}</pre></td></tr>
+    <tr>
+    <td><pre>
+# Numbered list
+# Entry 2
+## Nesting
+    </pre></td>
+    <td><pre>
+* Bulleted list
+* Entry 2
+** Nesting
+    </pre></td>
+    </tr></table>
     <script type='text/javascript'>document.editForm.content.focus();</script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

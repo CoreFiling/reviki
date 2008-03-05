@@ -14,6 +14,11 @@ import org.radeox.engine.context.BaseRenderContext;
 import org.radeox.filter.LinkTestFilter;
 import org.radeox.macro.MacroRepository;
 
+/**
+ * Hides a configured Radeox render engine behind our interface. 
+ * 
+ * @author mth
+ */
 public class RadeoxMarkupRenderer implements MarkupRenderer {
   
   private final RenderEngine _engine;
