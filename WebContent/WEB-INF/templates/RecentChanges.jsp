@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title">Page list</tiles:putAttribute>
+  <tiles:putAttribute name="title">Recent changes</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <ul>
       <c:forEach var="change" items="${recentChanges}">
