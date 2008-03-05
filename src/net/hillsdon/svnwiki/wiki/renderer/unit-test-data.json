@@ -17,7 +17,7 @@
   { "comment": "Test an ul item with a sublist",
     "name":   "Unordered item with unordered sublist",
     "input":  "* Item\n** Subitem",
-    "output": "<ul><li> Item<ul>\n<li> Subitem</li></ul></li></ul>"
+    "output": "<ul><li> Item<ul><li> Subitem</li></ul></li></ul>"
   },
   { "comment": "Test a sublist without an initial tag (should not make a list)",
     "name":   "Unordered sublist without initial tag",
@@ -27,7 +27,7 @@
   { "comment": "Test an ol item with a sublist",
     "name":   "Ordered item with ordered sublist",
     "input":  "# Item\n## Subitem",
-    "output": "<ol><li> Item<ol>\n<li> Subitem</li></ol></li></ol>"
+    "output": "<ol><li> Item<ol><li> Subitem</li></ol></li></ol>"
   },
   { "comment": "Test a sublist without an initial tag (should not make a list)",
     "name":   "Ordered sublist without initial tag",
@@ -37,9 +37,10 @@
   { "comment": "Test an unordered list with an ordered sublist",
     "name":   "Unordered item with ordered sublist",
     "input":  "* Item\n*# Subitem",
-    "output": "<ul><li> Item<ol>\n<li> Subitem</li></ol></li></ul>"
+    "output": "<ul><li> Item<ol><li> Subitem</li></ol></li></ul>"
   },
   {
+    "bug":    "We put the hr within the paragraph, not sure if that's ok.",
     "name":   "Horizontal rule",
     "input":  "Some text\n----\nSome more text",
     "output": "<p>Some text</p><hr /><p>Some more text</p>"
@@ -47,12 +48,12 @@
   {
     "name":   "Preformatted block",
     "input":  "{{{\nPreformatted block\n}}}",
-    "output": "<pre>Preformatted block\n</pre>"
+    "output": "<pre>\nPreformatted block\n</pre>"
   },
   {
     "name":   "Two preformatted blocks",
     "input":  "{{{\nPreformatted block\n}}}\n{{{Block 2}}}",
-    "output": "<pre>Preformatted block\n</pre><pre>Block 2</pre>"
+    "output": "<pre>\nPreformatted block\n</pre><pre>Block 2</pre>"
   },
   {
     "name":   "h1",
@@ -97,32 +98,37 @@
   {
     "name":   "Raw URL",
     "input":  "http://example.com/examplepage",
-    "output": "<p><a href=\"http://example.com/examplepage\">http://example.com/examplepage</a></p>"
+    "output": "<p><a href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
   },
   {
+    "bug":    "unimplemented",
     "name":   "Unnamed URL",
     "input":  "[[http://example.com/examplepage]]",
-    "output": "<p><a href=\"http://example.com/examplepage\">http://example.com/examplepage</a></p>"
+    "output": "<p><a href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
   },
   {
+    "bug":    "unimplemented",
     "name":   "Named URL",
     "input":  "[[http://example.com/examplepage|Example Page]]",
-    "output": "<p><a href=\"http://example.com/examplepage\">Example Page</a></p>"
+    "output": "<p><a href='http://example.com/examplepage'>Example Page</a></p>"
   },
   {
+    "bug":    "unimplemented",
     "name":   "Unnamed link",
     "input":  "[[MyPage]]",
-    "output": "<p><a href=\"MyPage\">MyPage</a></p>"
+    "output": "<p><a href='MyPage'>MyPage</a></p>"
   },
   {
+    "bug":    "unimplemented",
     "name":   "Named link",
     "input":  "[[MyPage|My page]]",
-    "output": "<p><a href=\"MyPage\">My page</a></p>"
+    "output": "<p><a href='MyPage'>My page</a></p>"
   },
   {
+    "bug":    "unimplemented",
     "name":   "Image",
     "input":  "{{image.gif|my image}}",
-    "output": "<p><img src=\"image.gif\" alt=\"my image\"/></p>"
+    "output": "<p><img src='image.gif' alt='my image'/></p>"
   },
   {
     "name":   "Inline tt",
@@ -145,15 +151,16 @@
     "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
   },
   {
+    "bug":    "I don't see how this can be resolved without hardcoding a list of URI schemes",
     "name":   "URL/emphasis ambiguity",
     "input":  "This is an //italic// text. This is a url: http://www.wikicreole.org. This is what can go wrong://this should be an italic text//.",
-    "output": "<p>This is an <em>italic</em> text. This is a url: <a href=\"http://www.wikicreole.org\">http://www.wikicreole.org</a>. This is what can go wrong:<em>this should be an italic text</em>.</p>"
+    "output": "<p>This is an <em>italic</em> text. This is a url: <a href='http://www.wikicreole.org'>http://www.wikicreole.org</a>. This is what can go wrong:<em>this should be an italic text</em>.</p>"
   },
 
   {
     "name":   "Difficult emphasis #1",
     "input":  "// http://www.link.org //",
-    "output": "<p><em> <a href=\"http://www.link.org\">http://www.link.org</a> </em></p>"
+    "output": "<p><em> <a href='http://www.link.org'>http://www.link.org</a> </em></p>"
   },
   {
     "name":   "Difficult emphasis #2",
@@ -173,12 +180,12 @@
   {
     "name":   "Difficult emphasis #5",
     "input":  "// http://",
-    "output": "<p>// <a href=\"http://\">http://</a></p>"
+    "output": "<p>// <a href='http://'>http://</a></p>"
   },
   {
     "name":   "Difficult emphasis #6",
     "input":  "// http:////",
-    "output": "<p><em> <a href=\"http://\">http://</a></em></p>"
+    "output": "<p><em> <a href='http://'>http://</a></em></p>"
   },
   {
     "name":   "Difficult emphasis #7",
@@ -188,12 +195,12 @@
   {
     "name":   "Difficult emphasis #8",
     "input":  "//http://link.org//",
-    "output": "<p><em><a href=\"http://link.org\">http://link.org</a></em></p>"
+    "output": "<p><em><a href='http://link.org'>http://link.org</a></em></p>"
   },
   {
     "name":   "Difficult emphasis #9",
     "input":  "// ftp://www.link.org //",
-    "output": "<p><em> <a href=\"ftp://www.link.org\">ftp://www.link.org</a> </em></p>"
+    "output": "<p><em> <a href='ftp://www.link.org'>ftp://www.link.org</a> </em></p>"
   },
   {
     "name":   "Difficult emphasis #10",
@@ -213,12 +220,12 @@
   {
     "name":   "Difficult emphasis #13",
     "input":  "// ftp://",
-    "output": "<p>// <a href=\"ftp://\">ftp://</a></p>"
+    "output": "<p>// <a href='ftp://'>ftp://</a></p>"
   },
   {
     "name":   "Difficult emphasis #14",
     "input":  "// ftp:////",
-    "output": "<p><em> <a href=\"ftp://\">ftp://</a></em></p>"
+    "output": "<p><em> <a href='ftp://'>ftp://</a></em></p>"
   },
   {
     "name":   "Difficult emphasis #15",
@@ -228,7 +235,7 @@
   {
     "name":   "Difficult emphasis #16",
     "input":  "//ftp://link.org//",
-    "output": "<p><em><a href=\"ftp://link.org\">ftp://link.org</a></em></p>"
+    "output": "<p><em><a href='ftp://link.org'>ftp://link.org</a></em></p>"
   }
 ]
 

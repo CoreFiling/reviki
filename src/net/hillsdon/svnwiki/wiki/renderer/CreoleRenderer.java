@@ -50,7 +50,7 @@ public class CreoleRenderer {
   }
   private static class Heading extends RegexMatchToTag {
     public Heading(final int number) {
-      super(String.format("(?:^|\n)={%d}(.+?)(?:\n|$)", number), "h" + number, 1);
+      super(String.format("(^|\\n)[ \\t]*={%d}[ \\t](.+?)[ \\t]*=*\\s*(\\n|$)", number), "h" + number, 2);
     }
   }
   private static class ListNode extends RegexMatchToTag {
@@ -65,15 +65,16 @@ public class CreoleRenderer {
     RenderNode root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
-    RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
+    RenderNode italic = new RegexMatchToTag("(?s)//(.*?)//", "em", 1);
     RenderNode strikethrough = new RegexMatchToTag("--(.+?)--", "del", 1);
-    RenderNode bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
+    RenderNode bold = new RegexMatchToTag("(?s)[*][*](.*?)[*][*]", "strong", 1);
     RenderNode lineBreak = new RegexMatchToTag("\\\\\\\\", "br", null);
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
     RenderNode unorderedList = new ListNode("\\*", "ul");
     RenderNode orderedList = new ListNode("#", "ol");
     RenderNode rawUrl = new RawUrlNode();
-    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl};
+    RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "tt", 1);
+    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
     RenderNode[] nonStructural = concat(defaultNonStructural, customNonStructural);
 
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
@@ -90,6 +91,7 @@ public class CreoleRenderer {
         noWiki.addChildren(), 
         horizontalRule,
         table,
+        new Heading(6).addChildren(nonStructural),
         new Heading(5).addChildren(nonStructural),
         new Heading(4).addChildren(nonStructural), 
         new Heading(3).addChildren(nonStructural), 

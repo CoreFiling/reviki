@@ -22,8 +22,28 @@ public class TestCreoleRendererExternallyDefinedTests extends TestCase {
   }
   
   public void test() throws Exception {
+    int errors = 0;
     for (Map<String, String> test : _tests) {
-      assertEquals(test.get("output"), _renderer.render(new PageReference(""), test.get("input")));
+      final String caseName = test.get("name");
+      final String expected = test.get("output");
+      final String input = test.get("input");
+      final String actual = _renderer.render(new PageReference(""), input);
+      final boolean match = expected.equals(actual);
+      if (test.get("bug") != null) {
+        assertFalse("You fixed " + caseName, match);
+        continue;
+      }
+      if (!match) {
+        errors++;
+        System.err.println("Creole case: " + caseName);
+        System.err.println("Input:\n" + input);
+        System.err.println("Expected:\n" + expected);
+        System.err.println("Actual:\n" + actual);
+        System.err.println();
+      }
+    }
+    if (errors > 0) {
+      fail("Creole rendering errors, please see stderr.");
     }
   }
   

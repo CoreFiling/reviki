@@ -15,7 +15,7 @@ public class Escape {
   }
 
   /**
-   * HTML escaping routine.
+   * HTML escaping routine.  This is a bit extreme for element content.
    * 
    * @param content
    *          the unescaped content.
@@ -34,6 +34,15 @@ public class Escape {
       }
       else if (character == '&') {
         result.append("&amp;");
+      }
+      else if (character == '\"') {
+        result.append("&quot;");
+      }
+      else if (character == '\'') {
+        result.append("&#039;");
+      }
+      else if (character == '\\') {
+         result.append("&#092;");
       }
       else {
         result.append(character);
