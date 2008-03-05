@@ -102,6 +102,6 @@ public interface PageStore {
    * @throws PageStoreException On failure.
    * @throws IOException 
    */
-  void attachment(String page, String attachment, ContentTypedSink sink) throws PageStoreException;
+  void attachment(String page, String attachment, ContentTypedSink sink) throws PageStoreException, NotFoundException;
   
 }

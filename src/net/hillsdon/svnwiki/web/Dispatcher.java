@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.InitialConfiguration;
+import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.web.handlers.InitialConfigurationHandler;
 
 import org.apache.commons.logging.Log;
@@ -64,6 +65,9 @@ public class Dispatcher extends HttpServlet {
       else {
         _currentHandler.handle(request, response);
       }
+    }
+    catch (NotFoundException ex) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     catch (Exception ex) {
       handleException(request, response, ex);

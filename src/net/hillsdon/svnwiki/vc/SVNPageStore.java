@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
@@ -233,17 +234,30 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws PageStoreException {
+  public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(attachmentPath(page), attachment);
-    sink.setContentType("application/octet-stream"); 
-    sink.setFileName(attachment);
+    final OutputStream out = new OutputStream() {
+      boolean first = true;
+      public void write(int b) throws IOException {
+        if (first) {
+          sink.setContentType("application/octet-stream"); 
+          sink.setFileName(attachment);
+          first = false;
+        }
+        sink.stream().write(b);
+      }
+    };
+    
     _helper.execute(new SVNAction<Void>() {
       public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
-          repository.getFile(path, -1, null, sink.stream());
+          repository.getFile(path, -1, null, out);
         }
-        catch (IOException e) {
-          throw new PageStoreException(e);
+        catch (SVNException ex) {
+          if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(ex.getErrorMessage().getErrorCode())) {
+            throw new NotFoundException(ex);
+          }
+          throw ex;
         }
         return null;
       }
