@@ -44,6 +44,7 @@ public class TestWikiWordUtils extends TestCase {
   }
   
   public void testAcronyms() {
+    assertSplits(asList("Test", "MRG", "Page"), "TestMRGPage");
     assertSplits(asList("HTML", "Parser"), "HTMLParser");
     assertSplits(asList("Simple", "HTML", "Parser"), "SimpleHTMLParser");
     assertSplits(asList("Parses", "HTML"), "ParsesHTML");
