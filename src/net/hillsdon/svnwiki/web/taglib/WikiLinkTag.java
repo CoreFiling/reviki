@@ -32,7 +32,7 @@ public class WikiLinkTag extends TagSupport {
       InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
       if (linker != null) {
         JspWriter out = pageContext.getOut();
-        out.write(linker.link(getPage()));
+        out.write(linker.link(getPage(), getPage()));
       }
     }
     catch (IOException e) {

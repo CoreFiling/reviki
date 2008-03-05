@@ -13,7 +13,7 @@ public class InternalLinker {
   private final String _wikiName;
   private final String _contextPath;
 
-  public InternalLinker(final String contextPath, String wikiName, final PageStore store) {
+  public InternalLinker(final String contextPath, final String wikiName, final PageStore store) {
     _contextPath = contextPath;
     _wikiName = wikiName;
     _store = store;
@@ -36,7 +36,7 @@ public class InternalLinker {
     );
   }
   
-  public String link(final String pageName) {
+  public String link(final String pageName, final String linkText) {
     boolean exists = exists(pageName);
     if (!exists && WikiWordUtils.isAcronym(pageName)) {
       return Escape.html(pageName);
@@ -45,7 +45,7 @@ public class InternalLinker {
     return format("<a class='%s' href='%s'>%s</a>",
       cssClass,
       Escape.html(url(pageName)),
-      Escape.html(pageName)
+      Escape.html(linkText)
     );
   }
   

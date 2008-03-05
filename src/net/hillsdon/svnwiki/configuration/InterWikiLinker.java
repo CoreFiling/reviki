@@ -31,7 +31,7 @@ public class InterWikiLinker {
    * @throws UnknownWikiException If wikiName is unknown.
    * @see #addWiki(String, String)
    */
-  public String link(final String wikiName, final String pageName) throws UnknownWikiException {
+  public String url(final String wikiName, final String pageName) throws UnknownWikiException {
     String formatString = _links.get(wikiName);
     if (formatString == null) {
       throw new UnknownWikiException();
@@ -45,6 +45,10 @@ public class InterWikiLinker {
    */
   Map<String, String> getWikiToFormatStringMap() {
     return Collections.unmodifiableMap(_links);
+  }
+
+  public boolean hasWiki(final String name) {
+    return _links.keySet().contains(name);
   }
   
 }

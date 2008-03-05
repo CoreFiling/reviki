@@ -55,7 +55,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
           wikiName = wikiName.substring(0, wikiName.length() - 1);
         }
         if (wikiName == null) {
-          return _internalLinker.link(pageName);
+          return _internalLinker.link(pageName, pageName);
         }
         else {
           return interWikiLink(wikiName, pageName, matched);
@@ -71,7 +71,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
   }
 
   private String interWikiLink(final String wikiName, final String pageName, final String matched) throws UnknownWikiException, PageStoreException {
-    String href = _configuration.getInterWikiLinker().link(wikiName, pageName);
+    String href = _configuration.getInterWikiLinker().url(wikiName, pageName);
     return String.format("<a class='inter-wiki' href='%s'>%s</a>", href, Escape.html(matched));
   }
 
