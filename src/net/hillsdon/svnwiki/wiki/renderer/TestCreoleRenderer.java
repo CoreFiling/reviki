@@ -8,7 +8,8 @@ public class TestCreoleRenderer extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-    _render = new CreoleRenderer();
+    // Ignore wiki links for now.
+    _render = new CreoleRenderer(new RegexMatchToTag("$^", "", null, null, null));
   }
 
   public void testStrikethrough() {

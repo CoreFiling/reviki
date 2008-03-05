@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 
 /**
@@ -35,7 +36,7 @@ public class InterWikiLinker {
     if (formatString == null) {
       throw new UnknownWikiException();
     }
-    return String.format(formatString, pageName);
+    return String.format(formatString, Escape.url(pageName));
   }
   
   /**

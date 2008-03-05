@@ -44,40 +44,41 @@ public class CreoleRenderer {
     }
   }
 
-  private static final RenderNode ROOT;
-  static {
+  private final RenderNode _root;
+  
+  public CreoleRenderer(final RenderNode wikiLink) {
     RenderNode root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
     RenderNode strikethrough = new RegexMatchToTag("--(.*?)--", "del", 1);
-    RegexMatchToTag bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
+    RenderNode bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
     RenderNode lineBreak = new RegexMatchToTag("\\\\", "br", null);
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
     RenderNode unorderedList = new List("\\*", "ul");
-    RegexMatchToTag orderedList = new List("#", "ol");
-    RegexMatchToTag listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
+    RenderNode orderedList = new List("#", "ol");
+    RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .setChildren(bold, italic, lineBreak, unorderedList, orderedList);
     root.setChildren(
         noWiki.setChildren(), 
         horizontalRule,
-        new Heading(5).setChildren(bold, italic, lineBreak, strikethrough),
-        new Heading(4).setChildren(bold, italic, lineBreak, strikethrough), 
-        new Heading(3).setChildren(bold, italic, lineBreak, strikethrough), 
-        new Heading(2).setChildren(bold, italic, lineBreak, strikethrough), 
-        new Heading(1).setChildren(bold, italic, lineBreak, strikethrough),
+        new Heading(5).setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
+        new Heading(4).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
+        new Heading(3).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
+        new Heading(2).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
+        new Heading(1).setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
         orderedList.setChildren(listItem),
         unorderedList.setChildren(listItem),
-        paragraph.setChildren(orderedList, unorderedList, horizontalRule, bold, italic, lineBreak, strikethrough), 
-        italic.setChildren(bold, italic, lineBreak, strikethrough), 
-        bold.setChildren(bold, italic, lineBreak, strikethrough),
-        strikethrough.setChildren(bold, italic, lineBreak, strikethrough)
+        paragraph.setChildren(orderedList, unorderedList, horizontalRule, bold, italic, lineBreak, strikethrough, wikiLink), 
+        italic.setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
+        bold.setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
+        strikethrough.setChildren(bold, italic, lineBreak, strikethrough, wikiLink)
      );
-    ROOT = root;
+    _root = root;
   }
   
   public String render(final String in) {
-    return ROOT.render(in.replaceAll("\r", ""));
+    return _root.render(in.replaceAll("\r", ""));
   }
   
 }
