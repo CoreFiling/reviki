@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.hillsdon.svnwiki.search.QuerySyntaxException;
 import net.hillsdon.svnwiki.search.SearchEngine;
-import net.hillsdon.svnwiki.search.SearchMatch;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -36,26 +34,19 @@ public class WikiGraphImpl implements WikiGraph {
     _searchEngine = searchEngine;
   }
   
-  public Set<String> getBacklinks(final String page) throws IOException, PageStoreException {
-    try {
-      Set<SearchMatch>  backlinks = _searchEngine.search(_searchEngine.escape(page), false);
-      backlinks.remove(new SearchMatch(page, null));
-      final Set<String> pages = new LinkedHashSet<String>(backlinks.size());
-      for (SearchMatch match : backlinks) {
-        pages.add(match.getPage());
-      }
-      return pages;
-    }
-    catch (QuerySyntaxException ex) {
-      throw new RuntimeException("Escaping should preclude this error.", ex);
-    }
+  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
+    return _searchEngine.incomingLinks(page);
   }
 
-  public Set<String> getIsolatedPages() throws IOException, PageStoreException {
+  public Set<String> outgoingLinks(String page) throws IOException, PageStoreException {
+    return _searchEngine.outgoingLinks(page);
+  }
+
+  public Set<String> isolatedPages() throws IOException, PageStoreException {
     final Set<String> isolated = new LinkedHashSet<String>();
     for (PageReference page : _pageStore.list()) {
       final String name = page.getPath();
-      if (getBacklinks(name).isEmpty()) {
+      if (incomingLinks(name).isEmpty()) {
         isolated.add(name);
       }
     }

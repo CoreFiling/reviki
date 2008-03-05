@@ -38,7 +38,7 @@ public class OrphanedPages implements RequestHandler {
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
-    List<String> alphabetical = new ArrayList<String>(_graph.getIsolatedPages());
+    List<String> alphabetical = new ArrayList<String>(_graph.isolatedPages());
     Collections.sort(alphabetical);
     request.setAttribute("pageList", alphabetical);
     request.getRequestDispatcher("/WEB-INF/templates/OrphanedPages.jsp").include(request, response);

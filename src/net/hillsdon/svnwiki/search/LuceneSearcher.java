@@ -15,6 +15,8 @@
  */
 package net.hillsdon.svnwiki.search;
 
+import static net.hillsdon.fij.core.Functional.map;
+import static net.hillsdon.fij.core.Functional.set;
 import static net.hillsdon.fij.text.Strings.join;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.pathToTitle;
 
@@ -166,6 +168,61 @@ public class LuceneSearcher implements SearchEngine {
     deleteDocument(FIELD_PATH, path);
     rememberLastIndexedRevision(revision);
   }
+  
+  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
+    if (_dir == null) {
+      return Collections.emptySet();
+    }
+    createIndexIfNecessary();
+    IndexReader reader = IndexReader.open(_dir);
+    try {
+      Searcher searcher = new IndexSearcher(reader);
+      try {
+        Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, escape(page), false), SearchMatch.TO_PAGE_NAME));
+        results.remove(page);
+        return results;
+      }
+      catch (QuerySyntaxException e) {
+        throw new RuntimeException("Should not happen due to escaping.");
+      }
+      finally {
+        searcher.close();
+      }
+    }
+    finally {
+      reader.close();
+    }
+  }
+
+  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
+    if (_dir == null) {
+      return Collections.emptySet();
+    }
+    createIndexIfNecessary();
+    IndexReader reader = IndexReader.open(_dir);
+    try {
+      Searcher searcher = new IndexSearcher(reader);
+      try {
+        Hits hits = searcher.search(new TermQuery(new Term(FIELD_PATH, page)));
+        Iterator<?> iterator = hits.iterator();
+        if (iterator.hasNext()) {
+          Hit hit = (Hit) iterator.next();
+          String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
+          Set<String> results = set(outgoingLinks.split("\\s"));
+          results.remove(page);
+          return results;
+        }
+        return Collections.emptySet();
+      }
+      finally {
+        searcher.close();
+      }
+    }
+    finally {
+      reader.close();
+    }
+  }
+
   
   public Set<SearchMatch> search(final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {

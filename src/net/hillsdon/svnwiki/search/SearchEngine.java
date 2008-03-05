@@ -40,6 +40,22 @@ public interface SearchEngine {
   Set<SearchMatch> search(String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException;
 
   /**
+   * @param page A page.
+   * @return Outgoing links from that page, excluding that page.
+   * @throws IOException On error reading the search index.
+   * @throws PageStoreException If an error occurs reading wiki-data.
+   */
+  Set<String> outgoingLinks(String page) throws IOException, PageStoreException;
+
+  /**
+   * @param page A page.
+   * @return Incoming links to that page, excluding that page.
+   * @throws IOException On error reading the search index.
+   * @throws PageStoreException If an error occurs reading wiki-data.
+   */
+  Set<String> incomingLinks(String page) throws IOException, PageStoreException;
+
+  /**
    * Indexes page change.
    * 
    * @param path Page.

@@ -43,7 +43,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
     _delegate.index(path, revision, content);
   }
 
-  public Set<SearchMatch> search(final String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
+  public Set<SearchMatch> search(final String query, final boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
     return _delegate.search(query, provideExtracts);
   }
 
@@ -78,6 +78,14 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
 
   public String escape(final String in) {
     return _delegate.escape(in);
+  }
+
+  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
+    return _delegate.incomingLinks(page);
+  }
+
+  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
+    return _delegate.outgoingLinks(page);
   }
   
 }

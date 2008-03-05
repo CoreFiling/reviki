@@ -44,7 +44,8 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
 import net.hillsdon.svnwiki.wiki.WikiGraph;
 import net.hillsdon.svnwiki.wiki.WikiGraphImpl;
-import net.hillsdon.svnwiki.wiki.macros.BackLinkListMacro;
+import net.hillsdon.svnwiki.wiki.macros.IncomingLinksMacro;
+import net.hillsdon.svnwiki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.svnwiki.wiki.macros.SearchMacro;
 import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
@@ -81,7 +82,7 @@ public class WikiHandler implements RequestHandler {
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
     WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, _searchEngine);
     
-    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(_searchEngine));
+    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine));
     _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, macros);
     _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
   }

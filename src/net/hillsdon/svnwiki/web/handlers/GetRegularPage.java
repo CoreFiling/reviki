@@ -96,7 +96,7 @@ public class GetRegularPage implements PageRequestHandler {
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
-    List<String> pageNames = new ArrayList<String>(_graph.getBacklinks(page.getPath()));
+    List<String> pageNames = new ArrayList<String>(_graph.incomingLinks(page.getPath()));
     Collections.sort(pageNames);
     if (pageNames.size() > BACKLINKS_LIMIT) {
       pageNames = pageNames.subList(0, BACKLINKS_LIMIT - 1);
