@@ -233,7 +233,7 @@ public class SVNPageStore implements PageStore {
         return null;
       }
     });
-    return PageInfo.UNCOMMITTED;
+    return PageInfo.DELETED;
   }
 
   private long set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
@@ -242,7 +242,7 @@ public class SVNPageStore implements PageStore {
         try {
           Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
           ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, locks, false, null);
-          if (baseRevision == PageInfo.UNCOMMITTED) {
+          if (baseRevision < 0) {
             _helper.createFile(commitEditor, path, content);
           }
           else {
