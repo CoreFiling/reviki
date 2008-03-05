@@ -27,11 +27,12 @@ public class TestCreoleRendererJsonDriven extends TestCase {
     int errors = 0;
     for (Map<String, String> test : _tests) {
       final String caseName = test.get("name");
+      final String bugExplanation = test.get("bug");
       final String expected = test.get("output");
       final String input = test.get("input");
       final String actual = _renderer.render(new PageReference(""), input);
       final boolean match = expected.equals(actual);
-      if (test.get("bug") != null) {
+      if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);
         continue;
       }
