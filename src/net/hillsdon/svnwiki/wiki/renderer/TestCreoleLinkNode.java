@@ -11,7 +11,7 @@ public class TestCreoleLinkNode extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(new InternalLinker("/context", "wiki", new SimplePageStore()), new FakeConfiguration()));
+    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker("/context", "wiki", new SimplePageStore()), new FakeConfiguration()));
   }
   
   public void testInternal() {
@@ -24,6 +24,16 @@ public class TestCreoleLinkNode extends TestCase {
   
   public void testExternal() {
     assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[http://www.example.com|Tasty]]")));
+  }
+  
+  public void testAttachments() {
+    // The class isn't too clever here.
+    assertEquals("<a class='attachment' href='WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[attachment.txt|Read this]]")));
+    assertEquals("<a class='attachment' href='ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]")));
+  }
+  
+  public void testInterWikiAttachment() {
+    // This'd be nice, e.g. other:SomePage/attached.txt
   }
   
 }

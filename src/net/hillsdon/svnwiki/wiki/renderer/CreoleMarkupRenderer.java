@@ -16,10 +16,8 @@ public class CreoleMarkupRenderer implements MarkupRenderer {
   private final CreoleRenderer _creole;
   
   public CreoleMarkupRenderer(final Configuration configuration, final InternalLinker internalLinker) {
-    final SvnWikiLinkPartHandler linkPartHandler = new SvnWikiLinkPartHandler(internalLinker, configuration);
+    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, internalLinker, configuration);
     final List<Macro> macros = new ArrayList<Macro>();
-    macros.add(new AttachedMacro("attached", "<a href='%s'>%s</a>"));
-    macros.add(new AttachedMacro("image", "<img src='%s' />"));
     _creole = new CreoleRenderer(
         new RenderNode[] {
             new UnescapedHtmlNode(true),
@@ -28,8 +26,9 @@ public class CreoleMarkupRenderer implements MarkupRenderer {
         new RenderNode[] {
             new JavaSyntaxHighlightedNode(false),
             new UnescapedHtmlNode(false),
-            new CreoleLinkNode(linkPartHandler),
-            new CustomWikiLinkNode(linkPartHandler),
+            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, internalLinker, configuration)),
+            new CreoleLinkNode(linkHandler),
+            new CustomWikiLinkNode(linkHandler),
             new MacroNode(macros),
         });
   }

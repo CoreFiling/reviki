@@ -9,10 +9,15 @@ import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   
+  public static final String IMAGE = "<img class='%s' src='%s' alt='%s' />";
+  public static final String ANCHOR = "<a class='%s' href='%s'>%s</a>";
+  
   private final InternalLinker _internalLinker;
   private final Configuration _configuration;
+  private final String _formatString;
 
-  public SvnWikiLinkPartHandler(final InternalLinker internalLinker, final Configuration configuration) {
+  public SvnWikiLinkPartHandler(final String formatString, final InternalLinker internalLinker, final Configuration configuration) {
+    _formatString = formatString;
     _internalLinker = internalLinker;
     _configuration = configuration;
   }
@@ -34,13 +39,27 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
         }
       }
       else {
-        return _internalLinker.link(link.getRefd(), link.getText());
+        // Add page prefix if it is an attachment for the current page.
+        String refd = link.getRefd();
+        boolean hasPagePart = refd.contains("/");
+        if (refd.contains(".") || hasPagePart) {
+          if (!hasPagePart) {
+            refd = page.getPath() + "/attachments/" + refd;
+          }
+          else {
+            refd = refd.replaceFirst("/", "/attachments/");
+          }
+          return link(page, renderer, "attachment", refd, link.getText());
+        }
+        else {
+          return _internalLinker.link(link.getRefd(), link.getText());
+        }
       }
     }
   }
   
   private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text) {
-    return String.format("<a class='%s' href='%s'>%s</a>", Escape.html(clazz), Escape.html(url), renderer.render(page, text));
+    return String.format(_formatString, Escape.html(clazz), Escape.html(url), renderer.render(page, text));
   }
 
 }
