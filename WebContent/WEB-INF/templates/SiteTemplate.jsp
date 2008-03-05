@@ -3,7 +3,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title><tiles:insertAttribute name="title"/></title>
-  <link href="/style.css" rel="stylesheet" type="text/css"/>
+  <style type="text/css">
+    body {
+      font-family: Verdana, Arial, sans-serif
+    }
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      padding-left: 0.4em;
+      padding-right: 0.4em;
+    }
+    a.new-page {
+      color: #888888;
+    }
+  </style>
 </head>
 <body>
   <div id="content">
