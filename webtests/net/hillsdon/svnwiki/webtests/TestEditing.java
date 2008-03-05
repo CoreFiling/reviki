@@ -17,8 +17,8 @@ public class TestEditing extends WebTestSupport {
     assertEquals(initialRevision + 1, getRevisionNumberFromTitle(edited));
   }
 
-  private long getRevisionNumberFromTitle(HtmlPage initial) {
-    Matcher matcher = RE_REVISION.matcher(initial.getTitleText());
+  private long getRevisionNumberFromTitle(final HtmlPage page) {
+    Matcher matcher = RE_REVISION.matcher(page.getTitleText());
     assertTrue(matcher.find());
     long revision = Long.parseLong(matcher.group().substring(1));
     return revision;
