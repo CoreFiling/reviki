@@ -37,24 +37,6 @@
       text-align: center;
       background-color: yellow;
     }
-    h3.heading-1 {
-      font-weight: bold;
-      font-size: 150%;
-    }
-    h3.heading-1-1 {
-      font-weight: bold;
-      font-size: 120%;
-    }
-    h3.heading-1-1-1 {
-      font-weight: bold;
-      font-size: 100%;
-    }
-    h3.heading-1-1-1-1 {
-      font-size: 100%;
-    }
-    h3.heading-1-1-1-1-1 {
-      font-size: 80%;
-    }
   </style>
 </head>
 <body>
