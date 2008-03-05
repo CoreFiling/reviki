@@ -18,11 +18,15 @@ package net.hillsdon.svnwiki.web.handlers;
 import static java.lang.String.format;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
 
+import java.io.PrintWriter;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.search.SearchEngine;
+import net.hillsdon.svnwiki.search.SearchMatch;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
@@ -39,6 +43,8 @@ public class FindPage implements PageRequestHandler {
   + "</OpenSearchDescription>\n";
   
   static final String PARAM_QUERY = "query";
+  private static final String PARAM_QUERY_ALTERNATE = "q";
+
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
@@ -58,6 +64,9 @@ public class FindPage implements PageRequestHandler {
     }
     String query = request.getParameter(PARAM_QUERY);
     if (query == null) {
+      request.getParameter(PARAM_QUERY_ALTERNATE);
+    }
+    if (query == null) {
       _regularPage.handlePage(path, request, response, page);
       return;
     }
@@ -65,12 +74,23 @@ public class FindPage implements PageRequestHandler {
     boolean pageExists = _store.list().contains(new PageReference(query));
     if (request.getParameter("force") == null && pageExists) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
+      return;
+    }
+    
+    Set<SearchMatch> results = _searchEngine.search(query, true);
+    if ("txt".equals(request.getParameter("ctype"))) {
+      response.setContentType("text/plain");
+      PrintWriter writer = response.getWriter();
+      for (SearchMatch matcher : results) {
+        writer.println(matcher.getPage());
+      }
+      return;
     }
     else {
       if (!pageExists && isWikiWord(query)) {
         request.setAttribute("suggestCreate", query);
       }
-      request.setAttribute("results", _searchEngine.search(query, true));
+      request.setAttribute("results", results);
       request.getRequestDispatcher("/WEB-INF/templates/SearchResults.jsp").include(request, response);
     }
   }

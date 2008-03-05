@@ -17,7 +17,15 @@
     <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link href="${cssUrl}" rel="stylesheet" media="screen" type="text/css" />
+  <link href="<c:url value="/resources/jquery.suggest.css"/>" rel="stylesheet" media="screen" type="text/css" />
+  <script type="text/javascript" src="<c:url value="/resources/jquery.js"/>"></script>
+  <script type="text/javascript" src="<c:url value="/resources/jquery.dimensions.js"/>"></script>
+  <script type="text/javascript" src="<c:url value="/resources/jquery.bgiframe.js"/>"></script>
+  <script type="text/javascript" src="<c:url value="/resources/jquery.suggest.js"/>"></script>
   <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
+  <script type="text/javascript">
+    svnwiki.BASE_URL = "<sw:wikiUrl page=""/>"
+  </script>
 </head>
 <body>
   <c:if test="${not empty flash}">
@@ -40,7 +48,7 @@
         <li class="menu"><sw:wikiLink page="AllPages"/></li>
         <li class="menu">
           <form style="display: inline;" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
-            <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
+            <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
             <input value="Go" type="submit"/>
           </form>
         </li>

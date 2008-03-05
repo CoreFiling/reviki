@@ -16,5 +16,17 @@ svnwiki.formAsJavaScriptLink = function(formId, linkText) {
   var parent = form.parentNode;
   var space = parent.insertBefore(document.createTextNode(" "), form)
   parent.insertBefore(a, space);
-  
 }
+svnwiki.configureAutoSuggest = function() {
+  if ($("#query")) {
+    $(function() {
+      $("#query").suggest(svnwiki.BASE_URL + "FindPage?ctype=txt&force", {
+        param: "query",
+        onSelect: function() {
+          window.location = svnwiki.BASE_URL + this.value;
+        }
+      });
+    });
+  }  
+}
+$(document).ready(svnwiki.configureAutoSuggest);
