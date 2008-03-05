@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class TestCreoleRendererJsonDriven extends TestCase {
   }
   
   public void test() throws Exception {
+    final PrintStream err = System.err;
     int errors = 0;
     for (Map<String, String> test : _tests) {
       final String caseName = test.get("name");
@@ -35,11 +37,11 @@ public class TestCreoleRendererJsonDriven extends TestCase {
       }
       if (!match) {
         errors++;
-        System.err.println("Creole case: " + caseName);
-        System.err.println("Input:\n" + input);
-        System.err.println("Expected:\n" + expected);
-        System.err.println("Actual:\n" + actual);
-        System.err.println();
+        err.println("Creole case: " + caseName);
+        err.println("Input:\n" + input);
+        err.println("Expected:\n" + expected);
+        err.println("Actual:\n" + actual);
+        err.println();
       }
     }
     if (errors > 0) {
