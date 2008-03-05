@@ -6,8 +6,8 @@
   },
   {
     "name":   "Raw HTML",
-    "input":  "[<html>]<div class='unusual'></div>[</html>]",
-    "output": "<p><div class='unusual'></div></p>"
+    "input":  "[<html>]\n<div class='unusual'></div>\n[</html>]",
+    "output": "<p>\n<div class='unusual'></div>\n</p>"
   }
 ]
 
