@@ -1,6 +1,7 @@
 package net.hillsdon.svnwiki.wiki;
 
 import junit.framework.TestCase;
+import net.hillsdon.svnwiki.configuration.InterWikiLinker;
 import net.hillsdon.svnwiki.vc.SimplePageStore;
 
 import org.radeox.engine.context.BaseRenderContext;
@@ -15,9 +16,10 @@ public class TestCustomWikiLinkFilter extends TestCase {
   protected void setUp() throws Exception {
     InterWikiLinker interWikiLinker = new InterWikiLinker();
     interWikiLinker.addWiki("c2", "http://c2.com/cgi/wiki?%s");
-    _filter = new CustomWikiLinkFilter(interWikiLinker);
+    _filter = new CustomWikiLinkFilter();
     _context = new BaseFilterContext();
     BaseRenderContext renderContext = new BaseRenderContext();
+    renderContext.set(CustomWikiLinkFilter.INTERWIKI_LINKER_CONTEXT_KEY, interWikiLinker);
     SimplePageStore store = new SimplePageStore();
     store.set("ExistingWikiWord", "", 0, "", "");
     renderContext.setRenderEngine(new SvnWikiRenderEngine(store));

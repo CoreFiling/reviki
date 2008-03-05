@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.wiki;
 
+import net.hillsdon.svnwiki.configuration.InterWikiLinker;
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 
 import org.radeox.api.engine.RenderEngine;
@@ -11,12 +12,11 @@ import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
 
 public class CustomWikiLinkFilter extends RegexTokenFilter {
-  
-  private final InterWikiLinker _interwikiLinker;
 
-  public CustomWikiLinkFilter(final InterWikiLinker interwikiLinker) {
+  public static final String INTERWIKI_LINKER_CONTEXT_KEY = "interwikiLinker";
+  
+  public CustomWikiLinkFilter() {
     super("([\\p{L}\\d]+:)?([\\p{L}\\d]+)");
-    _interwikiLinker = interwikiLinker;
   }
   
   @Override
@@ -39,7 +39,8 @@ public class CustomWikiLinkFilter extends RegexTokenFilter {
           }
         }
         else {
-          appendInterWikiLink(writer, wikiName, pageName, matched);
+          InterWikiLinker interWikiLinker = (InterWikiLinker) context.getRenderContext().get(INTERWIKI_LINKER_CONTEXT_KEY);
+          appendInterWikiLink(writer, wikiName, pageName, matched, interWikiLinker);
           return;
         }
       }
@@ -50,8 +51,8 @@ public class CustomWikiLinkFilter extends RegexTokenFilter {
     writer.write(matched);
   }
 
-  private void appendInterWikiLink(final StringBufferWriter writer, final String wikiName, final String pageName, final String matched) throws UnknownWikiException {
-    String href = _interwikiLinker.link(wikiName, pageName);
+  private void appendInterWikiLink(final StringBufferWriter writer, final String wikiName, final String pageName, final String matched, final InterWikiLinker interwikiLinker) throws UnknownWikiException {
+    String href = interwikiLinker.link(wikiName, pageName);
     writer.write(String.format("<a class='inter-wiki' href='%s'>%s</a>", Encoder.escape(href), matched));
   }
 

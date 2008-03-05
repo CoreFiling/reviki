@@ -1,7 +1,9 @@
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.configuration;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 
 public class InterWikiLinker {
 

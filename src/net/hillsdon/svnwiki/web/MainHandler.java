@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.InitialConfiguration;
+import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -27,7 +28,7 @@ public class MainHandler implements RequestHandler {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
-    _get = new GetPage(_pageStore, searcher, new RadeoxMarkupRenderer(_pageStore));
+    _get = new GetPage(_pageStore, searcher, new RadeoxMarkupRenderer(new PageStoreConfiguration(_pageStore), _pageStore));
     _search = new Search(_pageStore, searcher);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
