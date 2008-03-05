@@ -1,6 +1,5 @@
 package net.hillsdon.svnwiki.vc;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +60,6 @@ public class SVNHelper {
     }
     return results;
   }
-
 
   @SuppressWarnings("unchecked")
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final SVNLogEntry entry) throws SVNException {

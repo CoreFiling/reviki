@@ -39,7 +39,6 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 1.", getAttachmentAtEndOfLink(attachments.getAnchorByHref("file.txt")));
     
     page = editWikiPage(name, "{attached:file.txt}", "Linked to attachment", false);
-    System.err.println(page.asXml());
     assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
     
     attachments = clickAttachmentsLink(page, name);

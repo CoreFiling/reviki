@@ -85,9 +85,10 @@ public interface PageStore {
    * @param storeName The name to store the attachment as.
    * @param baseRevision TODO
    * @param in Data read from here.
+   * @param commitMessage TODO
    * @throws PageStoreException If something goes wrong. 
    */
-  void attach(String page, String storeName, long baseRevision, InputStream in) throws PageStoreException;
+  void attach(String page, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
 
   /**
    * @param page A page name.

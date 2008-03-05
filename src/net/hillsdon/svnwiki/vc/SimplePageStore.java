@@ -50,7 +50,7 @@ public class SimplePageStore implements PageStore {
     return Collections.emptyList();
   }
 
-  public void attach(final String page, final String storeName, long baseRevision, final InputStream in) throws PageStoreException {
+  public void attach(final String page, final String storeName, long baseRevision, final InputStream in, String commitMessage) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
 

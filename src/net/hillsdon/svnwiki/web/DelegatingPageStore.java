@@ -57,8 +57,8 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.history(path);
   }
 
-  public void attach(final String page, final String storeName, long baseRevision, final InputStream in) throws PageStoreException {
-    _delegate.attach(page, storeName, baseRevision, in);
+  public void attach(final String page, final String storeName, long baseRevision, final InputStream in, String commitMessage) throws PageStoreException {
+    _delegate.attach(page, storeName, baseRevision, in, commitMessage);
   }
 
   public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {

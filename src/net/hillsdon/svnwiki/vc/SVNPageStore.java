@@ -182,10 +182,10 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in) throws PageStoreException {
+  public void attach(final String page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     String dir = attachmentPath(page);
-    ensureDir(dir);
-    set(dir + "/" + storeName, null, baseRevision, in, "");
+    ensureDir(dir, commitMessage);
+    set(dir + "/" + storeName, null, baseRevision, in, commitMessage);
   }
 
   public Collection<PageStoreEntry> attachments(final String page) throws PageStoreException {
@@ -204,11 +204,11 @@ public class SVNPageStore implements PageStore {
     return page + "-attachments";
   }
 
-  private void ensureDir(final String dir) throws PageStoreException {
+  private void ensureDir(final String dir, final String commitMessage) throws PageStoreException {
     _helper.execute(new SVNAction<Void>() {
       public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(dir, -1) == SVNNodeKind.NONE) {
-          ISVNEditor commitEditor = repository.getCommitEditor("[svnwiki commit] Add attachments dir.", null);
+          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null);
           try {
             _helper.createDir(commitEditor, dir);
           }

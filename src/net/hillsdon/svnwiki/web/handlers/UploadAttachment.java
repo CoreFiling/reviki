@@ -87,7 +87,8 @@ public class UploadAttachment extends PageRequestHandler {
     else if (storeName.indexOf('.') == -1) {
       storeName += fileName.substring(fileName.indexOf('.'));
     }
-    getStore().attach(page, storeName, baseRevision, in);
+    String operation = baseRevision == PageInfo.UNCOMMITTED ? "Added" : "Updated";
+    getStore().attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
   }
 
 }
