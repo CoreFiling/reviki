@@ -37,6 +37,8 @@ import org.apache.commons.io.IOUtils;
 
 public class UploadAttachment implements PageRequestHandler {
 
+  public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
+  
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private final PageStore _store;
@@ -78,7 +80,7 @@ public class UploadAttachment implements PageRequestHandler {
       }
       
       if (file == null || file.getSize() == 0) {
-        request.setAttribute("flash", "Please browse to a non-empty file to upload.");
+        request.setAttribute("flash", ERROR_NO_FILE);
         _listAttachments.handlePage(path, request, response, page);
         return;
       }

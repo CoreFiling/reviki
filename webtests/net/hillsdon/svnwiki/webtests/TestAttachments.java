@@ -19,10 +19,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
+
 import org.apache.commons.io.IOUtils;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -38,6 +41,15 @@ public class TestAttachments extends WebTestSupport {
     catch (FailingHttpStatusCodeException ex) {
       assertEquals(404, ex.getStatusCode());
     }
+  }
+
+  public void testUploadNothingGivesError() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    HtmlPage page = editWikiPage(name, "", "", true);
+    HtmlPage attachments = clickAttachmentsLink(page, name);
+    HtmlForm form = attachments.getFormByName("attachmentUpload");
+    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+    assertEquals(UploadAttachment.ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {

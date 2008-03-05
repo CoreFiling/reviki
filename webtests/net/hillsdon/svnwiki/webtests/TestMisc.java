@@ -31,7 +31,7 @@ public class TestMisc extends WebTestSupport {
   
   public void testNoBackLinkToSelf() throws Exception {
     assertTrue(getWebPage("pages/test/FrontPage")
-      .getByXPath("//a[@class='backlink' and @href = 'FrontPage']").isEmpty());
+      .getByXPath("id('backlinks')//a[@href = 'FrontPage']").isEmpty());
   }
   
 }

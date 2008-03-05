@@ -25,8 +25,8 @@
       <p><em>This page is a new page.  Click 'Edit' to add content.</em></p>
     </c:if>
     <hr />
+    <p id="backlinks">
     <c:if test="${not empty backlinks}">
-      <p>
       Referenced on:
       <c:forEach var="backlink" items="${backlinks}">
         <sw:wikiLink page="${backlink}"/>
@@ -34,8 +34,8 @@
       <c:if test="${backlinksLimited}">
         <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.path}&force">...</a>
       </c:if>
-      </p>
     </c:if>
+    </p>
     <c:choose>
       <c:when test="${pageInfo.locked}">
         <c:choose>

@@ -6,7 +6,7 @@
   <tiles:putAttribute name="title">Wiki List</tiles:putAttribute>
   <tiles:putAttribute name="heading">Wiki List</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <ul>
+    <ul id="wikiList">
       <c:forEach var="wikiName" items="${configuration.wikiNames}">
         <li>
           <a href="<c:url value="/pages/${wikiName}/FrontPage"/>"><c:out value="${wikiName}"/></a>
