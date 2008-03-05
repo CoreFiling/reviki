@@ -6,8 +6,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>svnwiki - <tiles:insertAttribute name="title"/></title>
-  <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml"" />
-  <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
+  <c:if test="${wikiIsValid != null and wikiIsValid}">
+    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml"" />
+    <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
+  </c:if>
   <style type="text/css">
     h1.title {
       margin: 0;
@@ -81,7 +83,7 @@
     </div>
   </c:if>
   <div id="topbar">
-    <c:if test="${wikiIsValid}">
+    <c:if test="${wikiIsValid != null and wikiIsValid}">
       <ul class="menu">
         <tiles:insertAttribute name="menuItems" ignore="true"/>
         <li class="menu"><sw:wikiLink page="FrontPage"/></li>
