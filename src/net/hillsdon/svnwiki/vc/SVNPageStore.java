@@ -122,7 +122,6 @@ public class SVNPageStore implements PageStore {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       HashMap<String, String> properties = new HashMap<String, String>();
       
-      // We really want (kind, revision) back to avoid a race here...
       SVNNodeKind kind = _repository.checkPath(path, revision);
       if (SVNNodeKind.FILE.equals(kind)) {
         _repository.getFile(path, revision, properties, baos);
