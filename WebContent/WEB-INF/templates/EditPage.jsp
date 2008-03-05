@@ -17,9 +17,9 @@
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text"/>
-      <input style="width:5em;" name="preview" type="submit" value="Preview"/>
       <input style="width:5em;" name="save" type="submit" value="Save"/>
       <input style="width:5em;" name="unlock" type="submit" value="Cancel"/>
+      <input style="width:5em;" name="preview" type="submit" value="Preview"/>
       <br />
       <label for="minorEdit">Minor edit?</label><input type="checkbox" id="minorEdit" name="minorEdit"/>
     </form>
