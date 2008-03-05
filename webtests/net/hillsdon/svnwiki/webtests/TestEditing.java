@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.webtests;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,12 +17,28 @@ public class TestEditing extends WebTestSupport {
     HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", "", false);
     assertEquals(initialRevision + 1, getRevisionNumberFromTitle(edited));
   }
-
+  
   private long getRevisionNumberFromTitle(final HtmlPage page) {
     Matcher matcher = RE_REVISION.matcher(page.getTitleText());
     assertTrue(matcher.find());
     long revision = Long.parseLong(matcher.group().substring(1));
     return revision;
+  }
+  
+  public void testCancelEditNewPage() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    editThenCancel(name);
+  }
+  
+  public void testCancelEditExistingPage() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    editWikiPage(name, "Whatever", "", true);
+    editThenCancel(name);
+  }
+
+  private void editThenCancel(final String name) throws IOException {
+    HtmlPage editPage = (HtmlPage) getWebPage("pages/" + name).getFormByName("editForm").getInputByValue("Edit").click();
+    editPage.getFormByName("editForm").getInputByValue("Cancel").click();
   }
   
 }

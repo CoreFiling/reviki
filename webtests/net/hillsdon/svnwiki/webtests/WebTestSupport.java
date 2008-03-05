@@ -28,6 +28,8 @@ public abstract class WebTestSupport extends TestCase {
     credentials.addCredentials(System.getProperty("wiki.user"), System.getProperty("wiki.password"));
     _client.setCredentialsProvider(credentials);
     _client.setRedirectEnabled(true);
+    _client.setThrowExceptionOnFailingStatusCode(true);
+    _client.setThrowExceptionOnScriptError(true);
   }
 
   protected String getUrl(final String path) {
