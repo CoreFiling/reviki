@@ -15,6 +15,8 @@
  */
 package net.hillsdon.fij.core;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -151,6 +153,10 @@ public class Functional {
       result.add(o);
     }
     return result;
+  }
+
+  public static <T> Set<T> set(final T... items) {
+    return set(asList(items));
   }
 
   public static <T> Set<T> set(final Iterator<T> iter) {

@@ -22,11 +22,20 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
 /**
- * Interface for something that renders wiki markup.
+ * Interface for something that renders wiki markup in some other format.
  * 
  * @author mth
  */
 public interface MarkupRenderer {
+  
+  /**
+   * Useful for testing.
+   */
+  MarkupRenderer AS_IS = new MarkupRenderer() {
+    public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
+      out.write(in);
+    }
+  };
   
   void render(PageReference page, String in, Writer out) throws IOException, PageStoreException;
     
