@@ -60,14 +60,14 @@ public class RegexMatchToTag implements RenderNode {
       // Just output the stuff before the match.
       result += htmlEscape(text.substring(0, earliestMatch.start()));
       // Handle the match and recurse.
-      result += earliestRule.handle(earliestRule, earliestMatch);
+      result += earliestRule.handle(earliestMatch);
       result += render(text.substring(earliestMatch.end()));
       return result;
     }
     return htmlEscape(text);
   }
 
-  public String handle(final RenderNode node, final Matcher matcher) {
+  public String handle(final Matcher matcher) {
     if (_contentGroup == null) {
       return "<" + _tag + " />";
     }
@@ -75,7 +75,7 @@ public class RegexMatchToTag implements RenderNode {
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return "<" + _tag + ">" +  node.render(text) + "</" + _tag + ">";
+    return "<" + _tag + ">" +  render(text) + "</" + _tag + ">";
   }
 
   public Matcher find(final String text) {
