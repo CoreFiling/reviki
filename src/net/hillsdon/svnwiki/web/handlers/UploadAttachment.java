@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,7 +49,7 @@ public class UploadAttachment implements PageRequestHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
+  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException, ServletException {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }
@@ -73,19 +74,23 @@ public class UploadAttachment implements PageRequestHandler {
           file = item;
         }
       }
-      if (file == null) {
-        throw new InvalidInputException("No file received.");
-      }
       if (baseRevision == null) {
         baseRevision = PageInfo.UNCOMMITTED;
       }
       
-      InputStream in = file.getInputStream();
-      try {
-        store(page, attachmentName, baseRevision, file.getName(), in);
+      if (file == null || file.getSize() == 0) {
+        request.setAttribute("flash", "Please browse to a non-empty file to upload.");
+        request.getRequestDispatcher("/WEB-INF/templates/Attachments.jsp").include(request, response);
       }
-      finally {
-        IOUtils.closeQuietly(in);
+      else {
+        InputStream in = file.getInputStream();
+        try {
+          store(page, attachmentName, baseRevision, file.getName(), in);
+          response.sendRedirect(request.getRequestURL().toString());
+        }
+        finally {
+          IOUtils.closeQuietly(in);
+        }
       }
     }
     finally {
@@ -94,7 +99,6 @@ public class UploadAttachment implements PageRequestHandler {
       }
     }
     
-    response.sendRedirect(request.getRequestURL().toString());
   }
 
   private void store(final PageReference page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
