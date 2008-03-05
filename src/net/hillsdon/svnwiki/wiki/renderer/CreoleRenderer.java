@@ -40,7 +40,7 @@ public class CreoleRenderer {
 
   public static class RawUrlNode extends AbstractRegexNode {
     public RawUrlNode() {
-      super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]*[^\\s\\[\\]\"'\\(\\)\\,\\.]");
+      super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
     public String handle(final PageReference page, final Matcher matcher) {
       String escaped = Escape.html(matcher.group(0));
