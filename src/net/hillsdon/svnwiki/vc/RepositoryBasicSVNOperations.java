@@ -42,12 +42,9 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperty;
-import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
 /**
  * The real impl, using an {@link SVNRepository}.
@@ -58,10 +55,6 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  */
 public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
-  private interface SVNAction<T> {
-    T perform(SVNRepository repository) throws SVNException, PageStoreException, IOException;
-  }
-  
   private final SVNRepository _repository;
 
   public RepositoryBasicSVNOperations(final SVNRepository repository) {
@@ -218,29 +211,15 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   public void ensureDir(final String dir, final String commitMessage) throws PageStoreException {
-    execute(new SVNAction<Void>() {
-      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        if (repository.checkPath(dir, -1) == SVNNodeKind.NONE) {
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null);
-          try {
-            createDir(commitEditor, dir);
-          }
-          finally {
-            commitEditor.closeEdit();
-          }
+    if (checkPath(dir, -1) == SVNNodeKind.NONE) {
+      execute(new SVNEditAction(commitMessage) {
+        protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+          createDir(commitEditor, dir);
         }
-        return null;
-      }
-    });
-  }
-
-  private void checkForInterveningCommit(final SVNException ex) throws InterveningCommitException {
-    if (SVNErrorCode.FS_CONFLICT.equals(ex.getErrorMessage().getErrorCode())) {
-      // What to do!
-      throw new InterveningCommitException(ex);
+      });
     }
   }
-  
+
   public SVNNodeKind checkPath(final String path, final long revision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<SVNNodeKind>() {
       public SVNNodeKind perform(final SVNRepository repository) throws SVNException, PageStoreException {
@@ -261,89 +240,49 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
   
   public long create(final String path, final String commitMessage, final InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException, IOException {
-        try {
-          BufferedInputStream bis = new BufferedInputStream(content);
-          String mimeType = detectMimeType(bis);
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null, false, null);
-          createFile(commitEditor, path, mimeType, bis);
-          return commitEditor.closeEdit().getNewRevision();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
+    final BufferedInputStream bis = new BufferedInputStream(content);
+    return execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+        String mimeType = detectMimeType(bis);
+        createFile(commitEditor, path, mimeType, bis);
       }
     });
   }
 
   public long edit(final String path, final long baseRevision, final String commitMessage, final String lockToken, final InputStream content) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, createLocksMap(path, lockToken), false, null);
-          editFile(commitEditor, path, baseRevision, content);
-          return commitEditor.closeEdit().getNewRevision();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
+    return execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+        editFile(commitEditor, path, baseRevision, content);
       }
     });
   }
 
   public long copy(final String fromPath, final long fromRevision, final String toPath, final String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null, false, null);
-          copyFile(commitEditor, fromPath, fromRevision, toPath);
-          return commitEditor.closeEdit().getNewRevision();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
+    return execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+        copyFile(commitEditor, fromPath, fromRevision, toPath);
       }
     });
   }
 
   public long rename(final String fromPath, final String toPath, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, null, false, null);
-          moveFile(commitEditor, fromPath, baseRevision, toPath);
-          return commitEditor.closeEdit().getNewRevision();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
+    return execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
+        moveFile(commitEditor, fromPath, baseRevision, toPath);
       }
     });
   }
   
-  public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
-        try {
-          ISVNEditor commitEditor = repository.getCommitEditor(commitMessage, createLocksMap(path, lockToken), false, null);
-          deleteFile(commitEditor, path, baseRevision);
-          return commitEditor.closeEdit().getNewRevision();
-        }
-        catch (SVNException ex) {
-          checkForInterveningCommit(ex);
-          throw ex;
-        }
-      }
-    });
-  }
-
   private Map<String, String> createLocksMap(final String path, final String lockToken) {
     return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
+  }
+  
+  public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
+    return execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException {
+        deleteFile(commitEditor, path, baseRevision);
+      }
+    });
   }
 
   public SVNLock getLock(final String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
@@ -352,65 +291,6 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
         return repository.getLock(path);
       }
     });
-  }
-
-  private void createDir(final ISVNEditor commitEditor, final String dir) throws SVNException {
-    commitEditor.openRoot(-1);
-    commitEditor.addDir(dir, null, -1);
-    commitEditor.closeDir();
-    commitEditor.closeDir();
-  }
-
-  private void copyFile(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
-    String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openRoot(-1);
-    commitEditor.openDir(dir, -1);
-    commitEditor.addFile(toPath, fromPath, fromRevision);
-    commitEditor.closeDir();
-    commitEditor.closeDir();
-  }
-
-  private void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
-    String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openRoot(-1);
-    commitEditor.openDir(dir, -1);
-    commitEditor.deleteEntry(fromPath, baseRevision);
-    commitEditor.addFile(toPath, fromPath, baseRevision);
-    commitEditor.closeDir();
-    commitEditor.closeDir();
-  }
-  
-  private void createFile(final ISVNEditor commitEditor, final String filePath, final String mimeType, final InputStream data) throws SVNException {
-    String dir = SVNPathUtil.removeTail(filePath);
-    commitEditor.openRoot(-1);
-    commitEditor.openDir(dir, -1);
-    commitEditor.addFile(filePath, null, -1);
-    commitEditor.applyTextDelta(filePath, null);
-    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-    String checksum = deltaGenerator.sendDelta(filePath, data, commitEditor, true);
-    if (mimeType != null) {
-      commitEditor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, mimeType);
-    }
-    commitEditor.closeFile(filePath, checksum);
-    commitEditor.closeDir();
-    commitEditor.closeDir();
-  }
-
-  private void deleteFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision) throws SVNException {
-    commitEditor.openRoot(-1);
-    commitEditor.deleteEntry(filePath, baseRevision);
-    commitEditor.closeDir();
-  }
-  
-  private void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final InputStream newData) throws SVNException {
-    commitEditor.openRoot(-1);
-    commitEditor.openFile(filePath, baseRevision);
-    commitEditor.applyTextDelta(filePath, null);
-    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-    // We don't keep the base around so we can't provide it here.
-    String checksum = deltaGenerator.sendDelta(filePath, newData, commitEditor, true);
-    commitEditor.closeFile(filePath, checksum);
-    commitEditor.closeDir();
   }
 
 }
