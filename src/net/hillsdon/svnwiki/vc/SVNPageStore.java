@@ -237,12 +237,12 @@ public class SVNPageStore implements PageStore {
   public void attachment(final String page, final String attachment, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(attachmentPath(page), attachment);
     final OutputStream out = new OutputStream() {
-      boolean first = true;
+      boolean _first = true;
       public void write(int b) throws IOException {
-        if (first) {
+        if (_first) {
           sink.setContentType("application/octet-stream"); 
           sink.setFileName(attachment);
-          first = false;
+          _first = false;
         }
         sink.stream().write(b);
       }
