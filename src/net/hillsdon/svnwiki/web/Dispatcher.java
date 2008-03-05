@@ -57,8 +57,9 @@ public class Dispatcher extends HttpServlet {
   
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    request.setCharacterEncoding("UTF-8");
     response.setContentType("text/html");
-    response.setCharacterEncoding("utf-8");
+    response.setCharacterEncoding("UTF-8");
     setCurrentHandler();
     try {
       if ((request.getContextPath() + "/configuration").equals(request.getRequestURI())) {
