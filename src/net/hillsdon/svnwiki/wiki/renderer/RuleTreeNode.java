@@ -65,7 +65,7 @@ public class RuleTreeNode {
       return result;
     }
     else {
-      return text;
+      return htmlEscape(text);
     }
   }
 
@@ -77,11 +77,46 @@ public class RuleTreeNode {
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return "<" + _tag + ">" + node.render(text) + "</" + _tag + ">";
+    return "<" + _tag + ">" +  node.render(text) + "</" + _tag + ">";
   }
 
   private Matcher matcher(final String text) {
     return _re.matcher(text);
   }
-
+  
+  /**
+   * HTML escaping routine.
+   * @param content the unescaped content.
+   * @return the escaped output.
+   */
+  private static String htmlEscape(final String content) {
+    char[] chars = content.toCharArray();
+    final StringBuffer result = new StringBuffer(2 * chars.length);
+    for (int i = 0; i < chars.length; ++i) {
+      char character = chars[i];
+      if (character == '<') {
+        result.append("&lt;");
+      }
+      else if (character == '>') {
+        result.append("&gt;");
+      }
+      else if (character == '&') {
+        result.append("&amp;");
+     }
+      else if (character == '\"') {
+        result.append("&quot;");
+      }
+      else if (character == '\'') {
+        result.append("&#039;");
+      }
+      else if (character == '\\') {
+         result.append("&#092;");
+      }
+      else {
+        result.append(character);
+      }
+    }
+    return result.toString();
+  }
+  
 }

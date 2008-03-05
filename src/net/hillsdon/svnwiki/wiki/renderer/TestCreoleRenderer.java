@@ -41,4 +41,8 @@ public class TestCreoleRenderer extends TestCase {
     assertEquals("<ol><li>foo</li>\n<li> bar</li></ol>", _render.render("#foo\n# bar"));
   }
   
+  public void testHtmlEscaping() {
+    assertEquals("<p><em>&lt;script&gt;</em></p>", _render.render("//<script>//"));
+  }
+  
 }
