@@ -3,6 +3,7 @@ package net.hillsdon.svnwiki.web.handlers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
@@ -12,9 +13,9 @@ public class GetPage extends PageRequestHandler {
   private RecentChanges _recentChanges;
   private AllPages _allPages;
 
-  public GetPage(final PageStore pageStore, final MarkupRenderer markupRenderer) {
+  public GetPage(final PageStore pageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer) {
     super(pageStore);
-    _regularPage = new GetRegularPage(pageStore, markupRenderer);
+    _regularPage = new GetRegularPage(pageStore, markupRenderer, searchEngine);
     _recentChanges = new RecentChanges(pageStore);
     _allPages = new AllPages(pageStore);
   }

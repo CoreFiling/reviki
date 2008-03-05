@@ -21,7 +21,7 @@ public class Search implements RequestHandler {
 
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String query = request.getParameter(PARAM_QUERY);
-    if (_store.list().contains(query)) {
+    if (request.getParameter("force") == null && _store.list().contains(query)) {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + query));
     }
     else {

@@ -9,6 +9,17 @@
     ${renderedContents}
     </div>
     <hr/>
+    <c:if test="${not empty backlinks}">
+      <p>
+      Referenced on:
+      <c:forEach var="backlink" items="${backlinks}">
+        <a href="<c:out value="${backlink}"/>"><c:out value="${backlink}"/></a>
+      </c:forEach>
+      <c:if test="${backlinksLimited}">
+        <a href="<c:url value="/search?query=${pageInfo.path}&force"/>">...</a>
+      </c:if>
+      </p>
+    </c:if>
     <c:choose>
       <c:when test="${pageInfo.locked}">
         <c:choose>
