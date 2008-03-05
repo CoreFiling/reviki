@@ -17,6 +17,7 @@ package net.hillsdon.svnwiki.vc;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
+import static net.hillsdon.fij.core.Functional.filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,13 +29,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.hillsdon.fij.core.Functional;
+import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.svnwiki.vc.SVNHelper.SVNAction;
 
 import org.tmatesoft.svn.core.SVNErrorCode;
@@ -53,6 +55,12 @@ import org.tmatesoft.svn.core.io.SVNRepository;
  * @author mth
  */
 public class SVNPageStore implements PageStore {
+
+  private static final Predicate<ChangeInfo> CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
+    public Boolean transform(ChangeInfo in) {
+      return in.getKind() == StoreKind.PAGE;
+    }
+  };
 
   /**
    * The assumed encoding of files from the repository.
@@ -83,12 +91,7 @@ public class SVNPageStore implements PageStore {
         return _helper.log(ref.getPath(), -1, true, 0, -1);
       }
     });
-    for (Iterator<ChangeInfo> iter = changes.iterator(); iter.hasNext();) {
-      if (!(iter.next().getKind() == StoreKind.PAGE)) {
-        iter.remove();
-      }
-    }
-    return changes;
+    return Functional.list((((filter(changes, CHANGE_TO_PAGE)))));
   }
 
 
