@@ -37,7 +37,7 @@ public class Dispatcher extends HttpServlet {
     super.init(config);
     ConfigurationLocation configuration = new ConfigurationLocation();
     configuration.load();
-    _handler = new WikiChoice(configuration);
+    _handler = new WikiChoice(config.getServletContext(), configuration);
   }
 
   @Override

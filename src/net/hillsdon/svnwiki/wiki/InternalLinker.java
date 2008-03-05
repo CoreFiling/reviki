@@ -10,8 +10,10 @@ public class InternalLinker {
 
   private final PageStore _store;
   private final String _wikiName;
+  private final String _contextPath;
 
-  public InternalLinker(final String wikiName, final PageStore store) {
+  public InternalLinker(final String contextPath, String wikiName, final PageStore store) {
+    _contextPath = contextPath;
     _wikiName = wikiName;
     _store = store;
   }
@@ -27,8 +29,9 @@ public class InternalLinker {
   
   public String link(final String pageName) {
     String cssClass = exists(pageName) ? "existing-page" : "new-page";
-    return format("<a class='%s' href='/pages/%s/%s'>%s</a>",
+    return format("<a class='%s' href='%s/pages/%s/%s'>%s</a>",
       cssClass,
+      _contextPath,
       Escape.url(_wikiName), 
       Escape.url(pageName), 
       Escape.html(pageName)

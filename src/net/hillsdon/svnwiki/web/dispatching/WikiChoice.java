@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ public class WikiChoice implements RequestHandler {
   private final Map<String, RequestHandler> _wikis = new ConcurrentHashMap<String, RequestHandler>();
 
   private final ConfigurationLocation _configuration;
+
+  private final ServletContext _servletContext;
 
   public class ConfigureWikiHandler implements RequestHandler {
     
@@ -56,12 +59,13 @@ public class WikiChoice implements RequestHandler {
     
   }
   
-  public WikiChoice(final ConfigurationLocation configuration) {
+  public WikiChoice(ServletContext servletContext, final ConfigurationLocation configuration) {
+    _servletContext = servletContext;
     _configuration = configuration;
   }
 
   private WikiHandler addWiki(final PerWikiInitialConfiguration configuration) {
-    WikiHandler handler = new WikiHandler(configuration);
+    WikiHandler handler = new WikiHandler(configuration, _servletContext.getContextPath());
     _wikis.put(configuration.getWikiName(), handler);
     return handler;
   }

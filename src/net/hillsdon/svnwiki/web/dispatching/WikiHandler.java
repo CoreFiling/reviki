@@ -38,7 +38,7 @@ public class WikiHandler implements RequestHandler {
   
   private PageHandler _handler;
 
-  public WikiHandler(final PerWikiInitialConfiguration configuration) {
+  public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
     // The search engine is informed of page changes by a delegating page store.
     // A delegating search engine checks it is up-to-date using the page store
     // so we have a circularity here, but a useful one.
@@ -47,7 +47,7 @@ public class WikiHandler implements RequestHandler {
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
-    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(configuration.getWikiName(), _cachingPageStore));
+    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(contextPath, configuration.getWikiName(), _cachingPageStore));
     _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer);
   }
 
