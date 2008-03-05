@@ -12,19 +12,19 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 public class TestSearch extends WebTestSupport {
 
   public void testLinkToOpenSearchAvailableFromRegularPages() throws Exception {
-    HtmlPage results = getWebPage("pages/FrontPage");
+    HtmlPage results = getWebPage("pages/test/FrontPage");
     HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
     // Session crap on the end.
-    assertTrue(link.getHrefAttribute().startsWith("/svnwiki/pages/FindPage/opensearch.xml"));
+    assertTrue(link.getHrefAttribute().startsWith("/svnwiki/pages/test/FindPage/opensearch.xml"));
     @SuppressWarnings("unused")
     XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
   }
   
   public void testSearchOffersToCreateWikiPageThatDoesntExistWhenWeSearchForAWikiWord() throws Exception {
     String name = uniqueWikiPageName("ThisDoesNotExist");
-    HtmlPage results = search(getWebPage(""), name);
+    HtmlPage results = search(getWebPage("pages/test/FrontPage"), name);
     assertTrue(results.asText().contains("Create new page " + name));
-    results.getAnchorByHref("/svnwiki/pages/" + name);
+    results.getAnchorByHref("/svnwiki/pages/test/" + name);
   }
   
   /**
@@ -49,7 +49,7 @@ public class TestSearch extends WebTestSupport {
 
   private void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
     HtmlPage results = search(page, query);
-    results.getAnchorByHref("/svnwiki/pages/" + name);
+    results.getAnchorByHref("/svnwiki/pages/test/" + name);
   }
   
 }

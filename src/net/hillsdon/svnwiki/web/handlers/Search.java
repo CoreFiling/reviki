@@ -46,7 +46,7 @@ public class Search implements RequestHandler {
       query = "";
     }
     if (request.getParameter("force") == null && _store.list().contains(new PageReference(query))) {
-      response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + query));
+      response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
     }
     else {
       if (isWikiWord(query)) {

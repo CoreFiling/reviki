@@ -36,7 +36,7 @@ public abstract class WebTestSupport extends TestCase {
     return System.getProperty("wiki.user");
   }
 
-  protected String getUrl(final String path) {
+  private String getUrl(final String path) {
     return BASE_URL + "/" + path;
   }
 
@@ -58,7 +58,7 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On failure.
    */
   public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws IOException {
-    HtmlPage page = getWebPage("pages/" + name);
+    HtmlPage page = getWebPage("pages/test/" + name);
     URL pageUrl = page.getWebResponse().getUrl();
     if (isNew != null) {
       assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));

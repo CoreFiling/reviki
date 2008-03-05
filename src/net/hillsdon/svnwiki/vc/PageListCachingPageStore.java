@@ -2,7 +2,6 @@ package net.hillsdon.svnwiki.vc;
 
 import java.util.Collection;
 
-import net.hillsdon.svnwiki.web.SimpleDelegatingPageStore;
 
 /**
  * Caches the set of pages forever.  This makes it only

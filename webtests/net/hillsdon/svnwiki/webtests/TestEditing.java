@@ -39,7 +39,7 @@ public class TestEditing extends WebTestSupport {
 
   private void editThenCancel(final String name) throws IOException {
     final String flagText = "Should not be saved.";
-    HtmlPage editPage = (HtmlPage) getWebPage("pages/" + name).getFormByName("editForm").getInputByValue("Edit").click();
+    HtmlPage editPage = (HtmlPage) getWebPage("pages/test/" + name).getFormByName("editForm").getInputByValue("Edit").click();
     HtmlForm form = editPage.getFormByName("editForm");
     form.getTextAreaByName("content").setText(flagText);
     HtmlPage viewPage = (HtmlPage) form.getInputByValue("Cancel").click();

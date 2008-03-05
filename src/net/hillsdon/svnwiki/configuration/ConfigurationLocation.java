@@ -17,25 +17,37 @@ import org.tmatesoft.svn.core.SVNURL;
  * 
  * @author mth
  */
-public class InitialConfiguration {
+public class ConfigurationLocation {
 
   private static final String DEFAULT_CONFIG_DIR_NAME = "svnwiki-data";
-  private static final String CONFIG_FILE_NAME = "svnwiki.properties";
   private static final String SEARCH_INDEX_DIR_NAME = "search-index";
+  private static final String CONFIG_FILE_NAME = "svnwiki.properties";
   // Properties file keys:
   private static final String KEY_SVN_URL = "svn-url";
   
-  private SVNURL _url = null;
+  private final Properties _properties = new Properties();
 
-  public SVNURL getUrl() {
-    return _url;
+  public SVNURL getUrl(final String wikiName) {
+    String url = (String) _properties.getProperty(KEY_SVN_URL + "-" + wikiName);
+    try {
+      return SVNURL.parseURIDecoded(url);
+    }
+    catch (SVNException ex) {
+      return null;
+    }
   }
 
   /**
+   * @param wikiName 
    * @return Somewhere writable to put the search index, or null if that is not possible.
    */
-  public File getSearchIndexDirectory() {
-    File indexDir = new File(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
+  public File getSearchIndexDirectory(final String wikiName) {
+    File searchDir = getWritableChildDir(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
+    return searchDir == null ? null : getWritableChildDir(searchDir, wikiName);
+  }
+  
+  public File getWritableChildDir(final File dir, final String child) {
+    File indexDir = new File(dir, child);
     if (!indexDir.exists()) {
       if (!indexDir.mkdir()) {
         return null;
@@ -47,17 +59,18 @@ public class InitialConfiguration {
     return null;
   }
   
-  public void setUrl(final String url) throws IllegalArgumentException {
+  public void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
     try {
-      _url = SVNURL.parseURIDecoded(url);
+      SVNURL svnUrl = SVNURL.parseURIDecoded(url);
+      _properties.setProperty(KEY_SVN_URL + "-" + wikiName, svnUrl.toDecodedString());
     }
     catch (SVNException e) {
       throw new IllegalArgumentException("Invalid SVN URL", e);
     }
   }
 
-  public boolean isComplete() {
-    return _url != null;
+  public boolean isComplete(final String wikiName) {
+    return getUrl(wikiName) != null;
   }
 
   /**
@@ -109,14 +122,8 @@ public class InitialConfiguration {
       try {
         FileInputStream in = new FileInputStream(file);
         try {
-          Properties properties = new Properties();
-          properties.load(in);
-          try {
-            setUrl(properties.getProperty(KEY_SVN_URL));
-          }
-          catch (IllegalArgumentException ex) {
-            // Oh well.
-          }
+          _properties.clear();
+          _properties.load(in);
         }
         finally {
           in.close();
@@ -132,12 +139,10 @@ public class InitialConfiguration {
     File location = getConfigurationLocation();
     if (location != null && location.canWrite()) {
       File file = new File(location, CONFIG_FILE_NAME);
-      Properties properties = new Properties();
-      properties.setProperty(KEY_SVN_URL, getUrl().toDecodedString());
       try {
         FileOutputStream in = new FileOutputStream(file);
         try {
-          properties.store(in, "svnwiki configuration details");
+          _properties.store(in, "svnwiki configuration details");
         }
         finally {
           in.close();

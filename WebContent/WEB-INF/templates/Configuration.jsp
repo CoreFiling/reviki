@@ -1,8 +1,8 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title" value="Configuration"/>
-  <tiles:putAttribute name="heading" value="Configuration"/>
+  <tiles:putAttribute name="title"><c:out value="${wikiName}"/> configuration</tiles:putAttribute>
+  <tiles:putAttribute name="heading"><c:out value="${wikiName}"/> configuration</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>
       The wiki will store pages at the directory pointed to by the given SVN URL.

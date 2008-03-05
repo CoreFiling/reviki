@@ -1,14 +1,16 @@
 package net.hillsdon.svnwiki.web;
 
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
 
 public class ConsumedPath {
 
-  private Iterator<String> _iterator;
+  private ListIterator<String> _iterator;
+  private List<String> _list;
 
   public ConsumedPath(final HttpServletRequest request) {
     this(request.getRequestURI(), request.getContextPath());
@@ -20,9 +22,19 @@ public class ConsumedPath {
     if (query != -1) {
       path = path.substring(0, query);
     }
-    _iterator = Arrays.asList(path.split("/")).iterator();
+    _list = Arrays.asList(path.split("/"));
+    _iterator = _list.listIterator();
   }
 
+  public String peek() {
+    try {
+      return _list.get(_iterator.nextIndex());
+    }
+    catch (IndexOutOfBoundsException ex) {
+      return null;
+    }
+  }
+  
   public String next() {
     try {
       return _iterator.next();

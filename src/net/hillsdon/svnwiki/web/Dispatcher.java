@@ -10,9 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.svnwiki.configuration.InitialConfiguration;
+import net.hillsdon.svnwiki.configuration.ConfigurationLocation;
 import net.hillsdon.svnwiki.vc.NotFoundException;
-import net.hillsdon.svnwiki.web.handlers.InitialConfigurationHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,48 +26,26 @@ public class Dispatcher extends HttpServlet {
   private static final Log LOG = LogFactory.getLog(Dispatcher.class);
   
   private static final long serialVersionUID = 1L;
-  private InitialConfiguration _configuration;
-  private RequestHandler _currentHandler;
-  private RequestHandler _configurationHandler;
+  private RequestHandler _handler;
+
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    _configuration = new InitialConfiguration();
-    _configuration.load();
-    _configurationHandler = new InitialConfigurationHandler(_configuration);
+    ConfigurationLocation configuration = new ConfigurationLocation();
+    configuration.load();
+    _handler = new WikiChoice(configuration);
   }
 
-  private void setCurrentHandler() {
-    try {
-      if (_configuration.isComplete()) {
-        if (_currentHandler == _configurationHandler || _currentHandler == null) {
-          _currentHandler = new WikiChoice(_configuration);
-        }
-      }
-      else {
-        _currentHandler = _configurationHandler;
-      }
-    }
-    catch (Exception ex) {
-      _currentHandler = _configurationHandler;
-    }
-  }
-  
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     request.setCharacterEncoding("UTF-8");
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
-    setCurrentHandler();
+
     ConsumedPath path = new ConsumedPath(request);
     try {
-      if ((request.getContextPath() + "/configuration").equals(request.getRequestURI())) {
-        _configurationHandler.handle(path, request, response);
-      }
-      else {
-        _currentHandler.handle(path, request, response);
-      }
+      _handler.handle(path, request, response);
     }
     catch (NotFoundException ex) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);

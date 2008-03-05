@@ -9,7 +9,7 @@
         <ul>
           <c:forEach var="match" items="${results}">
             <li>
-              <a href="<c:url value="/pages/${match.page}"/>"><c:out value="${match.page}"/></a>
+              <a href="<c:url value="/pages/${wikiName}/${match.page}"/>"><c:out value="${match.page}"/></a>
               <p style="margin-top: 0px">
                 ${match.htmlExtract}
               </p>
@@ -22,7 +22,7 @@
       </c:otherwise>
     </c:choose>
     <c:if test="${not empty suggestCreate}">
-      <a href="<c:url value="/pages/${suggestCreate}"/>">Create new page <c:out value="${suggestCreate}"/></a>
+      <a href="<c:url value="/pages/${wikiName}/${suggestCreate}"/>">Create new page <c:out value="${suggestCreate}"/></a>
     </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

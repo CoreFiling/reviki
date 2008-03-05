@@ -6,8 +6,8 @@ import java.io.StringWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.svnwiki.configuration.InitialConfiguration;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
+import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
@@ -34,7 +34,7 @@ public class WikiHandler implements RequestHandler {
   
   private PageHandler _handler;
 
-  public WikiHandler(final InitialConfiguration configuration) throws IOException {
+  public WikiHandler(final PerWikiInitialConfiguration configuration) {
     // The search engine is informed of page changes by a delegating page store.
     // A delegating search engine checks it is up-to-date using the page store
     // so we have a circularity here, but a useful one.

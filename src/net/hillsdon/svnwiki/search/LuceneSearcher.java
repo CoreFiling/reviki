@@ -61,12 +61,14 @@ public class LuceneSearcher implements SearchEngine {
   /**
    * @param dir The search index lives here.  
    *            If null is passed the search will behave as a null implemenation.
-   * @throws IOException If we fail to create the index.
    */
-  public LuceneSearcher(final File dir) throws IOException {
+  public LuceneSearcher(final File dir) {
     _dir = dir;
-    if (dir != null && !IndexReader.indexExists(dir)) {
-      new IndexWriter(dir, createAnalyzer(), true).close();
+  }
+
+  private void createIndexIfNecessary() throws IOException {
+    if (_dir != null && !IndexReader.indexExists(_dir)) {
+      new IndexWriter(_dir, createAnalyzer(), true).close();
     }
   }
 
@@ -128,11 +130,13 @@ public class LuceneSearcher implements SearchEngine {
     if (_dir == null) {
       return;
     }
+    createIndexIfNecessary();
     replaceDocument(FIELD_PATH, createWikiPageDocument(path, content));
     rememberLastIndexedRevision(revision);
   }
   
   public synchronized void delete(final String path, final long revision) throws IOException {
+    createIndexIfNecessary();
     deleteDocument(FIELD_PATH, path);
     rememberLastIndexedRevision(revision);
   }
@@ -141,6 +145,7 @@ public class LuceneSearcher implements SearchEngine {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
     }
+    createIndexIfNecessary();
     IndexReader reader = IndexReader.open(_dir);
     try {
       Searcher searcher = new IndexSearcher(reader);
@@ -195,6 +200,7 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   public long getHighestIndexedRevision() throws IOException {
+    createIndexIfNecessary();
     String property = getProperty(PROPERTY_LAST_INDEXED_REVISION);
     try {
       if (property != null) {

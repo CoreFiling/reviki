@@ -6,7 +6,7 @@ import net.hillsdon.svnwiki.vc.InterveningCommitException;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.web.SimpleDelegatingPageStore;
+import net.hillsdon.svnwiki.vc.SimpleDelegatingPageStore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

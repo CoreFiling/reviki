@@ -17,7 +17,7 @@ public class TestAttachments extends WebTestSupport {
 
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
     try {
-      getWebPage(getUrl("FrontPage/attachments/DoesntExist.txt"));
+      getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
       fail();
     }
     catch (FailingHttpStatusCodeException ex) {

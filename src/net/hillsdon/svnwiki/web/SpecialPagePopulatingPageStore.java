@@ -9,6 +9,7 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.vc.SimpleDelegatingPageStore;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
