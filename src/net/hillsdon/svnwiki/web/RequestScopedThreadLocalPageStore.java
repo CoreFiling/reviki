@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.web;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return _threadLocal.get();
   }
   
-  public PageInfo get(final String path, long revision) throws PageStoreException {
+  public PageInfo get(final String path, final long revision) throws PageStoreException {
     return get().get(path, revision);
   }
 
@@ -52,7 +53,7 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().recentChanges();
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content, String commitMessage) throws PageStoreException {
+  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
     get().set(path, lockToken, baseRevision, content, commitMessage);
   }
 
@@ -60,12 +61,20 @@ public final class RequestScopedThreadLocalPageStore implements PageStore {
     return get().tryToLock(path);
   }
 
-  public void unlock(final String page, String lockToken) throws PageStoreException {
+  public void unlock(final String page, final String lockToken) throws PageStoreException {
     get().unlock(page, lockToken);
   }
 
-  public List<ChangeInfo> history(String path) throws PageStoreException {
+  public List<ChangeInfo> history(final String path) throws PageStoreException {
     return get().history(path);
+  }
+
+  public void attach(final String page, final String storeName, final InputStream in) throws PageStoreException {
+    get().attach(page, storeName, in);
+  }
+
+  public Collection<String> attachments(final String page) throws PageStoreException {
+    return get().attachments(page);
   }
 
 }

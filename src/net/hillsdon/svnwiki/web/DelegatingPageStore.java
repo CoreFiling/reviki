@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.web;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class DelegatingPageStore implements PageStore {
 
   private final PageStore _delegate;
 
-  public DelegatingPageStore(PageStore delegate) {
+  public DelegatingPageStore(final PageStore delegate) {
     _delegate = delegate;
   }
   
@@ -26,7 +27,7 @@ public class DelegatingPageStore implements PageStore {
     return _delegate;
   }
 
-  public PageInfo get(String path, long revision) throws PageStoreException {
+  public PageInfo get(final String path, final long revision) throws PageStoreException {
     return _delegate.get(path, revision);
   }
 
@@ -38,20 +39,28 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.recentChanges();
   }
 
-  public void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException {
+  public void set(final String path, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
     _delegate.set(path, lockToken, baseRevision, content, commitMessage);
   }
 
-  public PageInfo tryToLock(String path) throws PageStoreException {
+  public PageInfo tryToLock(final String path) throws PageStoreException {
     return _delegate.tryToLock(path);
   }
 
-  public void unlock(String page, String lockToken) throws PageStoreException {
+  public void unlock(final String page, final String lockToken) throws PageStoreException {
     _delegate.unlock(page, lockToken);
   }
 
-  public List<ChangeInfo> history(String path) throws PageStoreException {
+  public List<ChangeInfo> history(final String path) throws PageStoreException {
     return _delegate.history(path);
+  }
+
+  public void attach(final String page, final String storeName, final InputStream in) throws PageStoreException {
+    _delegate.attach(page, storeName, in);
+  }
+
+  public Collection<String> attachments(String page) throws PageStoreException {
+    return _delegate.attachments(page);
   }
   
 }

@@ -13,6 +13,7 @@ public class Attachments extends PageRequestHandler {
 
   @Override
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final String page) throws Exception {
+    request.setAttribute("attachments", getStore().attachments(page));
     request.getRequestDispatcher("/WEB-INF/templates/Attachments.jsp").include(request, response);
   }
 

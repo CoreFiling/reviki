@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.vc;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -76,5 +77,21 @@ public interface PageStore {
    */
   void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
 
+  /**
+   * Add an attachment to a page.
+   * 
+   * @param page The page name.
+   * @param storeName The name to store the attachment as.
+   * @param in Data read from here.
+   * @throws PageStoreException If something goes wrong. 
+   */
+  void attach(String page, String storeName, InputStream in) throws PageStoreException;
+
+  /**
+   * @param page A page name.
+   * @return File names of all attachments.
+   * @throws PageStoreException If something goes wrong. 
+   */
+  Collection<String> attachments(String page) throws PageStoreException;
 
 }
