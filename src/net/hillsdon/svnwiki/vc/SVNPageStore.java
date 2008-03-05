@@ -133,7 +133,6 @@ public class SVNPageStore implements PageStore {
           }
           catch (SVNException ex) {
             SVNErrorMessage error = ex.getErrorMessage();
-            System.err.println(error.getErrorCode().getDescription());
             if (error.getErrorCode() == SVNErrorCode.RA_DAV_PATH_NOT_FOUND) {
               return createNewOrDeletedPageInfo(ref);
             }
