@@ -64,7 +64,7 @@ public class GetRegularPage extends PageRequestHandler {
     }
     else {
       StringWriter writer = new StringWriter();
-      _markupRenderer.render(main.getContent(), writer);
+      _markupRenderer.render(main, main.getContent(), writer);
       
       request.setAttribute("renderedContents", writer.toString());
       request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").include(request, response);

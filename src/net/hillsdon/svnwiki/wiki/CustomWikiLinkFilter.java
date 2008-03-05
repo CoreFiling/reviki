@@ -23,20 +23,44 @@ public class CustomWikiLinkFilter extends RegexTokenFilter {
   public CustomWikiLinkFilter() {
     super("([\\p{L}\\d]+:)?([\\p{L}\\d]+)");
   }
+
+  /**
+   * This is something of a hack... Radeox just blindly applies one
+   * regex after another so we're at risk of crapping over URLs,
+   * including hrefs we create etc.
+   * 
+   * @param buffer Current buffer.
+   * @return True if we're in the middle of a URL.
+   */
+  private boolean inURL(final StringBuffer buffer) {
+    int lastWs = buffer.lastIndexOf(" ");
+    int lastUrl = Math.max(Math.max(buffer.lastIndexOf("http"), buffer.lastIndexOf("href=")), buffer.lastIndexOf("src="));
+    int lastAttached = buffer.lastIndexOf("{attached|");
+    if (lastUrl > lastWs || lastAttached > lastWs) {
+      return true;
+    }
+    return false;
+  }
   
   @Override
   public void handleMatch(final StringBuffer buffer, final MatchResult result, final FilterContext context) {
     final String matched = result.group(0);
+    if (inURL(buffer)) {
+      buffer.append(matched);
+      return;
+    }
+    
+    String wikiName = result.group(1);
+    String pageName = result.group(2);
+    
     RenderEngine engine = context.getRenderContext().getRenderEngine();
     StringBufferWriter writer = new StringBufferWriter(buffer);
     try {
       if (engine instanceof WikiRenderEngine) {
         WikiRenderEngine wikiEngine = (WikiRenderEngine) engine;
-        String wikiName = result.group(1);
         if (wikiName != null) {
           wikiName = wikiName.substring(0, wikiName.length() - 1);
         }
-        String pageName = result.group(2);
         if (wikiName == null) {
           if (WikiWordUtils.isWikiWord(pageName)) {
             appendInternalLink(wikiEngine, buffer, pageName);

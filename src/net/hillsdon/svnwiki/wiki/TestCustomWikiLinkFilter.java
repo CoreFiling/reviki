@@ -25,6 +25,13 @@ public class TestCustomWikiLinkFilter extends TestCase {
     renderContext.setRenderEngine(new SvnWikiRenderEngine(store));
     _context.setRenderContext(renderContext);
   }
+
+  public void testUrlsNotMatched() {
+    String url = "http://www.example.com/SomeWikiWord";
+    assertEquals(url, _filter.filter(url, _context));
+    String attached = "{attached|SomeFile.txt}";
+    assertEquals(attached, _filter.filter(attached, _context));
+  }
   
   public void testNewAndExisting() {
     assertEquals("This has a <a class='new-page' href='WikiWord'>WikiWord</a>.", _filter.filter("This has a WikiWord.", _context));

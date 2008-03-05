@@ -202,7 +202,12 @@ public class SVNPageStore implements PageStore {
       public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
         if (repository.checkPath(dir, -1) == SVNNodeKind.NONE) {
           ISVNEditor commitEditor = repository.getCommitEditor("[svnwiki commit] Add attachments dir.", null);
-          _helper.createDir(commitEditor, dir);
+          try {
+            _helper.createDir(commitEditor, dir);
+          }
+          finally {
+            commitEditor.closeEdit();
+          }
         }
         return null;
       }
