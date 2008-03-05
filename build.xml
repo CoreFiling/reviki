@@ -53,7 +53,21 @@
     </copy>
   </target>
 
-  <target name="test-plugin">
+  <target name="test-plugin-dependency">
+    <delete dir="test-plugin-dependency/build"/>
+    <mkdir dir="test-plugin-dependency/build"/>
+    <javac srcdir="test-plugin-dependency/src"
+           destdir="test-plugin-dependency/build">
+      <classpath refid="classpath" />
+    </javac>
+    <jar destfile="test-plugin/test-plugin-dependency.jar" >
+      <fileset dir="test-plugin-dependency/build">
+        <include name="**/*"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="test-plugin" depends="test-plugin-dependency">
     <delete dir="test-plugin/build"/>
     <mkdir dir="test-plugin/build"/>
     <javac srcdir="test-plugin/src"
@@ -61,9 +75,16 @@
       <classpath refid="classpath" />
     </javac>
     <jar destfile="test-plugin/test-plugin.jar" >
-      <fileset dir="test-plugin/build">
-        <include name="**/*.class"/>
+      <fileset dir="test-plugin">
+        <include name="test-plugin-dependency.jar"/>
       </fileset>
+      <fileset dir="test-plugin/build">
+        <include name="**/*"/>
+      </fileset>
+      <manifest>
+        <attribute name="Class-Path" value="test-plugin-dependency.jar"/>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.svnwiki.test.plugin.Example"/>
+      </manifest>
     </jar>
   </target>
 
