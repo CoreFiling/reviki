@@ -4,10 +4,20 @@
   <tiles:putAttribute name="title">Search results</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <h1>Search results for '<c:out value="${param.query}"/>'</h1>
-    <ul>
-      <c:forEach var="path" items="${results}">
-        <li><a href="<c:url value="/pages/${path}"/>"><c:out value="${path}"/></a></li>
-      </c:forEach>
-    </ul>
+    <c:choose>
+      <c:when test="${not empty results}">
+        <ul>
+          <c:forEach var="path" items="${results}">
+            <li><a href="<c:url value="/pages/${path}"/>"><c:out value="${path}"/></a></li>
+          </c:forEach>
+        </ul>
+      </c:when>
+      <c:otherwise>
+        <p>No results found.</p>
+      </c:otherwise>
+    </c:choose>
+    <c:if test="${not empty suggestCreate}">
+      <a href="<c:url value="/pages/${suggestCreate}"/>">Create new page <c:out value="${suggestCreate}"/></a>
+    </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

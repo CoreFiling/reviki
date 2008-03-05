@@ -31,7 +31,10 @@ public class SetPage extends PageRequestHandler {
       store.set(page, lockToken, baseRevision, content);
     }
     else {
-      store.unlock(page, lockToken);
+      // New pages don't have a lock.
+      if (lockToken.length() > 0) {
+        store.unlock(page, lockToken);
+      }
     }
     response.sendRedirect(request.getRequestURI());
   }

@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +27,9 @@ public class Search implements RequestHandler {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + query));
     }
     else {
+      if (isWikiWord(query)) {
+        request.setAttribute("suggestCreate", query);
+      }
       request.setAttribute("results", _searchEngine.search(query));
       request.getRequestDispatcher("/WEB-INF/templates/SearchResults.jsp").include(request, response);
     }

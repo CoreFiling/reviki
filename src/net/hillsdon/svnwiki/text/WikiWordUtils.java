@@ -32,6 +32,10 @@ public final class WikiWordUtils {
     return out;
   }
 
+  public static boolean isWikiWord(final String text) {
+    return text.split("\\s").length == 1 && splitCamelCase(text).size() > 1; 
+  }
+  
   // Behaviour undefined for strings containing punctuation/whitespace.
   // Note that here uppercase is defined as !Character.isLowerCase(char)
   // notably, this includeds digits.

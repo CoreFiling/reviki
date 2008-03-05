@@ -10,6 +10,13 @@ import junit.framework.TestCase;
 
 public class TestWikiWordUtils extends TestCase { 
 
+  public void testIsWikiWord() {
+    assertTrue(WikiWordUtils.isWikiWord("HTMLParser"));
+    assertFalse(WikiWordUtils.isWikiWord("HTML Parser"));
+    assertFalse(WikiWordUtils.isWikiWord("HTML"));
+    assertFalse(WikiWordUtils.isWikiWord("parser"));
+  }
+  
   public void testLabel() {
     assertEquals("My first property", pathToTitle("object/myFirstProperty").toString());
     assertEquals("Lemon cheesecake", pathToTitle("lemonCheesecake").toString());

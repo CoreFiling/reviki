@@ -17,7 +17,7 @@ final class RequestParameterReaders {
     if (value == null) {
       throw new InvalidInputException(String.format("'%s' required.", parameter));
     }
-    return value;
+    return value.trim();
   }
 
   public static Long getLong(final String value, final String parameter) throws InvalidInputException {
