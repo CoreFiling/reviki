@@ -6,7 +6,7 @@ SKIP_DIRS = ('.svn', 'external')
 BOILERPLATE = open('BOILERPLATE', 'r').read()
 
 def apply_boilerplate(arg, dirname, fnames):
-  for i, name in enumerate(fnames):
+  for i, name in list(enumerate(fnames)):
     if name in SKIP_DIRS:
       del fnames[i]
     elif name.endswith('.java'):
