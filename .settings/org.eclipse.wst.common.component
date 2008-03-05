@@ -3,6 +3,7 @@
     <wb-module deploy-name="svnwiki">
         <wb-resource deploy-path="/" source-path="/WebContent"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/webtests"/>
         <property name="context-root" value="svnwiki"/>
         <property name="java-output-path" value="build/classes"/>
     </wb-module>

@@ -1,0 +1,5 @@
+Compile/test-time dependencies.
+  * Servlet API.
+  * htmlunit jars that we don't already depend on.
+
+Runtime jars are in WebContent/WEB-INF/lib.
