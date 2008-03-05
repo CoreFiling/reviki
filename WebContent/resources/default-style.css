@@ -51,6 +51,11 @@ ul.menu {
   text-align: center;
   background-color: yellow;
 }
+#build-details {
+  text-align: right;
+  font-size: 75%;
+  color: grey;
+}
 hr {
   color: black;
   background-color: black;

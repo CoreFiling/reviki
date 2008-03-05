@@ -49,6 +49,6 @@
     </div>
     <tiles:insertAttribute name="content"/>
   </div>
-  <p class="build-details">$BuildRevision$</p>
+  <p id="build-details">Built from r$BuildRevision$.</p>
 </body>
 </html>
