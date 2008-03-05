@@ -14,7 +14,6 @@ def apply_boilerplate(arg, dirname, fnames):
       ensure_has_boilerplate(path)
 
 def ensure_has_boilerplate(path):
-  print path
   content = open(path, 'r').read()
   if content.find(BOILERPLATE.strip()) == -1:
     content = BOILERPLATE + content
