@@ -11,6 +11,11 @@ import org.radeox.regex.MatchResult;
 import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
 
+/**
+ * Alternative to Radeox's link recognition.
+ * 
+ * @author mth
+ */
 public class CustomWikiLinkFilter extends RegexTokenFilter {
 
   public static final String INTERWIKI_LINKER_CONTEXT_KEY = "interwikiLinker";

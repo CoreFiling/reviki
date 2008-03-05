@@ -5,6 +5,11 @@ import java.io.Writer;
 
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
+/**
+ * Interface for something that renders wiki markup.
+ * 
+ * @author mth
+ */
 public interface MarkupRenderer {
   
   public void render(String in, Writer out) throws IOException, PageStoreException;

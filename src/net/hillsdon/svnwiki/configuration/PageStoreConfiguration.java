@@ -8,6 +8,11 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
+/**
+ * Configuration derived from ConfigXXX pages in the wiki.
+ * 
+ * @author mth
+ */
 public class PageStoreConfiguration implements Configuration {
 
   private final PageStore _store;
@@ -16,6 +21,12 @@ public class PageStoreConfiguration implements Configuration {
     _store = store;
   }
   
+  /**
+   * @return An interwiki linker populated according to ConfigInterWikiLinks
+   *         which should be lines of the form:
+   *         c2 http://c2.com/cgi/wiki?%s
+   *         where %s is a placeholder for the page name. 
+   */
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {
     PageInfo page = _store.get("ConfigInterWikiLinks", -1);
     InterWikiLinker linker = new InterWikiLinker();

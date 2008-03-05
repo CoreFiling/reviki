@@ -15,6 +15,11 @@ import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
+/**
+ * All requests come through here if we're correctly configured.
+ * 
+ * @author mth
+ */
 public class MainHandler implements RequestHandler {
 
   private RequestScopedThreadLocalPageStore _pageStore;

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 
 /**
- * Indexes page changes.
+ * Indexes page changes so they are available to a {@link SearchEngine}.
  * 
  * @author mth
  */

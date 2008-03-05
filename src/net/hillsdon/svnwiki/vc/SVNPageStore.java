@@ -175,7 +175,7 @@ public class SVNPageStore implements PageStore {
     try {
       long revision = page.getRevision();
       Map<String, Long> pathsToRevisions = singletonMap(path, revision);
-      _repository.lock(pathsToRevisions, "Locked by svnwiki.", false, new ISVNLockHandlerAdapter());
+      _repository.lock(pathsToRevisions, "Locked by svnwiki.", false, new SVNLockHandlerAdapter());
       return get(path, revision);
     }
     catch (SVNAuthenticationException ex) {
@@ -192,7 +192,7 @@ public class SVNPageStore implements PageStore {
 
   public void unlock(final String path, final String lockToken) throws PageStoreException {
     try {
-      _repository.unlock(singletonMap(path, lockToken), false, new ISVNLockHandlerAdapter());
+      _repository.unlock(singletonMap(path, lockToken), false, new SVNLockHandlerAdapter());
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);

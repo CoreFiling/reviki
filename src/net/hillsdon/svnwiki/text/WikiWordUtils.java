@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility methods for working with wiki-words.
+ * Utility methods for working with WikiWords.
  *
  * @copyright
  * @author mth

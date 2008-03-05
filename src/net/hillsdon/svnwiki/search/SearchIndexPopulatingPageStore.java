@@ -10,6 +10,11 @@ import net.hillsdon.svnwiki.web.DelegatingPageStore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Intercepts page edits in order to update the search index.
+ * 
+ * @author mth
+ */
 public class SearchIndexPopulatingPageStore extends DelegatingPageStore {
 
   private static final Log LOG = LogFactory.getLog(SearchIndexPopulatingPageStore.class);

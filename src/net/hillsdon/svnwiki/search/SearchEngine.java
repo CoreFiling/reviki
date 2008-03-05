@@ -3,6 +3,11 @@ package net.hillsdon.svnwiki.search;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * Searches the wiki.
+ * 
+ * @author mth
+ */
 public interface SearchEngine {
 
   /**

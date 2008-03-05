@@ -4,6 +4,11 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
+/**
+ * Returns a default FrontPage if there isn't one in the repository.
+ * 
+ * @author mth
+ */
 public class FrontPagePopulatingPageStore extends DelegatingPageStore {
 
   private static final String FRONT_PAGE_CONTENT = "Welcome to ~~svnwiki~~!";

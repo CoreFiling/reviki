@@ -11,7 +11,15 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 
-public class RequestScopedThreadLocalPageStore implements PageStore {
+/**
+ * Allow us to pass a PageStore into various objects but
+ *  a) use authentication from the current request
+ *  b) work with the thread-safety limitations of 
+ *     {@link org.tmatesoft.svn.core.io.SVNRepository}.
+ * 
+ * @author mth
+ */
+public final class RequestScopedThreadLocalPageStore implements PageStore {
 
   private final ThreadLocal<PageStore> _threadLocal = new ThreadLocal<PageStore>();
   private final PageStoreFactory _factory;

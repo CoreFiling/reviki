@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import net.hillsdon.svnwiki.configuration.Configuration;
-import net.hillsdon.svnwiki.configuration.InterWikiLinker;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
@@ -22,10 +21,6 @@ public class RadeoxMarkupRenderer implements MarkupRenderer {
     _configuration = configuration;
     _engine = new SvnWikiRenderEngine(store);
     _engine.getInitialRenderContext().setRenderEngine(_engine);
-    // This needs to be configurable...
-    InterWikiLinker iwl = new InterWikiLinker();
-    iwl.addWiki("smbug", "https://candide.corefiling.com/~bugs/show_bug.cgi?id=%s");
-    
     _engine.getInitialRenderContext().getFilterPipe().deactivateFilter(LinkTestFilter.class.getName());
     _engine.getInitialRenderContext().getFilterPipe().addFilter(new CustomWikiLinkFilter());
   }
