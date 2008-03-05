@@ -69,7 +69,7 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
   }
 
   public Set<String> search(final String queryString) throws IOException, QuerySyntaxException {
-    if (_dir == null) {
+    if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
     }
     IndexReader reader = IndexReader.open(_dir);

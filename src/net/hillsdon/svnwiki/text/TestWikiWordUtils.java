@@ -1,6 +1,7 @@
 package net.hillsdon.svnwiki.text;
 
 import static java.util.Arrays.asList;
+import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.pathToTitle;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.splitCamelCase;
 
@@ -11,10 +12,11 @@ import junit.framework.TestCase;
 public class TestWikiWordUtils extends TestCase { 
 
   public void testIsWikiWord() {
-    assertTrue(WikiWordUtils.isWikiWord("HTMLParser"));
-    assertFalse(WikiWordUtils.isWikiWord("HTML Parser"));
-    assertFalse(WikiWordUtils.isWikiWord("HTML"));
-    assertFalse(WikiWordUtils.isWikiWord("parser"));
+    assertTrue(isWikiWord("HTMLParser"));
+    assertFalse(isWikiWord("HTML Parser"));
+    assertFalse(isWikiWord("HTML"));
+    assertFalse(isWikiWord("parser"));
+    assertFalse(isWikiWord("parserGenerator"));
   }
   
   public void testLabel() {

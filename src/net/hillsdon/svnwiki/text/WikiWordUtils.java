@@ -11,7 +11,14 @@ import java.util.List;
  */
 public final class WikiWordUtils {
 
-  public static CharSequence pathToTitle(String path) {
+  /**
+   * Takes the last '/' component of a '/' separated path and splits the last
+   * component as a wiki word.
+   * 
+   * @param path The path.
+   * @return e.g. "foo/BarHumbug" gives "Bar humbug".
+   */
+  public static CharSequence pathToTitle(final String path) {
     List<String> parts = splitCamelCase(path.substring(path.lastIndexOf('/') + 1));
     StringBuilder out = new StringBuilder();
     for (int i = 0; i < parts.size(); ++i) {
@@ -32,13 +39,21 @@ public final class WikiWordUtils {
     return out;
   }
 
+  /**
+   * @param text Some text.
+   * @return true if it looks like a wiki word.
+   */
   public static boolean isWikiWord(final String text) {
-    return text.split("\\s").length == 1 && splitCamelCase(text).size() > 1; 
+    return text.split("\\s").length == 1 && !isNextLower(text.toCharArray(), -1) && splitCamelCase(text).size() > 1; 
   }
   
-  // Behaviour undefined for strings containing punctuation/whitespace.
-  // Note that here uppercase is defined as !Character.isLowerCase(char)
-  // notably, this includeds digits.
+  /**
+   * Splits camel case.
+   * 
+   * Behaviour undefined for strings containing punctuation/whitespace.
+   * Note that here uppercase is defined as !Character.isLowerCase(char)
+   * notably, this includeds digits.
+   */
   public static List<String> splitCamelCase(final String in) {
     List<String> result = new ArrayList<String>();
     char[] chars = in.toCharArray();
