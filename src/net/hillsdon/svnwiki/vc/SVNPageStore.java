@@ -142,7 +142,6 @@ public class SVNPageStore implements PageStore {
           Date lastChangedDate = null;
           final ChangeInfo deletingChange = getChangeThatDeleted(ref);
           if (deletingChange != null) {
-            System.err.println("KNown deleted!!!");
             pseudoRevision = PageInfo.DELETED;
             lastChangedRevision = deletingChange.getRevision();
             lastChangedAuthor = deletingChange.getUser();
