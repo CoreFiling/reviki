@@ -6,14 +6,16 @@
   <tiles:putAttribute name="title">Recent changes</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <h1>Recent changes</h1>
-    <ul>
+    <table>
+      <tr><th>Date</th><th>Page</th><th>User</th><th></th></tr>
       <c:forEach var="change" items="${recentChanges}">
-        <li><a href="<c:url value="${change.page}"/>">
-          <c:out value="${change.page}"/></a>
-           on <f:formatDate type="both" value="${change.date}"/>
-           by <c:out value="${change.user}"/>
-        </li>
+        <tr>
+          <td><f:formatDate type="both" value="${change.date}"/></td>
+          <td><a href="<c:url value="${change.page}"/>"><c:out value="${change.page}"/></a></td>
+          <td><c:out value="${change.user}"/></td>
+          <td><a href="<c:url value="${change.page}?revision=${change.revision}&diff=${change.revision - 1}"/>">[Show diff]</a></td>
+        </tr>
       </c:forEach>
-    </ul>
+    </table>
   </tiles:putAttribute>
 </tiles:insertTemplate>

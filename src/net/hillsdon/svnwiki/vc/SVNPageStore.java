@@ -72,7 +72,7 @@ public class SVNPageStore implements PageStore {
             String name = path.substring(rootPath.length() + 1);
             String user = entry.getAuthor();
             Date date = entry.getDate();
-            results.add(0, new ChangeInfo(name, user, date));
+            results.add(0, new ChangeInfo(name, user, date, entry.getRevision()));
           }
         }
       }
@@ -125,15 +125,16 @@ public class SVNPageStore implements PageStore {
       SVNNodeKind kind = _repository.checkPath(path, revision);
       if (SVNNodeKind.FILE.equals(kind)) {
         _repository.getFile(path, revision, properties, baos);
-        long actualRevision = Long.parseLong(properties.get(SVNProperty.REVISION));
+        long actualRevision = SVNProperty.longValue(properties.get(SVNProperty.REVISION));
+        long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
         SVNLock lock = _repository.getLock(path);
         String lockOwner = lock == null ? null : lock.getOwner();
         String lockToken = lock == null ? null : lock.getID();
-        return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lockOwner, lockToken);
+        return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lockOwner, lockToken);
       }
       else if (SVNNodeKind.NONE.equals(kind)) {
         // Distinguishing between 'uncommitted' and 'deleted' would be useful for history.
-        return new PageInfo(path, "", PageInfo.UNCOMMITTED, null, null);
+        return new PageInfo(path, "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null);
       }
       else {
         throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, path));

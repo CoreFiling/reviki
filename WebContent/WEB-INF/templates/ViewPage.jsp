@@ -28,5 +28,10 @@
         </form> 
       </c:otherwise>
     </c:choose>
+    <c:if test="${not pageInfo.new}">
+      <p>
+      <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last change</a>
+      </p>
+    </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

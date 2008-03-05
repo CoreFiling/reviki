@@ -14,15 +14,18 @@ public class PageInfo {
   private final String _content;
 
   private final long _revision;
+
+  private final long _lastChangedRevision;
   
   private final String _lockedBy;
 
   private final String _lockToken; 
   
-  public PageInfo(final String path, final String content, final long revision, final String lockedBy, final String lockToken) {
+  public PageInfo(final String path, final String content, final long revision, final long lastChangedRevision, final String lockedBy, final String lockToken) {
     _path = path;
     _content = content;
     _revision = revision;
+    _lastChangedRevision = lastChangedRevision;
     _lockedBy = lockedBy;
     _lockToken = lockToken;
   }
@@ -64,6 +67,10 @@ public class PageInfo {
 
   public boolean lockedByUserIfNeeded(final String user) {
     return isNew() || user.equals(getLockedBy());
+  }
+  
+  public long getLastChangedRevision() {
+    return _lastChangedRevision;
   }
   
 }

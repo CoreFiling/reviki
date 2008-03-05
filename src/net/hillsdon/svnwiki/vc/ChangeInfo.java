@@ -12,11 +12,13 @@ public class ChangeInfo {
   private final String _page;
   private final String _user;
   private final Date _date;
+  private final long _revision;
   
-  public ChangeInfo(String page, String user, Date date) {
+  public ChangeInfo(String page, String user, Date date, long revision) {
     _page = page;
     _user = user;
     _date = date;
+    _revision = revision;
   }
 
   public String getPage() {
@@ -29,6 +31,10 @@ public class ChangeInfo {
 
   public Date getDate() {
     return _date;
+  }
+  
+  public long getRevision() {
+    return _revision;
   }
   
 }
