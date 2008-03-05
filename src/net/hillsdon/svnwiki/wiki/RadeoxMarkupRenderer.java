@@ -8,7 +8,7 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseRenderContext;
-import org.radeox.filter.WikiLinkFilter;
+import org.radeox.filter.LinkTestFilter;
 
 public class RadeoxMarkupRenderer implements MarkupRenderer {
   
@@ -17,7 +17,12 @@ public class RadeoxMarkupRenderer implements MarkupRenderer {
   public RadeoxMarkupRenderer(final PageStore store) {
     _engine = new SvnWikiRenderEngine(store);
     _engine.getInitialRenderContext().setRenderEngine(_engine);
-    _engine.getInitialRenderContext().getFilterPipe().addFilter(new WikiLinkFilter());
+    // This needs to be configurable...
+    InterWikiLinker iwl = new InterWikiLinker();
+    iwl.addWiki("smbug", "https://candide.corefiling.com/~bugs/show_bug.cgi?id=%s");
+    
+    _engine.getInitialRenderContext().getFilterPipe().deactivateFilter(LinkTestFilter.class.getName());
+    _engine.getInitialRenderContext().getFilterPipe().addFilter(new CustomWikiLinkFilter(iwl));
   }
   
   public void render(final String in, final Writer out) throws IOException {
