@@ -21,7 +21,7 @@ public class RenderedPage {
   private final String _pageName;
   private final Document _document; 
 
-  public RenderedPage(String pageName, Document document) {
+  public RenderedPage(final String pageName, final Document document) {
     _pageName = pageName;
     _document = document;
   }
