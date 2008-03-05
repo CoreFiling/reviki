@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.wiki.graph;
 
 import static net.hillsdon.fij.core.Functional.list;
 import static net.hillsdon.fij.core.Functional.map;

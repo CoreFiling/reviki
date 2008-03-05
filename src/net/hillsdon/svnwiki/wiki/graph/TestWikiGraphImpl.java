@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.wiki.graph;
 
 import static net.hillsdon.fij.core.Functional.set;
 import static org.easymock.EasyMock.expect;

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
-import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class OrphanedPages implements RequestHandler {
 

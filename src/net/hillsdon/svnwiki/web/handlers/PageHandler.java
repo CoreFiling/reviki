@@ -25,7 +25,7 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
-import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.

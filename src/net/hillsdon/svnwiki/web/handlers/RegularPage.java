@@ -22,7 +22,7 @@ import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
-import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class RegularPage implements PageRequestHandler {
 

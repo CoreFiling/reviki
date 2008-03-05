@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class IncomingLinksMacro extends AbstractListOfPagesMacro {
 
