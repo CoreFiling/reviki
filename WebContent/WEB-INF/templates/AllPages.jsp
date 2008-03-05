@@ -1,7 +1,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title">Page list</tiles:putAttribute>
+  <tiles:putAttribute name="title">All Pages</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <ul>
       <c:forEach var="path" items="${pageList}">
