@@ -32,8 +32,9 @@ public class MacroNode extends AbstractRegexNode {
 
   private final Map<String, Macro> _macros;
 
-  public MacroNode(final Collection<Macro> macros) {
-    super("(?s)<<([\\p{Digit}\\p{L}]+?):(.+?)>>");
+  public MacroNode(final Collection<Macro> macros, final boolean block) {
+    super(block ? "(?s)(?:^|\\n)<<([\\p{Digit}\\p{L}]+?):(.+?)(^|\\n)>>"
+                : "(?s)\\<<([\\p{Digit}\\p{L}]+?):(.+?)>>");
     _macros = new LinkedHashMap<String, Macro>();
     for (Macro macro : macros) {
       _macros.put(macro.getName(), macro);
@@ -49,7 +50,7 @@ public class MacroNode extends AbstractRegexNode {
     return matcher.group(1).trim();
   }
 
-  public String handle(PageReference page, final Matcher matcher) {
+  public String handle(final PageReference page, final Matcher matcher) {
     Macro macro = _macros.get(getMacroName(matcher));
     return macro.handle(page, matcher.group(2));
   }

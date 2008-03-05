@@ -41,6 +41,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
         new RenderNode[] {
             new UnescapedHtmlNode(true),
             new JavaSyntaxHighlightedNode(true),
+            new MacroNode(macros, true),
         },
         new RenderNode[] {
             new JavaSyntaxHighlightedNode(false),
@@ -48,7 +49,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
             new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, internalLinker, configuration)),
             new CreoleLinkNode(linkHandler),
             new CustomWikiLinkNode(linkHandler),
-            new MacroNode(macros),
+            new MacroNode(macros, false),
         });
   }
 
