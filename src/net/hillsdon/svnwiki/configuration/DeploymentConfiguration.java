@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 import org.tmatesoft.svn.core.SVNException;
@@ -17,18 +20,19 @@ import org.tmatesoft.svn.core.SVNURL;
  * 
  * @author mth
  */
-public class ConfigurationLocation {
+public class DeploymentConfiguration {
 
   private static final String DEFAULT_CONFIG_DIR_NAME = "svnwiki-data";
   private static final String SEARCH_INDEX_DIR_NAME = "search-index";
   private static final String CONFIG_FILE_NAME = "svnwiki.properties";
   // Properties file keys:
-  private static final String KEY_SVN_URL = "svn-url";
+  private static final String KEY_PREFIX_SVN_URL = "svn-url-";
+  private static final String KEY_DEFAULT_WIKI = "default-wiki";
   
   private final Properties _properties = new Properties();
 
   public SVNURL getUrl(final String wikiName) {
-    String url = (String) _properties.getProperty(KEY_SVN_URL + "-" + wikiName);
+    String url = (String) _properties.getProperty(KEY_PREFIX_SVN_URL + wikiName);
     try {
       return SVNURL.parseURIDecoded(url);
     }
@@ -62,10 +66,13 @@ public class ConfigurationLocation {
   public void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
     try {
       SVNURL svnUrl = SVNURL.parseURIDecoded(url);
-      _properties.setProperty(KEY_SVN_URL + "-" + wikiName, svnUrl.toDecodedString());
+      _properties.setProperty(KEY_PREFIX_SVN_URL + wikiName, svnUrl.toDecodedString());
     }
     catch (SVNException e) {
       throw new IllegalArgumentException("Invalid SVN URL", e);
+    }
+    if (getDefaultWiki() == null) {
+      setDefaultWiki(wikiName);
     }
   }
 
@@ -152,6 +159,25 @@ public class ConfigurationLocation {
         // We swallow errors for now.
       }
     }
+  }
+
+  public void setDefaultWiki(final String wikiName) {
+    _properties.setProperty(KEY_DEFAULT_WIKI, wikiName);
+  }
+
+  public String getDefaultWiki() {
+    return _properties.getProperty(KEY_DEFAULT_WIKI);
+  }
+  
+  public Collection<String> getWikiNames() {
+    List<String> names = new ArrayList<String>();
+    for (Object o : _properties.keySet()) {
+      String key =  (String) o;
+      if (key.startsWith(KEY_PREFIX_SVN_URL)) {
+        names.add(key.substring(KEY_PREFIX_SVN_URL.length(), key.length()));
+      }
+    }
+    return names;
   }
 
 }

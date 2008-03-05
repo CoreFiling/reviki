@@ -29,10 +29,10 @@ public class InternalLinker {
   
   public String link(final String pageName) {
     String cssClass = exists(pageName) ? "existing-page" : "new-page";
-    return format("<a class='%s' href='%s/pages/%s/%s'>%s</a>",
+    return format("<a class='%s' href='%s/pages/%s%s'>%s</a>",
       cssClass,
       _contextPath,
-      Escape.url(_wikiName), 
+      _wikiName != null ? Escape.url(_wikiName) + "/" : "", 
       Escape.url(pageName), 
       Escape.html(pageName)
     );

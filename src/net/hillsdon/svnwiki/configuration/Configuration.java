@@ -5,7 +5,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 /**
  * Configuration that is available once we have an SVN repository configured.
  *
- * @see ConfigurationLocation
+ * @see DeploymentConfiguration
  * @author mth
  */
 public interface Configuration {

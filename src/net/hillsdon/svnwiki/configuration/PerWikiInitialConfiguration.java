@@ -7,11 +7,18 @@ import org.tmatesoft.svn.core.SVNURL;
 
 public class PerWikiInitialConfiguration {
 
-  private final ConfigurationLocation _configuration;
+  private final DeploymentConfiguration _configuration;
   private final String _wikiName;
+  private final String _givenWikiName;
 
-  public PerWikiInitialConfiguration(final ConfigurationLocation configuration, final String wikiName) {
+  /**
+   * @param configuration Main configuration.
+   * @param givenWikiName Name we were accessed as, either wikiName or null if we're the default.
+   * @param wikiName Name of this wiki.
+   */
+  public PerWikiInitialConfiguration(final DeploymentConfiguration configuration, final String givenWikiName, final String wikiName) {
     _configuration = configuration;
+    _givenWikiName = givenWikiName;
     _wikiName = wikiName;
   }
   
@@ -37,6 +44,24 @@ public class PerWikiInitialConfiguration {
 
   public boolean isComplete() {
     return _configuration.isComplete(_wikiName);
+  }
+
+  public String getGivenWikiName() {
+    return _givenWikiName;
+  }
+  
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof PerWikiInitialConfiguration) {
+      String givenWikiName = ((PerWikiInitialConfiguration) obj)._givenWikiName;
+      return _givenWikiName == null ? givenWikiName == null : _givenWikiName.equals(givenWikiName);
+    }
+    return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() ^ (_givenWikiName == null ? 0 : _givenWikiName.hashCode());
   }
   
 }

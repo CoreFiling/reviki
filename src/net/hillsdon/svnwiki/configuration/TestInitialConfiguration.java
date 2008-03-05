@@ -5,8 +5,8 @@ import junit.framework.TestCase;
 public class TestInitialConfiguration extends TestCase {
 
   public void testThrowsIllegalArgumentExceptionOnRubbishInput() {
-    ConfigurationLocation configuration = new ConfigurationLocation();
-    PerWikiInitialConfiguration perWikiConfiguration = new PerWikiInitialConfiguration(configuration, "SomeWiki");
+    DeploymentConfiguration configuration = new DeploymentConfiguration();
+    PerWikiInitialConfiguration perWikiConfiguration = new PerWikiInitialConfiguration(configuration, "SomeWiki", "SomeWiki");
     try {
       perWikiConfiguration.setUrl("foo bar");
       fail();
