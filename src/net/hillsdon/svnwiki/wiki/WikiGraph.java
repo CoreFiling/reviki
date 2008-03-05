@@ -27,10 +27,25 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
  */
 public interface WikiGraph {
 
+  /**
+   * @return Pages that have no incoming links (excluding themselves).
+   * @throws IOException On error reading an index.
+   * @throws PageStoreException On error reading wiki data.
+   */
   Set<String> isolatedPages() throws IOException, PageStoreException;
   
+  /**
+   * @return Incoming links for the page (excluding the page itself).
+   * @throws IOException On error reading an index.
+   * @throws PageStoreException On error reading wiki data.
+   */
   Set<String> incomingLinks(String page) throws IOException, PageStoreException;
   
+  /**
+   * @return Outgoing links for the page (excluding the page itself).
+   * @throws IOException On error reading an index.
+   * @throws PageStoreException On error reading wiki data.
+   */
   Set<String> outgoingLinks(String page) throws IOException, PageStoreException;
 
 }
