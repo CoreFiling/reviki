@@ -55,6 +55,9 @@ public class SVNHelper {
     _repository = repository;
   }
 
+  /**
+   * Returns the most recent changes first.
+   */
   public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(SVNRepository repository) throws SVNException, PageStoreException {

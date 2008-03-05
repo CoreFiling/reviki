@@ -85,7 +85,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
-    final ChangeInfo deletedIn = getChangeThatDeleted(ref, -1);
+    final ChangeInfo deletedIn = getChangeThatDeleted(ref);
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
     List<ChangeInfo> changes = _helper.log(ref.getPath(), -1, true, 0, lastRevision);
     if (deletedIn != null) {
@@ -140,8 +140,9 @@ public class SVNPageStore implements PageStore {
           long lastChangedRevision = PageInfo.UNCOMMITTED; 
           String lastChangedAuthor = null;
           Date lastChangedDate = null;
-          final ChangeInfo deletingChange = getChangeThatDeleted(ref, revision);
+          final ChangeInfo deletingChange = getChangeThatDeleted(ref);
           if (deletingChange != null) {
+            System.err.println("KNown deleted!!!");
             pseudoRevision = PageInfo.DELETED;
             lastChangedRevision = deletingChange.getRevision();
             lastChangedAuthor = deletingChange.getUser();
@@ -161,7 +162,7 @@ public class SVNPageStore implements PageStore {
     });
   }
 
-  private ChangeInfo getChangeThatDeleted(final PageReference ref, final long maxRevision) throws PageStoreAuthenticationException, PageStoreException {
+  private ChangeInfo getChangeThatDeleted(final PageReference ref) throws PageStoreAuthenticationException, PageStoreException {
     return _tracker.getChangeThatDeleted(_helper, ref.getPath());
   }
   

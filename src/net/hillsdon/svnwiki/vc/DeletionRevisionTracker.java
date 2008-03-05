@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.vc;
 
+import static net.hillsdon.fij.core.IterableUtils.reversed;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,7 +28,7 @@ public class DeletionRevisionTracker {
   private void catchUp(final SVNHelper helper) throws PageStoreAuthenticationException, PageStoreException {
     long latest = helper.getLatestRevision();
     if (latest > _lastTracked) {
-      for (ChangeInfo change : helper.log("", -1, false, _lastTracked, latest)) {
+      for (ChangeInfo change : reversed(helper.log("", -1, false, _lastTracked, latest))) {
         final String page = change.getPage();
         if (page != null) {
           if (change.getChangeType() == ChangeType.DELETED) {
