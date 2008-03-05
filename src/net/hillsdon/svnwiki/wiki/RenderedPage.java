@@ -62,14 +62,17 @@ public class RenderedPage {
     final NodeList links = _document.getElementsByTagName("A");
     for (int i = 0, len = links.getLength(); i < len; ++i) {
       Element link = (Element) links.item(i);
-      String clazz = link.getAttribute("class");
-      if (RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find()) {
+      if (hasWikiPageClass(link.getAttribute("class"))) {
         String href = link.getAttribute("href");
         int lastSlash = href.lastIndexOf('/');
         outgoing.add(href.substring(lastSlash + 1));
       }
     }
     return outgoing;
+  }
+
+  private boolean hasWikiPageClass(String clazz) {
+    return RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find();
   }
 
 }
