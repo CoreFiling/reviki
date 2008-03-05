@@ -1,5 +1,6 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import java.lang.reflect.Array;
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.text.Escape;
@@ -31,9 +32,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
 //
 
 /**
- * A Creole 0.1 renderer.
+ * An incomplete Creole 1.0 renderer.
  * 
- * @see http://www.wikicreole.org/wiki/Creole1.0
+ * @see <a href="http://www.wikicreole.org/wiki/Creole1.0">The 1.0 specification.</a>
  * @author mth
  */
 public class CreoleRenderer {
@@ -73,9 +74,7 @@ public class CreoleRenderer {
     RenderNode orderedList = new ListNode("#", "ol");
     RenderNode rawUrl = new RawUrlNode();
     RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl};
-    RenderNode[] nonStructural = new RenderNode[defaultNonStructural.length + customNonStructural.length];
-    System.arraycopy(customNonStructural, 0, nonStructural, 0, customNonStructural.length);
-    System.arraycopy(defaultNonStructural, 0, nonStructural, customNonStructural.length, defaultNonStructural.length);
+    RenderNode[] nonStructural = concat(defaultNonStructural, customNonStructural);
 
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
     RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
@@ -83,7 +82,7 @@ public class CreoleRenderer {
     RenderNode tableCell = new RegexMatchToTag("[|]+([^|]*)", "td", 1);
     table.addChildren(tableRow);
     tableRow.addChildren(tableHeading, tableCell);
-    tableCell.addChildren(nonStructural);
+    tableCell.addChildren(concat(nonStructural, noWiki));
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(nonStructural);
@@ -108,6 +107,14 @@ public class CreoleRenderer {
   
   public String render(final PageReference page, final String in) {
     return _root.render(page, in.replaceAll("\r", ""));
+  }
+  
+  @SuppressWarnings("unchecked")
+  private static <T> T[] concat(final T[] some, final T... more) {
+    T[] all = (T[]) Array.newInstance(some.getClass().getComponentType(), some.length + more.length);
+    System.arraycopy(some, 0, all, 0, some.length);
+    System.arraycopy(more, 0, all, some.length, more.length);
+    return all;
   }
   
 }
