@@ -1,5 +1,6 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.path} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
@@ -30,7 +31,7 @@
     </c:choose>
     <c:if test="${not pageInfo.new}">
       <p>
-      <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last change</a>
+      <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last changed by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/>.</a>
       </p>
     </c:if>
   </tiles:putAttribute>

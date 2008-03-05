@@ -27,6 +27,7 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
@@ -131,14 +132,16 @@ public class SVNPageStore implements PageStore {
         _repository.getFile(path, revision, properties, baos);
         long actualRevision = SVNProperty.longValue(properties.get(SVNProperty.REVISION));
         long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
+        Date lastChangedDate = SVNTimeUtil.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
+        String lastChangedAuthor = properties.get(SVNProperty.LAST_AUTHOR);
         SVNLock lock = _repository.getLock(path);
         String lockOwner = lock == null ? null : lock.getOwner();
         String lockToken = lock == null ? null : lock.getID();
-        return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lockOwner, lockToken);
+        return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
       }
       else if (SVNNodeKind.NONE.equals(kind)) {
         // Distinguishing between 'uncommitted' and 'deleted' would be useful for history.
-        return new PageInfo(path, "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null);
+        return new PageInfo(path, "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
       }
       else {
         throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, path));
