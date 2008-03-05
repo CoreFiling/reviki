@@ -71,8 +71,6 @@ public class WikiHandler implements RequestHandler {
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    request.setAttribute("wikiName", _configuration.getWikiName());
-    request.setAttribute("wikiIsValid", _configuration.isComplete());
     request.setAttribute("internalLinker", _internalLinker);
     try {
       // Handle the lifecycle of the thread-local request dependent page store.

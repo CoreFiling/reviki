@@ -20,9 +20,10 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRevisio
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,8 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.external.diff_match_patch.diff_match_patch;
 import net.hillsdon.svnwiki.search.QuerySyntaxException;
-import net.hillsdon.svnwiki.search.SearchEngine;
-import net.hillsdon.svnwiki.search.SearchMatch;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
@@ -39,6 +38,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.WikiGraph;
 
 public class GetRegularPage implements PageRequestHandler {
 
@@ -55,13 +55,13 @@ public class GetRegularPage implements PageRequestHandler {
   }
   
   private final MarkupRenderer _markupRenderer;
-  private final SearchEngine _engine;
+  private final WikiGraph _graph;
   private final PageStore _store;
 
-  public GetRegularPage(final PageStore store, final MarkupRenderer markupRenderer, final SearchEngine engine) {
+  public GetRegularPage(final PageStore store, final MarkupRenderer markupRenderer, final WikiGraph graph) {
     _store = store;
     _markupRenderer = markupRenderer;
-    _engine = engine;
+    _graph = graph;
   }
 
   public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
@@ -86,19 +86,11 @@ public class GetRegularPage implements PageRequestHandler {
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
-    Set<SearchMatch> backlinks = _engine.search(_engine.escape(page.getPath()), false);
-    backlinks.remove(new SearchMatch(page.getPath(), null));
-    if (backlinks.size() > BACKLINKS_LIMIT) {
+    List<String> pageNames = new ArrayList<String>(_graph.getBacklinks(page.getPath()));
+    Collections.sort(pageNames);
+    if (pageNames.size() > BACKLINKS_LIMIT) {
+      pageNames = pageNames.subList(0, BACKLINKS_LIMIT - 1);
       request.setAttribute("backlinksLimited", true);
-    }
-    
-    Set<String> pageNames = new LinkedHashSet<String>();
-    int i = 0;
-    for (SearchMatch backlink : backlinks) {
-      pageNames.add(backlink.getPage());
-      if (++i >= BACKLINKS_LIMIT) {
-        break;
-      }
     }
     request.setAttribute("backlinks", pageNames);
   }

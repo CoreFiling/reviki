@@ -25,6 +25,8 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
+import net.hillsdon.svnwiki.wiki.WikiGraph;
+import net.hillsdon.svnwiki.wiki.WikiGraphImpl;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.
@@ -40,13 +42,16 @@ public class PageHandler implements RequestHandler {
   private final RequestHandler _recentChanges;
   private final RequestHandler _allPages;
   private final RequestHandler _search;
+  private final RequestHandler _orphanedPages;
 
   public PageHandler(final ConfigPageCachingPageStore cachingPageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer) {
+    WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, searchEngine);
     _recentChanges = new RecentChanges(cachingPageStore);
     _allPages = new AllPages(cachingPageStore);
     _search = new Search(cachingPageStore, searchEngine);
     _attachments = new Attachments(cachingPageStore);
-    _regularPage = new RegularPage(cachingPageStore, markupRenderer, searchEngine);
+    _regularPage = new RegularPage(cachingPageStore, markupRenderer, wikiGraph);
+    _orphanedPages = new OrphanedPages(wikiGraph);
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -69,6 +74,9 @@ public class PageHandler implements RequestHandler {
     }
     else if ("FindPage".equals(pageName)) {
       _search.handle(path, request, response);
+    }
+    else if ("OrphanedPages".equals(pageName)) {
+      _orphanedPages.handle(path, request, response);
     }
     else {
       if ("attachments".equals(path.peek())) {

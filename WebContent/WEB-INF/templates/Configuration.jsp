@@ -1,13 +1,17 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title"><c:out value="${wikiName}"/> configuration</tiles:putAttribute>
-  <tiles:putAttribute name="heading"><c:out value="${wikiName}"/> configuration</tiles:putAttribute>
+  <tiles:putAttribute name="title">Config Svn Location</tiles:putAttribute>
+  <tiles:putAttribute name="heading">Config Svn Location</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>
       The wiki will store pages at the directory pointed to by the given SVN URL.
-      The URL should not be the root of the repository unless you really want svnwiki
-      to put its files there.
+      The URL should not be the root of the repository unless you really want to
+      store the data there.
+    </p>
+    <p>
+      If the location contains existing wiki data it may take some minutes for
+      indexing to complete after you submit this form.
     </p>
     
     <form action="" method="post">

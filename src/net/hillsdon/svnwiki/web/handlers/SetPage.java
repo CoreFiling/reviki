@@ -28,8 +28,6 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class SetPage implements PageRequestHandler {
 
-  // Value of the submit element, 'Save' or 'Cancel'.
-  private static final String PARAM_ACTION = "action";
   static final String PARAM_CONTENT = "content";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private static final String PARAM_LOCK_TOKEN = "lockToken";
@@ -55,7 +53,7 @@ public class SetPage implements PageRequestHandler {
 
   public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
-    if ("Save".equals(request.getParameter(PARAM_ACTION))) {
+    if (request.getParameter("save") != null) {
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(CRLF)) {
