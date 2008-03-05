@@ -56,4 +56,8 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     get().unlock(page, lockToken);
   }
 
+  public List<ChangeInfo> history(String path) throws PageStoreException {
+    return get().history(path);
+  }
+
 }

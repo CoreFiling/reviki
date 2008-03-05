@@ -44,5 +44,9 @@ public class SimplePageStore implements PageStore {
 
   public void unlock(String page, String lockToken) {
   }
+
+  public List<ChangeInfo> history(String path) throws PageStoreException {
+    return Collections.emptyList();
+  }
   
 }

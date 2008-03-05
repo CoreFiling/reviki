@@ -49,5 +49,9 @@ public class DelegatingPageStore implements PageStore {
   public void unlock(String page, String lockToken) throws PageStoreException {
     _delegate.unlock(page, lockToken);
   }
+
+  public List<ChangeInfo> history(String path) throws PageStoreException {
+    return _delegate.history(path);
+  }
   
 }

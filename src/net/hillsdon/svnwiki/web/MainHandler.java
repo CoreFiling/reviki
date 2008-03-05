@@ -8,6 +8,7 @@ import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
+import net.hillsdon.svnwiki.web.handlers.History;
 import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
@@ -19,6 +20,7 @@ public class MainHandler implements RequestHandler {
   private RequestHandler _editor;
   private RequestHandler _set;
   private RequestHandler _search;
+  private RequestHandler _history;
 
   public MainHandler(final Configuration configuration) {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
@@ -28,6 +30,7 @@ public class MainHandler implements RequestHandler {
     _search = new Search(_pageStore, searcher);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
+    _history = new History(_pageStore);
   }
   
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -40,7 +43,12 @@ public class MainHandler implements RequestHandler {
             _search.handle(request, response);
           }
           else {
-            _get.handle(request, response);
+            if (request.getParameter("history") != null) {
+              _history.handle(request, response);
+            }
+            else {
+              _get.handle(request, response);
+            }
           }
         }
         else if ("POST".equals(request.getMethod())) {

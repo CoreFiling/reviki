@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,13 +47,12 @@ public class SVNPageStore implements PageStore {
    * The assumed encoding of files from the repository.
    */
   private static final String UTF8 = "UTF8";
-  
+
   private final SVNRepository _repository;
 
   /**
-   * Note the repository URL can be deep, it need not refer to 
-   * the root of the repository itself.  We put pages in the root
-   * of what we're given.
+   * Note the repository URL can be deep, it need not refer to the root of the
+   * repository itself. We put pages in the root of what we're given.
    */
   public SVNPageStore(final SVNRepository repository) {
     _repository = repository;
@@ -62,22 +60,41 @@ public class SVNPageStore implements PageStore {
 
   @SuppressWarnings("unchecked")
   public List<ChangeInfo> recentChanges() throws PageStoreException {
-    try {
-      List<SVNLogEntry> entries = limitedLog();
-      List<ChangeInfo> results = new LinkedList<ChangeInfo>();
-      String rootPath = _repository.getRepositoryPath("");
-      for (ListIterator<SVNLogEntry> iter = entries.listIterator(entries.size()); iter.hasPrevious();) {
-        SVNLogEntry entry = iter.previous();
-        for (String path : (Collection<String>) entry.getChangedPaths().keySet()) {
-          if (path.length() > rootPath.length()) {
-            String name = path.substring(rootPath.length() + 1);
-            String user = entry.getAuthor();
-            Date date = entry.getDate();
-            results.add(new ChangeInfo(name, user, date, entry.getRevision()));
-          }
-        }
+    return log("", RECENT_CHANGES_HISTORY_SIZE);
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final SVNLogEntry entry) throws SVNException {
+    List<ChangeInfo> results = new LinkedList<ChangeInfo>();
+    for (String path : (Iterable<String>) entry.getChangedPaths().keySet()) {
+      if (path.length() > rootPath.length()) {
+        String name = path.substring(rootPath.length() + 1);
+        String user = entry.getAuthor();
+        Date date = entry.getDate();
+        results.add(new ChangeInfo(name, user, date, entry.getRevision()));
       }
-      return results;
+    }
+    return results;
+  }
+
+  private String getRoot() throws SVNException {
+    return _repository.getRepositoryPath("");
+  }
+
+  public List<ChangeInfo> history(final String path) throws PageStoreException {
+    return log(path, -1);
+  }
+
+  private List<ChangeInfo> log(final String path, final long limit) throws PageStoreException {
+    try {
+      final String rootPath = getRoot();
+      final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
+      _repository.log(new String[] {path}, -1, 0, true, true, RECENT_CHANGES_HISTORY_SIZE, new ISVNLogEntryHandler() {
+        public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
+          entries.addAll(logEntryToChangeInfos(rootPath, logEntry));
+        }
+      });
+      return entries;
     }
     catch (SVNAuthenticationException ex) {
       throw new PageStoreAuthenticationException(ex);
@@ -87,20 +104,6 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  /**
-   * @return Last N log entries in reverse chronological order.
-   * @throws SVNException On failure.
-   */
-  private List<SVNLogEntry> limitedLog() throws SVNException {
-    final List<SVNLogEntry> entries = new LinkedList<SVNLogEntry>();
-    _repository.log(new String[]{""}, -1, 0, true, true, RECENT_CHANGES_HISTORY_SIZE, new ISVNLogEntryHandler() {
-      public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-        entries.add(0, logEntry);
-      }
-    });
-    return entries;
-  }
-  
   public Collection<String> list() throws PageStoreException {
     try {
       List<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
@@ -122,11 +125,11 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  public PageInfo get(final String path, long revision) throws PageStoreException {
+  public PageInfo get(final String path, final long revision) throws PageStoreException {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       HashMap<String, String> properties = new HashMap<String, String>();
-      
+
       SVNNodeKind kind = _repository.checkPath(path, revision);
       if (SVNNodeKind.FILE.equals(kind)) {
         _repository.getFile(path, revision, properties, baos);
@@ -140,7 +143,8 @@ public class SVNPageStore implements PageStore {
         return new PageInfo(path, toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
       }
       else if (SVNNodeKind.NONE.equals(kind)) {
-        // Distinguishing between 'uncommitted' and 'deleted' would be useful for history.
+        // Distinguishing between 'uncommitted' and 'deleted' would be useful
+        // for history.
         return new PageInfo(path, "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
       }
       else {
@@ -160,7 +164,7 @@ public class SVNPageStore implements PageStore {
     if (page.isNew()) {
       return page;
     }
-    
+
     try {
       long revision = page.getRevision();
       Map<String, Long> pathsToRevisions = singletonMap(path, revision);
@@ -178,7 +182,7 @@ public class SVNPageStore implements PageStore {
       throw new PageStoreException(ex);
     }
   }
-  
+
   public void unlock(final String path, final String lockToken) throws PageStoreException {
     try {
       _repository.unlock(singletonMap(path, lockToken), false, new ISVNLockHandlerAdapter());
@@ -190,10 +194,10 @@ public class SVNPageStore implements PageStore {
       throw new PageStoreException(ex);
     }
   }
-  
-  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException  {
+
+  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException {
     try {
-      Map<String, String> locks = lockToken == null ? Collections.<String, String>emptyMap() : Collections.<String, String>singletonMap(path, lockToken);
+      Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
       ISVNEditor commitEditor = _repository.getCommitEditor("[automated commit]", locks, false, null);
       if (baseRevision == PageInfo.UNCOMMITTED) {
         createFile(commitEditor, path, fromUTF8(content));
@@ -235,7 +239,7 @@ public class SVNPageStore implements PageStore {
     commitEditor.closeFile(filePath, checksum);
     commitEditor.closeDir();
   }
-  
+
   private static String toUTF8(final byte[] bytes) {
     try {
       return new String(bytes, UTF8);
@@ -244,7 +248,7 @@ public class SVNPageStore implements PageStore {
       throw new AssertionError("Java supports UTF8.");
     }
   }
-  
+
   private static byte[] fromUTF8(final String string) {
     try {
       return string.getBytes(UTF8);
@@ -253,5 +257,5 @@ public class SVNPageStore implements PageStore {
       throw new AssertionError("Java supports UTF8.");
     }
   }
-  
+
 }

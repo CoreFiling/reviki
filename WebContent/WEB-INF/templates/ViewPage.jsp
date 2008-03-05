@@ -42,7 +42,7 @@
     </c:choose>
     <c:if test="${not pageInfo.new}">
       <p>
-      <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last changed by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/>.</a>
+        <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last changed by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> (<a href="?history">full history</a>).
       </p>
     </c:if>
   </tiles:putAttribute>

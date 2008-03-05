@@ -2,18 +2,14 @@ package net.hillsdon.svnwiki.vc;
 
 import java.util.Date;
 
-import net.hillsdon.svnwiki.text.WikiWordUtils;
-
 /**
  * Contents at a particular revision.
  * 
  * @author mth
  */
-public class PageInfo {
+public class PageInfo extends PageReference {
 
   public static final long UNCOMMITTED = -2;
-
-  private final String _path;
 
   private final String _content;
 
@@ -30,7 +26,7 @@ public class PageInfo {
   private final String _lockToken;
   
   public PageInfo(final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken) {
-    _path = path;
+    super(path);
     _content = content;
     _revision = revision;
     _lastChangedRevision = lastChangedRevision;
@@ -40,14 +36,6 @@ public class PageInfo {
     _lockToken = lockToken;
   }
 
-  public String getTitle() {
-    return WikiWordUtils.pathToTitle(getPath()).toString();
-  }
-  
-  public String getPath() {
-    return _path;
-  }
-  
   public String getContent() {
     return _content;
   }

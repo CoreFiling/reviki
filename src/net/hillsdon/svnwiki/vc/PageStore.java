@@ -21,6 +21,13 @@ public interface PageStore {
    * @throws PageStoreException If something goes wrong.
    */
   List<ChangeInfo> recentChanges() throws PageStoreException;
+
+  /**
+   * @param path The path.
+   * @return Changes, in most recent first.
+   * @throws PageStoreException If something goes wrong.
+   */
+  List<ChangeInfo> history(String path) throws PageStoreException;
   
   /**
    * The page info may represent a page that doesn't exist yet,
