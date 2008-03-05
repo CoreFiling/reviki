@@ -46,7 +46,7 @@ public class SetPage implements PageRequestHandler {
   public static final String PARAM_COMMIT_MESSAGE = "description";
   public static final String PARAM_MINOR_EDIT = "minorEdit";
 
-  private static String createLinkingCommitMessage(final HttpServletRequest request) {
+  static String createLinkingCommitMessage(final HttpServletRequest request) {
     boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
     String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
     if (commitMessage == null || commitMessage.trim().length() == 0) {
@@ -55,7 +55,7 @@ public class SetPage implements PageRequestHandler {
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + request.getRequestURL();
   }
   
-  private static final String CRLF = "\r\n";
+  static final String CRLF = "\r\n";
   
   private final PageStore _store;
 
@@ -97,7 +97,7 @@ public class SetPage implements PageRequestHandler {
         toRef = new PageReference(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
-      return new RedirectView(RequestBasedWikiUrls.get(request).page(toPage));
+      return new RedirectView(RequestBasedWikiUrls.get(request).page(toRef.getPath()));
     }
     else if (hasRenameParam) {
       final String toPage = getRequiredString(request, PARAM_TO_PAGE);

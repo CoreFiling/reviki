@@ -13,8 +13,30 @@ import java.util.Map;
  */
 public final class MockHttpServletRequest extends NullHttpServletRequest {
 
+  private Map<String, Object> _attributes = new LinkedHashMap<String, Object>();
   private Map<String, List<String>> _parameters = new LinkedHashMap<String, List<String>>();
+  private String _requestURL = "";
+  private String _contextPath = "";
 
+  @Override
+  public void setAttribute(final String key, final Object value) {
+    _attributes.put(key, value);
+  }
+
+  public void setContextPath(final String contextPath) {
+    _contextPath = contextPath;
+  }
+  
+  @Override
+  public String getContextPath() {
+    return _contextPath;
+  }
+  
+  @Override
+  public Object getAttribute(final String key) {
+    return _attributes.get(key);
+  }
+  
   public void setParameter(final String name, final String value) {
     setParameter(name, Collections.singletonList(value));
   }
@@ -36,6 +58,20 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
       return entries.get(0);
     }
     return null;
+  }
+
+  @Override
+  public String getRequestURI() {
+    return _requestURL;
+  }
+  
+  @Override
+  public StringBuffer getRequestURL() {
+    return new StringBuffer(_requestURL);
+  }
+  
+  public void setRequestURL(final String requestURL) {
+    _requestURL = requestURL;
   }
   
 }
