@@ -15,6 +15,7 @@
  */
 package net.hillsdon.svnwiki.search;
 
+import static net.hillsdon.fij.text.Strings.join;
 import static net.hillsdon.svnwiki.text.WikiWordUtils.pathToTitle;
 
 import java.io.File;
@@ -70,6 +71,7 @@ public class LuceneSearcher implements SearchEngine {
    * We tokenize the wiki word to allow e.g. 'another' to find 'AnotherNewPage'.
    */
   private static final String FIELD_TITLE = "title";
+  private static final String FIELD_OUTGOING_LINKS = "outgoing-links";
   
   private static final String FIELD_PROPERTY_KEY = "property";
   private static final String FIELD_PROPERTY_VALUE = "property-value";
@@ -113,6 +115,7 @@ public class LuceneSearcher implements SearchEngine {
     Document document = new Document();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_OUTGOING_LINKS, join(renderedPage.findOutgoingWikiLinks().iterator(), " "), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, renderedPage.asText(), Field.Store.YES, Field.Index.TOKENIZED));
     return document;
