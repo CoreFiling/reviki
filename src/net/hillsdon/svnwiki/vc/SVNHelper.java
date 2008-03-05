@@ -70,7 +70,7 @@ public class SVNHelper {
       if (!pathOnly || changedPath.substring(rootPath.length() + 1).equals(path)) {
         ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
-        // something useful with 'other changes.
+        // something useful with 'other' changes.
         if (change.getKind() != StoreKind.OTHER) {
           results.add(change);
         }
