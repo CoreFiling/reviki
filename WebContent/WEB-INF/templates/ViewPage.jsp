@@ -32,7 +32,7 @@
         <sw:wikiLink page="${backlink}"/>
       </c:forEach>
       <c:if test="${backlinksLimited}">
-        <a href="<sw:wikiUrl page="FindPage"/>query=${pageInfo.path}&force">...</a>
+        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.path}&force">...</a>
       </c:if>
       </p>
     </c:if>
