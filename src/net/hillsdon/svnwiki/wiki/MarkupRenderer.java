@@ -13,6 +13,6 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
  */
 public interface MarkupRenderer {
   
-  public void render(PageReference page, String in, Writer out) throws IOException, PageStoreException;
+  void render(PageReference page, String in, Writer out) throws IOException, PageStoreException;
     
 }
