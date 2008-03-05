@@ -40,7 +40,7 @@ public class RecentChanges implements RequestHandler {
     request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
   }
 
-  private List<ChangeInfo> getRecentChanges(boolean showMinor) throws PageStoreException {
+  private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {
     List<ChangeInfo> allChanges = _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
     if (showMinor) {
       return allChanges;
