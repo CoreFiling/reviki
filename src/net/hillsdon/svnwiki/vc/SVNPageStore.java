@@ -50,7 +50,7 @@ import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
  */
 public class SVNPageStore implements PageStore {
 
-  private static final Predicate<ChangeInfo> CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
+  private static final Predicate<ChangeInfo> IS_CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
     public Boolean transform(final ChangeInfo in) {
       return in.getKind() == StoreKind.PAGE;
     }
@@ -85,7 +85,7 @@ public class SVNPageStore implements PageStore {
     if (deletedIn != null) {
       changes.add(0, deletedIn);
     }
-    return Functional.list((((filter(changes, CHANGE_TO_PAGE)))));
+    return Functional.list((((filter(changes, IS_CHANGE_TO_PAGE)))));
   }
 
   public Collection<PageReference> list() throws PageStoreException {
