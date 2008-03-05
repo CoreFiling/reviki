@@ -15,8 +15,8 @@
  */
 package net.hillsdon.svnwiki.vc;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
 public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
 
   private static final String CONFIG_PREFIX = "Config";
-  private Map<PageReference, PageInfo> _cache = new LinkedHashMap<PageReference, PageInfo>();
+  private final ConcurrentMap<PageReference, PageInfo> _cache = new ConcurrentHashMap<PageReference, PageInfo>();
 
   public ConfigPageCachingPageStore(final PageStore delegate) {
     super(delegate);
@@ -53,7 +53,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
   @Override
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
     if (isConfigPage(ref.getPath())) {
-      _cache = new LinkedHashMap<PageReference, PageInfo>();
+      _cache.remove(ref);
     }
     return super.set(ref, lockToken, baseRevision, content, commitMessage);
   }
