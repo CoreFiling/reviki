@@ -37,7 +37,7 @@ public class ConfigurationHandler implements RequestHandler {
 
   private void showView(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     request.setAttribute("configuration", _configuration);
-    request.getRequestDispatcher("/WEB-INF/templates/Configuration.jsp").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/templates/Configuration.jsp").include(request, response);
   }
       
 }

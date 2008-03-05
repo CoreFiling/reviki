@@ -10,7 +10,7 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 
 /**
- * Wherein we go to mad lengths to store the SVN URL somewhere.
+ * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
  * 
  * @author mth
  */
@@ -18,6 +18,7 @@ public class Configuration {
 
   private static final String DEFAULT_CONFIG_DIR_NAME = "svnwiki-data";
   private static final String CONFIG_FILE_NAME = "svnwiki.properties";
+  private static final String SEARCH_INDEX_DIR_NAME = "search-index";
   // Properties file keys:
   private static final String KEY_SVN_URL = "svn-url";
   
@@ -27,6 +28,22 @@ public class Configuration {
     return _url;
   }
 
+  /**
+   * @return Somewhere writable to put the search index, or null if that is not possible.
+   */
+  public File getSearchIndexDirectory() {
+    File indexDir = new File(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
+    if (!indexDir.exists()) {
+      if (!indexDir.mkdir()) {
+        return null;
+      }
+    }
+    if (indexDir.isDirectory() && indexDir.canWrite()) {
+      return indexDir;
+    }
+    return null;
+  }
+  
   public void setUrl(final String url) throws IllegalArgumentException {
     try {
       _url = SVNURL.parseURIDecoded(url);

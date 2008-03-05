@@ -3,10 +3,12 @@ package net.hillsdon.svnwiki.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.svnwiki.search.LuceneSearcher;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.handlers.EditorForPage;
 import net.hillsdon.svnwiki.web.handlers.GetPage;
+import net.hillsdon.svnwiki.web.handlers.Search;
 import net.hillsdon.svnwiki.web.handlers.SetPage;
 import net.hillsdon.svnwiki.wiki.RadeoxMarkupRenderer;
 
@@ -16,10 +18,13 @@ public class MainHandler implements RequestHandler {
   private RequestHandler _get;
   private RequestHandler _editor;
   private RequestHandler _set;
+  private RequestHandler _search;
 
   public MainHandler(final Configuration configuration) {
-    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl());
+    LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
+    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
+    _search = new Search(searcher);
     _get = new GetPage(_pageStore, new RadeoxMarkupRenderer(_pageStore));
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
@@ -31,7 +36,12 @@ public class MainHandler implements RequestHandler {
       _pageStore.create(request);
       try {
         if ("GET".equals(request.getMethod())) {
-          _get.handle(request, response);
+          if ((request.getContextPath() + "/search").equals(request.getRequestURI())) {
+            _search.handle(request, response);
+          }
+          else {
+            _get.handle(request, response);
+          }
         }
         else if ("POST".equals(request.getMethod())) {
           if (request.getParameter("content") == null) {

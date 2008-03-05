@@ -52,14 +52,14 @@ public class GetRegularPage extends PageRequestHandler {
     if (diffRevision != null) {
       PageInfo base = store.get(page, diffRevision);
       request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
-      request.getRequestDispatcher("/WEB-INF/templates/ViewDiff.jsp").forward(request, response);
+      request.getRequestDispatcher("/WEB-INF/templates/ViewDiff.jsp").include(request, response);
     }
     else {
       StringWriter writer = new StringWriter();
       _markupRenderer.render(main.getContent(), writer);
       
       request.setAttribute("renderedContents", writer.toString());
-      request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").forward(request, response);
+      request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").include(request, response);
     }
   }
 

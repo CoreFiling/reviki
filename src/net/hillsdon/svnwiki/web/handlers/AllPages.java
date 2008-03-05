@@ -17,7 +17,7 @@ public class AllPages extends PageRequestHandler {
 
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
     request.setAttribute("pageList", store.list());
-    request.getRequestDispatcher("/WEB-INF/templates/AllPages.jsp").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/templates/AllPages.jsp").include(request, response);
   }
 
 }

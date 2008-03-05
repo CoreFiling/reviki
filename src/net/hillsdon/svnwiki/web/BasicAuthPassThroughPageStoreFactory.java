@@ -5,6 +5,8 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.hillsdon.svnwiki.search.SearchIndexPopulatingPageStore;
+import net.hillsdon.svnwiki.search.SearchIndexer;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
@@ -58,13 +60,15 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
     }
   }
 
-  private SVNURL _url;
+  private final SVNURL _url;
+  private final SearchIndexer _indexer;
   
   /**
    * @param url Repository URL.
    */
-  public BasicAuthPassThroughPageStoreFactory(final SVNURL url) {
+  public BasicAuthPassThroughPageStoreFactory(final SVNURL url, final SearchIndexer indexer) {
     _url = url;
+    _indexer = indexer;
   }
 
   static UsernamePassword getBasicAuthCredentials(String authorization) {
@@ -101,7 +105,7 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
       UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new FrontPagePopulatingPageStore(new CachingPageStore(new SVNPageStore(repository)));
+      return new SearchIndexPopulatingPageStore(_indexer, new FrontPagePopulatingPageStore(new CachingPageStore(new SVNPageStore(repository))));
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);

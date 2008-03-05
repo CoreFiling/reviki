@@ -17,7 +17,7 @@ public class RecentChanges extends PageRequestHandler {
 
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
     request.setAttribute("recentChanges", store.recentChanges());
-    request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/templates/RecentChanges.jsp").include(request, response);
   }
 
 }
