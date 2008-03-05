@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import net.hillsdon.svnwiki.vc.SimplePageStore;
 
 public class TestRadeoxMarkupRenderer extends TestCase {
 
-  private static final String EXAMPLE = "~~Hello~~";
-
   public void test() throws IOException {
-    // FIXME!
-    MarkupRenderer renderer = new RadeoxMarkupRenderer(null);
+    SimplePageStore pageStore = new SimplePageStore();
+    MarkupRenderer renderer = new RadeoxMarkupRenderer(pageStore);
     StringWriter writer = new StringWriter();
-    renderer.render(EXAMPLE, writer);
-    assertEquals("<i class=\"italic\">Hello</i>", writer.toString());
+    renderer.render("A WikiWord is in this sentence.", writer);
+    assertEquals("", writer.toString());
   }
   
 }
