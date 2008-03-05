@@ -64,15 +64,22 @@ public class SVNPageStore implements PageStore {
   }
 
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final SVNLogEntry entry) throws SVNException {
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, String path, final SVNLogEntry entry) throws SVNException {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
-    for (String path : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (path.length() > rootPath.length()) {
-        String name = path.substring(rootPath.length() + 1);
-        String user = entry.getAuthor();
-        Date date = entry.getDate();
-        results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
+    String user = entry.getAuthor();
+    Date date = entry.getDate();
+    // FIXME: This is messy.  If we're querying the root we want to report on all changed
+    //        pages, otherwise we only want to report on the page we're interested in.
+    if ("".equals(path)) {
+      for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
+        if (changedPath.length() > rootPath.length()) {
+          String name = changedPath.substring(rootPath.length() + 1);
+          results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
+        }
       }
+    }
+    else {
+      results.add(new ChangeInfo(path, user, date, entry.getRevision(), entry.getMessage()));
     }
     return results;
   }
@@ -91,7 +98,7 @@ public class SVNPageStore implements PageStore {
       final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
       _repository.log(new String[] {path}, -1, 0, true, true, RECENT_CHANGES_HISTORY_SIZE, new ISVNLogEntryHandler() {
         public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-          entries.addAll(logEntryToChangeInfos(rootPath, logEntry));
+          entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry));
         }
       });
       return entries;
