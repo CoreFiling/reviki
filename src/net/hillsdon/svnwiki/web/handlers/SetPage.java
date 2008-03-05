@@ -8,6 +8,8 @@ import net.hillsdon.svnwiki.web.InvalidInputException;
 
 public class SetPage extends PageRequestHandler {
 
+  private static final String CRLF = "\r\n";
+
   public SetPage(final PageStore store) {
     super(store);
   }
@@ -35,8 +37,8 @@ public class SetPage extends PageRequestHandler {
       if (content == null) {
         throw new InvalidInputException("'content' required.");
       }
-      if (!content.endsWith("\n")) {
-        content = content + "\n";
+      if (!content.endsWith(CRLF)) {
+        content = content + CRLF;
       }
 
       store.set(page, lockToken, baseRevision, content);
