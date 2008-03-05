@@ -31,7 +31,7 @@
     </javac>
     <copy todir="${build}">
       <fileset dir="${source}">
-        <include name="${preopulated-pages}"/>
+        <include name="${prepopulated-pages}"/>
         <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
       </fileset>
     </copy>
