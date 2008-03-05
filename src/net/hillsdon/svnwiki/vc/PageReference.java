@@ -15,10 +15,22 @@
  */
 package net.hillsdon.svnwiki.vc;
 
+import net.hillsdon.fij.core.Transform;
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 
+/**
+ * Quite possibly this class is more trouble that it is worth.
+ * 
+ * @author mth
+ */
 public class PageReference implements Comparable<PageReference> {
 
+  public static final Transform<PageReference, String> TO_NAME = new Transform<PageReference, String>() {
+    public String transform(PageReference in) {
+      return in.getPath();
+    }
+  };
+  
   private final String _path;
 
   public PageReference(final String path) {

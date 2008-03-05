@@ -15,6 +15,9 @@
  */
 package net.hillsdon.svnwiki.wiki;
 
+import static net.hillsdon.fij.core.Functional.list;
+import static net.hillsdon.fij.core.Functional.map;
+
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -35,11 +38,15 @@ public class WikiGraphImpl implements WikiGraph {
   }
   
   public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
-    return _searchEngine.incomingLinks(page);
+    Set<String> incoming = _searchEngine.incomingLinks(page);
+    retainOnlyExistingPages(incoming);
+    return incoming;
   }
 
-  public Set<String> outgoingLinks(String page) throws IOException, PageStoreException {
-    return _searchEngine.outgoingLinks(page);
+  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
+    Set<String> outgoing = _searchEngine.outgoingLinks(page);
+    retainOnlyExistingPages(outgoing);
+    return outgoing;
   }
 
   public Set<String> isolatedPages() throws IOException, PageStoreException {
@@ -51,6 +58,17 @@ public class WikiGraphImpl implements WikiGraph {
       }
     }
     return isolated;
+  }
+
+  /**
+   * The search index will only update its record of outgoing links
+   * when pages are edited so we compensate by filtering.
+   * 
+   * @param pages Incoming.
+   * @throws PageStoreException If we can't get the page list.
+   */
+  private void retainOnlyExistingPages(final Set<String> pages) throws PageStoreException {
+    pages.retainAll(list(map(_pageStore.list(), PageReference.TO_NAME)));
   }
 
 }
