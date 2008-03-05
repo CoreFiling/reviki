@@ -1,7 +1,5 @@
 package net.hillsdon.svnwiki.web.handlers;
 
-import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getLong;
-
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.svnwiki.web.InvalidInputException;

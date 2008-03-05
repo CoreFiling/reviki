@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import net.hillsdon.svnwiki.configuration.Configuration;
 import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.text.WikiWordUtils;
+import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.UnknownWikiException;
@@ -38,7 +39,7 @@ public class CustomWikiLinkNode extends AbstractRegexNode {
     return wikiName != null || WikiWordUtils.isWikiWord(pageName);
   }
 
-  public String handle(final Matcher result) {
+  public String handle(PageReference page, final Matcher result) {
     final String matched = result.group(0);
     String wikiName = result.group(1);
     String pageName = result.group(2);

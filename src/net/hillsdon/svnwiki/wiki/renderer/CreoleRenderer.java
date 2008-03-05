@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import net.hillsdon.svnwiki.vc.PageReference;
+
 // Adapted from the Creole 0.4 implementation in JavaScript available here
 // http://www.meatballsociety.org/Creole/0.4/
 // Original copyright notice follows:
@@ -38,15 +40,15 @@ public class CreoleRenderer {
       super(String.format("(?:^|\n)={%d}(.+?)(?:\n|$)", number), "h" + number, 1);
     }
   }
-  private static class List extends RegexMatchToTag {
-    public List(final String match, final String tag) {
+  private static class ListNode extends RegexMatchToTag {
+    public ListNode(final String match, final String tag) {
       super("(^|\\n)(" + match + "[^*#].*(\\n|$)([*#]{2}.*(\\n|$))*)+", tag, 0, "(^|\\n)[*#]", "$1");
     }
   }
 
   private final RenderNode _root;
   
-  public CreoleRenderer(final RenderNode wikiLink) {
+  public CreoleRenderer(final RenderNode[] customNonStructural) {
     RenderNode root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
@@ -55,30 +57,35 @@ public class CreoleRenderer {
     RenderNode bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
     RenderNode lineBreak = new RegexMatchToTag("\\\\", "br", null);
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
-    RenderNode unorderedList = new List("\\*", "ul");
-    RenderNode orderedList = new List("#", "ol");
+    RenderNode unorderedList = new ListNode("\\*", "ul");
+    RenderNode orderedList = new ListNode("#", "ol");
+    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough};
+    RenderNode[] nonStructural = new RenderNode[defaultNonStructural.length + customNonStructural.length];
+    System.arraycopy(defaultNonStructural, 0, nonStructural, 0, defaultNonStructural.length);
+    System.arraycopy(customNonStructural, 0, nonStructural, defaultNonStructural.length, customNonStructural.length);
+    
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
-                              .setChildren(bold, italic, lineBreak, unorderedList, orderedList);
-    root.setChildren(
-        noWiki.setChildren(), 
+                              .addChildren(unorderedList, orderedList).addChildren(nonStructural);
+    root.addChildren(
+        noWiki.addChildren(), 
         horizontalRule,
-        new Heading(5).setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
-        new Heading(4).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
-        new Heading(3).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
-        new Heading(2).setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
-        new Heading(1).setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
-        orderedList.setChildren(listItem),
-        unorderedList.setChildren(listItem),
-        paragraph.setChildren(orderedList, unorderedList, horizontalRule, bold, italic, lineBreak, strikethrough, wikiLink), 
-        italic.setChildren(bold, italic, lineBreak, strikethrough, wikiLink), 
-        bold.setChildren(bold, italic, lineBreak, strikethrough, wikiLink),
-        strikethrough.setChildren(bold, italic, lineBreak, strikethrough, wikiLink)
+        new Heading(5).addChildren(nonStructural),
+        new Heading(4).addChildren(nonStructural), 
+        new Heading(3).addChildren(nonStructural), 
+        new Heading(2).addChildren(nonStructural), 
+        new Heading(1).addChildren(nonStructural),
+        orderedList.addChildren(listItem),
+        unorderedList.addChildren(listItem),
+        paragraph.addChildren(orderedList, unorderedList, horizontalRule).addChildren(nonStructural), 
+        italic.addChildren(nonStructural), 
+        bold.addChildren(nonStructural),
+        strikethrough.addChildren(nonStructural)
      );
     _root = root;
   }
   
-  public String render(final String in) {
-    return _root.render(in.replaceAll("\r", ""));
+  public String render(final PageReference page, final String in) {
+    return _root.render(page, in.replaceAll("\r", ""));
   }
   
 }

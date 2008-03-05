@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.svnwiki.vc.PageReference;
 
 public abstract class AbstractRegexNode implements RenderNode {
 
@@ -22,13 +23,12 @@ public abstract class AbstractRegexNode implements RenderNode {
     return _children;
   }
 
-  public AbstractRegexNode setChildren(final RenderNode... rules) {
-    _children.clear();
+  public AbstractRegexNode addChildren(final RenderNode... rules) {
     _children.addAll(asList(rules));
     return this;
   }
 
-  public String render(final String text) {
+  public String render(final PageReference page, final String text) {
     if (text == null || text.length() == 0) {
       return "";
     }
@@ -50,8 +50,8 @@ public abstract class AbstractRegexNode implements RenderNode {
       // Just output the stuff before the match.
       result += Escape.html(text.substring(0, earliestMatch.start()));
       // Handle the match and recurse.
-      result += earliestRule.handle(earliestMatch);
-      result += render(text.substring(earliestMatch.end()));
+      result += earliestRule.handle(page, earliestMatch);
+      result += render(page, text.substring(earliestMatch.end()));
       return result;
     }
     return Escape.html(text);

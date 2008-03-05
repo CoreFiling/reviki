@@ -3,10 +3,12 @@ package net.hillsdon.svnwiki.wiki.renderer;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import net.hillsdon.svnwiki.vc.PageReference;
+
 public interface RenderNode {
 
   /**
-   * @return Child nodes as set in {@link #setChildren(RenderNode...)},
+   * @return Child nodes as set in {@link #addChildren(RenderNode...)},
    *         the default is the empty list.
    */
   List<RenderNode> getChildren();
@@ -18,14 +20,15 @@ public interface RenderNode {
    *              
    * @return this, for conviniene.
    */
-  RenderNode setChildren(RenderNode... nodes);
+  RenderNode addChildren(RenderNode... nodes);
 
   /**
    * Render starting from this node.
+   * @param page TODO
    * @param text Input text.
    * @return Rendered HTML.
    */
-  String render(String text);
+  String render(PageReference page, String text);
   
   /**
    * Test for a match in the given text.
@@ -36,9 +39,10 @@ public interface RenderNode {
   Matcher find(String text);
 
   /**
+   * @param page TODO
    * @param matcher A matcher that found a match using our find method and we were deemed the best.
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
-  String handle(Matcher matcher);
+  String handle(PageReference page, Matcher matcher);
 
 }

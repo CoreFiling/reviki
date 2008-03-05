@@ -4,6 +4,8 @@ package net.hillsdon.svnwiki.wiki.renderer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.hillsdon.svnwiki.vc.PageReference;
+
 public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
 
   private final String _tag;
@@ -23,7 +25,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     _replaceString = replaceString;
   }
 
-  public String handle(final Matcher matcher) {
+  public String handle(final PageReference page, final Matcher matcher) {
     if (_contentGroup == null) {
       return "<" + _tag + " />";
     }
@@ -31,7 +33,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return "<" + _tag + ">" +  render(text) + "</" + _tag + ">";
+    return "<" + _tag + ">" +  render(page, text) + "</" + _tag + ">";
   }
 
   @Override
