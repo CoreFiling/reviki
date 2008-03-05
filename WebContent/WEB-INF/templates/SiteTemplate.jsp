@@ -48,7 +48,7 @@
       <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">Recent changes</a></li>
       <li class="menu"><a href="<c:url value="/pages/AllPages"/>">All pages</a></li>
     </ul>
-    <form style="margin-top:0.2em;" action="<c:url value="/search"/>" method="get">
+    <form name="searchForm" style="margin-top:0.2em;" action="<c:url value="/search"/>" method="get">
       <input name="query" type="text" value="<c:out value="${param.query}"/>"/>
       <input value="Go" type="submit"/>
     </form>

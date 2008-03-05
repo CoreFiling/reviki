@@ -4,7 +4,7 @@
   <tiles:putAttribute name="title"><c:out value="svnwiki - ${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <h1><c:out value="${pageInfo.title}"/></h1>
-    <form name="edit" action="" method="post">
+    <form name="editForm" action="" method="post">
       <textarea rows="25" cols="80" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
@@ -13,6 +13,6 @@
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>
     </form>
-    <script type='text/javascript'>document.edit.content.focus();</script>
+    <script type='text/javascript'>document.editForm.content.focus();</script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

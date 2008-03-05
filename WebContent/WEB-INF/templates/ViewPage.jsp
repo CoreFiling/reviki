@@ -35,8 +35,8 @@
         </c:choose>
       </c:when>
       <c:otherwise>
-        <form action="" method="post">
-          <input type="submit" value="Edit"/>
+        <form name="editForm" action="" method="post">
+          <input name="editButton" type="submit" value="Edit"/>
         </form> 
       </c:otherwise>
     </c:choose>
