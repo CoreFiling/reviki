@@ -178,14 +178,16 @@
     "output": "<p><em> http: </em></p>"
   },
   {
+    "comment": "'a' added to make realistic",
     "name":   "Difficult emphasis #5",
-    "input":  "// http://",
-    "output": "<p>// <a href='http://'>http://</a></p>"
+    "input":  "// http://a",
+    "output": "<p>// <a href='http://a'>http://a</a></p>"
   },
   {
+    "comment": "'a' added to make realistic",
     "name":   "Difficult emphasis #6",
-    "input":  "// http:////",
-    "output": "<p><em> <a href='http://'>http://</a></em></p>"
+    "input":  "// http://a//",
+    "output": "<p><em> <a href='http://a'>http://a</a></em></p>"
   },
   {
     "name":   "Difficult emphasis #7",
@@ -219,13 +221,13 @@
   },
   {
     "name":   "Difficult emphasis #13",
-    "input":  "// ftp://",
-    "output": "<p>// <a href='ftp://'>ftp://</a></p>"
+    "input":  "// ftp://a",
+    "output": "<p>// <a href='ftp://a'>ftp://a</a></p>"
   },
   {
     "name":   "Difficult emphasis #14",
-    "input":  "// ftp:////",
-    "output": "<p><em> <a href='ftp://'>ftp://</a></em></p>"
+    "input":  "// ftp://a//",
+    "output": "<p><em> <a href='ftp://a'>ftp://a</a></em></p>"
   },
   {
     "name":   "Difficult emphasis #15",
