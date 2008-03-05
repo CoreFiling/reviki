@@ -65,7 +65,7 @@ public class CreoleRenderer {
     RenderNode noWiki = new RegexMatchToTag("(?:^|\\n)[{][{][{]\\n?(.*?(\\n.*?)*?)[}][}][}](\\n|$)", "pre", 1);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RenderNode italic = new RegexMatchToTag("//(.*?)//", "em", 1);
-    RenderNode strikethrough = new RegexMatchToTag("--(.*?)--", "del", 1);
+    RenderNode strikethrough = new RegexMatchToTag("--(.+?)--", "del", 1);
     RenderNode bold = new RegexMatchToTag("[*][*](.*?)[*][*]", "strong", 1);
     RenderNode lineBreak = new RegexMatchToTag("\\\\", "br", null);
     RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
