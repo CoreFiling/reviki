@@ -11,5 +11,6 @@
       <label for="toPage">New page name </label><input name="toPage" type="text" value=""/>
       <input name="rename" type="submit" value="Rename"/>
     </form>
+    <script type='text/javascript'>document.renameForm.toPage.focus();</script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

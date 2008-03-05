@@ -11,5 +11,6 @@
       <label for="toPage">New page name </label><input name="toPage" type="text" value=""/>
       <input name="copy" type="submit" value="Copy"/>
     </form>
+    <script type='text/javascript'>document.copyForm.toPage.focus();</script>
   </tiles:putAttribute>
 </tiles:insertTemplate>
