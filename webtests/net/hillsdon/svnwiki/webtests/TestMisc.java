@@ -4,9 +4,9 @@ package net.hillsdon.svnwiki.webtests;
 
 public class TestMisc extends WebTestSupport {
 
-  public void testRootRedirectsToFrontPage() throws Exception {
-    // Now we have subwikis it isn't clear what we ought to do...
-    //assertTrue(getWebPage("").getTitleText().contains("Front Page"));
+  public void testWikiRootRedirectsToFrontPage() throws Exception {
+    assertTrue(getWebPage("pages/test/").getTitleText().contains("Front Page"));
+    assertTrue(getWebPage("pages/test").getTitleText().contains("Front Page"));
   }
   
   public void testNoBackLinkToSelf() throws Exception {

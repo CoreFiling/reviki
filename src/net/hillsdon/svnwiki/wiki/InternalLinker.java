@@ -9,8 +9,10 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 public class InternalLinker {
 
   private final PageStore _store;
+  private final String _wikiName;
 
-  public InternalLinker(PageStore store) {
+  public InternalLinker(final String wikiName, final PageStore store) {
+    _wikiName = wikiName;
     _store = store;
   }
 
@@ -24,10 +26,13 @@ public class InternalLinker {
   }
   
   public String link(final String pageName) {
-    if (exists(pageName)) {
-      return format("<a class='existing-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
-    }
-    return format("<a class='new-page' href='%s'>%s</a>", Escape.url(pageName), Escape.html(pageName));
+    String cssClass = exists(pageName) ? "existing-page" : "new-page";
+    return format("<a class='%s' href='/pages/%s/%s'>%s</a>",
+      cssClass,
+      Escape.url(_wikiName), 
+      Escape.url(pageName), 
+      Escape.html(pageName)
+    );
   }
   
 }

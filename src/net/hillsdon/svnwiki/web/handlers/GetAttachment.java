@@ -17,17 +17,18 @@ import net.hillsdon.svnwiki.web.common.InvalidInputException;
 
 import org.apache.commons.fileupload.FileUploadException;
 
-public class GetAttachment extends PageRequestHandler {
+public class GetAttachment implements PageRequestHandler {
+
+  private final PageStore _store;
 
   public GetAttachment(final PageStore store) {
-    super(store);
+    _store = store;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
     final String attachmentName = path.next();
-    getStore().attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
+    _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
       public void setContentType(final String contentType) {
         response.setContentType(contentType);
       }

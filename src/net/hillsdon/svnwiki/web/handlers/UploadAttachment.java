@@ -22,16 +22,16 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
-public class UploadAttachment extends PageRequestHandler {
+public class UploadAttachment implements PageRequestHandler {
 
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
   private static final String PARAM_BASE_REVISION = "baseRevision";
+  private final PageStore _store;
 
   public UploadAttachment(final PageStore store) {
-    super(store);
+    _store = store;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws InvalidInputException, FileUploadException, IOException, PageStoreException {
     if (!ServletFileUpload.isMultipartContent(request)) {
@@ -91,7 +91,7 @@ public class UploadAttachment extends PageRequestHandler {
       storeName += fileName.substring(fileName.indexOf('.'));
     }
     String operation = baseRevision == PageInfo.UNCOMMITTED ? "Added" : "Updated";
-    getStore().attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
+    _store.attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
   }
 
 }

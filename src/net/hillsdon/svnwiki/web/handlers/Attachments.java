@@ -7,20 +7,18 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
-public class Attachments extends PageRequestHandler {
+public class Attachments implements PageRequestHandler {
 
   private final PageRequestHandler _list;
   private final PageRequestHandler _upload;
   private final PageRequestHandler _get;
 
   public Attachments(final PageStore pageStore) {
-    super(pageStore);
     _list = new ListAttachments(pageStore);
     _upload = new UploadAttachment(pageStore);
     _get = new GetAttachment(pageStore);
   }
 
-  @Override
   public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     if (path.hasNext()) {
       _get.handlePage(path, request, response, page);

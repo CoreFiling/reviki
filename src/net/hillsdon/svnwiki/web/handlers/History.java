@@ -10,15 +10,16 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
-public class History extends PageRequestHandler {
+public class History implements PageRequestHandler {
 
-  public History(PageStore store) {
-    super(store);
+  private final PageStore _store;
+
+  public History(final PageStore store) {
+    _store = store;
   }
 
-  @Override
-  public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    List<ChangeInfo> changes = getStore().history(page);
+  public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+    List<ChangeInfo> changes = _store.history(page);
     request.setAttribute("changes", changes);
     request.getRequestDispatcher("/WEB-INF/templates/History.jsp").include(request, response);
   }

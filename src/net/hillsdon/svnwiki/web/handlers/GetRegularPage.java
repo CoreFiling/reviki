@@ -25,7 +25,7 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
-public class GetRegularPage extends PageRequestHandler {
+public class GetRegularPage implements PageRequestHandler {
 
   private static final String PARAM_DIFF_REVISION = "diff";
   private static final int BACKLINKS_LIMIT = 15;
@@ -41,9 +41,10 @@ public class GetRegularPage extends PageRequestHandler {
   
   private final MarkupRenderer _markupRenderer;
   private final SearchEngine _engine;
+  private final PageStore _store;
 
-  public GetRegularPage(final PageStore pageStore, final MarkupRenderer markupRenderer, final SearchEngine engine) {
-    super(pageStore);
+  public GetRegularPage(final PageStore store, final MarkupRenderer markupRenderer, final SearchEngine engine) {
+    _store = store;
     _markupRenderer = markupRenderer;
     _engine = engine;
   }
@@ -53,10 +54,10 @@ public class GetRegularPage extends PageRequestHandler {
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
 
-    PageInfo main = getStore().get(page, revison);
+    PageInfo main = _store.get(page, revison);
     request.setAttribute("pageInfo", main);
     if (diffRevision != null) {
-      PageInfo base = getStore().get(page, diffRevision);
+      PageInfo base = _store.get(page, diffRevision);
       request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
       request.getRequestDispatcher("/WEB-INF/templates/ViewDiff.jsp").include(request, response);
     }

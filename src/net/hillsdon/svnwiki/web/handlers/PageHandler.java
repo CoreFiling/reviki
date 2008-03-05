@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
-import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
@@ -35,8 +34,9 @@ public class PageHandler implements RequestHandler {
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String pageName = path.next();
-    if (pageName == null) {
-      throw new NotFoundException();
+    if (pageName == null || "".equals(pageName)) {
+      response.sendRedirect(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/FrontPage");
+      return;
     }
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);

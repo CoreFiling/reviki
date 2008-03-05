@@ -47,7 +47,7 @@ public class WikiHandler implements RequestHandler {
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
     searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
-    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(_cachingPageStore));
+    _renderer = new CreoleMarkupRenderer(new PageStoreConfiguration(_pageStore), new InternalLinker(configuration.getWikiName(), _cachingPageStore));
     _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer);
   }
 

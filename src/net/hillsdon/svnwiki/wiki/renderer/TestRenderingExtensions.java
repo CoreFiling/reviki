@@ -28,7 +28,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
-    CreoleMarkupRenderer renderer = new CreoleMarkupRenderer(new FakeConfiguration(), new InternalLinker(new SimplePageStore()));
+    CreoleMarkupRenderer renderer = new CreoleMarkupRenderer(new FakeConfiguration(), new InternalLinker("mywiki", new SimplePageStore()));
     final StringWriter out = new StringWriter();
     renderer.render(new PageReference(""), input, out);
     return out.toString();

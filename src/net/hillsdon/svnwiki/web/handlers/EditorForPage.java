@@ -13,14 +13,16 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestAttributes;
 
-public class EditorForPage extends PageRequestHandler {
+public class EditorForPage implements PageRequestHandler {
+
+  private final PageStore _store;
 
   public EditorForPage(final PageStore store) {
-    super(store);
+    _store = store;
   }
 
   public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException {
-    PageInfo pageInfo = getStore().tryToLock(page);
+    PageInfo pageInfo = _store.tryToLock(page);
     request.setAttribute("pageInfo", pageInfo);
     if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
       request.setAttribute("flash", "Could not lock the page.");
