@@ -17,6 +17,7 @@ public class CreoleMarkupRenderer implements MarkupRenderer {
   
   public CreoleMarkupRenderer(final Configuration configuration, final InternalLinker internalLinker) {
     final List<Macro> macros = new ArrayList<Macro>();
+    macros.add(new LinkMacro());
     macros.add(new AttachedMacro("attached", "<a href='%s'>%s</a>"));
     macros.add(new AttachedMacro("image", "<img src='%s' />"));
     
