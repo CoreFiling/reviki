@@ -70,10 +70,11 @@ public interface PageStore {
    * @param lockToken TODO
    * @param baseRevision Used to check the edited copy was the latest.
    * @param content The new content.
+   * @param commitMessage TODO
    * @throws InterveningCommitException If base revision is not the same as the head at the point immediately prior to the commit.
    * @throws PageStoreException If something else goes wrong.
    */
-  void set(String path, String lockToken, long baseRevision, String content) throws InterveningCommitException, PageStoreException;
+  void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
 
 
 }

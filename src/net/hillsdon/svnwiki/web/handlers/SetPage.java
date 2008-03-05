@@ -10,10 +10,23 @@ import net.hillsdon.svnwiki.vc.PageStore;
 
 public class SetPage extends PageRequestHandler {
 
+  // Value of the submit element, 'Save' or 'Cancel'.
+  private static final String PARAM_ACTION = "action";
   private static final String PARAM_CONTENT = "content";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private static final String PARAM_LOCK_TOKEN = "lockToken";
+  private static final String PARAM_COMMIT_MESSAGE = "description";
+  
+  private static final String DEFAULT_COMMIT_MESSAGE = "[svnwiki commit]";
   private static final String CRLF = "\r\n";
+
+  private static String createLinkingCommitMessage(final HttpServletRequest request) {
+    String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
+    if (commitMessage == null || commitMessage.trim().length() == 0) {
+      commitMessage = DEFAULT_COMMIT_MESSAGE;
+    }
+    return commitMessage + "\n" + request.getRequestURL();
+  }
 
   public SetPage(final PageStore store) {
     super(store);
@@ -22,13 +35,13 @@ public class SetPage extends PageRequestHandler {
   @Override
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws Exception {
     String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
-    if ("Save".equals(request.getParameter("action"))) {
+    if ("Save".equals(request.getParameter(PARAM_ACTION))) {
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(CRLF)) {
         content = content + CRLF;
       }
-      store.set(page, lockToken, baseRevision, content);
+      store.set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
     }
     else {
       // New pages don't have a lock.

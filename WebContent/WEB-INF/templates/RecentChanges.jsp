@@ -7,13 +7,13 @@
   <tiles:putAttribute name="content">
     <h1>Recent changes</h1>
     <table>
-      <tr><th>Date</th><th>Page</th><th>User</th><th></th></tr>
+      <tr><th>Date</th><th>Page</th><th>User</th><th>Description</th></tr>
       <c:forEach var="change" items="${recentChanges}">
         <tr>
           <td><f:formatDate type="both" value="${change.date}"/></td>
           <td><a href="<c:url value="${change.page}"/>"><c:out value="${change.page}"/></a></td>
           <td><c:out value="${change.user}"/></td>
-          <td><a href="<c:url value="${change.page}?revision=${change.revision}&diff=${change.revision - 1}"/>">Show change</a></td>
+          <td><a href="<c:url value="${change.page}?revision=${change.revision}&diff=${change.revision - 1}"/>"><c:out value="${change.description}"/></a></td>
         </tr>
       </c:forEach>
     </table>

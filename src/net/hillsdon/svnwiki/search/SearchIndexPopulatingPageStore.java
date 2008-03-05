@@ -22,8 +22,8 @@ public class SearchIndexPopulatingPageStore extends DelegatingPageStore {
   }
 
   @Override
-  public void set(String path, String lockToken, long baseRevision, String content) throws InterveningCommitException, PageStoreException {
-    super.set(path, lockToken, baseRevision, content);
+  public void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException {
+    super.set(path, lockToken, baseRevision, content, commitMessage);
     try {
       _indexer.index(path, content);
     }

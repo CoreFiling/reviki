@@ -8,5 +8,8 @@
     ${markedUpDiff}
     </div>
     <hr/>
+    <p>
+      <a href="?history">Full history</a>
+    </p>
   </tiles:putAttribute>
 </tiles:insertTemplate>

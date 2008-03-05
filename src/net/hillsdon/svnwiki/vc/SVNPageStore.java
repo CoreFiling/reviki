@@ -71,7 +71,7 @@ public class SVNPageStore implements PageStore {
         String name = path.substring(rootPath.length() + 1);
         String user = entry.getAuthor();
         Date date = entry.getDate();
-        results.add(new ChangeInfo(name, user, date, entry.getRevision()));
+        results.add(new ChangeInfo(name, user, date, entry.getRevision(), entry.getMessage()));
       }
     }
     return results;
@@ -195,10 +195,10 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException {
+  public void set(final String path, final String lockToken, final long baseRevision, final String content, String commitMessage) throws PageStoreException {
     try {
       Map<String, String> locks = lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
-      ISVNEditor commitEditor = _repository.getCommitEditor("[automated commit]", locks, false, null);
+      ISVNEditor commitEditor = _repository.getCommitEditor(commitMessage, locks, false, null);
       if (baseRevision == PageInfo.UNCOMMITTED) {
         createFile(commitEditor, path, fromUTF8(content));
       }

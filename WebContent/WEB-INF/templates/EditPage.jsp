@@ -9,6 +9,7 @@
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
+      <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text"/>
       <input style="width:5em;" name="action" type="submit" value="Save"/>
       <input style="width:5em;" name="action" type="submit" value="Cancel"/>
     </form> 

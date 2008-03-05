@@ -38,8 +38,8 @@ public class DelegatingPageStore implements PageStore {
     return _delegate.recentChanges();
   }
 
-  public void set(String path, String lockToken, long baseRevision, String content) throws InterveningCommitException, PageStoreException {
-    _delegate.set(path, lockToken, baseRevision, content);
+  public void set(String path, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException {
+    _delegate.set(path, lockToken, baseRevision, content, commitMessage);
   }
 
   public PageInfo tryToLock(String path) throws PageStoreException {

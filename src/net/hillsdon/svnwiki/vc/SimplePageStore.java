@@ -32,7 +32,7 @@ public class SimplePageStore implements PageStore {
     return Collections.emptyList();
   }
 
-  public void set(final String path, String lockToken, final long baseRevision, final String content) throws PageStoreException {
+  public void set(final String path, String lockToken, final long baseRevision, final String content, String commitMessage) throws PageStoreException {
     long revision = baseRevision + 1;
     PageInfo page = new PageInfo(path, content, revision, revision, null, null, null, null);
     _pages.put(path, page);

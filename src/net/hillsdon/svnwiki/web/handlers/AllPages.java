@@ -1,6 +1,9 @@
 package net.hillsdon.svnwiki.web.handlers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +19,9 @@ public class AllPages extends PageRequestHandler {
   }
 
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException {
-    request.setAttribute("pageList", store.list());
+    List<String> alphabetical = new ArrayList<String>(store.list());
+    Collections.sort(alphabetical);
+    request.setAttribute("pageList", alphabetical);
     request.getRequestDispatcher("/WEB-INF/templates/AllPages.jsp").include(request, response);
   }
 

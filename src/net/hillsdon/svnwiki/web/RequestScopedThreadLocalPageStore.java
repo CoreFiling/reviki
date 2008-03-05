@@ -44,8 +44,8 @@ public class RequestScopedThreadLocalPageStore implements PageStore {
     return get().recentChanges();
   }
 
-  public void set(final String path, final String lockToken, final long baseRevision, final String content) throws PageStoreException {
-    get().set(path, lockToken, baseRevision, content);
+  public void set(final String path, final String lockToken, final long baseRevision, final String content, String commitMessage) throws PageStoreException {
+    get().set(path, lockToken, baseRevision, content, commitMessage);
   }
 
   public PageInfo tryToLock(final String path) throws PageStoreException {

@@ -9,7 +9,7 @@ public class TestRadeoxMarkupRenderer extends TestCase {
 
   public void testIdentifiesWikiWords() throws Exception {
     SimplePageStore pageStore = new SimplePageStore();
-    pageStore.set("ExistingPage", null, -1, "content");
+    pageStore.set("ExistingPage", null, -1, "content", "");
     MarkupRenderer renderer = new RadeoxMarkupRenderer(pageStore);
     StringWriter writer = new StringWriter();
     renderer.render("An ExistingPage and a PageWeStillNeedToWrite.", writer);
