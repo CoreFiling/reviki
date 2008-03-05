@@ -57,7 +57,7 @@
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
        </classes>
-       <fileset dir="${web}" includes="*" />
+       <fileset dir="${web}" includes="**" />
        <webinf dir="${web}/WEB-INF" includes="**" />
     </war>
   </target>
