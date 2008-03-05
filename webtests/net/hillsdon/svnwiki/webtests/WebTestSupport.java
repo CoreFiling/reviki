@@ -69,8 +69,6 @@ public abstract class WebTestSupport extends TestCase {
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
     page = (HtmlPage) editForm.getInputByValue("Save").click();
     assertEquals(pageUrl, page.getWebResponse().getUrl());
-    // Only holds true if there's no mark-up...
-    page.getWebResponse().getContentAsString().contains(content);
     return page;
   }
 
