@@ -4,6 +4,7 @@
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
+  <property name="reports" value="reports" />   
   <property name="war" value="${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/svnwiki/web/vcintegration/prepopulated/**"/>
 
@@ -19,12 +20,14 @@
   <target name="init">
      <mkdir dir="${build-classes}" />
      <mkdir dir="${build-web}" />
+     <mkdir dir="${reports}" />
      <exec outputproperty="revision" executable="svnversion"/>
   </target>
 
   <target name="clean">
     <delete dir="${build-classes}" />
     <delete dir="${build-web}" />
+    <delete dir="${reports}" />
     <delete file="${war}"/>
   </target>
 
@@ -41,6 +44,8 @@
     <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$BuildRevision$" value="${revision}"/>
     <copy todir="${build-classes}">
       <fileset dir="${source}">
+        <include name="**/*.json"/>
+        <include name="**/*.xml"/>
         <include name="${prepopulated-pages}"/>
         <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
       </fileset>
@@ -58,6 +63,22 @@
         <include name="**/*"/>
       </metainf>
     </jar>
+  </target>
+
+  <target name="unitTests" depends="compile">
+    <junit printsummary="yes" haltonfailure="yes">
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement location="${build-classes}"/>
+      </classpath>
+      <formatter type="xml"/>
+      <batchtest todir="${reports}">
+        <fileset dir="${source}">
+          <include name="**/Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 
   <target name="war" depends="compile, taglibJar">
