@@ -7,11 +7,12 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.web.DelegatingPageStore;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SearchIndexPopulatingPageStore extends DelegatingPageStore {
 
-  private static final Logger LOG = Logger.getLogger(LuceneSearcher.class);
+  private static final Log LOG = LogFactory.getLog(SearchIndexPopulatingPageStore.class);
 
   private final SearchIndexer _indexer;
 
