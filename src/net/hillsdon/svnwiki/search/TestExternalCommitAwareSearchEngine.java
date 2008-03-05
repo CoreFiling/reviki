@@ -17,11 +17,8 @@ package net.hillsdon.svnwiki.search;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 import junit.framework.TestCase;
@@ -43,15 +40,15 @@ public class TestExternalCommitAwareSearchEngine extends TestCase {
     _externalCommitAware.setPageStore(_mockedPageStore);
   }
 
-  public void testSearchSkipsSyncIfNoPageStoreProvided() throws Exception {
+  public void testSkipsSyncIfNoPageStoreProvided() throws Exception {
     _externalCommitAware.setPageStore(null);
-    expectAndVerifyJustDelegatedSearch();
+    _externalCommitAware.syncWithExternalCommits();
   }
   
-  public void testSearchSkipsSyncIfAlreadyIndexedLatestRevision() throws Exception {
+  public void testSkipsSyncIfAlreadyIndexedLatestRevision() throws Exception {
     expect(_mockedDelegate.getHighestIndexedRevision()).andReturn(12L);
     expect(_mockedPageStore.getLatestRevision()).andReturn(12L);
-    expectAndVerifyJustDelegatedSearch();
+    _externalCommitAware.syncWithExternalCommits();
   }
 
   public void testAsksForAndIndexesMissedPagesWhenIndexedRevisionLessThanLatestRevision() throws Exception {
@@ -66,14 +63,7 @@ public class TestExternalCommitAwareSearchEngine extends TestCase {
     _mockedDelegate.delete("DeletedPage", 12);
     _mockedDelegate.index("EditedPage", 12, "Edited content");
 
-    expectAndVerifyJustDelegatedSearch();
-  }
-  
-  private void expectAndVerifyJustDelegatedSearch() throws Exception {
-    expect(_mockedDelegate.search("Whatever", true)).andReturn(Collections.<SearchMatch>emptySet());
-    replay(_mockedDelegate, _mockedPageStore);
-    _externalCommitAware.search("Whatever", true);
-    verify(_mockedDelegate, _mockedPageStore);
+    _externalCommitAware.syncWithExternalCommits();
   }
   
 }

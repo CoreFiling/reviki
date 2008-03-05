@@ -66,23 +66,24 @@ public class WikiHandler implements RequestHandler {
   private final PageHandler _handler;
   private final InternalLinker _internalLinker;
 
+  private ExternalCommitAwareSearchEngine _searchEngine;
+
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
-    // There are some fairly messed-up cycles here...
-    ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
       public void render(PageReference page, String in, Writer out) throws IOException, PageStoreException {
         _renderer.render(page, in, out);
       }
     })));
-    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searchEngine);
+    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), _searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
-    searchEngine.setPageStore(_pageStore);
+    _searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
-    WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, searchEngine);
+    WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, _searchEngine);
     
-    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(searchEngine));
+    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new BackLinkListMacro(wikiGraph), new SearchMacro(_searchEngine));
     _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, macros);
-    _handler = new PageHandler(_cachingPageStore, searchEngine, _renderer, wikiGraph);
+    _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
   }
 
   public void handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -92,6 +93,7 @@ public class WikiHandler implements RequestHandler {
       // Handle the lifecycle of the thread-local request dependent page store.
       _pageStore.create(request);
       try {
+        _searchEngine.syncWithExternalCommits();
         addSideBarToRequest(request);
         _handler.handle(path, request, response);
       }

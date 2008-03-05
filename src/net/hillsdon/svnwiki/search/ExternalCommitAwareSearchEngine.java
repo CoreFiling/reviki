@@ -44,11 +44,10 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
   }
 
   public Set<SearchMatch> search(final String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
-    syncWithExternalCommits();
     return _delegate.search(query, provideExtracts);
   }
 
-  private synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
+  public synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
     if (_store != null) {
       long latest = _store.getLatestRevision();
       long highestIndexed = _delegate.getHighestIndexedRevision();
@@ -80,5 +79,5 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
   public String escape(final String in) {
     return _delegate.escape(in);
   }
-
+  
 }
