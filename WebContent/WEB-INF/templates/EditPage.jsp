@@ -3,7 +3,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="svnwiki - ${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1><c:out value="${pageInfo.title}"/></h1>
+    <h1 class="title"><c:out value="${pageInfo.title}"/></h1>
     <form name="editForm" action="" method="post">
       <textarea rows="25" cols="80" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>

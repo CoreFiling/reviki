@@ -3,7 +3,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1><a href="?"><c:out value="${pageInfo.title}"/></a></h1>
+    <h1 class="title"><a href="?"><c:out value="${pageInfo.title}"/></a></h1>
     <div id="wiki-rendering">
     ${markedUpDiff}
     </div>

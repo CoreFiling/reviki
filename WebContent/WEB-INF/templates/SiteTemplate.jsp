@@ -7,7 +7,7 @@
   <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<c:url value="/pages/RecentChanges/atom.xml"/>" />
   <link rel="search" href="<c:url value="/pages/FindPage/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   <style type="text/css">
-    h1 {
+    h1.title {
       margin: 0;
       clear: both;
       display: block;
@@ -15,8 +15,11 @@
       border-top: 1px solid black;
       font-size: 150%;
     }
-    h2 {
+    h1 {
       font-size: 150%;
+    }
+    h2 {
+      font-size: 130%;
     }
     h3 {
       font-size: 120%;
@@ -46,8 +49,9 @@
       padding: 0;
       margin: 0;
     }
-    #sidebar {
+    #topbar {
       float: right;
+      margin-bottom: 0.3em;
     }
     #wiki-rendering {
       width: 55em;
@@ -73,8 +77,9 @@
       </p>
     </div>
   </c:if>
-  <div id="sidebar">
+  <div id="topbar">
     <ul class="menu">
+      <tiles:insertAttribute name="menuItems" ignore="true"/>
       <li class="menu"><a href="<c:url value="/pages/FrontPage"/>">FrontPage</a></li>
       <li class="menu"><a href="<c:url value="/pages/RecentChanges"/>">RecentChanges</a></li>
       <li class="menu"><a href="<c:url value="/pages/AllPages"/>">AllPages</a></li>

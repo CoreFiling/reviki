@@ -3,7 +3,7 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Search results</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1>Search results for '<c:out value="${param.query}"/>'</h1>
+    <h1 class="title">Search results for '<c:out value="${param.query}"/>'</h1>
     <c:choose>
       <c:when test="${not empty results}">
         <ul>
