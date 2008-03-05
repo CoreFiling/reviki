@@ -9,7 +9,8 @@ package net.hillsdon.svnwiki.wiki.renderer.creole;
 public class CreoleImageNode extends LinkNode {
 
   public CreoleImageNode(final LinkPartsHandler handler) {
-    super("[{][{](.*?)[}][}]", new CreoleLinkContentsSplitter(), handler);
+    // Disambiguate from {{{nowiki}}}.
+    super("[{][{]([^{].*?)[}][}]", new CreoleLinkContentsSplitter(), handler);
   }
   
 }

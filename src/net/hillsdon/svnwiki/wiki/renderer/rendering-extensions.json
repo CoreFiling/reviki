@@ -12,7 +12,7 @@
   {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
-    "output": "<p>Hello <tt>there</tt></p>"
+    "output": "<p>Hello <tt>//there//</tt>.</p>"
   }
 ]
 
