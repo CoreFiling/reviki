@@ -41,7 +41,8 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       new PageReference("FrontPage"),
       new PageReference("FindPage"),
-      new PageReference("ConfigCss")
+      new PageReference("ConfigCss"),
+      new PageReference("ConfigSideBar")
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReference("AllPages"),
