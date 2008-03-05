@@ -1,0 +1,96 @@
+[
+  {
+    "name":   "bold",
+    "input":  "**bold**",
+    "output": "<p><strong>bold</strong></p>"
+  },
+  {
+    "name":   "italics",
+    "input":  "//italics//",
+    "output": "<p><em>italics</em></p>"
+  },
+  {
+    "name":   "bold, italics cross lines",
+    "input":  "Bold and italics should //be\nable// to cross lines.\n\nBut, should //not be...\n\n...able// to cross paragraphs.",
+    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
+  },
+  {
+    "name":   "bold and italics nested",
+    "input":  "**//bold italics//**\n//**bold italics**//\n//This is **also** good.//",
+    "output": "<p><strong><em>bold italics</em></strong>\n<em><strong>bold italics</strong></em>\n<em>This is <strong>also</strong> good.</em></p>"
+  },
+  {
+    "comment": "spec doesn't define output here",
+    "name":   "bold and italics not nested",
+    "input":  "**//bold italics**//\n//**bold italics//**",
+    "output": "<p><strong>//bold italics</strong><em>\n</em><strong>bold italics//</strong></p>"
+    
+  },
+  {
+    "comment": "altered from spec as we do parse markup within headings (permitted but not required by the spec)",
+    "name":   "headings",
+    "input":  "= Level 1 (largest) =\n== Level 2 ==\n=== Level 3 ===\n==== Level 4 ====\n===== Level 5 =====\n====== Level 6 ======\n=== Also level 3\n=== Also level 3 =\n=== Also level 3 ==\n=== **not** //parsed// ===",
+    "output": "<h1>Level 1 (largest)</h1><h2>Level 2</h2><h3>Level 3</h3><h4>Level 4</h4><h5>Level 5</h5><h6>Level 6</h6><h3>Also level 3</h3><h3>Also level 3</h3><h3>Also level 3</h3><h3><strong>not</strong> <em>parsed</em></h3>"
+  },
+  {
+    "bug":    "unimplemented",
+    "name":   "linking",
+    "input":  "[[link]]\n[[MyBigPage|Go to my page]]\n\n[[http://www.wikicreole.org/]]\nhttp://www.rawlink.org/, http://www.another.rawlink.org\n[[http://www.wikicreole.org/|Visit the WikiCreole website]]\n[[Weird Stuff|**Weird** //Stuff//]]\n[[Ohana:WikiFamily]]",
+    "output": "<a href='http://www.examplewiki.com/link'>link</a>\n<a href='http://www.examplewiki.com/MyBigPage'>Go to my page</a>\n<a href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org//a, a href='http://www.another.rawlink.org'http://www.another.rawlink.org</a>\n<a href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a href='http://www.examplewiki.com/Weird_Stuff'>**Weird** //Stuff//</a>\n<a href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a>"
+  },
+  {
+    "name":   "paragraphs",
+    "input":  "This is my text.\n\nThis is more text.",
+    "output": "<p>This is my text.\n</p><p>\nThis is more text.</p>"
+  },
+  {
+    "bug":    "we don't handle line breaks within paragraphs for some reason",
+    "name":   "line breaks",
+    "input":  "This is the first line,\\and this is the second.",
+    "output": "<p>This is the first line,<br />and this is the second.</p>"
+  },
+  {
+    "name":   "bulleted list",
+    "input":  "* Item 1\n** Item 1.1\n* Item 2",
+    "output": "<ul><li> Item 1<ul><li> Item 1.1</li></ul></li>\n<li> Item 2</li></ul>"
+  },
+  {
+    "name":   "numbered list",
+    "input":  "# Item 1\n## Item 1.1\n# Item 2",
+    "output": "<ol><li> Item 1<ol><li> Item 1.1</li></ol></li>\n<li> Item 2</li></ol>"
+  },
+  {
+    "name":   "horizontal rule",
+    "input":  "----",
+    "output": "<hr />"
+  },
+  {
+    "bug":    "unimplemented",
+    "name":   "image link",
+    "input":  "{{myimage.png|this is my image}}",
+    "output": "<img src='myimage.png' alt='this is my image' />"
+  },
+  {
+    "bug":    "similar to line breaks bug",
+    "name":   "table",
+    "input":  "|=Heading Col 1 |=Heading Col 2         |\n|Cell 1.1       |Two lines\\in Cell 1.2 |\n|Cell 2.1       |Cell 2.2               |",
+    "output": "<table><tr><th>Heading Col 1 </th><th>Heading Col 2         </th></tr><tr><td>Cell 1.1       </td><td>Two lines<br />in Cell 1.2 </td></tr><tr><td>Cell 2.1       </td><td>Cell 2.2               </td></tr></table>"
+  },
+  {
+    "name":   "block no wiki",
+    "input":  "{{{\n//This// does **not** get [[formatted]]\n}}}",
+    "output": "<pre>\n//This// does **not** get [[formatted]]\n</pre>"
+  },
+  {
+    "name":   "inline no wiki",
+    "input":  "Some examples of markup are: {{{** <i>this</i> ** }}}",
+    "output": "<p>Some examples of markup are: <tt>** &lt;i&gt;this&lt;/i&gt; ** </tt></p>"
+  },
+  {
+    "bug":    "we don't yet cope with code braces as per the spec",
+    "name":   "no wiki code with closing braces",
+    "input":  "{{{\nif (x != NULL) {\n  for (i = 0; i  size; i++) {\n    if (x[i]  0) {\n      x[i]--;\n  }}}\n}}}",
+    "output": "<pre>\nif (x != NULL) {\n  for (i = 0; i  size; i++) {\n    if (x[i]  0) {\n      x[i]--;\n  }}}\n</pre>"
+  }
+]
+

@@ -1,0 +1,35 @@
+<examples>
+<pre>
+~#1
+http://www.foo.com/~bar/
+~http://www.foo.com/
+CamelCaseLink
+~CamelCaseLink
+</pre>
+<pre> x </pre>
+<pre>
+//[[Important page|this link is italicized]]//
+**[[Important page]]**
+//**[[Important page]]**//
+</pre>
+<pre>
+ema href="http://www.examplewiki.com/Important_Page"this link is italicized/a/em
+stronga href="http://www.examplewiki.com/Important_page"Important page/a/strong
+emstronga href="http://www.examplewiki.com/Important_page"Important page/a/strong/em
+</pre>
+<pre>
+* **bold** item
+* //italic// item
+# item about a [[certain page]]
+# {{{ //this// is **not** [[processed]] }}}
+</pre>
+<pre>
+ul
+listrongbold/strong item/li
+liemitalic/em item/li
+/ul
+ol
+liitem about a a href="http://www.examplewiki.com/certain_page"certain page/a/li
+litt//this// is **not** [[processed]]/tt/li
+/ol
+</pre></examples>
