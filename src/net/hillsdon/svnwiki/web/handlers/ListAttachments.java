@@ -15,8 +15,6 @@
  */
 package net.hillsdon.svnwiki.web.handlers;
 
-import java.util.Collections;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,7 +33,8 @@ public class ListAttachments implements PageRequestHandler {
   }
 
   public View handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    return new JspView("Attachments", Collections.<String, Object>singletonMap("attachments", _store.attachments(page)));
+    request.setAttribute("attachments", _store.attachments(page));
+    return new JspView("Attachments");
   }
 
 }

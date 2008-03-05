@@ -43,7 +43,8 @@ public class AllPages implements RequestHandler {
   public View handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
     List<PageReference> alphabetical = new ArrayList<PageReference>(_store.list());
     Collections.sort(alphabetical);
-    return new JspView("AllPages", Collections.<String, Object>singletonMap("pageList", alphabetical));
+    request.setAttribute("pageList", alphabetical);
+    return new JspView("AllPages");
   }
 
 }

@@ -21,8 +21,6 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -102,12 +100,11 @@ public class FindPage implements PageRequestHandler {
       };
     }
     else {
-      Map<String, Object> data = new LinkedHashMap<String, Object>();
       if (!pageExists && isWikiWord(query)) {
-        data.put("suggestCreate", query);
+        request.setAttribute("suggestCreate", query);
       }
-      data.put("results", results);
-      return new JspView("SearchResults", data);
+      request.setAttribute("results", results);
+      return new JspView("SearchResults");
     }
   }
 

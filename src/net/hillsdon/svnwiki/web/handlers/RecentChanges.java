@@ -16,9 +16,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,8 +54,8 @@ public class RecentChanges implements RequestHandler {
         }
       };
     }
-    Map<String, Object> data = Collections.<String, Object>singletonMap("recentChanges", recentChanges);
-    return new JspView("RecentChanges", data);
+    request.setAttribute("recentChanges", recentChanges);
+    return new JspView("RecentChanges");
   }
 
   private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {

@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,17 +67,16 @@ public class GetRegularPage implements PageRequestHandler {
   }
 
   public View handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
-    Map<String, Object> data = new LinkedHashMap<String, Object>();
     long revison = getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
-    addBacklinksInformation(data, page);
+    addBacklinksInformation(request, page);
 
     final PageInfo main = _store.get(page, revison);
     request.setAttribute("pageInfo", main);
     if (diffRevision != null) {
       PageInfo base = _store.get(page, diffRevision);
-      data.put("markedUpDiff", getDiffMarkup(main, base));
-      return new JspView("ViewDiff", data);
+      request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
+      return new JspView("ViewDiff");
     }
     else if (request.getParameter("raw") != null) {
       return new View() {
@@ -98,19 +95,19 @@ public class GetRegularPage implements PageRequestHandler {
     else {
       StringWriter writer = new StringWriter();
       _markupRenderer.render(main, main.getContent(), writer);
-      data.put("renderedContents", writer.toString());
-      return new JspView("ViewPage", data);
+      request.setAttribute("renderedContents", writer.toString());
+      return new JspView("ViewPage");
     }
   }
 
-  private void addBacklinksInformation(final Map<String, Object> data, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
+  private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
     List<String> pageNames = new ArrayList<String>(_graph.incomingLinks(page.getPath()));
     Collections.sort(pageNames);
     if (pageNames.size() > BACKLINKS_LIMIT) {
       pageNames = pageNames.subList(0, BACKLINKS_LIMIT - 1);
-      data.put("backlinksLimited", true);
+      request.setAttribute("backlinksLimited", true);
     }
-    data.put("backlinks", pageNames);
+    request.setAttribute("backlinks", pageNames);
   }
 
 }

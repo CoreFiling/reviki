@@ -15,7 +15,6 @@
  */
 package net.hillsdon.svnwiki.web.dispatching;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,8 +44,7 @@ public class WikiChoice implements RequestHandler {
     }
 
     public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-      final Map<String, Object> data = new LinkedHashMap<String, Object>();
-      data.put("configuration", _perWikiConfiguration);
+      request.setAttribute("configuration", _perWikiConfiguration);
       if ("POST".equals(request.getMethod())) {
         String url = request.getParameter("url");
         try {
@@ -58,12 +56,12 @@ public class WikiChoice implements RequestHandler {
           return new RedirectView(request.getRequestURI());
         }
         catch (IllegalArgumentException ex) {
-          data.put("error", ex.getMessage());
-          return new JspView("Configuration", data);
+          request.setAttribute("error", ex.getMessage());
+          return new JspView("Configuration");
         }
       }
       else {
-        return new JspView("Configuration", data);
+        return new JspView("Configuration");
       }
     }
     

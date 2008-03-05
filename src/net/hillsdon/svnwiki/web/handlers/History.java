@@ -15,7 +15,6 @@
  */
 package net.hillsdon.svnwiki.web.handlers;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +37,8 @@ public class History implements PageRequestHandler {
 
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
-    return new JspView("History", Collections.<String, Object>singletonMap("changes", changes));
+    request.setAttribute("changes", changes);
+    return new JspView("History");
   }
 
 }

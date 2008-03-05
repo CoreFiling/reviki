@@ -19,8 +19,6 @@ import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRequire
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,21 +49,20 @@ public class EditorForPage implements PageRequestHandler {
 
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException {
     PageInfo pageInfo = _store.tryToLock(page);
-    Map<String, Object> data = new LinkedHashMap<String, Object>();
-    data.put("pageInfo", pageInfo);
+    request.setAttribute("pageInfo", pageInfo);
     if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
-      data.put("flash", "Could not lock the page.");
-      return new JspView("ViewPage", data);
+      request.setAttribute("flash", "Could not lock the page.");
+      return new JspView("ViewPage");
     }
     else {
       if (request.getParameter(EditorForPage.PARAM_PREVIEW) != null) {
         pageInfo = pageInfo.alternativeContent(getRequiredString(request, SetPage.PARAM_CONTENT));
-        data.put("pageInfo", pageInfo);
+        request.setAttribute("pageInfo", pageInfo);
         StringWriter out = new StringWriter();
         _renderer.render(pageInfo, pageInfo.getContent(), out);
         request.setAttribute("preview", out.toString());
       }
-      return new JspView("EditPage", data);
+      return new JspView("EditPage");
     }
   }
 
