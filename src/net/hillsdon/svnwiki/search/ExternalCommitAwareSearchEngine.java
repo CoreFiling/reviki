@@ -28,9 +28,9 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine {
     _delegate.index(path, revision, content);
   }
 
-  public Set<SearchMatch> search(final String query) throws IOException, QuerySyntaxException, PageStoreException {
+  public Set<SearchMatch> search(final String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
     syncWithExternalCommits();
-    return _delegate.search(query);
+    return _delegate.search(query, provideExtracts);
   }
 
   private synchronized void syncWithExternalCommits() throws PageStoreException, IOException {

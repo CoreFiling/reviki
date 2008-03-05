@@ -16,12 +16,13 @@ public interface SearchEngine {
    * Search for pages.
    * 
    * @param query Query.
+   * @param provideExtracts TODO
    * @return Matches for the query, in rank order.
    * @throws IOException On error reading the search index. 
    * @throws QuerySyntaxException If the query is too broken to use. 
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  Set<SearchMatch> search(String query) throws IOException, QuerySyntaxException, PageStoreException;
+  Set<SearchMatch> search(String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException;
 
   /**
    * Indexes page change.

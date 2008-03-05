@@ -141,7 +141,7 @@ public class LuceneSearcher implements SearchEngine {
     rememberLastIndexedRevision(revision);
   }
   
-  public Set<SearchMatch> search(final String queryString) throws IOException, QuerySyntaxException {
+  public Set<SearchMatch> search(final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
     }
@@ -154,7 +154,7 @@ public class LuceneSearcher implements SearchEngine {
         LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : new String[] {FIELD_PATH, FIELD_TITLE, FIELD_CONTENT}) {
-          results.addAll(query(reader, analyzer, searcher, field, queryString));
+          results.addAll(query(reader, analyzer, searcher, field, queryString, provideExtracts));
         }
         return results;
       }
@@ -168,7 +168,7 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   @SuppressWarnings("unchecked")
-  private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString) throws IOException, QuerySyntaxException {
+  private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
     QueryParser parser = new QueryParser(field, analyzer);
     parser.setDefaultOperator(Operator.AND);
     Query query;
@@ -178,10 +178,12 @@ public class LuceneSearcher implements SearchEngine {
     catch (ParseException e) {
       throw new QuerySyntaxException(e.getMessage(), e);
     }
-    query.rewrite(reader);
+    Highlighter highlighter = null;
+    if (provideExtracts) {
+      query.rewrite(reader);
+      highlighter = new Highlighter(new SimpleHTMLFormatter(), new SimpleHTMLEncoder(), new QueryScorer(query));
+    }
     Hits hits = searcher.search(query);
-    Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(), new SimpleHTMLEncoder(), new QueryScorer(query));
-    
     LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
     Iterator<Hit> iter = hits.iterator();
     while (iter.hasNext()) {
@@ -189,7 +191,7 @@ public class LuceneSearcher implements SearchEngine {
       String text = hit.get(field);
       String extract = null;
       // The text is not stored for all fields, just provide a null extract.
-      if (text != null) {
+      if (highlighter != null && text != null) {
         TokenStream tokenStream = analyzer.tokenStream(field, new StringReader(text));
         // Get 3 best fragments and seperate with a "..."
         extract = highlighter.getBestFragments(tokenStream, text, 3, "...");

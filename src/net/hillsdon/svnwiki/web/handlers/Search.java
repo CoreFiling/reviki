@@ -50,10 +50,10 @@ public class Search implements RequestHandler {
       response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/pages/" + request.getAttribute("wikiName") + "/" + query));
     }
     else {
-      if (isWikiWord(query) && !pageExists) {
+      if (!pageExists && isWikiWord(query)) {
         request.setAttribute("suggestCreate", query);
       }
-      request.setAttribute("results", _searchEngine.search(query));
+      request.setAttribute("results", _searchEngine.search(query, true));
       request.getRequestDispatcher("/WEB-INF/templates/SearchResults.jsp").include(request, response);
     }
   }

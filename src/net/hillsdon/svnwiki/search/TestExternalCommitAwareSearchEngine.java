@@ -55,9 +55,9 @@ public class TestExternalCommitAwareSearchEngine extends TestCase {
   }
   
   private void expectAndVerifyJustDelegatedSearch() throws Exception {
-    expect(_mockedDelegate.search("Whatever")).andReturn(Collections.<SearchMatch>emptySet());
+    expect(_mockedDelegate.search("Whatever", true)).andReturn(Collections.<SearchMatch>emptySet());
     replay(_mockedDelegate, _mockedPageStore);
-    _externalCommitAware.search("Whatever");
+    _externalCommitAware.search("Whatever", true);
     verify(_mockedDelegate, _mockedPageStore);
   }
   

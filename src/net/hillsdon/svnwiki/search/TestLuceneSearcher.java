@@ -48,30 +48,30 @@ public class TestLuceneSearcher extends TestCase {
   public void testRepeatedAddsForSamePathReplace() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content", true));
     _searcher.index(path, -1, "the something else");
-    assertEquals(emptySet(), _searcher.search("content"));
+    assertEquals(emptySet(), _searcher.search("content", true));
     _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content", true));
   }
   
   public void testFindsByPath() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search(path));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search(path, true));
   }
   
   public void testFindsByTokenizedPath() throws Exception {
     final String path = "ThePath";
     _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("path"));
+    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("path", true));
   }
   
   /**
    * It isn't a valid query but its daft to choke on it.
    */
   public void testTrimToEmptyStringNoResults() throws Exception {
-    assertEquals(Collections.emptySet(), _searcher.search("  "));
+    assertEquals(Collections.emptySet(), _searcher.search("  ", true));
   }
   
 }

@@ -71,7 +71,7 @@ public class GetRegularPage implements PageRequestHandler {
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
-    Set<SearchMatch> backlinks = _engine.search(_engine.escape(page.getPath()));
+    Set<SearchMatch> backlinks = _engine.search(_engine.escape(page.getPath()), false);
     backlinks.remove(new SearchMatch(page.getPath(), null));
     if (backlinks.size() > BACKLINKS_LIMIT) {
       request.setAttribute("backlinksLimited", true);
