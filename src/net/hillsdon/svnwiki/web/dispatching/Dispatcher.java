@@ -29,6 +29,7 @@ import net.hillsdon.svnwiki.configuration.DeploymentConfiguration;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestAttributes;
+import net.hillsdon.svnwiki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.svnwiki.web.handlers.ListWikis;
 
 import org.apache.commons.logging.Log;
@@ -47,6 +48,7 @@ public class Dispatcher extends HttpServlet {
 
   private WikiChoice _choice;
   private ListWikis _list;
+  private JumpToWikiUrl _jump;
 
 
   @Override
@@ -55,6 +57,7 @@ public class Dispatcher extends HttpServlet {
     DeploymentConfiguration configuration = new DeploymentConfiguration();
     configuration.load();
     _list = new ListWikis(configuration);
+    _jump = new JumpToWikiUrl();
     _choice = new WikiChoice(config.getServletContext(), configuration);
   }
 
@@ -70,6 +73,9 @@ public class Dispatcher extends HttpServlet {
       String initial = path.next();
       if ("pages".equals(initial)) {
         _choice.handle(path, request, response);
+      }
+      else if ("jump".equals(initial)) {
+        _jump.handle(path, request, response);
       }
       else {
         _list.handle(path, request, response);

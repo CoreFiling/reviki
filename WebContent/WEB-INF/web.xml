@@ -13,6 +13,10 @@
 	  <servlet-name>dispatcher</servlet-name>
 	  <url-pattern>/list</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>dispatcher</servlet-name>
+	  <url-pattern>/jump</url-pattern>
+	</servlet-mapping>
     <listener>
       <listener-class>org.apache.tiles.web.startup.TilesListener</listener-class>
     </listener>
