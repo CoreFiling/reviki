@@ -27,13 +27,7 @@ public final class WikiWordUtils {
         if (out.length() > 0) {
           out.append(' ');
         }
-        if (i == 0) {
-          out.append(Character.toUpperCase(part.charAt(0)));
-        }
-        else {
-          out.append(Character.toLowerCase(part.charAt(0)));
-        }
-        out.append(part.substring(1));
+        out.append(part);
       }
     }
     return out;

@@ -20,8 +20,9 @@ public class TestWikiWordUtils extends TestCase {
   }
   
   public void testLabel() {
-    assertEquals("My first property", pathToTitle("object/myFirstProperty").toString());
-    assertEquals("Lemon cheesecake", pathToTitle("lemonCheesecake").toString());
+    assertEquals("My First Property", pathToTitle("MyFirstProperty").toString());
+    assertEquals("my First Property", pathToTitle("object/myFirstProperty").toString());
+    assertEquals("lemon Cheesecake", pathToTitle("lemonCheesecake").toString());
   }
   
   public void testDegenerate() {
