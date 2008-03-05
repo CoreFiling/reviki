@@ -123,8 +123,9 @@
 						displayItems(cached['items']);
 						
 					} else {
-					
-						$.get(options.source, {q: q}, function(txt) {
+                        query = {};
+                        query[options.param] = q;
+						$.get(options.source, query, function(txt) {
 
 							$results.hide();
 							
@@ -291,6 +292,7 @@
 		
 			options = options || {};
 			options.source = source;
+            options.param = options.param || 'q';
 			options.delay = options.delay || 100;
 			options.resultsClass = options.resultsClass || 'ac_results';
 			options.selectClass = options.selectClass || 'ac_over';
