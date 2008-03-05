@@ -24,7 +24,7 @@ public class TestCreoleRenderer extends TestCase {
   }
   
   public void testLineBreak() {
-    assertEquals("<p>foo<br />bar</p>", _render.render(_page, "foo\\bar"));
+    assertEquals("<p>foo<br />bar</p>", _render.render(_page, "foo\\\\bar"));
   }
   
   public void testTitles() {
