@@ -64,7 +64,7 @@ public class CreoleRenderer {
 
   private final RenderNode _root;
   
-  public CreoleRenderer(final RenderNode[] customStructural, final RenderNode[] customNonStructural) {
+  public CreoleRenderer(final RenderNode[] customBlock, final RenderNode[] customInline) {
     RenderNode root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
@@ -77,8 +77,8 @@ public class CreoleRenderer {
     RenderNode orderedList = new ListNode("#", "ol");
     RenderNode rawUrl = new RawUrlNode();
     RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "tt", 1);
-    RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
-    RenderNode[] nonStructural = concat(customNonStructural, defaultNonStructural);
+    RenderNode[] defaultInline = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
+    RenderNode[] inline = concat(customInline, defaultInline);
 
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
     RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
@@ -86,27 +86,27 @@ public class CreoleRenderer {
     RenderNode tableCell = new RegexMatchToTag("[|]+([^|]*)", "td", 1);
     table.addChildren(tableRow);
     tableRow.addChildren(tableHeading, tableCell);
-    tableCell.addChildren(concat(nonStructural, noWiki));
+    tableCell.addChildren(concat(inline, noWiki));
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
-                              .addChildren(unorderedList, orderedList).addChildren(nonStructural);
-    root.addChildren(customStructural);
+                              .addChildren(unorderedList, orderedList).addChildren(inline);
+    root.addChildren(customBlock);
     root.addChildren(
         noWiki, 
         horizontalRule,
         table,
-        new Heading(6).addChildren(nonStructural),
-        new Heading(5).addChildren(nonStructural),
-        new Heading(4).addChildren(nonStructural), 
-        new Heading(3).addChildren(nonStructural), 
-        new Heading(2).addChildren(nonStructural), 
-        new Heading(1).addChildren(nonStructural),
+        new Heading(6).addChildren(inline),
+        new Heading(5).addChildren(inline),
+        new Heading(4).addChildren(inline), 
+        new Heading(3).addChildren(inline), 
+        new Heading(2).addChildren(inline), 
+        new Heading(1).addChildren(inline),
         orderedList.addChildren(listItem),
         unorderedList.addChildren(listItem),
-        paragraph.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule).addChildren(nonStructural), 
-        italic.addChildren(nonStructural), 
-        bold.addChildren(nonStructural),
-        strikethrough.addChildren(nonStructural)
+        paragraph.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule).addChildren(inline), 
+        italic.addChildren(inline), 
+        bold.addChildren(inline),
+        strikethrough.addChildren(inline)
      );
     _root = root;
   }

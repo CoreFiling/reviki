@@ -11,8 +11,9 @@ import net.hillsdon.svnwiki.vc.PageReference;
  */
 public class UnescapedHtmlNode extends AbstractRegexNode {
 
-  public UnescapedHtmlNode() {
-    super("(?s)\\[<html>\\](.*?)\\[</html>\\]");
+  public UnescapedHtmlNode(final boolean block) {
+    super(block ? "(?s)(?:^|\\n)\\[<html>\\](.*?(^|\\n))\\[</html>\\]"
+                : "(?s)\\[<html>\\](.*?)\\[</html>\\]");
   }
 
   public String handle(final PageReference page, final Matcher matcher) {

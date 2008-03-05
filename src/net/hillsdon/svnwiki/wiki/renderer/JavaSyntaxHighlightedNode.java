@@ -17,8 +17,10 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
  */
 public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
 
-  public JavaSyntaxHighlightedNode() {
-    super("(?s)\\[<java>\\](.*?)\\[</java>\\]");
+  public JavaSyntaxHighlightedNode(final boolean block) {
+    super(
+        block ? "(?s)(?:^|\\n)\\[<java>\\](.*?)(^|\\n)\\[</java>\\]"
+              : "(?s)\\[<java>\\](.*?)\\[</java>\\]");
   }
 
   public String handle(final PageReference page, final Matcher matcher) {
