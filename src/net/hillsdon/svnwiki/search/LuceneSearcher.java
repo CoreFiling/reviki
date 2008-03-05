@@ -88,6 +88,7 @@ public class LuceneSearcher implements SearchEngine, SearchIndexer {
       Searcher searcher = new IndexSearcher(reader);
       try {
         Analyzer analyzer = new StandardAnalyzer();
+        // Prefer title matches (match equality is on page name)
         LinkedHashSet<SearchMatch> results = query(reader, analyzer, searcher, new QueryParser(FIELD_TITLE, analyzer), queryString);
         results.addAll(query(reader, analyzer, searcher, new QueryParser(FIELD_CONTENT, analyzer), queryString));
         return results;
