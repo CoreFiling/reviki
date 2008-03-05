@@ -12,7 +12,7 @@ public class TestAllPages extends WebTestSupport {
    */
   public void testAllPages() throws Exception {
     String name = uniqueWikiPageName("AllPagesTest");
-    editWikiPage(name, "Should appear in all pages", true);
+    editWikiPage(name, "Should appear in all pages", "", true);
 
     HtmlPage allPages = getWebPage("pages/AllPages");
     assertTrue(allPages.getTitleText().endsWith("All Pages"));

@@ -11,9 +11,9 @@ public class TestEditing extends WebTestSupport {
   
   public void testEditPageIncrementsRevision() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
-    HtmlPage initial = editWikiPage(name, "Initial content", true);
+    HtmlPage initial = editWikiPage(name, "Initial content", "", true);
     long initialRevision = getRevisionNumberFromTitle(initial);
-    HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", false);
+    HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", "", false);
     assertEquals(initialRevision + 1, getRevisionNumberFromTitle(edited));
   }
 

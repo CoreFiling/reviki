@@ -46,17 +46,19 @@ public abstract class WebTestSupport extends TestCase {
   /**
    * @param name Page name, a WikiWord.
    * @param content Content to set.
+   * @param descriptionOfChange Description of the change.
    * @param isNew Used to assert the page is either new or existing.
    * @return The page after the 'Save' button has been clicked.
    * @throws IOException On failure.
    */
-  public HtmlPage editWikiPage(final String name, final String content, final boolean isNew) throws IOException {
+  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final boolean isNew) throws IOException {
     HtmlPage page = getWebPage("pages/" + name);
     URL pageUrl = page.getWebResponse().getUrl();
     assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
     page = (HtmlPage) page.getFormByName("editForm").getInputByValue("Edit").click();
     HtmlForm editForm = page.getFormByName("editForm");
-    editForm.getTextAreaByName("content").setText(content);
+    editForm.getTextAreaByName("content").setText(content == null ? "" : content);
+    editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
     page = (HtmlPage) editForm.getInputByValue("Save").click();
     assertEquals(pageUrl, page.getWebResponse().getUrl());
     // Only holds true if there's no mark-up...

@@ -21,7 +21,7 @@ public class TestSearch extends WebTestSupport {
    */
   public void testNewPageCanBeFoundBySearchIndex() throws Exception {
     String name = uniqueWikiPageName("SearchIndexTest");
-    HtmlPage page = editWikiPage(name, "Should be found by search", true);
+    HtmlPage page = editWikiPage(name, "Should be found by search", "", true);
     assertSearchFindsPageUsingQuery(page, name, "found by search");
     assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name).toString());
     HtmlPage searchResult = search(page, name);

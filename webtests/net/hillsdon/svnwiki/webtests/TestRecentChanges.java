@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.webtests;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -18,9 +20,9 @@ public class TestRecentChanges extends WebTestSupport {
    */
   public void testRecentChanges() throws Exception {
     String createdFirst = uniqueWikiPageName("RecentChangesTestFirst");
-    editWikiPage(createdFirst, "", true);
+    editWikiPage(createdFirst, "", "", true);
     String createdSecond = uniqueWikiPageName("RecentChangesTestSecond");
-    editWikiPage(createdSecond, "", true);
+    editWikiPage(createdSecond, "", "", true);
     
     Iterator<HtmlAnchor> links = getRecentChangesLinks();
     HtmlAnchor first = links.next();
@@ -28,12 +30,16 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(first.asText(), createdSecond);
     assertEquals(second.asText(), createdFirst);
     
-    editWikiPage(createdFirst, "", false);
+    String descriptionOfChange = format("Bump %s up to top.", createdFirst);
+    editWikiPage(createdFirst, "", descriptionOfChange, false);
     links = getRecentChangesLinks();
     first = links.next();
     second = links.next();
     assertEquals(first.asText(), createdFirst);
     assertEquals(second.asText(), createdSecond);
+    
+    HtmlPage recentChanges = getWebPage("pages/RecentChanges");
+    recentChanges.asText().contains(descriptionOfChange);
   }
 
   @SuppressWarnings("unchecked")
