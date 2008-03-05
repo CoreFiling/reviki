@@ -1,5 +1,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
+import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getLong;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -17,10 +19,13 @@ import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class GetRegularPage extends PageRequestHandler {
 
+  private static final String PARAM_REVISION = "revision";
+  private static final String PARAM_DIFF_REVISION = "diff";
+  
   private final MarkupRenderer _markupRenderer;
 
   @SuppressWarnings("unchecked") // Diff library is odd...
-  private static String getDiffMarkup(PageInfo head, PageInfo base) {
+  private static String getDiffMarkup(final PageInfo head, final PageInfo base) {
     diff_match_patch api = new diff_match_patch();
     // Diff isn't public!
     LinkedList diffs = api.diff_main(base.getContent(), head.getContent());
@@ -33,26 +38,25 @@ public class GetRegularPage extends PageRequestHandler {
     _markupRenderer = markupRenderer;
   }
 
+  private long getRevision(final HttpServletRequest request) throws InvalidInputException {
+    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), "revision");
+    return givenRevision == null ? -1 : givenRevision;
+  }
+    
   public void handlePage(final HttpServletRequest request, final HttpServletResponse response, final PageStore store, final String page) throws PageStoreException, IOException, ServletException, InvalidInputException {
-    PageInfo head = store.get(page, -1);
-    String diffRevision = request.getParameter("diff");
-    request.setAttribute("pageInfo", head);
+    long revison = getRevision(request);
+    Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), "diff");
 
+    PageInfo main = store.get(page, revison);
+    request.setAttribute("pageInfo", main);
     if (diffRevision != null) {
-      long baseRevision;
-      try {
-        baseRevision = Long.parseLong(diffRevision);
-      }
-      catch (NumberFormatException ex) {
-        throw new InvalidInputException("'diff' must be a revision number.");
-      }
-      PageInfo base = store.get(page, baseRevision);
-      request.setAttribute("markedUpDiff", getDiffMarkup(head, base));
+      PageInfo base = store.get(page, diffRevision);
+      request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
       request.getRequestDispatcher("/WEB-INF/templates/ViewDiff.jsp").forward(request, response);
     }
     else {
       StringWriter writer = new StringWriter();
-      _markupRenderer.render(head.getContent(), writer);
+      _markupRenderer.render(main.getContent(), writer);
       
       request.setAttribute("renderedContents", writer.toString());
       request.getRequestDispatcher("/WEB-INF/templates/ViewPage.jsp").forward(request, response);

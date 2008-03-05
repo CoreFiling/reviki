@@ -20,10 +20,12 @@ final class RequestParameterReaders {
     return value;
   }
 
-  public static long getRequiredLong(final HttpServletRequest request, final String parameter) throws InvalidInputException {
-    String baseRevisionString = getRequiredString(request, parameter);
+  public static Long getLong(final String value, final String parameter) throws InvalidInputException {
+    if (value == null) {
+      return null;
+    }
     try {
-      return Long.parseLong(baseRevisionString);
+      return Long.parseLong(value);
     }
     catch (NumberFormatException ex) {
       throw new InvalidInputException(String.format("'%s' invalid.", parameter));
