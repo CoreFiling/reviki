@@ -24,8 +24,8 @@ public class MainHandler implements RequestHandler {
     LuceneSearcher searcher = new LuceneSearcher(configuration.getSearchIndexDirectory());
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), searcher);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
-    _search = new Search(searcher);
     _get = new GetPage(_pageStore, new RadeoxMarkupRenderer(_pageStore));
+    _search = new Search(_pageStore, searcher);
     _editor = new EditorForPage(_pageStore);
     _set = new SetPage(_pageStore);
   }
