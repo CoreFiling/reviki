@@ -20,8 +20,8 @@
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
-    <c:if test="${pageInfo.new}">
-      <p><em>This page is has not yet been created.  Click 'Edit' to add content.</em></p>
+    <c:if test="${pageInfo.new and empty pageInfo.content}">
+      <p><em>This page is a new page.  Click 'Edit' to add content.</em></p>
     </c:if>
     <hr />
     <c:if test="${not empty backlinks}">
