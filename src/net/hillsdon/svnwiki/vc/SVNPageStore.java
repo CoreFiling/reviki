@@ -8,6 +8,7 @@ import java.util.HashMap;
 import junit.framework.AssertionFailedError;
 
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -41,9 +42,20 @@ public class SVNPageStore implements PageStore {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       HashMap<String, String> properties = new HashMap<String, String>();
-      _repository.getFile(path, SVNRevision.HEAD.getNumber(), properties, baos);
-      long revision = Long.parseLong(properties.get(SVNProperty.REVISION));
-      return new PageInfo(toUTF8(baos.toByteArray()), revision);
+      
+      // We really want (kind, revision) back to avoid a race here...
+      SVNNodeKind kind = _repository.checkPath(path, SVNRevision.HEAD.getNumber());
+      if (SVNNodeKind.FILE.equals(kind)) {
+        _repository.getFile(path, SVNRevision.HEAD.getNumber(), properties, baos);
+        long revision = Long.parseLong(properties.get(SVNProperty.REVISION));
+        return new PageInfo(toUTF8(baos.toByteArray()), revision);
+      }
+      else if (SVNNodeKind.NONE.equals(kind)) {
+        return new PageInfo("", PageInfo.UNCOMMITTED);
+      }
+      else {
+        throw new PageStoreException(String.format("Unexpected node kind '%s' at '%s'", kind, path));
+      }
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
@@ -53,7 +65,12 @@ public class SVNPageStore implements PageStore {
   public void set(final String path, final long baseRevision, final String content) throws PageStoreException  {
     try {
       ISVNEditor commitEditor = _repository.getCommitEditor("[automated commit]", null);
-      modifyFile(commitEditor, path, baseRevision, fromUTF8(content));
+      if (baseRevision == PageInfo.UNCOMMITTED) {
+        createFile(commitEditor, path, fromUTF8(content));
+      }
+      else {
+        editFile(commitEditor, path, baseRevision, fromUTF8(content));
+      }
       commitEditor.closeEdit();
     }
     catch (SVNException ex) {
@@ -61,7 +78,17 @@ public class SVNPageStore implements PageStore {
     }
   }
 
-  private void modifyFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final byte[] newData) throws SVNException {
+  private void createFile(ISVNEditor commitEditor, String filePath, byte[] data) throws SVNException {
+    commitEditor.openRoot(-1);
+    commitEditor.addFile(filePath, null, -1);
+    commitEditor.applyTextDelta(filePath, null);
+    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+    String checksum = deltaGenerator.sendDelta(filePath, new ByteArrayInputStream(data), commitEditor, true);
+    commitEditor.closeFile(filePath, checksum);
+    commitEditor.closeDir();
+  }
+
+  private void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final byte[] newData) throws SVNException {
     commitEditor.openRoot(-1);
     commitEditor.openFile(filePath, baseRevision);
     commitEditor.applyTextDelta(filePath, null);

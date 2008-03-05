@@ -22,10 +22,9 @@ public class TestSvnkit extends TestCase {
     SVNRepository repository = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(URL));
     repository.setAuthenticationManager(new BasicAuthenticationManager(username, password));
     PageStore store = new SVNPageStore(repository);
-    PageInfo page = store.get("Foo.wiki");
-    String content = page.getContent();
-    
-    store.set("Foo.wiki", page.getRevision(), content + " extra! ");
+    PageInfo page = store.get("Blort.wiki");
+    store.set("Blort.wiki", page.getRevision(), "New content");
+    System.err.println(store.get("Blort.wiki"));
   }
 
 }

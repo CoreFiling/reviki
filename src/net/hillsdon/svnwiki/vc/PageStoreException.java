@@ -5,4 +5,7 @@ public class PageStoreException extends Exception {
   public PageStoreException(final Throwable cause) {
     super(cause);
   }
+  public PageStoreException(String message) {
+    super(message);
+  }
 }

@@ -7,6 +7,8 @@ package net.hillsdon.svnwiki.vc;
  */
 public class PageInfo {
 
+  public static final long UNCOMMITTED = -2;
+
   private final String _content;
 
   private final long _revision;
