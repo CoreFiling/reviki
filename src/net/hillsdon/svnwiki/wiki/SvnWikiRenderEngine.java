@@ -9,6 +9,11 @@ import org.radeox.api.engine.WikiRenderEngine;
 import org.radeox.engine.BaseRenderEngine;
 import org.radeox.util.Encoder;
 
+/**
+ * Customize the Radeox rendering engine to produce correct links for our wiki.
+ * 
+ * @author mth
+ */
 public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderEngine {
 
   private final PageStore _store;
@@ -30,17 +35,17 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
   
   @Override
   public void appendCreateLink(final StringBuffer buffer, final String name, final String view) {
-    appendLink(buffer, name, view);
+    buffer.append(String.format("<a class='new-page' href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
   }
 
   @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view) {
-    buffer.append(String.format("<a href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
+    buffer.append(String.format("<a class='existing-page' href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
   }
 
   @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view, final String anchor) {
-    buffer.append(String.format("<a href='%s#%s'>%s</a>", Encoder.escape(name), Encoder.escape(anchor), Encoder.escape(view)));
+    buffer.append(String.format("<a class='existing-page' href='%s#%s'>%s</a>", Encoder.escape(name), Encoder.escape(anchor), Encoder.escape(view)));
   }
 
   @Override
