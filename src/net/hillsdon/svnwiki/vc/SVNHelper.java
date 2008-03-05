@@ -52,7 +52,7 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  */
 public class SVNHelper {
 
-  public interface SVNAction<T> {
+  private interface SVNAction<T> {
     T perform(SVNRepository repository) throws SVNException, PageStoreException;
   }
   
