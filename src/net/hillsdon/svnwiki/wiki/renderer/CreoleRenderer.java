@@ -74,8 +74,8 @@ public class CreoleRenderer {
     RenderNode rawUrl = new RawUrlNode();
     RenderNode[] defaultNonStructural = {bold, italic, lineBreak, strikethrough, rawUrl};
     RenderNode[] nonStructural = new RenderNode[defaultNonStructural.length + customNonStructural.length];
-    System.arraycopy(defaultNonStructural, 0, nonStructural, 0, defaultNonStructural.length);
-    System.arraycopy(customNonStructural, 0, nonStructural, defaultNonStructural.length, customNonStructural.length);
+    System.arraycopy(customNonStructural, 0, nonStructural, 0, customNonStructural.length);
+    System.arraycopy(defaultNonStructural, 0, nonStructural, customNonStructural.length, defaultNonStructural.length);
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(nonStructural);
