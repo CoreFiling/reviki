@@ -4,10 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.web.ConsumedPath;
-import net.hillsdon.svnwiki.web.RequestBasedWikiUrls;
-import net.hillsdon.svnwiki.web.RequestHandler;
-import net.hillsdon.svnwiki.wiki.FeedWriter;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
+import net.hillsdon.svnwiki.web.common.RequestHandler;
+import net.hillsdon.svnwiki.wiki.feeds.FeedWriter;
 
 public class RecentChanges implements RequestHandler {
 

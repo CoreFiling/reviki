@@ -1,6 +1,7 @@
 package net.hillsdon.svnwiki.web.handlers;
 
-import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getLong;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRevision;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -20,8 +21,8 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.web.ConsumedPath;
-import net.hillsdon.svnwiki.web.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.InvalidInputException;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class GetRegularPage extends PageRequestHandler {
@@ -48,7 +49,7 @@ public class GetRegularPage extends PageRequestHandler {
   }
 
   public void handlePage(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws PageStoreException, IOException, ServletException, InvalidInputException, QuerySyntaxException {
-    long revison = RequestParameterReaders.getRevision(request);
+    long revison = getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
 

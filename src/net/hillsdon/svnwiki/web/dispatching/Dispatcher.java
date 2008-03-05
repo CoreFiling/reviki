@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.dispatching;
 
 import static java.lang.String.format;
 
@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.configuration.ConfigurationLocation;
 import net.hillsdon.svnwiki.vc.NotFoundException;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestAttributes;
+import net.hillsdon.svnwiki.web.common.RequestHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

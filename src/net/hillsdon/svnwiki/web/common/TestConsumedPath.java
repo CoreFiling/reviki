@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.common;
 
 import junit.framework.TestCase;
 

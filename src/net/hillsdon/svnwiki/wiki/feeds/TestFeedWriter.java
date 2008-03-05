@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.wiki.feeds;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -11,7 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
-import net.hillsdon.svnwiki.web.RequestBasedWikiUrls;
+import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

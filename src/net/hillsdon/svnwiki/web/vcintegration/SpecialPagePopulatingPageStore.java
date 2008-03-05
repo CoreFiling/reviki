@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.vcintegration;
 
 import java.io.IOException;
 import java.util.Arrays;

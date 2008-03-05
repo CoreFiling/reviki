@@ -1,14 +1,14 @@
 package net.hillsdon.svnwiki.web.handlers;
 
-import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getLong;
-import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRequiredString;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.web.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class SetPage extends PageRequestHandler {
 

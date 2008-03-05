@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.web.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class RegularPage extends PageRequestHandler {

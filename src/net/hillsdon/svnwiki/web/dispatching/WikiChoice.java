@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.dispatching;
 
 import java.io.IOException;
 import java.util.Map;
@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.svnwiki.configuration.ConfigurationLocation;
 import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.vc.NotFoundException;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestHandler;
 
 public class WikiChoice implements RequestHandler {
 

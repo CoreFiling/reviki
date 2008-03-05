@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.vcintegration;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -12,6 +12,7 @@ import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.vc.SVNPageStore;
+import net.hillsdon.svnwiki.web.common.RequestAttributes;
 
 import org.apache.commons.codec.binary.Base64;
 import org.tmatesoft.svn.core.SVNException;

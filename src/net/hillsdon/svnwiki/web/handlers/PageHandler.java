@@ -7,8 +7,8 @@ import net.hillsdon.svnwiki.search.SearchEngine;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.web.ConsumedPath;
-import net.hillsdon.svnwiki.web.RequestHandler;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 /**

@@ -1,8 +1,8 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.vcintegration;
 
-import static net.hillsdon.svnwiki.web.BasicAuthPassThroughPageStoreFactory.getBasicAuthCredentials;
+import static net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory.getBasicAuthCredentials;
 import junit.framework.TestCase;
-import net.hillsdon.svnwiki.web.BasicAuthPassThroughPageStoreFactory.UsernamePassword;
+import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory.UsernamePassword;
 
 public class TestBasicAuthPassThroughPageStoreFactory extends TestCase {
 

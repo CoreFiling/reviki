@@ -3,7 +3,7 @@
 	<display-name>svnwiki</display-name>
 	<servlet>
       <servlet-name>dispatcher</servlet-name>
-	  <servlet-class>net.hillsdon.svnwiki.web.Dispatcher</servlet-class>
+	  <servlet-class>net.hillsdon.svnwiki.web.dispatching.Dispatcher</servlet-class>
 	</servlet>
 	<servlet-mapping>
 	  <servlet-name>dispatcher</servlet-name>

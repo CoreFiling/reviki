@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
-import net.hillsdon.svnwiki.web.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class ListAttachments extends PageRequestHandler {
 

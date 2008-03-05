@@ -10,8 +10,8 @@ import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.web.ConsumedPath;
-import net.hillsdon.svnwiki.web.RequestAttributes;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestAttributes;
 
 public class EditorForPage extends PageRequestHandler {
 

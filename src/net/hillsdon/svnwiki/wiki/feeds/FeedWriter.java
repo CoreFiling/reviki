@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.wiki.feeds;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -14,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;

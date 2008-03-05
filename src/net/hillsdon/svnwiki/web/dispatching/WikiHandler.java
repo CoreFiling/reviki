@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.dispatching;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -16,7 +16,11 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.vc.PageStoreFactory;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.web.handlers.PageHandler;
+import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory;
+import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.CreoleMarkupRenderer;

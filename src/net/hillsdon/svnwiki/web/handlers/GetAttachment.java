@@ -1,6 +1,6 @@
 package net.hillsdon.svnwiki.web.handlers;
 
-import static net.hillsdon.svnwiki.web.handlers.RequestParameterReaders.getRevision;
+import static net.hillsdon.svnwiki.web.common.RequestParameterReaders.getRevision;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,8 +12,8 @@ import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.web.ConsumedPath;
-import net.hillsdon.svnwiki.web.InvalidInputException;
+import net.hillsdon.svnwiki.web.common.ConsumedPath;
+import net.hillsdon.svnwiki.web.common.InvalidInputException;
 
 import org.apache.commons.fileupload.FileUploadException;
 

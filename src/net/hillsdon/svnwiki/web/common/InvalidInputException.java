@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.web;
+package net.hillsdon.svnwiki.web.common;
 
 /**
  * Not intended for forms validation, just to guarantee required request parameters.

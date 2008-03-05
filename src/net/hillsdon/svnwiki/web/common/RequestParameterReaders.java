@@ -1,15 +1,14 @@
-package net.hillsdon.svnwiki.web.handlers;
+package net.hillsdon.svnwiki.web.common;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.svnwiki.web.InvalidInputException;
 
 /**
  * Utility methods for getting data out of requests.
  * 
  * @author mth
  */
-final class RequestParameterReaders {
+public final class RequestParameterReaders {
 
 
   public static String getRequiredString(final HttpServletRequest request, final String parameter) throws InvalidInputException {
