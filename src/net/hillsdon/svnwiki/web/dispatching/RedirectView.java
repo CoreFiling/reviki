@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Communicates a redirect.
  * 
- * Exception as that ought to be the effect on control-flow.
- * 
  * @author mth
  */
 public class RedirectView implements View {
