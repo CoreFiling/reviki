@@ -6,7 +6,7 @@ import net.hillsdon.svnwiki.vc.PageStoreException;
 
 public class FrontPagePopulatingPageStore extends DelegatingPageStore {
 
-  private static final String FRONT_PAGE_CONTENT = "Welcome to ~~svnwiki~~!\n";
+  private static final String FRONT_PAGE_CONTENT = "Welcome to ~~svnwiki~~!";
 
   public FrontPagePopulatingPageStore(final PageStore delegate) {
     super(delegate);
