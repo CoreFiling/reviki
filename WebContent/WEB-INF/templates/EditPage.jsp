@@ -23,7 +23,9 @@
       <br />
       <label for="minorEdit">Minor edit?</label><input type="checkbox" id="minorEdit" name="minorEdit"/>
     </form>
-    <script type='text/javascript'>document.editForm.content.focus();</script>
+    <c:if test="${empty preview}">
+      <script type='text/javascript'>document.editForm.content.focus();</script>
+    </c:if>
     <jsp:include page="cheatsheet.html"></jsp:include>
   </tiles:putAttribute>
 </tiles:insertTemplate>
