@@ -1,8 +1,8 @@
 package net.hillsdon.svnwiki.wiki.db.model;
 
 import static java.lang.String.format;
-import static net.hillsdon.svnwiki.text.Strings.join;
 import static net.hillsdon.fij.core.Functional.map;
+import static net.hillsdon.fij.text.Strings.join;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

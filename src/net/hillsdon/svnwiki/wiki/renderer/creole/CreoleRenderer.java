@@ -18,7 +18,7 @@ package net.hillsdon.svnwiki.wiki.renderer.creole;
 import java.lang.reflect.Array;
 import java.util.regex.Matcher;
 
-import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 
 // Adapted from the Creole 0.4 implementation in JavaScript available here

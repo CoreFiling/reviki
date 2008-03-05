@@ -16,7 +16,7 @@
 package net.hillsdon.svnwiki.wiki;
 
 import static java.lang.String.format;
-import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.text.WikiWordUtils;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;

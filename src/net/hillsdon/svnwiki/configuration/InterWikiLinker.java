@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 
 /**

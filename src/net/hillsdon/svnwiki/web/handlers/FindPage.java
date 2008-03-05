@@ -21,8 +21,8 @@ import static net.hillsdon.svnwiki.text.WikiWordUtils.isWikiWord;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.search.SearchEngine;
-import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;

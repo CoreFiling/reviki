@@ -1,7 +1,7 @@
 package net.hillsdon.svnwiki.wiki.db.model;
 
-import static net.hillsdon.svnwiki.text.Strings.join;
 import static net.hillsdon.fij.core.Functional.iter;
+import static net.hillsdon.fij.text.Strings.join;
 import net.hillsdon.fij.core.Transform;
 
 public class DBNamedObject {

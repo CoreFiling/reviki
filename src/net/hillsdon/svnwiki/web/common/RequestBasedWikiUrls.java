@@ -17,7 +17,7 @@ package net.hillsdon.svnwiki.web.common;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.wiki.WikiUrls;
 
 public class RequestBasedWikiUrls implements WikiUrls {

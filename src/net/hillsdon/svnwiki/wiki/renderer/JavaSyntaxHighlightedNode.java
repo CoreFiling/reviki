@@ -18,7 +18,7 @@ package net.hillsdon.svnwiki.wiki.renderer;
 import java.io.IOException;
 import java.util.regex.Matcher;
 
-import net.hillsdon.svnwiki.text.Escape;
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 

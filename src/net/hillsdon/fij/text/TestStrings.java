@@ -1,7 +1,7 @@
-package net.hillsdon.svnwiki.text;
+package net.hillsdon.fij.text;
 
 import static net.hillsdon.fij.core.Functional.iter;
-import static net.hillsdon.svnwiki.text.Strings.join;
+import static net.hillsdon.fij.text.Strings.join;
 import junit.framework.TestCase;
 
 public class TestStrings extends TestCase {

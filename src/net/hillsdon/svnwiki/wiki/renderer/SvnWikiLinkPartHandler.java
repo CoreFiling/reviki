@@ -15,8 +15,8 @@
  */
 package net.hillsdon.svnwiki.wiki.renderer;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.configuration.Configuration;
-import net.hillsdon.svnwiki.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 import net.hillsdon.svnwiki.wiki.InternalLinker;

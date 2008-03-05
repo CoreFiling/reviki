@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.text;
+package net.hillsdon.fij.text;
 
 import java.util.Iterator;
 
