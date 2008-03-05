@@ -104,6 +104,28 @@
     .java_javadoc_tag {
       color: rgb(147,147,147); background-color: rgb(247,247,247); font-style: italic; font-weight: bold;
     }
+    
+    div#MarkupHelp {
+      background-color: white; color: #333;
+      font-family: Verdana, Arial, Helvetica, sans-serif; line-height: 1.3em;
+    }
+    div#MarkupHelp table {
+      margin-bottom: 0; border-top: 3px solid #999; border-left: 3px solid #999;
+      border-right: 3px solid #BBB; border-bottom: 3px solid #BBB
+    }
+    div#MarkupHelp td {
+      font-size: 80%; padding: 0.2em; margin: 0; border: 1px solid #999; border-width: 1px 0 1px 0;
+      vertical-align: top; white-space: nowrap;
+    }
+    div#MarkupHelp td.arrow {
+      padding-right: 5px; padding: 0 0.75em; color: #999;
+    }
+    div#MarkupHelp h3 {
+      font-size: 90%; font-weight: bold; margin: 0 0 5px 0; padding: 5px 0 0 0;
+    }
+    div#MarkupHelp p {
+      font-size: 70%;
+    }
   </style>
 </head>
 <body>
