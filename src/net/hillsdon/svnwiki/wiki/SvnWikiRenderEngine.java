@@ -19,7 +19,6 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
 
   @Override
   public boolean exists(final String name) {
-    System.err.println("exists? " + name);
     try {
       // TODO: make this more efficient!
       return Arrays.asList(_store.list()).contains(name);
@@ -31,19 +30,16 @@ public class SvnWikiRenderEngine extends BaseRenderEngine implements WikiRenderE
   
   @Override
   public void appendCreateLink(final StringBuffer buffer, final String name, final String view) {
-    System.err.println("Called: " + name + " " + view);
     appendLink(buffer, name, view);
   }
 
   @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view) {
-    System.err.println("Called: " + name + " " + view);
     buffer.append(String.format("<a href='%s'>%s</a>", Encoder.escape(name), Encoder.escape(view)));
   }
 
   @Override
   public void appendLink(final StringBuffer buffer, final String name, final String view, final String anchor) {
-    System.err.println("Called: " + name + " " + view);
     buffer.append(String.format("<a href='%s#%s'>%s</a>", Encoder.escape(name), Encoder.escape(anchor), Encoder.escape(view)));
   }
 
