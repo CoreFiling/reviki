@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki;
+package net.hillsdon.svnwiki.wiki.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -8,12 +8,8 @@ import java.util.List;
 import net.hillsdon.svnwiki.configuration.Configuration;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.wiki.renderer.AttachedMacro;
-import net.hillsdon.svnwiki.wiki.renderer.CreoleRenderer;
-import net.hillsdon.svnwiki.wiki.renderer.CustomWikiLinkNode;
-import net.hillsdon.svnwiki.wiki.renderer.Macro;
-import net.hillsdon.svnwiki.wiki.renderer.MacroNode;
-import net.hillsdon.svnwiki.wiki.renderer.RenderNode;
+import net.hillsdon.svnwiki.wiki.InternalLinker;
+import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 
 public class CreoleMarkupRenderer implements MarkupRenderer {
 
