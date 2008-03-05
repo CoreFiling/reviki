@@ -2,9 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title"><c:out value="${pageInfo.path} - ${pageInfo.revisionName}"/></tiles:putAttribute>
+  <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <h1><c:out value="${pageInfo.path}"/></h1>
+    <h1><c:out value="${pageInfo.title}"/></h1>
     <div id="wiki-rendering">
     ${renderedContents}
     </div>

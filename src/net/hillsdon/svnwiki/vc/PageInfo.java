@@ -2,6 +2,8 @@ package net.hillsdon.svnwiki.vc;
 
 import java.util.Date;
 
+import net.hillsdon.svnwiki.text.WikiWordUtils;
+
 /**
  * Contents at a particular revision.
  * 
@@ -38,6 +40,10 @@ public class PageInfo {
     _lockToken = lockToken;
   }
 
+  public String getTitle() {
+    return WikiWordUtils.pathToTitle(getPath()).toString();
+  }
+  
   public String getPath() {
     return _path;
   }
