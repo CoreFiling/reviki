@@ -53,10 +53,12 @@ public abstract class WebTestSupport extends TestCase {
    * @return The page after the 'Save' button has been clicked.
    * @throws IOException On failure.
    */
-  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final boolean isNew) throws IOException {
+  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws IOException {
     HtmlPage page = getWebPage("pages/" + name);
     URL pageUrl = page.getWebResponse().getUrl();
-    assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
+    if (isNew != null) {
+      assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
+    }
     page = (HtmlPage) page.getFormByName("editForm").getInputByValue("Edit").click();
     HtmlForm editForm = page.getFormByName("editForm");
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
