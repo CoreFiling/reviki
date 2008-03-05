@@ -80,11 +80,15 @@ public class SimplePageStore implements PageStore {
     throw new UnsupportedOperationException();
   }
 
-  public Collection<PageReference> getChangedBetween(final long start, long end) {
+  public Collection<PageReference> getChangedBetween(final long start, final long end) {
     throw new UnsupportedOperationException();
   }
 
   public long getLatestRevision() {
+    throw new UnsupportedOperationException();
+  }
+
+  public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
   

@@ -28,10 +28,13 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 
 public class SetPage implements PageRequestHandler {
 
+  private static final String PARAM_FROM_PAGE = "fromPage";
+  private static final String PARAM_FROM_REVISION = "fromRevision";
+
   static final String PARAM_CONTENT = "content";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private static final String PARAM_LOCK_TOKEN = "lockToken";
-  private static final String PARAM_COMMIT_MESSAGE = "description";
+  static final String PARAM_COMMIT_MESSAGE = "description";
   private static final String PARAM_MINOR_EDIT = "minorEdit";
   
   private static final String CRLF = "\r\n";
@@ -52,8 +55,8 @@ public class SetPage implements PageRequestHandler {
   }
 
   public void handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
     if (request.getParameter("save") != null) {
+      String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       long baseRevision = getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(CRLF)) {
@@ -61,9 +64,15 @@ public class SetPage implements PageRequestHandler {
       }
       _store.set(page, lockToken, baseRevision, content, createLinkingCommitMessage(request));
     }
-    else {
+    else if (request.getParameter("copy") != null) {
+      final String fromPage = getRequiredString(request, PARAM_FROM_PAGE);
+      final long fromRevision = getLong(PARAM_FROM_REVISION, getRequiredString(request, PARAM_FROM_REVISION));
+      _store.copy(new PageReference(fromPage), fromRevision, page, createLinkingCommitMessage(request));
+    }
+    else if (request.getParameter("unlock") != null) {
+      String lockToken = request.getParameter(PARAM_LOCK_TOKEN);
       // New pages don't have a lock.
-      if (lockToken.length() > 0) {
+      if (lockToken != null && lockToken.length() > 0) {
         _store.unlock(page, lockToken);
       }
     }

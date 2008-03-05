@@ -34,8 +34,9 @@ public interface BasicSVNOperations {
 
   void ensureDir(String dir, String commitMessage) throws PageStoreException;
   long create(String path, String commitMessage, InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
+  long copy(String fromPath, long fromRevision, String toPath, String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
   long edit(String path, long baseRevision, String commitMessage, String lockToken, InputStream content) throws PageStoreAuthenticationException, PageStoreException;
-  void delete(String path, long baseRevision, String commitMessage, String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
+  long delete(String path, long baseRevision, String commitMessage, String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
 
   void unlock(PageReference ref, String lockToken) throws PageStoreAuthenticationException, PageStoreException;
   void lock(PageReference ref, long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException;

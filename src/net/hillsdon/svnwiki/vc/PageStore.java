@@ -109,6 +109,18 @@ public interface PageStore {
   long set(PageReference ref, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
 
   /**
+   * Copy from 'from' at 'fromRevision' to the unused page head.
+   * 
+   * @param from From page.
+   * @param fromRevision Valid revision of from page.
+   * @param to A new page name.
+   * @param commitMessage TODO
+   * @return The revision in which the copy took place.
+   * @throws PageStoreException On error.  Copying to a page that already exists is an error.
+   */
+  long copy(PageReference from, long fromRevision, PageReference to, String commitMessage) throws PageStoreException;
+  
+  /**
    * Add an attachment to a page.
    * 
    * @param ref The page name.

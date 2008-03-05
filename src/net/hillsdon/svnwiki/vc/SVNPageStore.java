@@ -247,4 +247,8 @@ public class SVNPageStore implements PageStore {
     return _operations.getLatestRevision();
   }
 
+  public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
+    return _operations.copy(from.getPath(), fromRevision, to.getPath(), commitMessage);
+  }
+
 }

@@ -82,4 +82,8 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
     return getDelegate().getLatestRevision();
   }
 
+  public long copy(PageReference from, long fromRevision, PageReference to, String commitMessage) throws PageStoreException {
+    return getDelegate().copy(from, fromRevision, to, commitMessage);
+  }
+  
 }
