@@ -65,8 +65,12 @@ public class PageHandler implements RequestHandler {
     }
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);
-    
-    if ("RecentChanges".equals(pageName)) {
+
+    if ("attachments".equals(path.peek())) {
+      path.next();
+      _attachments.handlePage(path, request, response, page);
+    }
+    else if ("RecentChanges".equals(pageName)) {
       _recentChanges.handle(path, request, response);
     }
     else if ("AllPages".equals(pageName)) {
@@ -79,13 +83,7 @@ public class PageHandler implements RequestHandler {
       _orphanedPages.handle(path, request, response);
     }
     else {
-      if ("attachments".equals(path.peek())) {
-        path.next();
-        _attachments.handlePage(path, request, response, page);
-      }
-      else {
-        _regularPage.handlePage(path, request, response, page);
-      }
+      _regularPage.handlePage(path, request, response, page);
     }
   }
 
