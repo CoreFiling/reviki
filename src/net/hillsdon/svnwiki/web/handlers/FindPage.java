@@ -29,7 +29,7 @@ import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 
-public class Search implements RequestHandler {
+public class FindPage implements RequestHandler {
 
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -44,7 +44,7 @@ public class Search implements RequestHandler {
   private final PageStore _store;
   private final SearchEngine _searchEngine;
 
-  public Search(final PageStore store, final SearchEngine searchEngine) {
+  public FindPage(final PageStore store, final SearchEngine searchEngine) {
     _store = store;
     _searchEngine = searchEngine;
   }

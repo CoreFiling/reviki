@@ -48,7 +48,7 @@ public class PageHandler implements RequestHandler {
     WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, searchEngine);
     _recentChanges = new RecentChanges(cachingPageStore);
     _allPages = new AllPages(cachingPageStore);
-    _search = new Search(cachingPageStore, searchEngine);
+    _search = new FindPage(cachingPageStore, searchEngine);
     _attachments = new Attachments(cachingPageStore);
     _regularPage = new RegularPage(cachingPageStore, markupRenderer, wikiGraph);
     _orphanedPages = new OrphanedPages(wikiGraph);
