@@ -10,8 +10,6 @@
 	<classpathentry kind="lib" path="lib/htmlunit-1.13.jar" sourcepath="/home/mth/downloads/htmlunit-src-1.13"/>
 	<classpathentry kind="lib" path="lib/jaxen-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/js-1.6R5.jar"/>
-	<classpathentry kind="lib" path="lib/xercesImpl-2.6.2.jar"/>
-	<classpathentry kind="lib" path="lib/xmlParserAPIs-2.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-0.8.jar"/>
 	<classpathentry kind="lib" path="lib/easymock.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
