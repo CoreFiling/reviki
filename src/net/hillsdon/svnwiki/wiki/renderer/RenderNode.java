@@ -36,7 +36,7 @@ public interface RenderNode {
   Matcher find(String text);
 
   /**
-   * @param matcher A matcher that found a match and was deemed the best.
+   * @param matcher A matcher that found a match using our find method and we were deemed the best.
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
   String handle(Matcher matcher);
