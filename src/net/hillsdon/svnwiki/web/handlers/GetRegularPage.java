@@ -44,8 +44,14 @@ import net.hillsdon.svnwiki.wiki.graph.WikiGraph;
 
 public class GetRegularPage implements PageRequestHandler {
 
-  private static final String PARAM_DIFF_REVISION = "diff";
   private static final int BACKLINKS_LIMIT = 15;
+
+  public static final String PARAM_DIFF_REVISION = "diff";
+
+  public static final String ATTR_PAGE_INFO = "pageInfo";
+  public static final String ATTR_BACKLINKS = "backlinks";
+  public static final String ATTR_BACKLINKS_LIMITED = "backlinksLimited";
+  public static final String ATTR_RENDERED_CONTENTS = "renderedContents";
 
   @SuppressWarnings("unchecked") // Diff library is odd...
   private static String getDiffMarkup(final PageInfo head, final PageInfo base) {
@@ -72,7 +78,7 @@ public class GetRegularPage implements PageRequestHandler {
     addBacklinksInformation(request, page);
 
     final PageInfo main = _store.get(page, revison);
-    request.setAttribute("pageInfo", main);
+    request.setAttribute(ATTR_PAGE_INFO, main);
     if (diffRevision != null) {
       PageInfo base = _store.get(page, diffRevision);
       request.setAttribute("markedUpDiff", getDiffMarkup(main, base));
@@ -95,7 +101,7 @@ public class GetRegularPage implements PageRequestHandler {
     else {
       StringWriter writer = new StringWriter();
       _markupRenderer.render(main, main.getContent(), writer);
-      request.setAttribute("renderedContents", writer.toString());
+      request.setAttribute(ATTR_RENDERED_CONTENTS, writer.toString());
       return new JspView("ViewPage");
     }
   }
@@ -105,9 +111,9 @@ public class GetRegularPage implements PageRequestHandler {
     Collections.sort(pageNames);
     if (pageNames.size() > BACKLINKS_LIMIT) {
       pageNames = pageNames.subList(0, BACKLINKS_LIMIT - 1);
-      request.setAttribute("backlinksLimited", true);
+      request.setAttribute(ATTR_BACKLINKS_LIMITED, true);
     }
-    request.setAttribute("backlinks", pageNames);
+    request.setAttribute(ATTR_BACKLINKS, pageNames);
   }
 
 }
