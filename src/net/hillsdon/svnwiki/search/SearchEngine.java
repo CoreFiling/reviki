@@ -31,7 +31,7 @@ public interface SearchEngine {
    * Search for pages.
    * 
    * @param query Query.
-   * @param provideExtracts TODO
+   * @param provideExtracts true if extracts from the matching text should be provided in the returned matches (slower). 
    * @return Matches for the query, in rank order.
    * @throws IOException On error reading the search index. 
    * @throws QuerySyntaxException If the query is too broken to use. 
