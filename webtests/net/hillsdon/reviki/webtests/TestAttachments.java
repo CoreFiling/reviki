@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.webtests;
+package net.hillsdon.reviki.webtests;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.webtests;
+package net.hillsdon.reviki.webtests;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 
-public class TestInterWikiLinks extends WebTestSupport {
-
+public class TestAllPages extends WebTestSupport {
+  
   /**
-   * Add an interwiki link mapping, create a link, make sure it points where we expect.
+   * Create a page.
+   * Ensure it appears in AllPages.
    */
-  public void test() throws Exception {
-    editWikiPage("ConfigInterWikiLinks", "foo http://www.example.com/Wiki?%s", "Link mapping.", null);
-    HtmlPage page = editWikiPage(uniqueWikiPageName("InterWikiLinkTest"), "foo:1234", "Add inter-wiki link.", true);
-    HtmlAnchor link = page.getAnchorByHref("http://www.example.com/Wiki?1234");
-    assertEquals("foo:1234", link.asText());
+  public void testAllPages() throws Exception {
+    String name = uniqueWikiPageName("AllPagesTest");
+    editWikiPage(name, "Should appear in all pages", "", true);
+
+    HtmlPage allPages = getWikiPage("AllPages");
+    assertTrue(allPages.getTitleText().endsWith("All Pages"));
+    HtmlAnchor link = allPages.getAnchorByHref("/svnwiki/pages/test/" + name);
+    assertEquals(name, link.asText());
   }
   
 }

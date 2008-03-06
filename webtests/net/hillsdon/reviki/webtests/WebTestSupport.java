@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.webtests;
+package net.hillsdon.reviki.webtests;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,7 +35,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  */
 public abstract class WebTestSupport extends TestCase {
 
-  private static final String BASE_URL = "http://localhost:8080/svnwiki";
+  private static final String BASE_URL = "http://localhost:8080/reviki";
   
   private WebClient _client;
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.webtests;
+package net.hillsdon.reviki.webtests;
 
-import static net.hillsdon.svnwiki.webtests.TestAttachments.getAttachmentAtEndOfLink;
+import static net.hillsdon.reviki.webtests.TestAttachments.getAttachmentAtEndOfLink;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
