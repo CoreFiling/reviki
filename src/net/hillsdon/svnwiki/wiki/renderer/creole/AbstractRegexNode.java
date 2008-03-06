@@ -43,35 +43,35 @@ public abstract class AbstractRegexNode implements RenderNode {
     return this;
   }
 
-  public String render(final PageReference page, final String text, final RenderNode parent) {
-    if (text == null || text.length() == 0) {
-      return "";
-    }
-    RenderNode earliestRule = null;
-    Matcher earliestMatch = null;
-    int earliestIndex = Integer.MAX_VALUE;
-    for (RenderNode child : _children) {
-      Matcher matcher = child.find(text);
-      if (matcher != null && matcher.group(0).length() > 0) {
-        if (matcher.start() < earliestIndex) {
-          earliestIndex = matcher.start();
-          earliestMatch = matcher;
-          earliestRule = child;
+  public String render(final PageReference page, /* mutable */ String text, final RenderNode parent) {
+    final StringBuilder result = new StringBuilder();
+    while (text != null && text.length() > 0) {
+      RenderNode earliestRule = null;
+      Matcher earliestMatch = null;
+      int earliestIndex = Integer.MAX_VALUE;
+      for (RenderNode child : _children) {
+        Matcher matcher = child.find(text);
+        if (matcher != null && matcher.group(0).length() > 0) {
+          if (matcher.start() < earliestIndex) {
+            earliestIndex = matcher.start();
+            earliestMatch = matcher;
+            earliestRule = child;
+          }
         }
       }
+      if (earliestRule != null) {
+        String beforeMatch = text.substring(0, earliestMatch.start());
+        String afterMatch = text.substring(earliestMatch.end());
+        result.append(Escape.html(beforeMatch));
+        result.append(earliestRule.handle(page, earliestMatch, this));
+        text = afterMatch;
+      }
+      else {
+        result.append(Escape.html(text));
+        text = "";
+      }
     }
-    if (earliestRule != null) {
-      String beforeMatch = text.substring(0, earliestMatch.start());
-      String afterMatch = text.substring(earliestMatch.end());
-      String result = "";
-      result += Escape.html(beforeMatch);
-      //System.err.println("Matched by " + earliestRule + ": " + earliestMatch.group(0));
-      result += earliestRule.handle(page, earliestMatch, this);
-      result += render(page, afterMatch, parent);
-      return result;
-    }
-    //System.err.println("No match using " + _children + ", test:\n" + text);
-    return Escape.html(text);
+    return result.toString();
   }
 
   public Matcher find(final String text) {
