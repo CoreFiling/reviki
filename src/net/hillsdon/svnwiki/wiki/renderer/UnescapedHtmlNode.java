@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
 
 /**
  * Obviously this has security issues...
@@ -33,8 +34,8 @@ public class UnescapedHtmlNode extends AbstractRegexNode {
                 : "(?s)\\[<html>\\](.*?)\\[</html>\\]");
   }
 
-  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
-    return matcher.group(1);
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+    return new LiteralResultNode(matcher.group(1));
   }
 
 }

@@ -40,15 +40,15 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     _replaceString = replaceString;
   }
 
-  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     if (_contentGroup == null) {
-      return "<" + _tag + " />";
+      return new TagResultNode(_tag);
     }
     String text = matcher.group(_contentGroup);
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return "<" + _tag + ">" +  render(page, text, this) + "</" + _tag + ">";
+    return new TagResultNode(_tag, render(page, text, this));
   }
   
   @Override

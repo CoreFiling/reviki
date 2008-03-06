@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.CompositeResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.LiteralResultNode;
 
 // Adapted from the Creole 0.4 implementation in JavaScript available here
 // http://www.meatballsociety.org/Creole/0.4/
@@ -60,9 +62,9 @@ public class CreoleRenderer {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
-    public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
       String escaped = Escape.html(matcher.group(0));
-      return String.format("<a href='%s'>%s</a>", escaped, escaped);
+      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escaped, escaped));
     }
   }
   private static class Heading extends RegexMatchToTag {
@@ -126,8 +128,8 @@ public class CreoleRenderer {
     _root = root;
   }
   
-  public String render(final PageReference page, final String in) {
-    return _root.render(page, in.replaceAll("\r", ""), null);
+  public ResultNode render(final PageReference page, final String in) {
+    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null));
   }
   
   @SuppressWarnings("unchecked")

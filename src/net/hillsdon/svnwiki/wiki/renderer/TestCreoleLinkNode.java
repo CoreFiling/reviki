@@ -30,21 +30,21 @@ public class TestCreoleLinkNode extends TestCase {
   }
   
   public void testInternal() {
-    assertEquals("<a class='new-page' href='/context/pages/wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null));
+    assertEquals("<a class='new-page' href='/context/pages/wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
   }
 
   public void testInterWiki() {
-    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null));
+    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null).toXHTML());
   }
   
   public void testExternal() {
-    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null));
+    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null).toXHTML());
   }
   
   public void testAttachments() {
     // The class isn't too clever here.
-    assertEquals("<a class='attachment' href='WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null));
-    assertEquals("<a class='attachment' href='ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null));
+    assertEquals("<a class='attachment' href='WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null).toXHTML());
+    assertEquals("<a class='attachment' href='ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null).toXHTML());
   }
   
   public void testInterWikiAttachment() {

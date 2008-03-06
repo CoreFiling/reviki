@@ -22,6 +22,7 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
 
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
@@ -40,13 +41,13 @@ public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
               : "(?s)\\[<java>\\](.*?)\\[</java>\\]");
   }
 
-  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     String content = matcher.group(1).trim();
     try {
-      return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true);
+      return new LiteralResultNode(XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true));
     }
     catch (IOException e) {
-      return "<pre>" + Escape.html(content) + "</pre>";
+      return new LiteralResultNode("<pre>" + Escape.html(content) + "</pre>");
     }
   }
 

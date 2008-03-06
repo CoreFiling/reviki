@@ -77,7 +77,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   }
   
   private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text) {
-    return String.format(_formatString, Escape.html(clazz), Escape.html(url), renderer.render(page, text, null));
+    return String.format(_formatString, Escape.html(clazz), Escape.html(url), CompositeResultNode.asText(renderer.render(page, text, null)));
   }
 
 }

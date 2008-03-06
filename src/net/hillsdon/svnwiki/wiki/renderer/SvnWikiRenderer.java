@@ -57,7 +57,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
   }
   
   public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
-    out.write(_creole.render(page, in));
+    out.write(_creole.render(page, in).toXHTML());
   }
 
 }

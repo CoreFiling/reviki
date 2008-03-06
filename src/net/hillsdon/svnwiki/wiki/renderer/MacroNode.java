@@ -22,7 +22,9 @@ import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.HtmlEscapeResultNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 
 import org.apache.commons.logging.Log;
@@ -49,7 +51,7 @@ public class MacroNode extends AbstractRegexNode {
     return matcher.group(1).trim();
   }
 
-  public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
     // We need to move to a push system for updating macros to avoid this.
     final String macroName = getMacroName(matcher);
     Macro macro = null;
@@ -61,25 +63,25 @@ public class MacroNode extends AbstractRegexNode {
       }
     }
     if (macro == null) {
-      return "<pre>" + Escape.html(matcher.group()) + "</pre>";
+      return new LiteralResultNode("<pre>" + Escape.html(matcher.group()) + "</pre>");
     }
     
     try {
       String content = macro.handle(page, matcher.group(2));
       switch (macro.getResultFormat()) {
         case XHTML:
-          return content;
+          return new LiteralResultNode(content);
         case WIKI:
           // Use the parent as renderer if possible as that has the appropriate child nodes.
           RenderNode renderer = parent != null ? parent : this;
-          return renderer.render(page, content, this);
+          return new CompositeResultNode(renderer.render(page, content, this));
         default:
-          return Escape.html(content);
+          return new HtmlEscapeResultNode(content);
       }
     }
     catch (Exception e) {
       LOG.error("Error handling macro on: " + page.getPath(), e);
-      return String.format("<p>Error evaluating macro '%s': %s</p>", Escape.html(macro.getName()), Escape.html(e.getMessage()));
+      return new LiteralResultNode(String.format("<p>Error evaluating macro '%s': %s</p>", Escape.html(macro.getName()), Escape.html(e.getMessage())));
     }
   }
 

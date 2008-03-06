@@ -34,7 +34,7 @@ public class TestMacroNode extends TestCase {
     MacroNode macroNode = new MacroNode(new Holder<List<Macro>>(asList(npes)), false);
     Matcher matcher = Pattern.compile("([a-z]+) ([a-z]+)").matcher("npes remainder");
     matcher.matches();
-    String result = macroNode.handle(new PageReference("WhatEver"), matcher, null);
+    String result = macroNode.handle(new PageReference("WhatEver"), matcher, null).toXHTML();
     assertTrue(result.contains("Simulated &amp; escape me please."));
   }
   

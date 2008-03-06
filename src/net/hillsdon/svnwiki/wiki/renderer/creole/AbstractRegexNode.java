@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 
 public abstract class AbstractRegexNode implements RenderNode {
@@ -43,8 +42,8 @@ public abstract class AbstractRegexNode implements RenderNode {
     return this;
   }
 
-  public String render(final PageReference page, /* mutable */ String text, final RenderNode parent) {
-    final StringBuilder result = new StringBuilder();
+  public List<ResultNode> render(final PageReference page, /* mutable */ String text, final RenderNode parent) {
+    final List<ResultNode> result = new ArrayList<ResultNode>();
     while (text != null && text.length() > 0) {
       RenderNode earliestRule = null;
       Matcher earliestMatch = null;
@@ -62,16 +61,16 @@ public abstract class AbstractRegexNode implements RenderNode {
       if (earliestRule != null) {
         String beforeMatch = text.substring(0, earliestMatch.start());
         String afterMatch = text.substring(earliestMatch.end());
-        result.append(Escape.html(beforeMatch));
-        result.append(earliestRule.handle(page, earliestMatch, this));
+        result.add(new HtmlEscapeResultNode(beforeMatch));
+        result.add(earliestRule.handle(page, earliestMatch, this));
         text = afterMatch;
       }
       else {
-        result.append(Escape.html(text));
+        result.add(new HtmlEscapeResultNode(text));
         text = "";
       }
     }
-    return result.toString();
+    return result;
   }
 
   public Matcher find(final String text) {

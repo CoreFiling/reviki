@@ -44,7 +44,7 @@ public interface RenderNode {
    * @param parent TODO
    * @return Rendered HTML.
    */
-  String render(PageReference page, String text, RenderNode parent);
+  List<ResultNode> render(PageReference page, String text, RenderNode parent);
   
   /**
    * Test for a match in the given text.
@@ -60,6 +60,6 @@ public interface RenderNode {
    * @param parent TODO
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
-  String handle(PageReference page, Matcher matcher, RenderNode parent);
+  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent);
 
 }
