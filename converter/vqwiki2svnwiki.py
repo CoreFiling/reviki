@@ -135,11 +135,11 @@ try:
   outputDir = sys.argv[2]
 except IndexError:
   print >> sys.stderr, 'Usage:', sys.argv[0], '<inputDir> <outputDir>'
-  exit(1)
+  sys.exit(1)
 
 if os.path.exists(outputDir):
   print >> sys.stderr, outputDir, 'already exists'
-  exit(1)
+  sys.exit(1)
 
 os.mkdir(outputDir)
 for wiki in get_wikis(inputDir):
