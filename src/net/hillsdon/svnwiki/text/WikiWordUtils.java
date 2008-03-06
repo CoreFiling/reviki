@@ -66,7 +66,7 @@ public final class WikiWordUtils {
   }
 
   private static boolean startsUpperCase(final String text) {
-    return Character.isUpperCase(text.charAt(0));
+    return text.length() > 0 && Character.isUpperCase(text.charAt(0));
   }
 
   private static boolean hasNoSpaces(final String text) {
