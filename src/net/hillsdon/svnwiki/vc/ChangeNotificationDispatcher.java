@@ -15,12 +15,14 @@
  */
 package net.hillsdon.svnwiki.vc;
 
+import static net.hillsdon.fij.core.Functional.filter;
 import static net.hillsdon.fij.core.Functional.list;
 import static net.hillsdon.fij.core.IterableUtils.reversed;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ListIterator;
+
+import net.hillsdon.fij.core.Predicate;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +53,7 @@ public class ChangeNotificationDispatcher {
     long latest = _operations.getLatestRevision();
     try {
       if (latest > _lastSynced) {
-        List<ChangeInfo> logs = _operations.log("", -1, false, true, _lastSynced, latest);
+        List<ChangeInfo> logs = _operations.log("", -1, false, true, _lastSynced + 1, latest);
         if (!logs.isEmpty()) {
           notifyListeners(latest, list(reversed(logs)));
         }
@@ -64,12 +66,12 @@ public class ChangeNotificationDispatcher {
   
   private void notifyListeners(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
     for (ChangeSubscriber subscriber : _subscribers) {
-      // Only tell folk what they need to know
-      ListIterator<ChangeInfo> iter = chronological.listIterator();
-      while (iter.hasNext() && iter.next().getRevision() <= subscriber.getHighestSyncedRevision()) {
-        // Consume.
-      }
-      List<ChangeInfo> relevant = chronological.subList(iter.nextIndex(), chronological.size());
+      final long subscriberHighestSynced = subscriber.getHighestSyncedRevision();
+      List<ChangeInfo> relevant = list(filter(chronological, new Predicate<ChangeInfo>() {
+        public Boolean transform(final ChangeInfo in) {
+          return in.getRevision() > subscriberHighestSynced;
+        }
+      }));
       if (!relevant.isEmpty()) {
         long start = System.currentTimeMillis();
         subscriber.handleChanges(upto, relevant);
@@ -78,4 +80,8 @@ public class ChangeNotificationDispatcher {
     }
   }
 
+  long getLastSynced() {
+    return _lastSynced;
+  }
+  
 }
