@@ -77,6 +77,8 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
   markup = ATTACH_RE.sub(handle_match, markup)
   return markup
 
+TABLE_RE = re.compile('(^|\n)####(.*?)####', re.DOTALL)
+
 def translate_markup(markup):
   """
   Convert the mark-up from VQWiki to Creole.
@@ -92,6 +94,15 @@ def translate_markup(markup):
     regex = re.compile('(^|\n)(\t+)' + re.escape(symbol))
     return regex.sub(expand_symbol, markup)
 
+  def translate_tables(markup):
+    def handle_table(match):
+      content = match.group(2).replace('##', ' | ').strip()
+      return '\n' + ('\n'.join('| ' + line for line in content.splitlines()))
+
+    return TABLE_RE.sub(handle_table, markup)
+
+  markup = markup.replace('\r\n', '\n')
+  markup = translate_tables(markup)
   markup = translate_lists('#', markup)
   markup = translate_lists('*', markup)
   markup = markup.replace('\t', '  ')
