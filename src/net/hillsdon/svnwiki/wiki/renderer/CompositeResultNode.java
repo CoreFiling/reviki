@@ -14,19 +14,15 @@ public class CompositeResultNode implements ResultNode {
   }
 
   public String toXHTML() {
-    return asText(_children);
+    String result = "";
+    for (ResultNode t : _children) {
+      result += t.toXHTML();
+    }
+    return result;
   }
 
   public List<ResultNode> getChildren() {
     return Collections.unmodifiableList(_children);
-  }
-
-  public static String asText(final Iterable<ResultNode> children) {
-    String result = "";
-    for (ResultNode t : children) {
-      result += t.toXHTML();
-    }
-    return result;
   }
 
 }
