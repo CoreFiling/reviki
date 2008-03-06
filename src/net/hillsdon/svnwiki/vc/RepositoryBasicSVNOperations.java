@@ -42,6 +42,7 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -97,11 +98,13 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) {
     List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
-      // Might want to put this at a higher level if we can ever do
-      // something useful with 'other' changes.
-      if (change.getKind() != StoreKind.OTHER) {
-        results.add(change);
+      if (SVNPathUtil.isAncestor(rootPath, changedPath)) {
+        ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
+        // Might want to put this at a higher level if we can ever do
+        // something useful with 'other' changes.
+        if (change.getKind() != StoreKind.OTHER) {
+          results.add(change);
+        }
       }
     }
     return results;
