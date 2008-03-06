@@ -88,6 +88,7 @@ public class Dispatcher extends HttpServlet {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     catch (Exception ex) {
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       handleException(request, response, ex);
     }
   }
