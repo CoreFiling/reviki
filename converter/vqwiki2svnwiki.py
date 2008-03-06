@@ -77,6 +77,9 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
   markup = ATTACH_RE.sub(handle_match, markup)
   return markup
 
+H1_RE = re.compile('^!!!(.*?)!!!$', re.MULTILINE)
+H2_RE = re.compile('^!!(.*?)!!$', re.MULTILINE)
+H3_RE = re.compile('^!(.*?)!$', re.MULTILINE)
 TABLE_RE = re.compile('(^|\n)####(.*?)####', re.DOTALL)
 BOLD_ITALIC_RE = re.compile("'''''(.*?)'''''", re.DOTALL)
 BOLD_RE = re.compile("'''(.*?)'''", re.DOTALL)
@@ -119,6 +122,10 @@ def translate_markup(markup):
   markup = BOLD_ITALIC_RE.sub(wrap_group_with(1, '//**', '**//'), markup)
   markup = BOLD_RE.sub(wrap_group_with(1, '**', '**'), markup)
   markup = ITALIC_RE.sub(wrap_group_with(1, '//', '//'), markup)
+
+  markup = H1_RE.sub(wrap_group_with(1, '== ', ' =='), markup)
+  markup = H2_RE.sub(wrap_group_with(1, '=== ', ' ==='), markup)
+  markup = H3_RE.sub(wrap_group_with(1, '==== ', ' ===='), markup)
 
   markup = translate_tables(markup)
   markup = translate_lists('#', markup)
