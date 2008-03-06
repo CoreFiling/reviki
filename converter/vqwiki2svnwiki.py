@@ -83,6 +83,8 @@ BOLD_RE = re.compile("'''(.*?)'''", re.DOTALL)
 ITALIC_RE = re.compile("''(.*?)''", re.DOTALL)
 INLINE_ESCAPE_RE = re.compile("__(.*?)__", re.DOTALL)
 MULTILINE_ESCAPE_RE = re.compile('(^|\n)@@@@(.*?)($|\n\n)', re.DOTALL)
+EXTERNAL_LINK = re.compile('ext:(.*?(\n|$))')
+NAMED_EXTERNAL_LINK = re.compile(r'\[ext:(.*?)\|(.*?)\]')
 
 def translate_markup(markup):
   """
@@ -110,6 +112,9 @@ def translate_markup(markup):
       return before + match.group(group) + after
     return helper
 
+  def handle_named_external_link(match):
+    return '[[' + match.group(1) + '|' + match.group(2) + ']]'
+
   # We normalize line endings first but do tabs to spaces last to simplify REs.
   markup = markup.replace('\r\n', '\n')
   markup = MULTILINE_ESCAPE_RE.sub(wrap_group_with(2, '\n{{{', '\n}}}\n\n'), markup)
@@ -123,6 +128,10 @@ def translate_markup(markup):
   markup = H1_RE.sub(wrap_group_with(1, '== ', ' =='), markup)
   markup = H2_RE.sub(wrap_group_with(1, '=== ', ' ==='), markup)
   markup = H3_RE.sub(wrap_group_with(1, '==== ', ' ===='), markup)
+
+  # Order important for these two.
+  markup = NAMED_EXTERNAL_LINK.sub(handle_named_external_link, markup)
+  markup = EXTERNAL_LINK.sub(wrap_group_with(1, '', ''), markup)
 
   markup = translate_tables(markup)
   markup = translate_lists('#', markup)
