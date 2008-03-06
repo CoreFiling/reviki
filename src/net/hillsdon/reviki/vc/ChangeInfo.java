@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public class ChangeInfo {
 
-  public static final String NO_COMMENT_MESSAGE_TAG = "[svnwiki commit]";
+  public static final String NO_COMMENT_MESSAGE_TAG = "[reviki commit]";
   public static final String MINOR_EDIT_MESSAGE_TAG = "[minor edit]\n";
   
   private final String _name;

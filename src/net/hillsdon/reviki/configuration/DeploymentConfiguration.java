@@ -37,9 +37,9 @@ import org.tmatesoft.svn.core.SVNURL;
  */
 public class DeploymentConfiguration {
 
-  private static final String DEFAULT_CONFIG_DIR_NAME = "svnwiki-data";
+  private static final String DEFAULT_CONFIG_DIR_NAME = "reviki-data";
   private static final String SEARCH_INDEX_DIR_NAME = "search-index";
-  private static final String CONFIG_FILE_NAME = "svnwiki.properties";
+  private static final String CONFIG_FILE_NAME = "reviki.properties";
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
   private static final String KEY_DEFAULT_WIKI = "default-wiki";
@@ -101,7 +101,7 @@ public class DeploymentConfiguration {
   private File getConfigurationLocation() {
     String location = null;
     try {
-      location = System.getProperty("svnwiki.data");
+      location = System.getProperty("reviki.data");
     }
     catch (SecurityException ex) {
     }
@@ -164,7 +164,7 @@ public class DeploymentConfiguration {
       try {
         FileOutputStream in = new FileOutputStream(file);
         try {
-          _properties.store(in, "svnwiki configuration details");
+          _properties.store(in, "reviki configuration details");
         }
         finally {
           in.close();

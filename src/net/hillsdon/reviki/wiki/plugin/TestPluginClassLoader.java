@@ -8,8 +8,8 @@ import junit.framework.TestCase;
 public class TestPluginClassLoader extends TestCase {
 
   private static final String EXAMPLE_PLUGIN_JAR = "test-plugin.jar";
-  private static final String DIRECTLY_IN_JAR_CLASS_NAME = "net.hillsdon.svnwiki.test.plugin.Example";
-  private static final String IN_EMBEDDED_JAR_CLASS_NAME = "net.hillsdon.svnwiki.test.plugin.Dependency";
+  private static final String DIRECTLY_IN_JAR_CLASS_NAME = "net.hillsdon.reviki.test.plugin.Example";
+  private static final String IN_EMBEDDED_JAR_CLASS_NAME = "net.hillsdon.reviki.test.plugin.Dependency";
 
   public void test() throws Exception {
     final PluginClassLoader classloader = new PluginClassLoader(getClass().getResource(EXAMPLE_PLUGIN_JAR), getClass().getClassLoader());

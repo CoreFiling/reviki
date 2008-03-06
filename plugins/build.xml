@@ -27,7 +27,7 @@
         <include name="**/*"/>
       </fileset>
       <manifest>
-        <attribute name="Plugin-Contributions" value="net.hillsdon.svnwiki.plugins.HelloWorldMacro"/>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.reviki.plugins.HelloWorldMacro"/>
       </manifest>
     </jar>
   </target>
@@ -62,7 +62,7 @@
       </fileset>
       <manifest>
         <attribute name="Class-Path" value="test-plugin-dependency.jar"/>
-        <attribute name="Plugin-Contributions" value="net.hillsdon.svnwiki.test.plugin.Example"/>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.reviki.test.plugin.Example"/>
       </manifest>
     </jar>
   </target>

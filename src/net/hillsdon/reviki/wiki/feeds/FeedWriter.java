@@ -87,7 +87,7 @@ public class FeedWriter {
     handler.startPrefixMapping("", ATOM_NS);
     handler.endPrefixMapping("");
     handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
-    addElement(handler, "title", "svnwiki feed");
+    addElement(handler, "title", "reviki feed");
     addLink(handler, wikiUrls.feed(), "self");
     addLink(handler, wikiUrls.root(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());

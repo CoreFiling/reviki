@@ -3,7 +3,7 @@
 """
 A python script to partially convert a VQWiki data directory
 to a directory suitable for checking in as the data for
-svnwiki.
+reviki.
 
 Author: Matt Hillsdon <matt@hillsdon.net>
 """

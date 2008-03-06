@@ -172,7 +172,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           Map<String, Long> pathsToRevisions = singletonMap(ref.getPath(), revision);
-          repository.lock(pathsToRevisions, "Locked by svnwiki.", false, new SVNLockHandlerAdapter());
+          repository.lock(pathsToRevisions, "Locked by reviki.", false, new SVNLockHandlerAdapter());
         }
         catch (SVNException ex) {
           if (SVNErrorCode.FS_PATH_ALREADY_LOCKED.equals(ex.getErrorMessage().getErrorCode())) {

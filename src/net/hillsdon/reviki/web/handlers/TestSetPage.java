@@ -53,9 +53,9 @@ public class TestSetPage extends TestCase {
     _store = createMock(PageStore.class);
     _page = new SetPage(_store);
     _request = new MockHttpServletRequest();
-    _request.setContextPath("/svnwiki");
-    _request.setRequestURL("http://www.example.com/svnwiki/pages/" + CALLED_ON_PAGE.getPath());
-    _request.setRequestURI("/svnwiki/pages/" + CALLED_ON_PAGE.getPath());
+    _request.setContextPath("/reviki");
+    _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());
+    _request.setRequestURI("/reviki/pages/" + CALLED_ON_PAGE.getPath());
     _response = null;
     RequestBasedWikiUrls.create(_request, new PerWikiInitialConfiguration(null, "", ""));
   }
@@ -147,7 +147,7 @@ public class TestSetPage extends TestCase {
   public void testCopyTo() throws Exception {
     _request.setParameter(SetPage.SUBMIT_COPY, "");
     _request.setParameter(SetPage.PARAM_TO_PAGE, "ToPage");
-    expect(_store.copy(CALLED_ON_PAGE, -1, new PageReference("ToPage"), "[svnwiki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.copy(CALLED_ON_PAGE, -1, new PageReference("ToPage"), "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
     assertEquals(RequestBasedWikiUrls.get(_request).page("ToPage"), view.getURL());
@@ -157,7 +157,7 @@ public class TestSetPage extends TestCase {
   public void testCopyFrom() throws Exception {
     _request.setParameter(SetPage.SUBMIT_COPY, "");
     _request.setParameter(SetPage.PARAM_FROM_PAGE, "FromPage");
-    expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[svnwiki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
     assertEquals(RequestBasedWikiUrls.get(_request).page(CALLED_ON_PAGE.getPath()), view.getURL());
@@ -178,7 +178,7 @@ public class TestSetPage extends TestCase {
   public void testRenameTo() throws Exception {
     _request.setParameter(SetPage.SUBMIT_RENAME, "");
     _request.setParameter(SetPage.PARAM_TO_PAGE, "ToPage");
-    expect(_store.rename(CALLED_ON_PAGE, new PageReference("ToPage"), -1, "[svnwiki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.rename(CALLED_ON_PAGE, new PageReference("ToPage"), -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
     assertEquals(RequestBasedWikiUrls.get(_request).page("ToPage"), view.getURL());

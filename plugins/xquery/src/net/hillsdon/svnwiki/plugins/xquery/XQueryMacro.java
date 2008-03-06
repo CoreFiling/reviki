@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.svnwiki.plugins.xquery;
+package net.hillsdon.reviki.plugins.xquery;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
-import net.hillsdon.svnwiki.wiki.renderer.macro.ResultFormat;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+import net.hillsdon.reviki.wiki.renderer.macro.ResultFormat;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;

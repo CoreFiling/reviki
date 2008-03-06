@@ -1,2 +1,2 @@
 #!/bin/bash
-svn up && ant clean war && cp svnwiki.war /scratch/mth/tomcat/webapps/
+svn up && ant clean war && cp reviki.war /scratch/mth/tomcat/webapps/
