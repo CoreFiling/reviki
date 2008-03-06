@@ -111,7 +111,7 @@ def translate_markup(markup):
     return helper
 
   markup = markup.replace('\r\n', '\n')
-  markup = MULTILINE_ESCAPE_RE.sub(wrap_group_with(2, '{{{', '\n}}}\n\n'), markup)
+  markup = MULTILINE_ESCAPE_RE.sub(wrap_group_with(2, '\n{{{', '\n}}}\n\n'), markup)
   markup = INLINE_ESCAPE_RE.sub(wrap_group_with(1, '{{', '}}'), markup)
   markup = BOLD_ITALIC_RE.sub(wrap_group_with(1, '//**', '**//'), markup)
   markup = BOLD_RE.sub(wrap_group_with(1, '**', '**'), markup)
