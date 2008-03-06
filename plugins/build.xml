@@ -62,7 +62,7 @@
       </fileset>
       <manifest>
         <attribute name="Class-Path" value="test-plugin-dependency.jar"/>
-        <attribute name="Plugin-Contributions" value="net.hillsdon.plugins.test.plugin.Example"/>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.svnwiki.test.plugin.Example"/>
       </manifest>
     </jar>
   </target>
