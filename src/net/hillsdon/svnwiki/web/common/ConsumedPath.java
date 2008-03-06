@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ConsumedPath {
 
-  public static ConsumedPath EMPTY = new ConsumedPath(Collections.<String>emptyList());
+  public static final ConsumedPath EMPTY = new ConsumedPath(Collections.<String>emptyList());
   
   private ListIterator<String> _iterator;
   private List<String> _list;
