@@ -24,6 +24,7 @@ import net.hillsdon.svnwiki.wiki.UnknownWikiException;
 import net.hillsdon.svnwiki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.svnwiki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.CompositeResultNode;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   

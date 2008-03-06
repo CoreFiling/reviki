@@ -24,8 +24,10 @@ import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.HtmlEscapeResultNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
+import net.hillsdon.svnwiki.wiki.renderer.result.CompositeResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

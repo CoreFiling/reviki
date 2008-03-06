@@ -1,9 +1,8 @@
-package net.hillsdon.svnwiki.wiki.renderer.creole;
+package net.hillsdon.svnwiki.wiki.renderer.result;
 
 import java.util.Collections;
 import java.util.List;
 
-import net.hillsdon.svnwiki.wiki.renderer.CompositeResultNode;
 
 /**
  * Outputs an XHTML tag.
@@ -21,6 +20,10 @@ public class TagResultNode extends CompositeResultNode {
   public TagResultNode(final String tag, final List<ResultNode> children) {
     super(children);
     _tag = tag;
+  }
+  
+  public String getTag() {
+    return _tag;
   }
   
   public String toXHTML() {

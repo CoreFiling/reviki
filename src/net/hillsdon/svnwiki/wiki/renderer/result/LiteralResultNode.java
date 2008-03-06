@@ -1,4 +1,5 @@
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.result;
+
 
 
 public class LiteralResultNode extends LeafResultNode {

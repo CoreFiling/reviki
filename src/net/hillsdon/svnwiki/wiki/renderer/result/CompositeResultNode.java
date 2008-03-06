@@ -1,9 +1,8 @@
-package net.hillsdon.svnwiki.wiki.renderer;
+package net.hillsdon.svnwiki.wiki.renderer.result;
 
 import java.util.Collections;
 import java.util.List;
 
-import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
 
 public class CompositeResultNode implements ResultNode {
   

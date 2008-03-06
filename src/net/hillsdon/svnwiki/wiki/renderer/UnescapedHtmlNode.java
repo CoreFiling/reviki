@@ -20,7 +20,8 @@ import java.util.regex.Matcher;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 /**
  * Obviously this has security issues...

@@ -1,4 +1,4 @@
-package net.hillsdon.svnwiki.wiki.renderer.creole;
+package net.hillsdon.svnwiki.wiki.renderer.result;
 
 import java.util.List;
 
@@ -7,7 +7,8 @@ import java.util.List;
  * 
  * The idea is we can encode useful information for analysis and
  * transformation but for now most of the nodes are generic and the
- * rendering work is still done in by the {@link RenderNode}s.
+ * rendering work is still done in by the 
+ * {@link net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode}s.
  * 
  * @author mth
  */

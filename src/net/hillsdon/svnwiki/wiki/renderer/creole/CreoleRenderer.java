@@ -20,8 +20,9 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.wiki.renderer.CompositeResultNode;
-import net.hillsdon.svnwiki.wiki.renderer.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.CompositeResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 // Adapted from the Creole 0.4 implementation in JavaScript available here
 // http://www.meatballsociety.org/Creole/0.4/

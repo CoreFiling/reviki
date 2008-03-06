@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 public interface RenderNode {
 

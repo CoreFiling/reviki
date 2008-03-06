@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 public abstract class AbstractRegexNode implements RenderNode {
 

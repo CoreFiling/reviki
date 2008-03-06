@@ -1,7 +1,7 @@
 package net.hillsdon.svnwiki.wiki.renderer.creole;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.svnwiki.wiki.renderer.LeafResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LeafResultNode;
 
 public class HtmlEscapeResultNode extends LeafResultNode {
 

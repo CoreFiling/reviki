@@ -22,7 +22,8 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.svnwiki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.svnwiki.wiki.renderer.creole.ResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 

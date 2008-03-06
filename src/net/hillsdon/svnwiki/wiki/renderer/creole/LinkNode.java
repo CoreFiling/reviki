@@ -18,7 +18,8 @@ package net.hillsdon.svnwiki.wiki.renderer.creole;
 import java.util.regex.Matcher;
 
 import net.hillsdon.svnwiki.vc.PageReference;
-import net.hillsdon.svnwiki.wiki.renderer.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.svnwiki.wiki.renderer.result.ResultNode;
 
 public class LinkNode extends AbstractRegexNode {
 
