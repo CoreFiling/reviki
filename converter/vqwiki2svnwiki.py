@@ -78,6 +78,10 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
   return markup
 
 TABLE_RE = re.compile('(^|\n)####(.*?)####', re.DOTALL)
+BOLD_ITALIC_RE = re.compile("'''''(.*?)'''''", re.DOTALL)
+BOLD_RE = re.compile("'''(.*?)'''", re.DOTALL)
+ITALIC_RE = re.compile("''(.*?)''", re.DOTALL)
+INLINE_ESCAPE_RE = re.compile("__(.*?)__", re.DOTALL)
 
 def translate_markup(markup):
   """
@@ -98,9 +102,17 @@ def translate_markup(markup):
     def handle_table(match):
       content = match.group(2).replace('##', ' | ').strip()
       return '\n' + ('\n'.join('| ' + line for line in content.splitlines()))
-
     return TABLE_RE.sub(handle_table, markup)
 
+  def wrap_group1_with(before, after):
+    def helper(match):
+      return before + match.group(1) + after
+    return helper
+
+  markup = BOLD_ITALIC_RE.sub(wrap_group1_with('//**', '**//'), markup)
+  markup = BOLD_RE.sub(wrap_group1_with('**', '**'), markup)
+  markup = ITALIC_RE.sub(wrap_group1_with('//', '//'), markup)
+  markup = INLINE_ESCAPE_RE.sub(wrap_group1_with('{{', '}}'), markup)
   markup = markup.replace('\r\n', '\n')
   markup = translate_tables(markup)
   markup = translate_lists('#', markup)
