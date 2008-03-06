@@ -11,6 +11,7 @@ Author: Matt Hillsdon <matt@hillsdon.net>
 import glob
 import os
 from os.path import join, split
+import shutil
 import re
 import sys
 
@@ -18,11 +19,11 @@ INPUT_DIR="/home/mth/tmp/wiki-data"
 OUTPUT_DIR="/home/mth/tmp/svnwiki-data"
 
 class VQWikiDescriptor:
-  def __init__(self, name, dataDir):
+  def __init__(self, name, rootDir, dataDir):
     self.name = name
     self.dataDir = dataDir
-    self.versionsDir = join(dataDir, 'versions')
-    self.uploadDir = join(dataDir, 'upload')
+    self.versionsDir = join(rootDir, 'versions', name)
+    self.uploadDir = join(rootDir, 'upload', name)
 
   def pages(self):
     return [split(x)[-1][0:-4]
@@ -37,15 +38,16 @@ def get_wikis(dir):
   """
   for wiki in [line.strip() for line in open(join(dir, 'virtualwikis.lst'), 'r')]:
     # Not sure if this is specific to our setup.
-    if (wiki == 'jsp'):
-      yield VQWikiDescriptor('default', dir)
+    if wiki == 'jsp':
+      dataDir = dir
     else:
-      yield VQWikiDescriptor(wiki, join(dir, wiki))
+      dataDir = join(dir, wiki)
+    yield VQWikiDescriptor(wiki, dir, dataDir)
 
 ATTACH_QUOTED_RE = re.compile(r'attach:"([0-9-]*)(.*?)"')
 ATTACH_RE = re.compile(r'attach:([0-9-]*)(.*?)\s')
 
-def fix_attachment_references(wiki, markup):
+def fix_attachment_references(wiki, inDir, outDir, page, markup):
   """
   Copies any attachments referenced by the page from
   the VQWiki upload directory to be attachments of the
@@ -59,7 +61,10 @@ def fix_attachment_references(wiki, markup):
   def handle_match(match):
     name = match.group(1) + match.group(2)
     cleanName = match.group(2)
-    print name, cleanName
+    attachmentDir = join(outDir, page + '-attachments');
+    if not os.path.isdir(attachmentDir):
+      os.mkdir(attachmentDir)
+    shutil.copyfile(join(inDir, name), join(attachmentDir, cleanName))
     return "[[" + cleanName + "]]"
   
   # Important to do quoted first as the REs overlap.
@@ -87,7 +92,7 @@ for wiki in get_wikis(INPUT_DIR):
   outputDataDir = join(OUTPUT_DIR, wiki.name)
   os.mkdir(outputDataDir)
   for page in wiki.pages():
-    markup = fix_attachment_references(wiki, translate_markup(wiki.get(page)))
+    markup = fix_attachment_references(wiki, wiki.uploadDir, outputDataDir, page, translate_markup(wiki.get(page)))
     fout = open(join(outputDataDir, page), 'w')
     fout.write(markup)
 
