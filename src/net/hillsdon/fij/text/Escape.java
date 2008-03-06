@@ -37,6 +37,9 @@ public class Escape {
    * @return the escaped output.
    */
   public static String html(final String content) {
+    if (content == null) {
+      return "";
+    }
     char[] chars = content.toCharArray();
     final StringBuffer result = new StringBuffer(2 * chars.length);
     for (int i = 0; i < chars.length; ++i) {
