@@ -18,12 +18,13 @@ package net.hillsdon.svnwiki.search;
 import java.io.IOException;
 import java.util.Set;
 
+import net.hillsdon.svnwiki.vc.NeedsSync;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
-public class ExternalCommitAwareSearchEngine implements SearchEngine {
+public class ExternalCommitAwareSearchEngine implements SearchEngine, NeedsSync {
 
   private PageStore _store;
   private final SearchEngine _delegate;

@@ -18,12 +18,14 @@ package net.hillsdon.svnwiki.web.dispatching;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
@@ -49,6 +51,8 @@ import net.hillsdon.svnwiki.wiki.graph.WikiGraphImpl;
 import net.hillsdon.svnwiki.wiki.macros.IncomingLinksMacro;
 import net.hillsdon.svnwiki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.svnwiki.wiki.macros.SearchMacro;
+import net.hillsdon.svnwiki.wiki.plugin.Plugins;
+import net.hillsdon.svnwiki.wiki.plugin.PluginsImpl;
 import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
 import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
@@ -72,11 +76,10 @@ public class WikiHandler implements RequestHandler {
   private final RequestScopedThreadLocalPageStore _pageStore;
   private final SvnWikiRenderer _renderer;
   private final ConfigPageCachingPageStore _cachingPageStore;
-  
   private final PageHandler _handler;
   private final InternalLinker _internalLinker;
-
-  private ExternalCommitAwareSearchEngine _searchEngine;
+  private final ExternalCommitAwareSearchEngine _searchEngine;
+  private final Plugins _plugins;
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
@@ -86,13 +89,19 @@ public class WikiHandler implements RequestHandler {
     })));
     PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), _searchEngine);
     _pageStore = new RequestScopedThreadLocalPageStore(factory);
+    _plugins = new PluginsImpl(_pageStore);
     _searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
     _internalLinker = new InternalLinker(contextPath, configuration.getGivenWikiName(), _cachingPageStore);
-    WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, _searchEngine);
-    
-    List<Macro> macros = Arrays.<Macro>asList(new XQueryMacro(), new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine));
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, macros);
+
+    final WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, _searchEngine);
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, new Accessor<List<Macro>>() {
+      public List<Macro> get() {
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new XQueryMacro(), new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
+        macros.addAll(_plugins.getImplementations(Macro.class));
+        return macros;
+      }
+    });
     _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
   }
 
@@ -103,6 +112,7 @@ public class WikiHandler implements RequestHandler {
       // Handle the lifecycle of the thread-local request dependent page store.
       _pageStore.create(request);
       try {
+        _plugins.syncWithExternalCommits();
         _searchEngine.syncWithExternalCommits();
         addSideBarEtcToRequest(request);
         // We need to complete the rendering here, so the view can call back into the page store.

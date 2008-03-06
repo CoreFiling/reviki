@@ -15,11 +15,10 @@
  */
 package net.hillsdon.svnwiki.wiki.renderer;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.regex.Matcher;
 
+import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.wiki.renderer.creole.AbstractRegexNode;
@@ -38,20 +37,12 @@ public class MacroNode extends AbstractRegexNode {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
   
-  private final Map<String, Macro> _macros;
+  private final Accessor<List<Macro>> _macros;
 
-  public MacroNode(final Collection<Macro> macros, final boolean block) {
-    super(block ? "(?s)(?:^|\\n)<<([\\p{Digit}\\p{L}]+?):(.+?)(^|\\n)>>"
-                : "(?s)\\<<([\\p{Digit}\\p{L}]+?):(.+?)>>");
-    _macros = new LinkedHashMap<String, Macro>();
-    for (Macro macro : macros) {
-      _macros.put(macro.getName(), macro);
-    }
-  }
-
-  @Override
-  protected boolean confirmMatchFind(final Matcher matcher) {
-    return _macros.containsKey(getMacroName(matcher));
+  public MacroNode(final Accessor<List<Macro>> macros, final boolean block) {
+    super(block ? "(?s)(?:^|\\n)<<([-\\p{Digit}\\p{L}]+?):(.+?)(^|\\n)>>"
+                : "(?s)\\<<([-\\p{Digit}\\p{L}]+?):(.+?)>>");
+    _macros = macros;
   }
 
   private String getMacroName(final Matcher matcher) {
@@ -59,7 +50,20 @@ public class MacroNode extends AbstractRegexNode {
   }
 
   public String handle(final PageReference page, final Matcher matcher, RenderNode parent) {
-    Macro macro = _macros.get(getMacroName(matcher));
+    // We need to move to a push system for updating macros to avoid this.
+    final String macroName = getMacroName(matcher);
+    Macro macro = null;
+    List<Macro> macros = _macros.get();
+    for (Macro candidate : macros) {
+      if (candidate.getName().equals(macroName)) {
+        macro = candidate;
+        break;
+      }
+    }
+    if (macro == null) {
+      return matcher.group();
+    }
+    
     try {
       String content = macro.handle(page, matcher.group(2));
       switch (macro.getResultFormat()) {

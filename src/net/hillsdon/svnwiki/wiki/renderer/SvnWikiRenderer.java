@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
+import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.svnwiki.configuration.Configuration;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStoreException;
@@ -35,7 +36,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
   private final InternalLinker _internalLinker;
   private CreoleRenderer _creole;
   
-  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker, final List<Macro> macros) {
+  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker,  final Accessor<List<Macro>> macros) {
     _configuration = configuration;
     _internalLinker = internalLinker;
     final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, _internalLinker, _configuration);

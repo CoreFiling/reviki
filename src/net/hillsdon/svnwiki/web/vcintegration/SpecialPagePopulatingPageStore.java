@@ -44,7 +44,9 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
   private static final PageReference PAGE_SIDEBAR = new PageReference("ConfigSideBar");
   private static final PageReference PAGE_HEADER = new PageReference("ConfigHeader");
   private static final PageReference PAGE_FOOTER = new PageReference("ConfigFooter");
-  
+
+  public static final PageReference PLUGINS_PAGE = new PageReference("ConfigPlugins");
+
   public static final Collection<PageReference> COMPLIMENTARY_CONTENT_PAGES = unmodifiableCollection(asList(PAGE_SIDEBAR, PAGE_HEADER, PAGE_FOOTER));
   
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
@@ -53,6 +55,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
       new PageReference("FindPage"),
       new PageReference("ConfigCss"),
       PAGE_SIDEBAR,
+      PLUGINS_PAGE,
       new PageReference("ConfigInterWikiLinks")
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(

@@ -15,7 +15,7 @@ public class HelloWorldMacro implements Macro {
   }
 
   public String handle(final PageReference page, final String remainder) throws Exception {
-    return "Hello, World!";
+    return "Hello " + remainder;
   }
   
 }
