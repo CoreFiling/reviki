@@ -53,7 +53,7 @@ public final class WikiWordUtils {
    * @return true if it looks like a wiki word.
    */
   public static boolean isWikiWord(final String text) {
-    return hasNoSpaces(text) && startsUpperCase(text) && (isAbbreviation(text) || hasCamelCaseParts(text)); 
+    return hasNoWhitespace(text) && startsUpperCase(text) && (isAbbreviation(text) || hasCamelCaseParts(text)); 
   }
 
   private static boolean hasCamelCaseParts(final String text) {
@@ -69,7 +69,7 @@ public final class WikiWordUtils {
     return text.length() > 0 && Character.isUpperCase(text.charAt(0));
   }
 
-  private static boolean hasNoSpaces(final String text) {
+  private static boolean hasNoWhitespace(final String text) {
     return text.split("\\s").length == 1;
   }
   
