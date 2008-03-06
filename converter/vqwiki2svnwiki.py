@@ -110,12 +110,16 @@ def translate_markup(markup):
       return before + match.group(group) + after
     return helper
 
+  # We normalize line endings first but do tabs to spaces last to simplify REs.
   markup = markup.replace('\r\n', '\n')
   markup = MULTILINE_ESCAPE_RE.sub(wrap_group_with(2, '\n{{{', '\n}}}\n\n'), markup)
   markup = INLINE_ESCAPE_RE.sub(wrap_group_with(1, '{{', '}}'), markup)
+
+  # Order is important for these three.
   markup = BOLD_ITALIC_RE.sub(wrap_group_with(1, '//**', '**//'), markup)
   markup = BOLD_RE.sub(wrap_group_with(1, '**', '**'), markup)
   markup = ITALIC_RE.sub(wrap_group_with(1, '//', '//'), markup)
+
   markup = translate_tables(markup)
   markup = translate_lists('#', markup)
   markup = translate_lists('*', markup)
