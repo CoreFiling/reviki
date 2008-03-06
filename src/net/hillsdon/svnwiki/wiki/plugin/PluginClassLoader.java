@@ -39,7 +39,12 @@ public class PluginClassLoader extends URLClassLoader {
     InputStream manifestInputStream = null;
     try {
       final URL manifestUrl = getManifestURL(jarUrl);
-      manifestInputStream = manifestUrl.openStream();
+      try {
+        manifestInputStream = manifestUrl.openStream();
+      }
+      catch (IOException ex) {
+        throw new InvalidPluginException("Could not open META-INF/MANIFEST.MF in plugin jar.");
+      }
       final Manifest manifest = new Manifest(manifestInputStream);
       
       final Attributes attrs = manifest.getMainAttributes();
@@ -104,12 +109,7 @@ public class PluginClassLoader extends URLClassLoader {
   }
 
   private URL getManifestURL(final URL jarUrl) throws IOException, URISyntaxException, InvalidPluginException {
-    // Note this has no parent, ensuring we get the correct manifest for our jar.
-    URL url = new URLClassLoader(new URL[] {jarUrl}, null).getResource("META-INF/MANIFEST.MF");
-    if (url == null) {
-      throw new InvalidPluginException("No manifest found in given jar.");
-    }
-    return url;
+    return new URL("jar:" + jarUrl + "!/META-INF/MANIFEST.MF");
   }
 
 }
