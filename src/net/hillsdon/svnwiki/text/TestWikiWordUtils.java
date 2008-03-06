@@ -33,6 +33,7 @@ public class TestWikiWordUtils extends TestCase {
     assertTrue(isWikiWord("HTML"));
     assertFalse(isWikiWord("parser"));
     assertFalse(isWikiWord("parserGenerator"));
+    assertFalse(isWikiWord("12th"));
   }
   
   public void testOddCharacters() {

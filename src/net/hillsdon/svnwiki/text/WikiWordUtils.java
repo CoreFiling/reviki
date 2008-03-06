@@ -53,9 +53,24 @@ public final class WikiWordUtils {
    * @return true if it looks like a wiki word.
    */
   public static boolean isWikiWord(final String text) {
-    return text.split("\\s").length == 1 
-           && !isNextLower(text.toCharArray(), -1)
-           && (text.matches("\\p{Lu}{3,}") || splitCamelCase(text).size() > 1); 
+    return hasNoSpaces(text) && startsUpperCase(text) && (isAbbreviation(text) || hasCamelCaseParts(text)); 
+  }
+
+  private static boolean hasCamelCaseParts(final String text) {
+    List<String> parts = splitCamelCase(text);
+    return parts.size() > 1;
+  }
+
+  private static boolean isAbbreviation(final String text) {
+    return text.matches("\\p{Lu}{3,}");
+  }
+
+  private static boolean startsUpperCase(final String text) {
+    return Character.isUpperCase(text.charAt(0));
+  }
+
+  private static boolean hasNoSpaces(final String text) {
+    return text.split("\\s").length == 1;
   }
   
   /**
