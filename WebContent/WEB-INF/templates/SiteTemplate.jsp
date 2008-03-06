@@ -1,6 +1,6 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://www.hillsdon.net/ns/svnwiki/tags" prefix="sw" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -8,7 +8,7 @@
   <c:set var="titlePrefix">
     <c:choose>
       <c:when test="${not empty wikiName}">${wikiName}</c:when>
-      <c:otherwise>svnwiki</c:otherwise>
+      <c:otherwise>reviki</c:otherwise>
     </c:choose>
   </c:set>
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
@@ -24,7 +24,7 @@
   <script type="text/javascript" src="<c:url value="/resources/jquery.suggest.js"/>"></script>
   <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
   <script type="text/javascript">
-    svnwiki.BASE_URL = "<sw:wikiUrl page=""/>"
+    reviki.BASE_URL = "<sw:wikiUrl page=""/>"
     $(document).ready(function() {
       $("#query").focus();
     });

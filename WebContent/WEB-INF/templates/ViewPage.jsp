@@ -1,7 +1,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
-<%@ taglib uri="http://www.hillsdon.net/ns/svnwiki/tags" prefix="sw" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
@@ -13,7 +13,7 @@
         </form>
       </li>
       <script type="text/javascript">
-        svnwiki.formAsJavaScriptLink("editTop", "Edit");
+        reviki.formAsJavaScriptLink("editTop", "Edit");
       </script>
       <li class="menu">
         <a href="${page.path}/attachments/">Attachments</a>
@@ -55,7 +55,7 @@
               <input type="submit" value="Edit"/>
             </form> 
             <script type="text/javascript">
-              svnwiki.formAsJavaScriptLink("editBottom", "Edit");
+              reviki.formAsJavaScriptLink("editBottom", "Edit");
             </script>
             <p id="lockedInfo">You have locked this page.</p>
           </c:when>
@@ -69,7 +69,7 @@
           <input name="editButton" type="submit" value="Edit"/>
         </form><a href="${page.path}/attachments/">Attachments</a>
         <script type="text/javascript">
-          svnwiki.formAsJavaScriptLink("editBottom", "Edit");
+          reviki.formAsJavaScriptLink("editBottom", "Edit");
         </script>
       </c:otherwise>
     </c:choose>

@@ -19,7 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import net.hillsdon.svnwiki.web.handlers.UploadAttachment;
+import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 import org.apache.commons.io.IOUtils;
 

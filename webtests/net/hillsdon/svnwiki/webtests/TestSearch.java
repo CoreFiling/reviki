@@ -15,7 +15,7 @@
  */
 package net.hillsdon.svnwiki.webtests;
 
-import net.hillsdon.svnwiki.text.WikiWordUtils;
+import net.hillsdon.reviki.text.WikiWordUtils;
 
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;

@@ -1,4 +1,4 @@
-<project name="svnwiki" default="war" basedir=".">
+<project name="reviki" default="war" basedir=".">
 
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
@@ -6,7 +6,7 @@
   <property name="build-web" value="ant-build/web" />   
   <property name="reports" value="reports" />   
   <property name="war" value="${ant.project.name}.war" />   
-  <property name="prepopulated-pages" value="net/hillsdon/svnwiki/web/vcintegration/prepopulated/**"/>
+  <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
   <path id="classpath">
      <fileset dir="lib">
@@ -48,17 +48,17 @@
         <include name="**/*.jar"/>
         <include name="**/*.xml"/>
         <include name="${prepopulated-pages}"/>
-        <include name="net/hillsdon/svnwiki/web/taglib/svnwiki.tld"/>
+        <include name="net/hillsdon/reviki/web/taglib/reviki.tld"/>
       </fileset>
     </copy>
   </target>
 
   <target name="taglibJar" depends="compile">
     <mkdir dir="${build-classes}/META-INF"/>
-    <move file="${build-classes}/net/hillsdon/svnwiki/web/taglib/svnwiki.tld" tofile="${build-classes}/META-INF/svnwiki.tld"/>
-    <jar destfile="WebContent/WEB-INF/lib/svnwiki-tlds.jar" >
+    <move file="${build-classes}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-classes}/META-INF/reviki.tld"/>
+    <jar destfile="WebContent/WEB-INF/lib/reviki-tlds.jar" >
       <fileset dir="${build-classes}">
-        <include name="net/hillsdon/svnwiki/web/taglib/**/*.class"/>
+        <include name="net/hillsdon/reviki/web/taglib/**/*.class"/>
       </fileset>
       <metainf dir="${build-classes}/META-INF">
         <include name="**/*"/>

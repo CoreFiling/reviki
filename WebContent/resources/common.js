@@ -1,10 +1,10 @@
-svnwiki = {};
+reviki = {};
 /**
  * POST is a sensible way to do non-idempotent operations
  * but form buttons look ugly so this will replace a form
  * with a JavaScript link.
  */
-svnwiki.formAsJavaScriptLink = function(formId, linkText) {
+reviki.formAsJavaScriptLink = function(formId, linkText) {
   var script = "javascript:document.getElementById('" + formId + "').submit()";
   var form = document.getElementById(formId);
   form.style.display = "none";
@@ -17,11 +17,11 @@ svnwiki.formAsJavaScriptLink = function(formId, linkText) {
   var space = parent.insertBefore(document.createTextNode(" "), form)
   parent.insertBefore(a, space);
 }
-svnwiki.configureAutoSuggest = function() {
+reviki.configureAutoSuggest = function() {
   var queryInput = $("#query");
   if (queryInput) {
     queryInput.attr["autocomplete"] = "off";
-    queryInput.suggest(svnwiki.BASE_URL + "FindPage?ctype=txt&limit=20&force", {
+    queryInput.suggest(reviki.BASE_URL + "FindPage?ctype=txt&limit=20&force", {
       param: "query",
       onSelect: function() {
         $("#searchForm").submit();
@@ -29,4 +29,4 @@ svnwiki.configureAutoSuggest = function() {
     });
   }
 }
-$(document).ready(svnwiki.configureAutoSuggest);
+$(document).ready(reviki.configureAutoSuggest);

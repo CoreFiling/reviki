@@ -1,7 +1,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
-<%@ taglib uri="http://www.hillsdon.net/ns/svnwiki/tags" prefix="sw" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">Recent Changes</tiles:putAttribute>
