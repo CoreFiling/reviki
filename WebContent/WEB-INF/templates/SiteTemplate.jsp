@@ -25,6 +25,9 @@
   <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
   <script type="text/javascript">
     svnwiki.BASE_URL = "<sw:wikiUrl page=""/>"
+    $(document).ready(function() {
+      $("#query").focus();
+    });
   </script>
 </head>
 <body>
@@ -55,16 +58,10 @@
       </ul>
     </c:if>
   </div>
-  <script type="text/javascript">
-    // Don't focus immediately or autosuggest won't properly turn of autocomplete. 
-    $(document).ready(function() {
-      $("#query").focus();
-    });
-  </script>
   <div id="header">
   ${renderedHeader}
   </div>
-  <div id="content">
+  <div id="content-area">
     <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
     <div id="sidebar" style="float:right">
     ${renderedSideBar}
