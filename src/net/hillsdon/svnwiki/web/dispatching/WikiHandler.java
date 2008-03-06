@@ -26,21 +26,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.accessors.Accessor;
+import net.hillsdon.fij.core.Factory;
 import net.hillsdon.svnwiki.configuration.PageStoreConfiguration;
 import net.hillsdon.svnwiki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.svnwiki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.svnwiki.search.LuceneSearcher;
+import net.hillsdon.svnwiki.vc.ChangeNotificationDispatcher;
 import net.hillsdon.svnwiki.vc.ConfigPageCachingPageStore;
+import net.hillsdon.svnwiki.vc.DeletedRevisionTracker;
+import net.hillsdon.svnwiki.vc.InMemoryDeletedRevisionTracker;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
+import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreAuthenticationException;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.web.common.ConsumedPath;
 import net.hillsdon.svnwiki.web.common.RequestHandler;
 import net.hillsdon.svnwiki.web.common.View;
 import net.hillsdon.svnwiki.web.handlers.PageHandler;
-import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughPageStoreFactory;
+import net.hillsdon.svnwiki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
+import net.hillsdon.svnwiki.web.vcintegration.PerRequestPageStoreFactory;
+import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
 import net.hillsdon.svnwiki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.svnwiki.web.vcintegration.SpecialPagePopulatingPageStore;
 import net.hillsdon.svnwiki.wiki.InternalLinker;
@@ -70,7 +76,7 @@ public class WikiHandler implements RequestHandler {
     }
   }
 
-  static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
+  public static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
   
   private final RequestScopedThreadLocalPageStore _pageStore;
   private final SvnWikiRenderer _renderer;
@@ -79,15 +85,21 @@ public class WikiHandler implements RequestHandler {
   private final InternalLinker _internalLinker;
   private final ExternalCommitAwareSearchEngine _searchEngine;
   private final Plugins _plugins;
+  private final ChangeNotificationDispatcher _syncUpdater;
+  private final RequestScopedThreadLocalBasicSVNOperations _operations;
 
   public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), new RenderedPageFactory(new MarkupRenderer() {
+    // Some of this is a bit circular...
+    RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
         _renderer.render(page, in, out);
       }
-    })));
-    PageStoreFactory factory = new BasicAuthPassThroughPageStoreFactory(configuration.getUrl(), _searchEngine);
-    _pageStore = new RequestScopedThreadLocalPageStore(factory);
+    });
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));
+    _operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl()));
+    DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
+    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, _operations);
+    _pageStore = new RequestScopedThreadLocalPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(_pageStore);
     _searchEngine.setPageStore(_pageStore);
     _cachingPageStore = new ConfigPageCachingPageStore(_pageStore);
@@ -107,23 +119,31 @@ public class WikiHandler implements RequestHandler {
     _plugins.addPluginAccessibleComponent(_pageStore);
     _plugins.addPluginAccessibleComponent(wikiGraph);
     _plugins.addPluginAccessibleComponent(_searchEngine);
+    
+    try {
+      _syncUpdater = new ChangeNotificationDispatcher(_operations, tracker, _searchEngine, _plugins);
+    }
+    catch (IOException ex) {
+      throw new RuntimeException("Failed to data required for start-up.", ex);
+    }
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     request.setAttribute("cssUrl", _internalLinker.url("ConfigCss") + "?raw");
     request.setAttribute("internalLinker", _internalLinker);
     try {
-      // Handle the lifecycle of the thread-local request dependent page store.
+      // Handle the lifecycle of the thread-local stuff.
+      _operations.create(request);
       _pageStore.create(request);
       try {
-        _plugins.syncWithExternalCommits();
-        _searchEngine.syncWithExternalCommits();
+        _syncUpdater.sync();
         addSideBarEtcToRequest(request);
         // We need to complete the rendering here, so the view can call back into the page store.
         _handler.handle(path, request, response).render(request, response);
         return View.NULL;
       }
       finally {
+        _operations.destroy();
         _pageStore.destroy();
       }
     }

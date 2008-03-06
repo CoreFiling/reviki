@@ -17,8 +17,8 @@ package net.hillsdon.svnwiki.vc;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface PageStoreFactory {
+public interface BasicSVNOperationsFactory {
 
-  PageStore newInstance(HttpServletRequest request) throws PageStoreException;
+  BasicSVNOperations newInstance(HttpServletRequest request) throws PageStoreException;
   
 }

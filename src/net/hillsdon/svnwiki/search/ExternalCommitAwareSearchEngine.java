@@ -16,15 +16,26 @@
 package net.hillsdon.svnwiki.search;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
-import net.hillsdon.svnwiki.vc.NeedsSync;
+import net.hillsdon.svnwiki.vc.ChangeInfo;
+import net.hillsdon.svnwiki.vc.ChangeSubscriber;
 import net.hillsdon.svnwiki.vc.PageInfo;
 import net.hillsdon.svnwiki.vc.PageReference;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.vc.StoreKind;
 
-public class ExternalCommitAwareSearchEngine implements SearchEngine, NeedsSync {
+/**
+ * Notifies the search engine of page changes immediately after they happen.
+ * 
+ * Important else we get backlinks wrong for new pages (as we only check
+ * for commits at the beginning of each request).
+ * 
+ * @author mth
+ */
+public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubscriber {
 
   private PageStore _store;
   private final SearchEngine _delegate;
@@ -48,22 +59,23 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, NeedsSync 
     return _delegate.search(query, provideExtracts);
   }
 
-  public synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
-    if (_store != null) {
-      long latest = _store.getLatestRevision();
-      long highestIndexed = _delegate.getHighestIndexedRevision();
-      if (latest > highestIndexed) {
-        for (PageReference ref : _store.getChangedBetween(highestIndexed + 1, latest)) {
-          PageInfo info = _store.get(ref, latest);
-          // Note we pass 'latest' as the revision here.  At the moment we get
-          // back the revision of deleted pages as -2 which isn't such a good
-          // thing to set our 'highest indexed revision' to...
-          if (info.isNew()) {
-            _delegate.delete(info.getPath(), latest);
-          }
-          else {
-            _delegate.index(info.getPath(), latest, info.getContent());
-          }
+  public long getHighestSyncedRevision() throws IOException {
+    return _delegate.getHighestIndexedRevision();
+  }
+  
+  public synchronized void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+    for (ChangeInfo change : chronological) {
+      if (change.getKind() == StoreKind.PAGE) {
+        PageReference ref = new PageReference(change.getPage());
+        PageInfo info = _store.get(ref, -1);
+        // Note we pass 'upto' as the revision here.  At the moment we get
+        // back the revision of deleted pages as -2 which isn't such a good
+        // thing to set our 'highest indexed revision' to...
+        if (info.isNew()) {
+          _delegate.delete(info.getPath(), upto);
+        }
+        else {
+          _delegate.index(info.getPath(), upto, info.getContent());
         }
       }
     }

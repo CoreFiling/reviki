@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import net.hillsdon.svnwiki.vc.AttachmentHistory;
+import net.hillsdon.fij.core.IterableUtils;
+import net.hillsdon.svnwiki.vc.ChangeInfo;
 import net.hillsdon.svnwiki.vc.ContentTypedSink;
 import net.hillsdon.svnwiki.vc.NotFoundException;
 import net.hillsdon.svnwiki.vc.PageStore;
 import net.hillsdon.svnwiki.vc.PageStoreException;
+import net.hillsdon.svnwiki.vc.StoreKind;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -63,11 +65,14 @@ public class PluginsImpl implements Plugins {
     return implementations;
   }
 
-  public synchronized void syncWithExternalCommits() throws PageStoreException, IOException {
-    for (AttachmentHistory attachment : _store.attachments(PLUGINS_PAGE)) {
-      PluginAtRevision plugin = _active.get(attachment.getName());
-      if (plugin == null || plugin._revision < attachment.getRevision()) {
-        updatePlugin(attachment.getName(), attachment.getRevision());
+  public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+    // We want to do the most recent first to prevent repeated work.
+    for (ChangeInfo change : IterableUtils.reversed(chronological)) {
+      if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(PLUGINS_PAGE.getPath())) {
+        PluginAtRevision plugin = _active.get(change.getName());
+        if (plugin == null || plugin._revision < change.getRevision()) {
+          updatePlugin(change.getName(), change.getRevision());
+        }
       }
     }
   }
@@ -104,6 +109,10 @@ public class PluginsImpl implements Plugins {
 
   public void addPluginAccessibleComponent(final Object component) {
     _context.addComponent(component);
+  }
+
+  public long getHighestSyncedRevision() throws IOException {
+    return 0;
   }
   
 }

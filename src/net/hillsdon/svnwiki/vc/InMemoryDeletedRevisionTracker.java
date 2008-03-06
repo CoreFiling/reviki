@@ -15,43 +15,40 @@
  */
 package net.hillsdon.svnwiki.vc;
 
-import static net.hillsdon.fij.core.IterableUtils.reversed;
-
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This initial implementation is an in-memory cache so will repopulate
- * itself on every restart.
+ * This initial implementation is an in-memory cache so will repopulate itself on every restart.
  * 
  * @author mth
  */
 public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
 
   private final Map<String, ChangeInfo> _deletions = new ConcurrentHashMap<String, ChangeInfo>();
-  private long _lastTracked;
  
-  private void catchUp(final BasicSVNOperations helper) throws PageStoreAuthenticationException, PageStoreException {
-    long latest = helper.getLatestRevision();
-    if (latest > _lastTracked) {
-      for (ChangeInfo change : reversed(helper.log("", -1, false, true, _lastTracked, latest))) {
-        final String page = change.getPage();
-        if (page != null) {
-          if (change.getChangeType() == ChangeType.DELETED) {
-            _deletions.put(page, change);
-          }
-          else {
-            _deletions.remove(page);
-          }
+  public ChangeInfo getChangeThatDeleted(final BasicSVNOperations helper, final String path) throws PageStoreAuthenticationException, PageStoreException {
+    return _deletions.get(path);
+  }
+
+  public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+    for (ChangeInfo change : chronological) {
+      final String page = change.getPage();
+      if (page != null) {
+        if (change.getChangeType() == ChangeType.DELETED) {
+          _deletions.put(page, change);
+        }
+        else {
+          _deletions.remove(page);
         }
       }
     }
-    _lastTracked = latest;
   }
-  
-  public ChangeInfo getChangeThatDeleted(final BasicSVNOperations helper, final String path) throws PageStoreAuthenticationException, PageStoreException {
-    catchUp(helper);
-    return _deletions.get(path);
+
+  public long getHighestSyncedRevision() throws IOException {
+    return 0;
   }
   
 }

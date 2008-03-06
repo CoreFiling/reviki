@@ -69,7 +69,7 @@ public class LuceneSearcher implements SearchEngine {
 
   public static class NoQueryPerformedException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-    public NoQueryPerformedException(QuerySyntaxException cause) {
+    public NoQueryPerformedException(final QuerySyntaxException cause) {
       super("No query was performed yet got query error", cause);
     }
   }
@@ -169,7 +169,8 @@ public class LuceneSearcher implements SearchEngine {
     replaceDocument(FIELD_PATH, createWikiPageDocument(path, content));
     rememberLastIndexedRevision(revision);
   }
-  
+
+  // See comment on index.
   public synchronized void delete(final String path, final long revision) throws IOException {
     createIndexIfNecessary();
     deleteDocument(FIELD_PATH, path);
@@ -182,7 +183,7 @@ public class LuceneSearcher implements SearchEngine {
     }
     try {
       return doReadOperation(new ReadOperation<Set<String>>() {
-        public Set<String> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
+        public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
           Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, escape(page), false), SearchMatch.TO_PAGE_NAME));
           results.remove(page);
           return results;
@@ -200,7 +201,7 @@ public class LuceneSearcher implements SearchEngine {
     }
     try {
       return doReadOperation(new ReadOperation<Set<String>>() {
-        public Set<String> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
+        public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
           Hits hits = searcher.search(new TermQuery(new Term(FIELD_PATH, page)));
           Iterator<?> iterator = hits.iterator();
           if (iterator.hasNext()) {
@@ -254,7 +255,7 @@ public class LuceneSearcher implements SearchEngine {
       return Collections.emptySet();
     }
     return doReadOperation(new ReadOperation<Set<SearchMatch>>() {
-      public Set<SearchMatch> execute(IndexReader reader, Searcher searcher, Analyzer analyzer) throws IOException, ParseException {
+      public Set<SearchMatch> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
         LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : new String[] {FIELD_PATH, FIELD_TITLE, FIELD_CONTENT}) {

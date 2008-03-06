@@ -17,16 +17,26 @@ package net.hillsdon.svnwiki.search;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import net.hillsdon.svnwiki.wiki.MarkupRenderer;
 import net.hillsdon.svnwiki.wiki.RenderedPageFactory;
 
+/**
+ * Tests for {@link LuceneSearcher}.
+ * 
+ * @author mth
+ */
 public class TestLuceneSearcher extends TestCase {
+
+  private static final String PAGE_NAME = "TheName";
+  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_NAME, null)));
   
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -63,25 +73,24 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testRepeatedAddsForSamePathReplace() throws Exception {
-    final String path = "ThePath";
-    _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content", true));
-    _searcher.index(path, -1, "the something else");
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
+    _searcher.index(PAGE_NAME, -1, "the something else");
     assertEquals(emptySet(), _searcher.search("content", true));
-    _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("content", true));
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
   
   public void testFindsByPath() throws Exception {
-    final String path = "ThePath";
-    _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search(path, true));
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME, true));
+    // path prefix is desirable too but doesn't work yet...
+    // assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
   
   public void testFindsByTokenizedPath() throws Exception {
-    final String path = "ThePath";
-    _searcher.index(path, -1, "the content");
-    assertEquals(singleton(new SearchMatch(path, null)), _searcher.search("path", true));
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
   }
   
   /**

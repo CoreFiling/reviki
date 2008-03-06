@@ -28,7 +28,7 @@ package net.hillsdon.svnwiki.vc;
  * @author mth
  *
  */
-public interface DeletedRevisionTracker {
+public interface DeletedRevisionTracker extends ChangeSubscriber {
 
   ChangeInfo getChangeThatDeleted(BasicSVNOperations helper, String path) throws PageStoreAuthenticationException, PageStoreException;
 

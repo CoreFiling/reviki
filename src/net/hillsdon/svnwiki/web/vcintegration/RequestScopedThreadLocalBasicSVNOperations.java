@@ -17,30 +17,30 @@ package net.hillsdon.svnwiki.web.vcintegration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.fij.core.Factory;
-import net.hillsdon.svnwiki.vc.AbstractDelegatingPageStore;
-import net.hillsdon.svnwiki.vc.PageStore;
+import net.hillsdon.svnwiki.vc.BasicSVNOperations;
+import net.hillsdon.svnwiki.vc.BasicSVNOperationsFactory;
+import net.hillsdon.svnwiki.vc.DelegatingBasicSVNOperations;
 import net.hillsdon.svnwiki.vc.PageStoreException;
 
 /**
- * Allow us to pass a PageStore into various objects but
+ * Allow us to pass a BasicSVNOperations implementation into various objects but
  *  a) use authentication from the current request
  *  b) work with the thread-safety limitations of 
  *     {@link org.tmatesoft.svn.core.io.SVNRepository}.
  * 
  * @author mth
  */
-public final class RequestScopedThreadLocalPageStore extends AbstractDelegatingPageStore {
+public final class RequestScopedThreadLocalBasicSVNOperations extends DelegatingBasicSVNOperations {
 
-  private final ThreadLocal<PageStore> _threadLocal = new ThreadLocal<PageStore>();
-  private final Factory<PageStore> _factory;
+  private final ThreadLocal<BasicSVNOperations> _threadLocal = new ThreadLocal<BasicSVNOperations>();
+  private final BasicSVNOperationsFactory _factory;
   
-  public RequestScopedThreadLocalPageStore(final Factory<PageStore> factory) {
+  public RequestScopedThreadLocalBasicSVNOperations(final BasicSVNOperationsFactory factory) {
     _factory = factory;
   }
   
   public void create(final HttpServletRequest request) throws PageStoreException {
-    _threadLocal.set(_factory.newInstance());
+    _threadLocal.set(_factory.newInstance(request));
   }
   
   public void destroy() {
@@ -48,7 +48,7 @@ public final class RequestScopedThreadLocalPageStore extends AbstractDelegatingP
   }
   
   @Override
-  protected PageStore getDelegate() {
+  protected BasicSVNOperations getDelegate() {
     return _threadLocal.get();
   }
   

@@ -1,6 +1,6 @@
 package net.hillsdon.svnwiki.wiki.plugin;
 
-import net.hillsdon.svnwiki.vc.NeedsSync;
+import net.hillsdon.svnwiki.vc.ChangeSubscriber;
 
 
 /**
@@ -8,7 +8,7 @@ import net.hillsdon.svnwiki.vc.NeedsSync;
  * 
  * @author mth
  */
-public interface Plugins extends ContributedImplementationProvider, NeedsSync {
+public interface Plugins extends ContributedImplementationProvider, ChangeSubscriber {
   
   /**
    * @param component A component plugins may depend on.

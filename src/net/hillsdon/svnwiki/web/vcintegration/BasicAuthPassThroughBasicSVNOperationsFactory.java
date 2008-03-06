@@ -20,15 +20,10 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.svnwiki.search.SearchEngine;
-import net.hillsdon.svnwiki.search.SearchIndexPopulatingPageStore;
-import net.hillsdon.svnwiki.vc.InMemoryDeletedRevisionTracker;
-import net.hillsdon.svnwiki.vc.PageListCachingPageStore;
-import net.hillsdon.svnwiki.vc.PageStore;
+import net.hillsdon.svnwiki.vc.BasicSVNOperations;
+import net.hillsdon.svnwiki.vc.BasicSVNOperationsFactory;
 import net.hillsdon.svnwiki.vc.PageStoreException;
-import net.hillsdon.svnwiki.vc.PageStoreFactory;
 import net.hillsdon.svnwiki.vc.RepositoryBasicSVNOperations;
-import net.hillsdon.svnwiki.vc.SVNPageStore;
 import net.hillsdon.svnwiki.web.common.RequestAttributes;
 
 import org.apache.commons.codec.binary.Base64;
@@ -45,7 +40,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  *   
  * @author mth
  */
-public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
+public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOperationsFactory {
 
   static class UsernamePassword {
     private final String _username;
@@ -80,16 +75,12 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
   }
 
   private final SVNURL _url;
-  private final SearchEngine _indexer;
-  private final InMemoryDeletedRevisionTracker _tracker;
   
   /**
    * @param url Repository URL.
    */
-  public BasicAuthPassThroughPageStoreFactory(final SVNURL url, final SearchEngine indexer) {
+  public BasicAuthPassThroughBasicSVNOperationsFactory(final SVNURL url) {
     _url = url;
-    _indexer = indexer;
-    _tracker = new InMemoryDeletedRevisionTracker();
   }
 
   static UsernamePassword getBasicAuthCredentials(String authorization) {
@@ -119,14 +110,14 @@ public class BasicAuthPassThroughPageStoreFactory implements PageStoreFactory {
     return new UsernamePassword(username, password);
   }
   
-  public PageStore newInstance(final HttpServletRequest request) throws PageStoreException {
+  public BasicSVNOperations newInstance(final HttpServletRequest request) throws PageStoreException {
     try {
       DAVRepositoryFactory.setup();
       SVNRepository repository = SVNRepositoryFactory.create(_url);
       UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_tracker, new RepositoryBasicSVNOperations(repository)))));
+      return new RepositoryBasicSVNOperations(repository);
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
