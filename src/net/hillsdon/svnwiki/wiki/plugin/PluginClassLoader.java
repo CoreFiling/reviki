@@ -100,7 +100,7 @@ public class PluginClassLoader extends URLClassLoader {
         out = new FileOutputStream(file);
         IOUtils.copy(in, out);
       }
-      catch (IOException ex) {
+      finally {
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);
       }
