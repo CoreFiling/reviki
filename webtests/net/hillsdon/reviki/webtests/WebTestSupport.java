@@ -138,7 +138,7 @@ public abstract class WebTestSupport extends TestCase {
   
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
     HtmlPage results = search(page, query);
-    results.getAnchorByHref("/svnwiki/pages/test/" + name);
+    results.getAnchorByHref("/reviki/pages/test/" + name);
   }
 
   protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {
