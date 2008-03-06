@@ -269,6 +269,7 @@ public class LuceneSearcher implements SearchEngine {
   @SuppressWarnings("unchecked")
   private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString, final boolean provideExtracts) throws IOException, ParseException {
     QueryParser parser = new QueryParser(field, analyzer);
+    parser.setLowercaseExpandedTerms(!FIELD_PATH.equals(field));
     parser.setDefaultOperator(Operator.AND);
     Query query = parser.parse(queryString);
     Highlighter highlighter = null;

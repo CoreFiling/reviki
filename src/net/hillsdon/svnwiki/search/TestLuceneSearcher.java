@@ -85,7 +85,7 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(PAGE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME, true));
     // path prefix is desirable too but doesn't work yet...
-    // assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
   
   public void testFindsByTokenizedPath() throws Exception {
