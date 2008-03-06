@@ -15,9 +15,6 @@ import shutil
 import re
 import sys
 
-INPUT_DIR="/home/mth/tmp/wiki-data"
-OUTPUT_DIR="/home/mth/tmp/svnwiki-data"
-
 class VQWikiDescriptor:
   def __init__(self, name, rootDir, dataDir):
     self.name = name
@@ -133,12 +130,20 @@ def translate_markup(markup):
   markup = markup.replace('\t', '  ')
   return markup
 
-if os.path.exists(OUTPUT_DIR):
-  print >> sys.stderr, OUTPUT_DIR, 'already exists'
+try:
+  inputDir = sys.argv[1]
+  outputDir = sys.argv[2]
+except IndexError:
+  print >> sys.stderr, 'Usage:', sys.argv[0], '<inputDir> <outputDir>'
   exit(1)
-os.mkdir(OUTPUT_DIR)
-for wiki in get_wikis(INPUT_DIR):
-  outputDataDir = join(OUTPUT_DIR, wiki.name)
+
+if os.path.exists(outputDir):
+  print >> sys.stderr, outputDir, 'already exists'
+  exit(1)
+
+os.mkdir(outputDir)
+for wiki in get_wikis(inputDir):
+  outputDataDir = join(outputDir, wiki.name)
   os.mkdir(outputDataDir)
   for page in wiki.pages():
     markup = fix_attachment_references(wiki, wiki.uploadDir, outputDataDir, page, translate_markup(wiki.get(page)))
