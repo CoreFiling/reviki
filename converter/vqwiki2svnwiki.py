@@ -42,6 +42,9 @@ def get_wikis(dir):
     else:
       yield VQWikiDescriptor(wiki, join(dir, wiki))
 
+ATTACH_QUOTED_RE = re.compile(r'attach:"([0-9-]*)(.*?)"')
+ATTACH_RE = re.compile(r'attach:([0-9-]*)(.*?)\s')
+
 def fix_attachment_references(wiki, markup):
   """
   Copies any attachments referenced by the page from
@@ -53,6 +56,15 @@ def fix_attachment_references(wiki, markup):
   Returns the text with the attachment references fixed
   to be Creole style.
   """
+  def handle_match(match):
+    name = match.group(1) + match.group(2)
+    cleanName = match.group(2)
+    print name, cleanName
+    return "[[" + cleanName + "]]"
+  
+  # Important to do quoted first as the REs overlap.
+  markup = ATTACH_QUOTED_RE.sub(handle_match, markup)
+  markup = ATTACH_RE.sub(handle_match, markup)
   return markup
 
 def translate_markup(markup):
