@@ -120,4 +120,9 @@ public class ChangeInfo {
     return getChangeType() == ChangeType.DELETED;
   }
   
+  @Override
+  public String toString() {
+    return _changeType.toString() + " of " + _page;
+  }
+  
 }

@@ -99,7 +99,7 @@ public abstract class WebTestSupport extends TestCase {
     return page;
   }
 
-  protected HtmlPage clickEditLink(HtmlPage page) throws IOException {
+  protected HtmlPage clickEditLink(final HtmlPage page) throws IOException {
     return (HtmlPage) page.getAnchorByName("editTopSubmitLink").click();
   }
   
@@ -119,13 +119,30 @@ public abstract class WebTestSupport extends TestCase {
     return attachments;
   }
 
-  public HtmlPage uploadAttachment(final String fileName, String pageName) throws IOException {
+  public HtmlPage uploadAttachment(final String fileName, final String pageName) throws IOException {
     HtmlPage attachments = clickAttachmentsLink(getWikiPage(pageName), pageName);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     form.getInputByName("file").setValueAttribute(fileName);
     form.getInputByName("attachmentName").setValueAttribute("file");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
     return attachments;
+    
+  }
+  
+  protected HtmlPage search(final HtmlPage page, final String query) throws IOException {
+    HtmlForm searchForm = page.getFormByName("searchForm");
+    searchForm.getInputByName("query").setValueAttribute(query);
+    HtmlPage results = (HtmlPage) searchForm.getInputByValue("Go").click();
+    return results;
+  }
+  
+  protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
+    HtmlPage results = search(page, query);
+    results.getAnchorByHref("/svnwiki/pages/test/" + name);
+  }
+
+  protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {
+    assertTrue(search(start, pageName).asText().contains("No results found"));
   }
 
 }

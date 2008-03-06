@@ -55,7 +55,8 @@ public class TestRename extends WebTestSupport {
     page = clickAttachmentsLink(page, toPageName);
     assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref("file.txt")));
     
+    assertSearchDoesNotFindPage(page, fromPageName);
     editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);
   }
-  
+
 }

@@ -53,7 +53,12 @@ public class TestDeletedPages extends WebTestSupport {
     String expectedContent = "The new content";
     assertTrue(editWikiPage(page._name, expectedContent, "Recreated", true).asText().contains(expectedContent));
   }
-  
+
+  public void testSearchDoesNotFindDeletedPage() throws Exception {
+    NamedPage page = createThenDeletePage();
+    assertSearchDoesNotFindPage(page._page, page._name);
+  }
+
   public void testCanViewDeletedPage() throws Exception {
     final String content = "Distinctive content";
     final String name = uniqueWikiPageName("EditPageTest");
