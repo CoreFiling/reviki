@@ -70,9 +70,10 @@ public class ChangeNotificationDispatcher {
         // Consume.
       }
       List<ChangeInfo> relevant = chronological.subList(iter.nextIndex(), chronological.size());
-      LOG.debug("Notifying of " + subscriber.getClass().getSimpleName() + " of " + relevant.size() + " changes.");
       if (!relevant.isEmpty()) {
+        long start = System.currentTimeMillis();
         subscriber.handleChanges(upto, relevant);
+        LOG.debug("Notified " + subscriber.getClass().getSimpleName() + " of " + relevant.size() + " changes in " + (System.currentTimeMillis() - start));
       }
     }
   }

@@ -219,15 +219,11 @@ public class SVNPageStore implements PageStore {
 
   public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(attachmentPath(ref), attachment);
-    final OutputStream out = new OutputStream() {
-      boolean _first = true;
-      public void write(final int b) throws IOException {
-        if (_first) {
-          sink.setContentType("application/octet-stream"); 
-          sink.setFileName(attachment);
-          _first = false;
-        }
-        sink.stream().write(b);
+    final OutputStream out = new LazyOutputStream() {
+      protected OutputStream lazyInit() throws IOException {
+        sink.setContentType("application/octet-stream"); 
+        sink.setFileName(attachment);
+        return sink.stream();
       }
     };
     _operations.getFile(path, revision, null, out);
