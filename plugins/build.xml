@@ -6,6 +6,7 @@
   <target name="all" depends="test-plugin"/>
 
   <path id="classpath">
+     <pathelement path="../ant-build/classes"/>
      <fileset dir="../lib">
         <include name="*.jar" />
      </fileset>
@@ -13,6 +14,23 @@
         <include name="*.jar" />
      </fileset>
   </path>    
+
+  <target name="hello-world">
+    <delete dir="hello-world/build"/>
+    <mkdir dir="hello-world/build"/>
+    <javac srcdir="hello-world/src"
+           destdir="hello-world/build">
+      <classpath refid="classpath" />
+    </javac>
+    <jar destfile="hello-world/hello-world.jar" >
+      <fileset dir="hello-world/build">
+        <include name="**/*"/>
+      </fileset>
+      <manifest>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.svnwiki.plugins.HelloWorldMacro"/>
+      </manifest>
+    </jar>
+  </target>
 
   <target name="test-plugin-dependency">
     <delete dir="test-plugin-dependency/build"/>
