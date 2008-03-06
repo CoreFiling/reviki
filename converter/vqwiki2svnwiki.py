@@ -86,8 +86,16 @@ def translate_markup(markup):
   Attachment references are not handled here,
   see fix_attachment_references.
   """
+  def translate_lists(symbol, markup):
+    def expand_symbol(match):
+      return match.group(1) + match.group(2) + symbol * len(match.group(2))
+    regex = re.compile('(^|\n)(\t+)' + re.escape(symbol))
+    return regex.sub(expand_symbol, markup)
+
+  markup = translate_lists('#', markup)
+  markup = translate_lists('*', markup)
+  markup = markup.replace('\t', '  ')
   return markup
-  
 
 if os.path.exists(OUTPUT_DIR):
   print >> sys.stderr, OUTPUT_DIR, 'already exists'
@@ -98,8 +106,5 @@ for wiki in get_wikis(INPUT_DIR):
   os.mkdir(outputDataDir)
   for page in wiki.pages():
     markup = fix_attachment_references(wiki, wiki.uploadDir, outputDataDir, page, translate_markup(wiki.get(page)))
-    fout = open(join(outputDataDir, page), 'w')
-    fout.write(markup)
-
-
+    open(join(outputDataDir, page), 'w').write(markup)
 
