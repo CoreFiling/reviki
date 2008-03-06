@@ -42,7 +42,7 @@ public class TestSearch extends WebTestSupport {
   /**
    * Search by WikiWord and Wiki Word.
    */
-  public void testNewPageCanBeFoundBySearchIndex() throws Exception {
+  public void testNewPageCanBeFoundByNameInSearchIndex() throws Exception {
     String name = uniqueWikiPageName("SearchIndexTest");
     HtmlPage page = editWikiPage(name, "Should be found by search", "", true);
     assertSearchFindsPageUsingQuery(page, name, "found by search");

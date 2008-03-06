@@ -124,7 +124,7 @@ public class WikiHandler implements RequestHandler {
       _syncUpdater = new ChangeNotificationDispatcher(_operations, tracker, _searchEngine, _plugins);
     }
     catch (IOException ex) {
-      throw new RuntimeException("Failed to data required for start-up.", ex);
+      throw new RuntimeException("Failed to read data required for start-up.", ex);
     }
   }
 

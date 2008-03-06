@@ -16,6 +16,7 @@
 package net.hillsdon.svnwiki.search;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,19 +65,23 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
   }
   
   public synchronized void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+    // We're going to work from head for the indexing so collapse edits down to page names.
+    final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
     for (ChangeInfo change : chronological) {
       if (change.getKind() == StoreKind.PAGE) {
-        PageReference ref = new PageReference(change.getPage());
-        PageInfo info = _store.get(ref, -1);
-        // Note we pass 'upto' as the revision here.  At the moment we get
-        // back the revision of deleted pages as -2 which isn't such a good
-        // thing to set our 'highest indexed revision' to...
-        if (info.isNew()) {
-          _delegate.delete(info.getPath(), upto);
-        }
-        else {
-          _delegate.index(info.getPath(), upto, info.getContent());
-        }
+        minimized.add(new PageReference(change.getPage()));
+      }
+    }
+    for (PageReference page : minimized) {
+      PageInfo info = _store.get(page, -1);
+      // Note we pass 'upto' as the revision here.  At the moment we get
+      // back the revision of deleted pages as -2 which isn't such a good
+      // thing to set our 'highest indexed revision' to...
+      if (info.isNew()) {
+        _delegate.delete(info.getPath(), upto);
+      }
+      else {
+        _delegate.index(info.getPath(), upto, info.getContent());
       }
     }
   }

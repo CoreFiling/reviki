@@ -120,7 +120,6 @@ public class LuceneSearcher implements SearchEngine {
   
   private Document createWikiPageDocument(final String path, final String content) throws IOException, PageStoreException {
     RenderedPage renderedPage = _renderedPageFactory.create(path, content);
-
     Document document = new Document();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));

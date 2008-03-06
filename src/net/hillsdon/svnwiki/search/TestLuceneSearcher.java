@@ -88,6 +88,27 @@ public class TestLuceneSearcher extends TestCase {
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
   
+  public void testCaseInsensitiveLowerFindsMixed() throws Exception {
+    _searcher.index(PAGE_NAME, -1, "The Content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
+  }
+
+  public void testCaseInsensitiveMixedFindsLower() throws Exception {
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("Content", true));
+  }
+
+  // Interestingly these fail while the others pass... when upgrading to Lucene 2.3.0.
+  public void testMoreInterestingWords() throws Exception {
+    _searcher.index(PAGE_NAME, -1, "cabbage patch");
+    assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("patch", false));
+    
+    _searcher.index(PAGE_NAME, -1, "fruit flies");
+    assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("flies", false));
+  }
+  
   public void testFindsByTokenizedPath() throws Exception {
     _searcher.index(PAGE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
