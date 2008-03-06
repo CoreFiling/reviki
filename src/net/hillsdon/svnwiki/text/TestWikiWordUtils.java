@@ -68,6 +68,17 @@ public class TestWikiWordUtils extends TestCase {
     assertSplits(asList("enter", "Room", "101"), "enterRoom101");    
   }
   
+  public void testDesiredButUnimplemented() {
+    // The splits should model digits properly, digit-to-lower should
+    // not be considered a step-down.
+    assertSplits(asList("January", "The", "1", "2th"), "JanuaryThe12th");
+    
+    // Run of two uppercase should not count as word.
+    assertSplits(asList("X", "Query"), "XQuery");
+    assertSplits(asList("XML", "Query"), "XMLQuery");
+    assertSplits(asList("The", "X", "Query", "Parser"), "TheXQueryParser");
+  }
+  
   public void testAcronyms() {
     assertSplits(asList("Test", "MRG", "Page"), "TestMRGPage");
     assertSplits(asList("HTML", "Parser"), "HTMLParser");
