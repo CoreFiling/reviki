@@ -102,6 +102,11 @@ public class WikiHandler implements RequestHandler {
       }
     });
     _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
+    
+    // Allow plugin classes to depend on the core wiki API.
+    _plugins.addPluginAccessibleComponent(_pageStore);
+    _plugins.addPluginAccessibleComponent(wikiGraph);
+    _plugins.addPluginAccessibleComponent(_searchEngine);
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
