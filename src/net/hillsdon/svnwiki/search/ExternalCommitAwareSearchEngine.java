@@ -52,7 +52,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     _store = store;
   }
   
-  public synchronized void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
+  public void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
     _delegate.index(path, revision, content);
   }
 

@@ -61,7 +61,7 @@ public class PageHandler implements RequestHandler {
       return new RedirectView(RequestBasedWikiUrls.get(request).page("FrontPage"));
     }
     if (pageName.contains("/")) {
-      throw new InvalidInputException(String.format(PATH_WALK_ERROR_MESSAGE, pageName));
+      throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);
     }
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);
