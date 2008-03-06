@@ -37,7 +37,7 @@ public class SearchMacro extends AbstractListOfPagesMacro {
 
   @Override
   protected Collection<String> getPages(final String remainder) throws Exception {
-    return list(map(_searchEngine.search(_searchEngine.escape(remainder), false), SearchMatch.TO_PAGE_NAME));
+    return list(map(_searchEngine.search(remainder, false), SearchMatch.TO_PAGE_NAME));
   }
 
 }
