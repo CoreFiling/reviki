@@ -44,6 +44,8 @@ def get_wikis(dir):
       dataDir = join(dir, wiki)
     yield VQWikiDescriptor(wiki, dir, dataDir)
 
+IMAGE_EXTENSIONS = ['png', 'gif', 'jpg', 'jpeg', 'bmp']
+
 ATTACH_QUOTED_RE = re.compile(r'attach:"([0-9-]*)(.*?)"')
 ATTACH_RE = re.compile(r'attach:([0-9-]*)(.*?)\s')
 
@@ -65,7 +67,10 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
     if not os.path.isdir(attachmentDir):
       os.mkdir(attachmentDir)
     shutil.copyfile(join(inDir, name), join(attachmentDir, cleanName))
-    return "[[" + cleanName + "]]"
+    if cleanName.rpartition('.')[2].lower() in IMAGE_EXTENSIONS:
+      return "{{" + cleanName + "}}"
+    else:
+      return "[[" + cleanName + "]]"
   
   # Important to do quoted first as the REs overlap.
   markup = ATTACH_QUOTED_RE.sub(handle_match, markup)
