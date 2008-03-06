@@ -33,26 +33,26 @@ public class TestRequestBasedWikiUrls extends TestCase {
   protected void setUp() throws Exception {
     _configuration = null;
     _request = new MockHttpServletRequest();
-    _request.setContextPath("/svnwiki");
-    _request.setRequestURL("http://www.example.com/svnwiki/some/page");
-    _request.setRequestURI("/svnwiki/some/page");
+    _request.setContextPath("/reviki");
+    _request.setRequestURL("http://www.example.com/reviki/some/page");
+    _request.setRequestURI("/reviki/some/page");
   }
   
 
   public void testNullWiki() {
     RequestBasedWikiUrls urls = new RequestBasedWikiUrls(_request, new PerWikiInitialConfiguration(_configuration, null, "foo"));
-    assertEquals("http://www.example.com/svnwiki/pages/", urls.root());
-    assertEquals("http://www.example.com/svnwiki/pages/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/svnwiki/pages/RecentChanges/atom.xml", urls.feed());
-    assertEquals("http://www.example.com/svnwiki/pages/FindPage", urls.search());
+    assertEquals("http://www.example.com/reviki/pages/", urls.root());
+    assertEquals("http://www.example.com/reviki/pages/Spaced+Out", urls.page("Spaced Out"));
+    assertEquals("http://www.example.com/reviki/pages/RecentChanges/atom.xml", urls.feed());
+    assertEquals("http://www.example.com/reviki/pages/FindPage", urls.search());
   }
 
   public void testGivenNameWiki() {
     RequestBasedWikiUrls urls = new RequestBasedWikiUrls(_request, new PerWikiInitialConfiguration(_configuration, "foo", "foo"));
-    assertEquals("http://www.example.com/svnwiki/pages/foo/", urls.root());
-    assertEquals("http://www.example.com/svnwiki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/svnwiki/pages/foo/RecentChanges/atom.xml", urls.feed());
-    assertEquals("http://www.example.com/svnwiki/pages/foo/FindPage", urls.search());
+    assertEquals("http://www.example.com/reviki/pages/foo/", urls.root());
+    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
+    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges/atom.xml", urls.feed());
+    assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
   }
   
 }
