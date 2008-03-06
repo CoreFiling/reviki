@@ -55,7 +55,6 @@ import net.hillsdon.svnwiki.wiki.plugin.Plugins;
 import net.hillsdon.svnwiki.wiki.plugin.PluginsImpl;
 import net.hillsdon.svnwiki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.svnwiki.wiki.renderer.macro.Macro;
-import net.hillsdon.svnwiki.wiki.xquery.XQueryMacro;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -97,7 +96,7 @@ public class WikiHandler implements RequestHandler {
     final WikiGraph wikiGraph = new WikiGraphImpl(_cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(new PageStoreConfiguration(_pageStore), _internalLinker, new Accessor<List<Macro>>() {
       public List<Macro> get() {
-        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new XQueryMacro(), new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }

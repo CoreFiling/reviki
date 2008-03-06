@@ -61,7 +61,7 @@ public class MacroNode extends AbstractRegexNode {
       }
     }
     if (macro == null) {
-      return matcher.group();
+      return "<pre>" + Escape.html(matcher.group()) + "</pre>";
     }
     
     try {
