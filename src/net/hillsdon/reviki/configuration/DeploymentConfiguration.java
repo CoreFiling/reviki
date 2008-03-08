@@ -107,7 +107,7 @@ public class DeploymentConfiguration {
     }
     if (location == null) {
       try {
-        location = System.getenv("SVNWIKI_DATA");
+        location = System.getenv("REVIKI_DATA");
       }
       catch (SecurityException ex) {
       }
