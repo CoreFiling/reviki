@@ -82,7 +82,7 @@
     </junit>
   </target>
 
-  <target name="war" depends="compile, taglibJar">
+  <target name="war" depends="compile">
     <war warfile="${war}"
          webxml="${build-web}/WEB-INF/web.xml">
        <classes dir="${build-classes}">
