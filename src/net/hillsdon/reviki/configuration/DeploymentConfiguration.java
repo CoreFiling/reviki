@@ -162,12 +162,12 @@ public class DeploymentConfiguration {
     if (location != null && location.canWrite()) {
       File file = new File(location, CONFIG_FILE_NAME);
       try {
-        FileOutputStream in = new FileOutputStream(file);
+        FileOutputStream out = new FileOutputStream(file);
         try {
-          _properties.store(in, "reviki configuration details");
+          _properties.store(out, "reviki configuration details");
         }
         finally {
-          in.close();
+          out.close();
         }
       }
       catch (IOException ex) {
