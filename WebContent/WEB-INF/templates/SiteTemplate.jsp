@@ -42,7 +42,7 @@
     <c:if test="${wikiIsValid != null and wikiIsValid}">
       <ul class="menu">
         <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
-        ${menuItems}
+        <c:out value="${menuItems}" escapeXml="false"/>
         <c:if test="${not empty menuItems}">
           <li class="menu menu-separator"></li>
         </c:if>
