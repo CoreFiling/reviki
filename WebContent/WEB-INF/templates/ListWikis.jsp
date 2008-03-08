@@ -19,15 +19,17 @@
     There are no wikis configured yet.
     </p>
     </c:if>
-    <p>
-    To configure a new wiki just go to the URL of one of its pages
-    and fill in the configuration details.
-    </p>
-    <p>
-    Enter a wiki name below to go to the FrontPage for that wiki. 
-    </p>
-    <form id="jump" name="jump" action="<c:url value="/jump"/>">
-    <input type="text" name="name"/><input type="submit" name="go" value="Go"/>
-    </form>
+    <c:if test="${configuration.editable}">
+      <p>
+      To configure a new wiki just go to the URL of one of its pages
+      and fill in the configuration details.
+      </p>
+      <p>
+      Enter a wiki name below to go to the FrontPage for that wiki. 
+      </p>
+      <form id="jump" name="jump" action="<c:url value="/jump"/>">
+      <input type="text" name="name"/><input type="submit" name="go" value="Go"/>
+      </form>
+    </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

@@ -47,6 +47,9 @@ public class WikiChoice implements RequestHandler {
     }
 
     public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+      if (!_configuration.isEditable()) {
+        throw new NotFoundException();
+      }
       request.setAttribute("configuration", _perWikiConfiguration);
       if ("POST".equals(request.getMethod())) {
         String url = request.getParameter("url");

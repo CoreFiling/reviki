@@ -175,6 +175,19 @@ public class DeploymentConfiguration {
       }
     }
   }
+  
+  /**
+   * @return true if changes can be persisted.
+   *              (note it is possible for this to change over time).
+   */
+  public boolean isEditable() {
+    final File parent = getConfigurationLocation();
+    if (parent != null) {
+      final File file = new File(parent, CONFIG_FILE_NAME);
+      return file.exists() ? file.canWrite() : parent.canWrite();
+    }
+    return false;
+  }
 
   public void setDefaultWiki(final String wikiName) {
     _properties.setProperty(KEY_DEFAULT_WIKI, wikiName);

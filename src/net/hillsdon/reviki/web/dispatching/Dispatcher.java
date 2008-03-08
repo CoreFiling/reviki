@@ -82,7 +82,9 @@ public class Dispatcher extends HttpServlet {
       else {
         view = _list.handle(path, request, response);
       }
-      view.render(request, response);
+      if (view != null) {
+        view.render(request, response);
+      }
     }
     catch (NotFoundException ex) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
