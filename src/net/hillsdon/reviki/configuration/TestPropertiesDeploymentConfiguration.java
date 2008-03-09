@@ -15,30 +15,40 @@
  */
 package net.hillsdon.reviki.configuration;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 public class TestPropertiesDeploymentConfiguration extends TestCase {
 
-  public void testThrowsIllegalArgumentExceptionOnRubbishInput() {
-    DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
-    WikiConfiguration perWikiConfiguration = configuration.getConfiguration("SomeWiki", "SomeWiki");
+  private final PersistentStringMap _properties = new AbstractPropertiesStore() {
+    public void load() throws IOException {
+    }
+    public void save() throws IOException {
+    }
+  };
+  
+  private final DeploymentConfiguration _configuration = new PropertiesDeploymentConfiguration(_properties);
+  
+  public void testSetURLThrowsIllegalArgumentExceptionOnRubbishInput() {
+    WikiConfiguration wiki = _configuration.getConfiguration("SomeWiki", "SomeWiki");
     try {
-      perWikiConfiguration.setUrl("foo bar");
+      wiki.setUrl("foo bar");
       fail();
     }
     catch (IllegalArgumentException expected) {
     }
   }
+
+  public void testDefaultWiki() {
+    _configuration.setDefaultWiki("foo");
+    assertEquals("foo", _configuration.getDefaultWiki());
+  }
   
-//// This touches the file system but is nonetheless useful from time to time.
-//  public void testLoadSave() {
-//    Configuration c1 = new Configuration();
-//    c1.setUrl("http://localhost/svn/wiki");
-//    c1.save();
-//
-//    Configuration c2 = new Configuration();
-//    c2.load();
-//    assertEquals("http://localhost/svn/wiki", c2.getUrl().toDecodedString());
-//  }
+  public void testNames() {
+    WikiConfiguration wiki = _configuration.getConfiguration("actual", "given");
+    assertEquals("given", wiki.getGivenWikiName());
+    assertEquals("actual", wiki.getWikiName());
+  }
   
 }
