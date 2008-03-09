@@ -26,60 +26,22 @@ import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
-import net.hillsdon.reviki.web.common.InvalidInputException;
-import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 
-public class WikiChoice implements RequestHandler {
+public class WikiChoice implements RequestHandler, ActiveWikis {
 
   private final Map<PerWikiInitialConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<PerWikiInitialConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
   private final ServletContext _servletContext;
 
-  public class ConfigureWikiHandler implements RequestHandler {
-    
-    private final PerWikiInitialConfiguration _perWikiConfiguration;
-
-    public ConfigureWikiHandler(final PerWikiInitialConfiguration perWikiConfiguration) {
-      _perWikiConfiguration = perWikiConfiguration;
-    }
-
-    public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-      if (!_configuration.isEditable()) {
-        throw new InvalidInputException("Editing of the configuration is currently disabled.");
-      }
-      request.setAttribute("configuration", _perWikiConfiguration);
-      if ("POST".equals(request.getMethod())) {
-        String url = request.getParameter("url");
-        try {
-          _perWikiConfiguration.setUrl(url);
-          _perWikiConfiguration.save();
-          if (_perWikiConfiguration.isComplete()) {
-            addWiki(_perWikiConfiguration);
-          }
-          return new RedirectView(request.getRequestURI());
-        }
-        catch (IllegalArgumentException ex) {
-          request.setAttribute("error", ex.getMessage());
-          return new JspView("Configuration");
-        }
-      }
-      else {
-        return new JspView("Configuration");
-      }
-    }
-    
-  }
-  
   public WikiChoice(ServletContext servletContext, final DeploymentConfiguration configuration) {
     _servletContext = servletContext;
     _configuration = configuration;
   }
 
-  private WikiHandler addWiki(final PerWikiInitialConfiguration configuration) {
+  public WikiHandler addWiki(final PerWikiInitialConfiguration configuration) {
     WikiHandler handler = new WikiHandler(configuration, _servletContext.getContextPath());
     _wikis.put(configuration, handler);
     return handler;
@@ -94,15 +56,15 @@ public class WikiChoice implements RequestHandler {
     return handler.handle(path, request, response);
   }
 
-  private RequestHandler getWikiHandler(final PerWikiInitialConfiguration configuration, final ConsumedPath path) throws NotFoundException {
-    RequestHandler wiki = _wikis.get(configuration);
+  private RequestHandler getWikiHandler(final PerWikiInitialConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
+    RequestHandler wiki = _wikis.get(perWikiConfiguration);
     boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
     if (wiki == null || reconfigure) {
       // At the moment we lazily install wiki handlers.  Fix this when adding a wiki list?
-      if (configuration.isComplete() && !reconfigure) {
-        return addWiki(configuration);
+      if (perWikiConfiguration.isComplete() && !reconfigure) {
+        return addWiki(perWikiConfiguration);
       }
-      return new ConfigureWikiHandler(configuration);
+      return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration);
     }
     return wiki;
   }
