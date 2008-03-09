@@ -1,5 +1,8 @@
 package net.hillsdon.reviki.configuration;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
@@ -70,5 +73,35 @@ public abstract class AbstractPropertiesStore implements PersistentStringMap {
   protected Properties getDelegate() {
     return _delegate;
   }
+
+  public synchronized void load() throws IOException {
+    InputStream in = inputStream();
+    if (in == null) {
+      return;
+    }
+    try {
+      _delegate.clear();
+      _delegate.load(in);
+    }
+    finally {
+      in.close();
+    }
+  }
+  
+  public synchronized void save() throws IOException {
+    OutputStream out = outputStream();
+    if (out == null) {
+      return;
+    }
+    try {
+      _delegate.store(out, "reviki configuration file");
+    }
+    finally {
+      out.close();
+    }
+  }
+  
+  protected abstract OutputStream outputStream() throws IOException;
+  protected abstract InputStream inputStream() throws IOException;
 
 }

@@ -15,16 +15,31 @@
  */
 package net.hillsdon.reviki.configuration;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import junit.framework.TestCase;
 
+import org.tmatesoft.svn.core.SVNURL;
+
 public class TestPropertiesDeploymentConfiguration extends TestCase {
 
+  private byte[] _bytes = new byte[0];
+
   private final PersistentStringMap _properties = new AbstractPropertiesStore() {
-    public void load() throws IOException {
+    protected InputStream inputStream() throws IOException {
+      return new ByteArrayInputStream(_bytes);
     }
-    public void save() throws IOException {
+    protected OutputStream outputStream() throws IOException {
+      return new ByteArrayOutputStream() {
+        @Override
+        public void close() throws IOException {
+          _bytes = toByteArray();
+        }
+      };
     }
   };
   
@@ -49,6 +64,15 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
     WikiConfiguration wiki = _configuration.getConfiguration("actual", "given");
     assertEquals("given", wiki.getGivenWikiName());
     assertEquals("actual", wiki.getWikiName());
+  }
+  
+  public void testLoadSave() throws Exception {
+    WikiConfiguration config = _configuration.getConfiguration("foo", "bar");
+    String url = "http://svn.example.com/svn";
+    config.setUrl(url);
+    config.save();
+    _configuration.load();
+    assertEquals(SVNURL.parseURIDecoded(url), _configuration.getConfiguration("foo", "bar").getUrl());
   }
   
 }
