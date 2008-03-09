@@ -16,6 +16,8 @@
 package net.hillsdon.reviki.vc;
 
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Describes a change.
@@ -24,6 +26,8 @@ import java.util.Date;
  */
 public class ChangeInfo {
 
+  private static final Pattern TAGS_THEN_CONTENT = Pattern.compile("(\\[(.*?)\\])*(.*)", Pattern.DOTALL);
+  
   public static final String NO_COMMENT_MESSAGE_TAG = "[reviki commit]";
   public static final String MINOR_EDIT_MESSAGE_TAG = "[minor edit]\n";
   
@@ -76,21 +80,10 @@ public class ChangeInfo {
   }
   
   public String getDescription() {
-    // TODO: generalize the idea of tagging commits.
-    String description = stripFinalURL();
-    int minorEdit = description.indexOf(MINOR_EDIT_MESSAGE_TAG);
-    int noMessage = description.indexOf(NO_COMMENT_MESSAGE_TAG);
-    if (noMessage != -1) {
-      return "None";
-    }
-    if (minorEdit > noMessage) {
-      return description.substring(minorEdit + MINOR_EDIT_MESSAGE_TAG.length());
-    }
-    if (noMessage > minorEdit) {
-      return description.substring(noMessage + NO_COMMENT_MESSAGE_TAG.length());
-    }
-    
-    return description;
+    Matcher matcher = TAGS_THEN_CONTENT.matcher(stripFinalURL());
+    matcher.matches();
+    String comment = matcher.group(3).trim();
+    return comment.length() == 0 ? "None" : comment;
   }
 
   private String stripFinalURL() {
