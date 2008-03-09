@@ -1,24 +1,24 @@
 package net.hillsdon.reviki.configuration;
 
-import java.io.File;
 import java.util.Collection;
-
-import org.tmatesoft.svn.core.SVNURL;
 
 public interface DeploymentConfiguration {
 
-  SVNURL getUrl(String wikiName);
+  /**
+   * @param actualWikiName The wiki name to store data under.
+   * @param givenWikiName The wiki name to use, possibly null for the default.
+   * @return A wiki configuration specific to <code>actualWikiName</code>
+   */
+  WikiConfiguration getConfiguration(String actualWikiName, String givenWikiName);
 
-  File getSearchIndexDirectory(String wikiName);
-
-  File getWritableChildDir(File dir, String child);
-
-  void setUrl(String wikiName, String url) throws IllegalArgumentException;
-
-  boolean isComplete(String wikiName);
-
+  /**
+   * Load the configuration into memory.
+   */
   void load();
 
+  /**
+   * Save the configuration to disk.
+   */
   void save();
 
   /**
@@ -27,10 +27,21 @@ public interface DeploymentConfiguration {
    */
   boolean isEditable();
 
+  /**
+   * Sets a wiki as default.
+   * 
+   * @param wikiName The name of a wiki.
+   */
   void setDefaultWiki(String wikiName);
 
+  /**
+   * @return The default wiki or null if none.
+   */
   String getDefaultWiki();
 
+  /**
+   * @return Names of the configured wikis.
+   */
   Collection<String> getWikiNames();
 
 }

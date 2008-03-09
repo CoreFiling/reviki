@@ -1,9 +1,9 @@
 package net.hillsdon.reviki.web.dispatching;
 
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 public interface ActiveWikis {
 
-  WikiHandler addWiki(PerWikiInitialConfiguration configuration);
+  WikiHandler addWiki(WikiConfiguration configuration);
 
 }

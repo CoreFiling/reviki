@@ -15,9 +15,11 @@
  */
 package net.hillsdon.reviki.web.common;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 /**
  * Test for {@link RequestBasedWikiUrls}.
@@ -26,21 +28,20 @@ import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
  */
 public class TestRequestBasedWikiUrls extends TestCase {
 
-  private DeploymentConfiguration _configuration;
+  private WikiConfiguration _configuration;
   private MockHttpServletRequest _request;
 
   @Override
   protected void setUp() throws Exception {
-    _configuration = null;
     _request = new MockHttpServletRequest();
+    _configuration = createMock(WikiConfiguration.class);
     _request.setContextPath("/reviki");
     _request.setRequestURL("http://www.example.com/reviki/some/page");
     _request.setRequestURI("/reviki/some/page");
   }
-  
 
   public void testNullWiki() {
-    RequestBasedWikiUrls urls = new RequestBasedWikiUrls(_request, new PerWikiInitialConfiguration(_configuration, null, "foo"));
+    RequestBasedWikiUrls urls = createURLs("foo", null);
     assertEquals("http://www.example.com/reviki/pages/", urls.root());
     assertEquals("http://www.example.com/reviki/pages/Spaced+Out", urls.page("Spaced Out"));
     assertEquals("http://www.example.com/reviki/pages/RecentChanges/atom.xml", urls.feed());
@@ -48,11 +49,18 @@ public class TestRequestBasedWikiUrls extends TestCase {
   }
 
   public void testGivenNameWiki() {
-    RequestBasedWikiUrls urls = new RequestBasedWikiUrls(_request, new PerWikiInitialConfiguration(_configuration, "foo", "foo"));
+    RequestBasedWikiUrls urls = createURLs("foo", "foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.root());
     assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
     assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges/atom.xml", urls.feed());
     assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
+  }
+  
+  private RequestBasedWikiUrls createURLs(final String actual, final String given) {
+    expect(_configuration.getWikiName()).andReturn(actual).anyTimes();
+    expect(_configuration.getGivenWikiName()).andReturn(given).anyTimes();
+    replay(_configuration);
+    return new RequestBasedWikiUrls(_request, _configuration);
   }
   
 }

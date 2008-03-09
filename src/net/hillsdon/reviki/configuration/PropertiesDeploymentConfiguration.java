@@ -44,8 +44,74 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
   private static final String KEY_DEFAULT_WIKI = "default-wiki";
   
+
+  private class PropertiesPerWikiConfiguration implements WikiConfiguration {
+
+    private final String _wikiName;
+    private final String _givenWikiName;
+
+    public PropertiesPerWikiConfiguration(final String givenWikiName, final String wikiName) {
+      _givenWikiName = givenWikiName;
+      _wikiName = wikiName;
+    }
+    
+    public File getSearchIndexDirectory() {
+      return PropertiesDeploymentConfiguration.this.getSearchIndexDirectory(_wikiName);
+    }
+
+    public void setUrl(final String location) {
+      PropertiesDeploymentConfiguration.this.setUrl(_wikiName, location);
+    }
+    
+    public SVNURL getUrl() {
+      return PropertiesDeploymentConfiguration.this.getUrl(_wikiName);
+    }
+
+    public String getWikiName() {
+      return _wikiName;
+    }
+
+    public void save() {
+      PropertiesDeploymentConfiguration.this.save();
+    }
+
+    public boolean isComplete() {
+      return PropertiesDeploymentConfiguration.this.isComplete(_wikiName);
+    }
+
+    public String getGivenWikiName() {
+      return _givenWikiName;
+    }
+    
+    public boolean isEditable() {
+      return PropertiesDeploymentConfiguration.this.isEditable();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj instanceof PropertiesPerWikiConfiguration) {
+        String givenWikiName = ((PropertiesPerWikiConfiguration) obj)._givenWikiName;
+        return _givenWikiName == null ? givenWikiName == null : _givenWikiName.equals(givenWikiName);
+      }
+      return false;
+    }
+    
+    @Override
+    public int hashCode() {
+      return getClass().hashCode() ^ (_givenWikiName == null ? 0 : _givenWikiName.hashCode());
+    }
+    
+  }
+
+  /**
+   * Note Properties is a synchonized collection.
+   */
   private final Properties _properties = new Properties();
 
+  public WikiConfiguration getConfiguration(final String actualWikiName, final String givenWikiName) {
+    return new PropertiesPerWikiConfiguration(givenWikiName, actualWikiName);
+  }
+  
   public SVNURL getUrl(final String wikiName) {
     String url = (String) _properties.getProperty(KEY_PREFIX_SVN_URL + wikiName);
     try {
@@ -56,16 +122,12 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     }
   }
 
-  /**
-   * @param wikiName 
-   * @return Somewhere writable to put the search index, or null if that is not possible.
-   */
-  public File getSearchIndexDirectory(final String wikiName) {
+  private File getSearchIndexDirectory(final String wikiName) {
     File searchDir = getWritableChildDir(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
     return searchDir == null ? null : getWritableChildDir(searchDir, wikiName);
   }
   
-  public File getWritableChildDir(final File dir, final String child) {
+  private File getWritableChildDir(final File dir, final String child) {
     File indexDir = new File(dir, child);
     if (!indexDir.exists()) {
       if (!indexDir.mkdir()) {
@@ -78,7 +140,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return null;
   }
   
-  public void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
+  private void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
     try {
       SVNURL svnUrl = SVNURL.parseURIDecoded(url);
       _properties.setProperty(KEY_PREFIX_SVN_URL + wikiName, svnUrl.toDecodedString());
@@ -91,7 +153,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     }
   }
 
-  public boolean isComplete(final String wikiName) {
+  private boolean isComplete(final String wikiName) {
     return getUrl(wikiName) != null;
   }
 

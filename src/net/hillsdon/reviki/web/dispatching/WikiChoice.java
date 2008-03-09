@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
@@ -32,7 +32,7 @@ import net.hillsdon.reviki.web.common.View;
 
 public class WikiChoice implements RequestHandler, ActiveWikis {
 
-  private final Map<PerWikiInitialConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<PerWikiInitialConfiguration, RequestHandler>();
+  private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
   private final ServletContext _servletContext;
 
@@ -41,14 +41,14 @@ public class WikiChoice implements RequestHandler, ActiveWikis {
     _configuration = configuration;
   }
 
-  public WikiHandler addWiki(final PerWikiInitialConfiguration configuration) {
+  public WikiHandler addWiki(final WikiConfiguration configuration) {
     WikiHandler handler = new WikiHandler(configuration, _servletContext.getContextPath());
     _wikis.put(configuration, handler);
     return handler;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    PerWikiInitialConfiguration configuration = getWikiConfiguration(path);
+    WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
     request.setAttribute(WikiHandler.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
     RequestBasedWikiUrls.create(request, configuration);
@@ -56,7 +56,7 @@ public class WikiChoice implements RequestHandler, ActiveWikis {
     return handler.handle(path, request, response);
   }
 
-  private RequestHandler getWikiHandler(final PerWikiInitialConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
+  private RequestHandler getWikiHandler(final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
     RequestHandler wiki = _wikis.get(perWikiConfiguration);
     boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
     if (wiki == null || reconfigure) {
@@ -69,7 +69,7 @@ public class WikiChoice implements RequestHandler, ActiveWikis {
     return wiki;
   }
 
-  private PerWikiInitialConfiguration getWikiConfiguration(final ConsumedPath path) throws NotFoundException {
+  private WikiConfiguration getWikiConfiguration(final ConsumedPath path) throws NotFoundException {
     boolean asDefault = false;
     String wikiName = path.peek();
     if (wikiName == null) {
@@ -86,8 +86,8 @@ public class WikiChoice implements RequestHandler, ActiveWikis {
     else {
       path.next();
     }
-    
-    return new PerWikiInitialConfiguration(_configuration, asDefault ? null : wikiName, wikiName);
+    String givenWikiName = asDefault ? null : wikiName;
+    return _configuration.getConfiguration(wikiName, givenWikiName);
   }
 
 }

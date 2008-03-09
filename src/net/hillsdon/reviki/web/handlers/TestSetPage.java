@@ -24,7 +24,7 @@ import static org.easymock.EasyMock.verify;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -57,7 +57,10 @@ public class TestSetPage extends TestCase {
     _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());
     _request.setRequestURI("/reviki/pages/" + CALLED_ON_PAGE.getPath());
     _response = null;
-    RequestBasedWikiUrls.create(_request, new PerWikiInitialConfiguration(null, "", ""));
+    WikiConfiguration configuration = createMock(WikiConfiguration.class);
+    expect(configuration.getGivenWikiName()).andReturn("foo").anyTimes();
+    replay(configuration);
+    RequestBasedWikiUrls.create(_request, configuration);
   }
   
   public void testNoActionIsInvalidInputException() throws Exception {

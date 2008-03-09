@@ -21,7 +21,7 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
 
   public void testThrowsIllegalArgumentExceptionOnRubbishInput() {
     DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
-    PerWikiInitialConfiguration perWikiConfiguration = new PerWikiInitialConfiguration(configuration, "SomeWiki", "SomeWiki");
+    WikiConfiguration perWikiConfiguration = configuration.getConfiguration("SomeWiki", "SomeWiki");
     try {
       perWikiConfiguration.setUrl("foo bar");
       fail();

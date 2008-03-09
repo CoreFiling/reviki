@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.fij.core.Factory;
 import net.hillsdon.reviki.configuration.PageStoreConfiguration;
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.LuceneSearcher;
 import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
@@ -88,7 +88,7 @@ public class WikiHandler implements RequestHandler {
   private final ChangeNotificationDispatcher _syncUpdater;
   private final RequestScopedThreadLocalBasicSVNOperations _operations;
 
-  public WikiHandler(final PerWikiInitialConfiguration configuration, final String contextPath) {
+  public WikiHandler(final WikiConfiguration configuration, final String contextPath) {
     // Some of this is a bit circular...
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {

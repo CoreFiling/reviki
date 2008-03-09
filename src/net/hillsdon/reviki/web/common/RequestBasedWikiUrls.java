@@ -18,12 +18,12 @@ package net.hillsdon.reviki.web.common;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
 public class RequestBasedWikiUrls implements WikiUrls {
 
-  public static void create(final HttpServletRequest request, final PerWikiInitialConfiguration configuration) {
+  public static void create(final HttpServletRequest request, final WikiConfiguration configuration) {
     request.setAttribute(RequestBasedWikiUrls.class.getName(), new RequestBasedWikiUrls(request, configuration));
   }
   
@@ -32,9 +32,9 @@ public class RequestBasedWikiUrls implements WikiUrls {
   }
   
   private String _base;
-  private final PerWikiInitialConfiguration _configuration;
+  private final WikiConfiguration _configuration;
 
-  public RequestBasedWikiUrls(final HttpServletRequest request, final PerWikiInitialConfiguration configuration) {
+  public RequestBasedWikiUrls(final HttpServletRequest request, final WikiConfiguration configuration) {
     _configuration = configuration;
     String requestURL = request.getRequestURL().toString();
     String path = request.getRequestURI().substring(request.getContextPath().length());
