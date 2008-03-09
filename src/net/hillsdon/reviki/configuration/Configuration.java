@@ -20,7 +20,7 @@ import net.hillsdon.reviki.vc.PageStoreException;
 /**
  * Configuration that is available once we have an SVN repository configured.
  *
- * @see DeploymentConfiguration
+ * @see PropertiesDeploymentConfiguration
  * @author mth
  */
 public interface Configuration {

@@ -35,7 +35,7 @@ import org.tmatesoft.svn.core.SVNURL;
  * 
  * @author mth
  */
-public class DeploymentConfiguration {
+public class PropertiesDeploymentConfiguration {
 
   private static final String DEFAULT_CONFIG_DIR_NAME = "reviki-data";
   private static final String SEARCH_INDEX_DIR_NAME = "search-index";

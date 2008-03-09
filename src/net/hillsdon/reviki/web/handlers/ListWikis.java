@@ -21,7 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
@@ -30,9 +30,9 @@ import net.hillsdon.reviki.web.common.View;
 
 public class ListWikis implements RequestHandler {
 
-  private final DeploymentConfiguration _configuration;
+  private final PropertiesDeploymentConfiguration _configuration;
 
-  public ListWikis(final DeploymentConfiguration configuration) {
+  public ListWikis(final PropertiesDeploymentConfiguration configuration) {
     _configuration = configuration;
   }
   

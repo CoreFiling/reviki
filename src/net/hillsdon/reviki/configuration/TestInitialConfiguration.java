@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 public class TestInitialConfiguration extends TestCase {
 
   public void testThrowsIllegalArgumentExceptionOnRubbishInput() {
-    DeploymentConfiguration configuration = new DeploymentConfiguration();
+    PropertiesDeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
     PerWikiInitialConfiguration perWikiConfiguration = new PerWikiInitialConfiguration(configuration, "SomeWiki", "SomeWiki");
     try {
       perWikiConfiguration.setUrl("foo bar");

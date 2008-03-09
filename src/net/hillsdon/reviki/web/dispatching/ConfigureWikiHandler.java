@@ -1,12 +1,9 @@
-/**
- * 
- */
 package net.hillsdon.reviki.web.dispatching;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
@@ -18,10 +15,10 @@ import net.hillsdon.reviki.web.common.View;
 public class ConfigureWikiHandler implements RequestHandler {
   
   private final PerWikiInitialConfiguration _perWikiConfiguration;
-  private final DeploymentConfiguration _configuration;
+  private final PropertiesDeploymentConfiguration _configuration;
   private final ActiveWikis _activeWikis;
 
-  public ConfigureWikiHandler(final DeploymentConfiguration configuration, final ActiveWikis activeWikis, final PerWikiInitialConfiguration perWikiConfiguration) {
+  public ConfigureWikiHandler(final PropertiesDeploymentConfiguration configuration, final ActiveWikis activeWikis, final PerWikiInitialConfiguration perWikiConfiguration) {
     _configuration = configuration;
     _activeWikis = activeWikis;
     _perWikiConfiguration = perWikiConfiguration;

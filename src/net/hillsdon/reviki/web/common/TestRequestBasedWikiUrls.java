@@ -16,7 +16,7 @@
 package net.hillsdon.reviki.web.common;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
 
 /**
@@ -26,7 +26,7 @@ import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
  */
 public class TestRequestBasedWikiUrls extends TestCase {
 
-  private DeploymentConfiguration _configuration;
+  private PropertiesDeploymentConfiguration _configuration;
   private MockHttpServletRequest _request;
 
   @Override
