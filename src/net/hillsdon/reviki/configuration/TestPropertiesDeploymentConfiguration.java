@@ -17,10 +17,10 @@ package net.hillsdon.reviki.configuration;
 
 import junit.framework.TestCase;
 
-public class TestInitialConfiguration extends TestCase {
+public class TestPropertiesDeploymentConfiguration extends TestCase {
 
   public void testThrowsIllegalArgumentExceptionOnRubbishInput() {
-    PropertiesDeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
+    DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
     PerWikiInitialConfiguration perWikiConfiguration = new PerWikiInitialConfiguration(configuration, "SomeWiki", "SomeWiki");
     try {
       perWikiConfiguration.setUrl("foo bar");

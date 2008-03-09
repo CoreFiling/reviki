@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -55,7 +56,7 @@ public class Dispatcher extends HttpServlet {
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    PropertiesDeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
+    DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
     configuration.load();
     _list = new ListWikis(configuration);
     _jump = new JumpToWikiUrl();

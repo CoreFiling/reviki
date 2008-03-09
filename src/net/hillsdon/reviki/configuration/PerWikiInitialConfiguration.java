@@ -22,7 +22,7 @@ import org.tmatesoft.svn.core.SVNURL;
 
 public class PerWikiInitialConfiguration {
 
-  private final PropertiesDeploymentConfiguration _configuration;
+  private final DeploymentConfiguration _configuration;
   private final String _wikiName;
   private final String _givenWikiName;
 
@@ -31,7 +31,7 @@ public class PerWikiInitialConfiguration {
    * @param givenWikiName Name we were accessed as, either wikiName or null if we're the default.
    * @param wikiName Name of this wiki.
    */
-  public PerWikiInitialConfiguration(final PropertiesDeploymentConfiguration configuration, final String givenWikiName, final String wikiName) {
+  public PerWikiInitialConfiguration(final DeploymentConfiguration configuration, final String givenWikiName, final String wikiName) {
     _configuration = configuration;
     _givenWikiName = givenWikiName;
     _wikiName = wikiName;

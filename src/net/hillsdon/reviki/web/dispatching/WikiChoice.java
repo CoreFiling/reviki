@@ -22,7 +22,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -33,10 +33,10 @@ import net.hillsdon.reviki.web.common.View;
 public class WikiChoice implements RequestHandler, ActiveWikis {
 
   private final Map<PerWikiInitialConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<PerWikiInitialConfiguration, RequestHandler>();
-  private final PropertiesDeploymentConfiguration _configuration;
+  private final DeploymentConfiguration _configuration;
   private final ServletContext _servletContext;
 
-  public WikiChoice(ServletContext servletContext, final PropertiesDeploymentConfiguration configuration) {
+  public WikiChoice(ServletContext servletContext, final DeploymentConfiguration configuration) {
     _servletContext = servletContext;
     _configuration = configuration;
   }
