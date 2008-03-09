@@ -26,6 +26,7 @@ import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PerWikiInitialConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
+import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
@@ -48,7 +49,7 @@ public class WikiChoice implements RequestHandler {
 
     public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
       if (!_configuration.isEditable()) {
-        throw new NotFoundException();
+        throw new InvalidInputException("Editing of the configuration is currently disabled.");
       }
       request.setAttribute("configuration", _perWikiConfiguration);
       if ("POST".equals(request.getMethod())) {
