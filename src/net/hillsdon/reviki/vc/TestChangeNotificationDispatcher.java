@@ -19,7 +19,7 @@ public class TestChangeNotificationDispatcher extends TestCase {
   private BasicSVNOperations _operations;
   private ChangeSubscriber _syncedUptoThreeSubscriber;
   private ChangeSubscriber _syncedUptoFourSubscriber;
-  private ChangeNotificationDispatcher _dispatcher;
+  private ChangeNotificationDispatcherImpl _dispatcher;
   private ChangeSubscriber _syncedUptoFiveSubscriber;
 
   @Override
@@ -43,7 +43,7 @@ public class TestChangeNotificationDispatcher extends TestCase {
     // Note we don't expect a call for _syncedUptoFiveSubscriber.
     
     replay(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
-    _dispatcher = new ChangeNotificationDispatcher(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber);
+    _dispatcher = new ChangeNotificationDispatcherImpl(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber);
     _dispatcher.sync();
     verify(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
     

@@ -31,7 +31,8 @@ import net.hillsdon.reviki.configuration.PageStoreConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.LuceneSearcher;
-import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
+import net.hillsdon.reviki.vc.ChangeNotificationDispatcherImpl;
+import net.hillsdon.reviki.vc.ChangeNotificationDospatcher;
 import net.hillsdon.reviki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.InMemoryDeletedRevisionTracker;
@@ -43,7 +44,20 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.AllPages;
+import net.hillsdon.reviki.web.handlers.Attachments;
+import net.hillsdon.reviki.web.handlers.FindPage;
+import net.hillsdon.reviki.web.handlers.OrphanedPages;
 import net.hillsdon.reviki.web.handlers.PageHandler;
+import net.hillsdon.reviki.web.handlers.RecentChanges;
+import net.hillsdon.reviki.web.handlers.RegularPage;
+import net.hillsdon.reviki.web.handlers.impl.AllPagesImpl;
+import net.hillsdon.reviki.web.handlers.impl.AttachmentsImpl;
+import net.hillsdon.reviki.web.handlers.impl.FindPageImpl;
+import net.hillsdon.reviki.web.handlers.impl.OrphanedPagesImpl;
+import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
+import net.hillsdon.reviki.web.handlers.impl.RecentChangesImpl;
+import net.hillsdon.reviki.web.handlers.impl.RegularPageImpl;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.PerRequestPageStoreFactory;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
@@ -61,6 +75,8 @@ import net.hillsdon.reviki.wiki.plugin.Plugins;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+
+import org.picocontainer.PicoBuilder;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -85,7 +101,7 @@ public class WikiHandler implements RequestHandler {
   private final InternalLinker _internalLinker;
   private final ExternalCommitAwareSearchEngine _searchEngine;
   private final Plugins _plugins;
-  private final ChangeNotificationDispatcher _syncUpdater;
+  private final ChangeNotificationDospatcher _syncUpdater;
   private final RequestScopedThreadLocalBasicSVNOperations _operations;
 
   public WikiHandler(final WikiConfiguration configuration, final String contextPath) {
@@ -113,7 +129,25 @@ public class WikiHandler implements RequestHandler {
         return macros;
       }
     });
-    _handler = new PageHandler(_cachingPageStore, _searchEngine, _renderer, wikiGraph);
+    
+    _handler = new PicoBuilder().build()
+      // These should move to being created by the container too.
+      .addComponent(_cachingPageStore)
+      .addComponent(wikiGraph)
+      .addComponent(_internalLinker)
+      .addComponent(renderedPageFactory)
+      .addComponent(_renderer)
+      .addComponent(_searchEngine)
+      
+      // Handlers.
+      .addComponent(PageHandler.class, PageHandlerImpl.class)
+      .addComponent(RegularPage.class, RegularPageImpl.class)
+      .addComponent(FindPage.class, FindPageImpl.class)
+      .addComponent(OrphanedPages.class, OrphanedPagesImpl.class)
+      .addComponent(AllPages.class, AllPagesImpl.class)
+      .addComponent(RecentChanges.class, RecentChangesImpl.class)
+      .addComponent(Attachments.class, AttachmentsImpl.class)
+      .getComponent(PageHandler.class);
     
     // Allow plugin classes to depend on the core wiki API.
     _plugins.addPluginAccessibleComponent(_pageStore);
@@ -121,7 +155,7 @@ public class WikiHandler implements RequestHandler {
     _plugins.addPluginAccessibleComponent(_searchEngine);
     
     try {
-      _syncUpdater = new ChangeNotificationDispatcher(_operations, tracker, _searchEngine, _plugins);
+      _syncUpdater = new ChangeNotificationDispatcherImpl(_operations, tracker, _searchEngine, _plugins);
     }
     catch (IOException ex) {
       throw new RuntimeException("Failed to read data required for start-up.", ex);

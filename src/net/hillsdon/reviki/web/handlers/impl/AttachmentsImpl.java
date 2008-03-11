@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,17 +22,19 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.Attachments;
+import net.hillsdon.reviki.web.handlers.PageRequestHandler;
 
-public class Attachments implements PageRequestHandler {
+public class AttachmentsImpl implements Attachments {
 
   private final PageRequestHandler _list;
   private final PageRequestHandler _upload;
   private final PageRequestHandler _get;
 
-  public Attachments(final PageStore pageStore) {
-    _list = new ListAttachments(pageStore);
-    _upload = new UploadAttachment(pageStore, _list);
-    _get = new GetAttachment(pageStore);
+  public AttachmentsImpl(final PageStore pageStore) {
+    _list = new ListAttachmentsImpl(pageStore);
+    _upload = new UploadAttachmentImpl(pageStore, _list);
+    _get = new GetAttachmentImpl(pageStore);
   }
 
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {

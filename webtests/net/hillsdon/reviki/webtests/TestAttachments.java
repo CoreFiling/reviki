@@ -19,7 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import net.hillsdon.reviki.web.handlers.UploadAttachment;
+import net.hillsdon.reviki.web.handlers.impl.UploadAttachmentImpl;
 
 import org.apache.commons.io.IOUtils;
 
@@ -63,7 +63,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
-    assertEquals(UploadAttachment.ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
+    assertEquals(UploadAttachmentImpl.ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {

@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
-
-import java.util.List;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.ListAttachments;
 
-public class History implements PageRequestHandler {
+public class ListAttachmentsImpl implements ListAttachments {
 
   private final PageStore _store;
 
-  public History(final PageStore store) {
+  public ListAttachmentsImpl(final PageStore store) {
     _store = store;
   }
 
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
-    List<ChangeInfo> changes = _store.history(page);
-    request.setAttribute("changes", changes);
-    return new JspView("History");
+    request.setAttribute("attachments", _store.attachments(page));
+    return new JspView("Attachments");
   }
 
 }

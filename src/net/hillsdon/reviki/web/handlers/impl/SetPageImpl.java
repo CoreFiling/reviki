@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
@@ -30,8 +30,9 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.SetPage;
 
-public class SetPage implements PageRequestHandler {
+public class SetPageImpl implements SetPage {
 
   public static final String SUBMIT_SAVE = "save";
   public static final String SUBMIT_COPY = "copy";
@@ -59,7 +60,7 @@ public class SetPage implements PageRequestHandler {
   
   private final PageStore _store;
 
-  public SetPage(final PageStore store) {
+  public SetPageImpl(final PageStore store) {
     _store = store;
   }
 

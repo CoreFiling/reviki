@@ -32,16 +32,16 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author mth
  */
-public class ChangeNotificationDispatcher {
+public class ChangeNotificationDispatcherImpl implements ChangeNotificationDospatcher {
 
-  private static final Log LOG = LogFactory.getLog(ChangeNotificationDispatcher.class);
+  private static final Log LOG = LogFactory.getLog(ChangeNotificationDispatcherImpl.class);
   
   private final BasicSVNOperations _operations;
   private final ChangeSubscriber[] _subscribers;
 
   private long _lastSynced = Long.MAX_VALUE;
 
-  public ChangeNotificationDispatcher(final BasicSVNOperations operations, final ChangeSubscriber... subscribers) throws IOException {
+  public ChangeNotificationDispatcherImpl(final BasicSVNOperations operations, final ChangeSubscriber... subscribers) throws IOException {
     _operations = operations;
     _subscribers = subscribers;
     for (ChangeSubscriber subscriber : subscribers) {

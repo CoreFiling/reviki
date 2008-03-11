@@ -31,8 +31,8 @@ import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
-import net.hillsdon.reviki.web.handlers.ListWikis;
+import net.hillsdon.reviki.web.handlers.impl.JumpToWikiUrlImpl;
+import net.hillsdon.reviki.web.handlers.impl.ListWikisImpl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,8 +49,8 @@ public class Dispatcher extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   private WikiChoice _choice;
-  private ListWikis _list;
-  private JumpToWikiUrl _jump;
+  private ListWikisImpl _list;
+  private JumpToWikiUrlImpl _jump;
 
 
   @Override
@@ -58,8 +58,8 @@ public class Dispatcher extends HttpServlet {
     super.init(config);
     DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
     configuration.load();
-    _list = new ListWikis(configuration);
-    _jump = new JumpToWikiUrl();
+    _list = new ListWikisImpl(configuration);
+    _jump = new JumpToWikiUrlImpl();
     _choice = new WikiChoice(config.getServletContext(), configuration);
   }
 

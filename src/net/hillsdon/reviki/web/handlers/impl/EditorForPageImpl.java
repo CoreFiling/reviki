@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 
@@ -33,16 +33,17 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.EditorForPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 
-public class EditorForPage implements PageRequestHandler {
+public class EditorForPageImpl implements EditorForPage {
 
   public static final String PARAM_PREVIEW = "preview";
   
   private final PageStore _store;
   private final MarkupRenderer _renderer;
 
-  public EditorForPage(final PageStore store, final MarkupRenderer renderer) {
+  public EditorForPageImpl(final PageStore store, final MarkupRenderer renderer) {
     _store = store;
     _renderer = renderer;
   }
@@ -55,8 +56,8 @@ public class EditorForPage implements PageRequestHandler {
       return new JspView("ViewPage");
     }
     else {
-      if (request.getParameter(EditorForPage.PARAM_PREVIEW) != null) {
-        pageInfo = pageInfo.alternativeContent(getRequiredString(request, SetPage.PARAM_CONTENT));
+      if (request.getParameter(EditorForPageImpl.PARAM_PREVIEW) != null) {
+        pageInfo = pageInfo.alternativeContent(getRequiredString(request, SetPageImpl.PARAM_CONTENT));
         request.setAttribute("pageInfo", pageInfo);
         StringWriter out = new StringWriter();
         _renderer.render(pageInfo, pageInfo.getContent(), out);

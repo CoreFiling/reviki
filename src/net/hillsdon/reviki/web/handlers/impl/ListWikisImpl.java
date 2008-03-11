@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.web.handlers.ListWikis;
 
-public class OrphanedPages implements RequestHandler {
+public class ListWikisImpl implements ListWikis {
 
-  private final WikiGraph _graph;
+  private final DeploymentConfiguration _configuration;
 
-  public OrphanedPages(final WikiGraph graph) {
-    _graph = graph;
+  public ListWikisImpl(final DeploymentConfiguration configuration) {
+    _configuration = configuration;
   }
-
+  
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
-    List<String> alphabetical = new ArrayList<String>(_graph.isolatedPages());
-    Collections.sort(alphabetical);
-    request.setAttribute("pageList", alphabetical);
-    return new JspView("OrphanedPages");
+    request.setAttribute("configuration", _configuration);
+    return new JspView("ListWikis");
   }
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
@@ -36,8 +36,11 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.FindPage;
+import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.RegularPage;
 
-public class FindPage implements PageRequestHandler {
+public class FindPageImpl implements FindPage {
 
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -55,7 +58,7 @@ public class FindPage implements PageRequestHandler {
   private final SearchEngine _searchEngine;
   private final PageRequestHandler _regularPage;
 
-  public FindPage(final PageStore store, final SearchEngine searchEngine, final PageRequestHandler regularPage) {
+  public FindPageImpl(final PageStore store, final SearchEngine searchEngine, final RegularPage regularPage) {
     _store = store;
     _searchEngine = searchEngine;
     _regularPage = regularPage;

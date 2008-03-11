@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -34,15 +34,15 @@ import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 
 /**
- * Test for {@link SetPage}.
+ * Test for {@link SetPageImpl}.
  * 
  * @author mth
  */
-public class TestSetPage extends TestCase {
+public class TestSetPageImpl extends TestCase {
 
   private static final PageReference CALLED_ON_PAGE = new PageReference("CalledOnPage");
   
-  private SetPage _page;
+  private SetPageImpl _page;
   private PageStore _store;
   private MockHttpServletRequest _request;
 
@@ -51,7 +51,7 @@ public class TestSetPage extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _store = createMock(PageStore.class);
-    _page = new SetPage(_store);
+    _page = new SetPageImpl(_store);
     _request = new MockHttpServletRequest();
     _request.setContextPath("/reviki");
     _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());
@@ -74,8 +74,8 @@ public class TestSetPage extends TestCase {
   
   public void testClashingOptionsIsInvalidInputException() throws Exception {
     try {
-      _request.setParameter(SetPage.SUBMIT_SAVE, "");
-      _request.setParameter(SetPage.SUBMIT_COPY, "");
+      _request.setParameter(SetPageImpl.SUBMIT_SAVE, "");
+      _request.setParameter(SetPageImpl.SUBMIT_COPY, "");
       _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
       fail();
     }
@@ -86,41 +86,41 @@ public class TestSetPage extends TestCase {
   
   public void testSaveRequiresLockToken() throws Exception {
     try {
-      _request.setParameter(SetPage.SUBMIT_SAVE, "");
-      _request.setParameter(SetPage.PARAM_CONTENT, "Content");
-      _request.setParameter(SetPage.PARAM_COMMIT_MESSAGE, "Message");
-      _request.setParameter(SetPage.PARAM_BASE_REVISION, "1");
+      _request.setParameter(SetPageImpl.SUBMIT_SAVE, "");
+      _request.setParameter(SetPageImpl.PARAM_CONTENT, "Content");
+      _request.setParameter(SetPageImpl.PARAM_COMMIT_MESSAGE, "Message");
+      _request.setParameter(SetPageImpl.PARAM_BASE_REVISION, "1");
       _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
       fail();
     }
     catch (InvalidInputException expected) {
-      assertTrue(expected.getMessage().contains(SetPage.PARAM_LOCK_TOKEN));
+      assertTrue(expected.getMessage().contains(SetPageImpl.PARAM_LOCK_TOKEN));
     }
   }
   
   public void testSaveRequiresBaseRevision() throws Exception {
     try {
-      _request.setParameter(SetPage.SUBMIT_SAVE, "");
-      _request.setParameter(SetPage.PARAM_LOCK_TOKEN, "dooby");
-      _request.setParameter(SetPage.PARAM_CONTENT, "Content");
-      _request.setParameter(SetPage.PARAM_COMMIT_MESSAGE, "Message");
+      _request.setParameter(SetPageImpl.SUBMIT_SAVE, "");
+      _request.setParameter(SetPageImpl.PARAM_LOCK_TOKEN, "dooby");
+      _request.setParameter(SetPageImpl.PARAM_CONTENT, "Content");
+      _request.setParameter(SetPageImpl.PARAM_COMMIT_MESSAGE, "Message");
       _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
       fail();
     }
     catch (InvalidInputException expected) {
-      assertTrue(expected.getMessage().contains(SetPage.PARAM_BASE_REVISION));
+      assertTrue(expected.getMessage().contains(SetPageImpl.PARAM_BASE_REVISION));
     }
   }
 
   public void testSaveDelegatesToPageStoreThenRedirectsToView() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_SAVE, "");
-    _request.setParameter(SetPage.PARAM_BASE_REVISION, "1");
-    _request.setParameter(SetPage.PARAM_LOCK_TOKEN, "dooby");
-    _request.setParameter(SetPage.PARAM_CONTENT, "Content");
-    _request.setParameter(SetPage.PARAM_COMMIT_MESSAGE, "Message");
+    _request.setParameter(SetPageImpl.SUBMIT_SAVE, "");
+    _request.setParameter(SetPageImpl.PARAM_BASE_REVISION, "1");
+    _request.setParameter(SetPageImpl.PARAM_LOCK_TOKEN, "dooby");
+    _request.setParameter(SetPageImpl.PARAM_CONTENT, "Content");
+    _request.setParameter(SetPageImpl.PARAM_COMMIT_MESSAGE, "Message");
 
     final String expectedCommitMessage = "Message\n" + _request.getRequestURL();
-    final String expectedContent = "Content" + SetPage.CRLF;
+    final String expectedContent = "Content" + SetPageImpl.CRLF;
     expect(_store.set(CALLED_ON_PAGE, "dooby", 1, expectedContent, expectedCommitMessage)).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
@@ -129,27 +129,27 @@ public class TestSetPage extends TestCase {
   }
 
   public void testCommitMessageIndicatesMinorEditIfAndOnlyIfParameterSet() throws Exception {
-    _request.setParameter(SetPage.PARAM_COMMIT_MESSAGE, "Message");
-    assertEquals("Message\n" + _request.getRequestURL(), SetPage.createLinkingCommitMessage(_request));
-    _request.setParameter(SetPage.PARAM_MINOR_EDIT, "");
-    assertEquals("[minor edit]\nMessage\n" + _request.getRequestURL(), SetPage.createLinkingCommitMessage(_request));
+    _request.setParameter(SetPageImpl.PARAM_COMMIT_MESSAGE, "Message");
+    assertEquals("Message\n" + _request.getRequestURL(), SetPageImpl.createLinkingCommitMessage(_request));
+    _request.setParameter(SetPageImpl.PARAM_MINOR_EDIT, "");
+    assertEquals("[minor edit]\nMessage\n" + _request.getRequestURL(), SetPageImpl.createLinkingCommitMessage(_request));
   }
   
   public void testCopyRequiresOneOfToPageOrFromPage() throws Exception {
     try {
-      _request.setParameter(SetPage.SUBMIT_COPY, "");
+      _request.setParameter(SetPageImpl.SUBMIT_COPY, "");
       _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
       fail();
     }
     catch (InvalidInputException ex) {
-      assertTrue(ex.getMessage().contains(SetPage.PARAM_TO_PAGE));
-      assertTrue(ex.getMessage().contains(SetPage.PARAM_FROM_PAGE));
+      assertTrue(ex.getMessage().contains(SetPageImpl.PARAM_TO_PAGE));
+      assertTrue(ex.getMessage().contains(SetPageImpl.PARAM_FROM_PAGE));
     }
   }
   
   public void testCopyTo() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_COPY, "");
-    _request.setParameter(SetPage.PARAM_TO_PAGE, "ToPage");
+    _request.setParameter(SetPageImpl.SUBMIT_COPY, "");
+    _request.setParameter(SetPageImpl.PARAM_TO_PAGE, "ToPage");
     expect(_store.copy(CALLED_ON_PAGE, -1, new PageReference("ToPage"), "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
@@ -158,8 +158,8 @@ public class TestSetPage extends TestCase {
   }
   
   public void testCopyFrom() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_COPY, "");
-    _request.setParameter(SetPage.PARAM_FROM_PAGE, "FromPage");
+    _request.setParameter(SetPageImpl.SUBMIT_COPY, "");
+    _request.setParameter(SetPageImpl.PARAM_FROM_PAGE, "FromPage");
     expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
@@ -168,19 +168,19 @@ public class TestSetPage extends TestCase {
   }
   
   public void testRenameRequiresToPage() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_RENAME, "");
+    _request.setParameter(SetPageImpl.SUBMIT_RENAME, "");
     try {
       _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
       fail();
     }
     catch (InvalidInputException ex) {
-      assertTrue(ex.getMessage().contains(SetPage.PARAM_TO_PAGE));
+      assertTrue(ex.getMessage().contains(SetPageImpl.PARAM_TO_PAGE));
     }
   }
   
   public void testRenameTo() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_RENAME, "");
-    _request.setParameter(SetPage.PARAM_TO_PAGE, "ToPage");
+    _request.setParameter(SetPageImpl.SUBMIT_RENAME, "");
+    _request.setParameter(SetPageImpl.PARAM_TO_PAGE, "ToPage");
     expect(_store.rename(CALLED_ON_PAGE, new PageReference("ToPage"), -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
@@ -189,7 +189,7 @@ public class TestSetPage extends TestCase {
   }
 
   public void testUnlockDoesNothingIfNoLockTokenProvided() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_UNLOCK, "");
+    _request.setParameter(SetPageImpl.SUBMIT_UNLOCK, "");
     replay(_store);
     RedirectView view = (RedirectView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, CALLED_ON_PAGE);
     assertEquals(_request.getRequestURL().toString(), view.getURL());
@@ -197,8 +197,8 @@ public class TestSetPage extends TestCase {
   }
 
   public void testUnlockUnlocksIfLockTokenProvided() throws Exception {
-    _request.setParameter(SetPage.SUBMIT_UNLOCK, "");
-    _request.setParameter(SetPage.PARAM_LOCK_TOKEN, "dooby");
+    _request.setParameter(SetPageImpl.SUBMIT_UNLOCK, "");
+    _request.setParameter(SetPageImpl.PARAM_LOCK_TOKEN, "dooby");
     _store.unlock(CALLED_ON_PAGE, "dooby");
     expectLastCall().once();
     replay(_store);

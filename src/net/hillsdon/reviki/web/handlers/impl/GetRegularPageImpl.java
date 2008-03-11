@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
@@ -39,10 +39,12 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.GetRegularPage;
+import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 
-public class GetRegularPage implements PageRequestHandler {
+public class GetRegularPageImpl implements GetRegularPage {
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
@@ -67,7 +69,7 @@ public class GetRegularPage implements PageRequestHandler {
   private final WikiGraph _graph;
   private final PageStore _store;
 
-  public GetRegularPage(final PageStore store, final MarkupRenderer markupRenderer, final WikiGraph graph) {
+  public GetRegularPageImpl(final PageStore store, final MarkupRenderer markupRenderer, final WikiGraph graph) {
     _store = store;
     _markupRenderer = markupRenderer;
     _graph = graph;

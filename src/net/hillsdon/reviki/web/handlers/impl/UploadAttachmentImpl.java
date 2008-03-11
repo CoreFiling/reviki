@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import java.io.InputStream;
 import java.util.List;
@@ -30,6 +30,8 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -37,7 +39,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
-public class UploadAttachment implements PageRequestHandler {
+public class UploadAttachmentImpl implements UploadAttachment {
 
   public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
   
@@ -46,7 +48,7 @@ public class UploadAttachment implements PageRequestHandler {
   private final PageStore _store;
   private final PageRequestHandler _listAttachments;
 
-  public UploadAttachment(final PageStore store, final PageRequestHandler _list) {
+  public UploadAttachmentImpl(final PageStore store, final PageRequestHandler _list) {
     _store = store;
     _listAttachments = _list;
   }

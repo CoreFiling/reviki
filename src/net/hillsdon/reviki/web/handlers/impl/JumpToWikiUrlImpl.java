@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 
@@ -28,10 +28,10 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
-import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 
-public class JumpToWikiUrl implements RequestHandler {
+public class JumpToWikiUrlImpl implements JumpToWikiUrl {
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
     String name = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");

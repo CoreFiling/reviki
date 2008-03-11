@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,24 +23,26 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.RegularPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 
-public class RegularPage implements PageRequestHandler {
+public class RegularPageImpl implements RegularPage {
 
   private final PageRequestHandler _view;
   private final PageRequestHandler _editor;
   private final PageRequestHandler _set;
   private final PageRequestHandler _history;
 
-  public RegularPage(final ConfigPageCachingPageStore cachingPageStore, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
-    _view = new GetRegularPage(cachingPageStore, markupRenderer, wikiGraph);
+  public RegularPageImpl(final ConfigPageCachingPageStore cachingPageStore, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
+    _view = new GetRegularPageImpl(cachingPageStore, markupRenderer, wikiGraph);
     // It is important to use the non-caching page store here.  It is ok to view 
     // something out of date but users must edit the latest revision or else they
     // won't be able to commit.
-    _editor = new EditorForPage(cachingPageStore.getUnderlying(), markupRenderer);
-    _set = new SetPage(cachingPageStore);
-    _history = new History(cachingPageStore);
+    _editor = new EditorForPageImpl(cachingPageStore.getUnderlying(), markupRenderer);
+    _set = new SetPageImpl(cachingPageStore);
+    _history = new HistoryImpl(cachingPageStore);
   }
   
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
@@ -48,10 +50,10 @@ public class RegularPage implements PageRequestHandler {
       return _history.handlePage(path, request, response, page);
     }
     else if ("POST".equals(request.getMethod())) {
-      if (request.getParameter(SetPage.SUBMIT_SAVE) != null 
-       || request.getParameter(SetPage.SUBMIT_COPY) != null
-       || request.getParameter(SetPage.SUBMIT_RENAME) != null
-       || request.getParameter(SetPage.SUBMIT_UNLOCK) != null) {
+      if (request.getParameter(SetPageImpl.SUBMIT_SAVE) != null 
+       || request.getParameter(SetPageImpl.SUBMIT_COPY) != null
+       || request.getParameter(SetPageImpl.SUBMIT_RENAME) != null
+       || request.getParameter(SetPageImpl.SUBMIT_UNLOCK) != null) {
         return _set.handlePage(path, request, response, page);
       }
       else {
@@ -59,10 +61,10 @@ public class RegularPage implements PageRequestHandler {
       }
     }
     else {
-      if (request.getParameter(SetPage.SUBMIT_RENAME) != null) {
+      if (request.getParameter(SetPageImpl.SUBMIT_RENAME) != null) {
         return new JspView("Rename");
       }
-      else if (request.getParameter(SetPage.SUBMIT_COPY) != null) {
+      else if (request.getParameter(SetPageImpl.SUBMIT_COPY) != null) {
         return new JspView("Copy");
       }
       return _view.handlePage(path, request, response, page);

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-import static net.hillsdon.reviki.web.handlers.SetPage.PARAM_COMMIT_MESSAGE;
+import static net.hillsdon.reviki.web.handlers.impl.SetPageImpl.PARAM_COMMIT_MESSAGE;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,9 +27,10 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.CopyPage;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
-public class CopyPage implements PageRequestHandler {
+public class CopyPageImpl implements CopyPage {
 
   private static final String PARAM_FROM_PAGE = "fromPage";
   private static final String PARAM_FROM_REVISION = "fromRevision";
@@ -38,7 +39,7 @@ public class CopyPage implements PageRequestHandler {
   private final PageStore _store;
   private final WikiUrls _urls;
 
-  public CopyPage(final PageStore store, final WikiUrls urls) {
+  public CopyPageImpl(final PageStore store, final WikiUrls urls) {
     _store = store;
     _urls = urls;
   }

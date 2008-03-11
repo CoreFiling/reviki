@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 
@@ -32,14 +32,15 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.GetAttachment;
 
 import org.apache.commons.fileupload.FileUploadException;
 
-public class GetAttachment implements PageRequestHandler {
+public class GetAttachmentImpl implements GetAttachment {
 
   private final PageStore _store;
 
-  public GetAttachment(final PageStore store) {
+  public GetAttachmentImpl(final PageStore store) {
     _store = store;
   }
 

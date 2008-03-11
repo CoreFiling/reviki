@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,14 +29,14 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.AllPages;
 
-public class AllPages implements RequestHandler {
+public class AllPagesImpl implements AllPages {
 
   private final PageStore _store;
 
-  public AllPages(final PageStore store) {
+  public AllPagesImpl(final PageStore store) {
     _store = store;
   }
 

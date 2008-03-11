@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,11 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
-import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.handlers.RecentChanges;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
-public class RecentChanges implements RequestHandler {
+public class RecentChangesImpl implements RecentChanges {
 
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
@@ -40,7 +40,7 @@ public class RecentChanges implements RequestHandler {
 
   private final PageStore _store;
 
-  public RecentChanges(final PageStore store) {
+  public RecentChangesImpl(final PageStore store) {
     _store = store;
   }
 
@@ -59,7 +59,7 @@ public class RecentChanges implements RequestHandler {
   }
 
   private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {
-    List<ChangeInfo> allChanges = _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
+    List<ChangeInfo> allChanges = _store.recentChanges(RecentChangesImpl.RECENT_CHANGES_HISTORY_SIZE);
     if (showMinor) {
       return allChanges;
     }

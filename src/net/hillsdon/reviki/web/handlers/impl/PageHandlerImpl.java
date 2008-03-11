@@ -13,46 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.handlers.impl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
-import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.web.handlers.AllPages;
+import net.hillsdon.reviki.web.handlers.Attachments;
+import net.hillsdon.reviki.web.handlers.FindPage;
+import net.hillsdon.reviki.web.handlers.OrphanedPages;
+import net.hillsdon.reviki.web.handlers.PageHandler;
+import net.hillsdon.reviki.web.handlers.RecentChanges;
+import net.hillsdon.reviki.web.handlers.RegularPage;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.
  * 
  * @author mth
  */
-public class PageHandler implements RequestHandler {
+public class PageHandlerImpl implements PageHandler {
 
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
-  private final PageRequestHandler _regularPage;
-  private final PageRequestHandler _findPage;
-  private final PageRequestHandler _attachments;
+  
+  private final RegularPage _regularPage;
+  private final FindPage _findPage;
+  private final Attachments _attachments;
 
-  private final RequestHandler _recentChanges;
-  private final RequestHandler _allPages;
-  private final RequestHandler _orphanedPages;
+  private final RecentChanges _recentChanges;
+  private final AllPages _allPages;
+  private final OrphanedPages _orphanedPages;
 
-  public PageHandler(final ConfigPageCachingPageStore cachingPageStore, final SearchEngine searchEngine, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
-    _recentChanges = new RecentChanges(cachingPageStore);
-    _allPages = new AllPages(cachingPageStore);
-    _attachments = new Attachments(cachingPageStore);
-    _regularPage = new RegularPage(cachingPageStore, markupRenderer, wikiGraph);
-    _findPage = new FindPage(cachingPageStore, searchEngine, _regularPage);
-    _orphanedPages = new OrphanedPages(wikiGraph);
+  public PageHandlerImpl(final RecentChanges recentChanges, final AllPages allPages, final Attachments attachments, final RegularPage regularPage, final FindPage findPage, final OrphanedPages orphanedPages) {
+    _recentChanges = recentChanges;
+    _allPages = allPages;
+    _attachments = attachments;
+    _regularPage = regularPage;
+    _findPage = findPage;
+    _orphanedPages = orphanedPages;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
