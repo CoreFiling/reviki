@@ -26,10 +26,10 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.OrphanedPages;
+import net.hillsdon.reviki.web.handlers.SpecialPage;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 
-public class OrphanedPagesImpl implements OrphanedPages {
+public class OrphanedPagesImpl implements SpecialPage {
 
   private final WikiGraph _graph;
 

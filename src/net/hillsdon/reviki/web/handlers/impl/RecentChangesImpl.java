@@ -29,10 +29,10 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.RecentChanges;
+import net.hillsdon.reviki.web.handlers.SpecialPage;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
-public class RecentChangesImpl implements RecentChanges {
+public class RecentChangesImpl implements SpecialPage {
 
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.

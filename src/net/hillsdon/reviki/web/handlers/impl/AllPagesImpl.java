@@ -27,9 +27,9 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.AllPages;
+import net.hillsdon.reviki.web.handlers.SpecialPage;
 
-public class AllPagesImpl implements AllPages {
+public class AllPagesImpl implements SpecialPage {
 
   private final PageStore _store;
 

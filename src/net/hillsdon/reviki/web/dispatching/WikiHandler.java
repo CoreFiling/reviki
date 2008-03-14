@@ -44,12 +44,8 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.AllPages;
 import net.hillsdon.reviki.web.handlers.Attachments;
-import net.hillsdon.reviki.web.handlers.FindPage;
-import net.hillsdon.reviki.web.handlers.OrphanedPages;
 import net.hillsdon.reviki.web.handlers.PageHandler;
-import net.hillsdon.reviki.web.handlers.RecentChanges;
 import net.hillsdon.reviki.web.handlers.RegularPage;
 import net.hillsdon.reviki.web.handlers.SpecialPages;
 import net.hillsdon.reviki.web.handlers.impl.AllPagesImpl;
@@ -144,10 +140,10 @@ public class WikiHandler implements RequestHandler {
       // Handlers.
       .addComponent(PageHandler.class, PageHandlerImpl.class)
       .addComponent(RegularPage.class, RegularPageImpl.class)
-      .addComponent(FindPage.class, FindPageImpl.class)
-      .addComponent(OrphanedPages.class, OrphanedPagesImpl.class)
-      .addComponent(AllPages.class, AllPagesImpl.class)
-      .addComponent(RecentChanges.class, RecentChangesImpl.class)
+      .addComponent(FindPageImpl.class)
+      .addComponent(OrphanedPagesImpl.class)
+      .addComponent(AllPagesImpl.class)
+      .addComponent(RecentChangesImpl.class)
       .addComponent(Attachments.class, AttachmentsImpl.class)
       .addComponent(SpecialPages.class, SpecialPagesImpl.class)
       .getComponent(PageHandler.class);

@@ -36,11 +36,11 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.FindPage;
 import net.hillsdon.reviki.web.handlers.Page;
 import net.hillsdon.reviki.web.handlers.RegularPage;
+import net.hillsdon.reviki.web.handlers.SpecialPage;
 
-public class FindPageImpl implements FindPage {
+public class FindPageImpl implements SpecialPage {
 
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
