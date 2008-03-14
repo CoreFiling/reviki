@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -44,7 +45,7 @@ public class RecentChangesImpl implements RecentChanges {
     _store = store;
   }
 
-  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     if ("atom.xml".equals(path.next())) {
       return new View() {

@@ -74,10 +74,10 @@ public class PageHandlerImpl implements PageHandler {
       return _attachments.handlePage(path, request, response, page);
     }
     else if ("RecentChanges".equals(pageName)) {
-      return _recentChanges.handle(path, request, response);
+      return _recentChanges.handlePage(path, request, response, page);
     }
     else if ("AllPages".equals(pageName)) {
-      return _allPages.handle(path, request, response);
+      return _allPages.handlePage(path, request, response, page);
     }
     else if ("FindPage".equals(pageName)) {
       return _findPage.handlePage(path, request, response, page);
