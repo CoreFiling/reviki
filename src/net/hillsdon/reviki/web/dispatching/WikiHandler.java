@@ -51,6 +51,7 @@ import net.hillsdon.reviki.web.handlers.OrphanedPages;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.handlers.RecentChanges;
 import net.hillsdon.reviki.web.handlers.RegularPage;
+import net.hillsdon.reviki.web.handlers.SpecialPages;
 import net.hillsdon.reviki.web.handlers.impl.AllPagesImpl;
 import net.hillsdon.reviki.web.handlers.impl.AttachmentsImpl;
 import net.hillsdon.reviki.web.handlers.impl.FindPageImpl;
@@ -58,6 +59,7 @@ import net.hillsdon.reviki.web.handlers.impl.OrphanedPagesImpl;
 import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
 import net.hillsdon.reviki.web.handlers.impl.RecentChangesImpl;
 import net.hillsdon.reviki.web.handlers.impl.RegularPageImpl;
+import net.hillsdon.reviki.web.handlers.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.PerRequestPageStoreFactory;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
@@ -147,6 +149,7 @@ public class WikiHandler implements RequestHandler {
       .addComponent(AllPages.class, AllPagesImpl.class)
       .addComponent(RecentChanges.class, RecentChangesImpl.class)
       .addComponent(Attachments.class, AttachmentsImpl.class)
+      .addComponent(SpecialPages.class, SpecialPagesImpl.class)
       .getComponent(PageHandler.class);
     
     // Allow plugin classes to depend on the core wiki API.

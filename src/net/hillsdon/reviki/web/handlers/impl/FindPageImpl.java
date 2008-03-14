@@ -37,7 +37,7 @@ import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.FindPage;
-import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.Page;
 import net.hillsdon.reviki.web.handlers.RegularPage;
 
 public class FindPageImpl implements FindPage {
@@ -56,7 +56,7 @@ public class FindPageImpl implements FindPage {
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
-  private final PageRequestHandler _regularPage;
+  private final Page _regularPage;
 
   public FindPageImpl(final PageStore store, final SearchEngine searchEngine, final RegularPage regularPage) {
     _store = store;
@@ -109,6 +109,10 @@ public class FindPageImpl implements FindPage {
       request.setAttribute("results", results);
       return new JspView("SearchResults");
     }
+  }
+
+  public String getName() {
+    return "FindPage";
   }
 
 }

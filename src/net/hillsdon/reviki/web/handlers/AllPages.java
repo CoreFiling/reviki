@@ -1,6 +1,6 @@
 package net.hillsdon.reviki.web.handlers;
 
 
-public interface AllPages extends PageRequestHandler {
+public interface AllPages extends SpecialPage {
 
 }

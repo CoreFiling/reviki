@@ -15,16 +15,14 @@
  */
 package net.hillsdon.reviki.web.handlers.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
@@ -39,7 +37,11 @@ public class OrphanedPagesImpl implements OrphanedPages {
     _graph = graph;
   }
 
-  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
+  public String getName() {
+    return "OrphanedPages";
+  }
+
+  public View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
     List<String> alphabetical = new ArrayList<String>(_graph.isolatedPages());
     Collections.sort(alphabetical);
     request.setAttribute("pageList", alphabetical);

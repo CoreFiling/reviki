@@ -1,5 +1,5 @@
 package net.hillsdon.reviki.web.handlers;
 
-public interface History extends PageRequestHandler {
+public interface History extends Page {
 
 }

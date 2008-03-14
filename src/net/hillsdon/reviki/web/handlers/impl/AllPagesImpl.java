@@ -44,4 +44,8 @@ public class AllPagesImpl implements AllPages {
     return new JspView("AllPages");
   }
 
+  public String getName() {
+    return "AllPages";
+  }
+
 }

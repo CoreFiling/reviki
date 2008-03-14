@@ -1,5 +1,5 @@
 package net.hillsdon.reviki.web.handlers;
 
-public interface CopyPage extends PageRequestHandler {
+public interface CopyPage extends Page {
 
 }

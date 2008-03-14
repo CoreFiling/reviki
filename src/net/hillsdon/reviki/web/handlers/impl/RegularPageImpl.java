@@ -23,17 +23,17 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.Page;
 import net.hillsdon.reviki.web.handlers.RegularPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 
 public class RegularPageImpl implements RegularPage {
 
-  private final PageRequestHandler _view;
-  private final PageRequestHandler _editor;
-  private final PageRequestHandler _set;
-  private final PageRequestHandler _history;
+  private final Page _view;
+  private final Page _editor;
+  private final Page _set;
+  private final Page _history;
 
   public RegularPageImpl(final ConfigPageCachingPageStore cachingPageStore, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
     _view = new GetRegularPageImpl(cachingPageStore, markupRenderer, wikiGraph);

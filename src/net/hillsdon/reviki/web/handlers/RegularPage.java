@@ -1,5 +1,5 @@
 package net.hillsdon.reviki.web.handlers;
 
-public interface RegularPage extends PageRequestHandler {
+public interface RegularPage extends Page {
 
 }

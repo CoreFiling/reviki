@@ -27,7 +27,7 @@ import net.hillsdon.reviki.web.common.View;
  * 
  * @author mth
  */
-public interface PageRequestHandler {
+public interface Page {
 
   View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception;
 

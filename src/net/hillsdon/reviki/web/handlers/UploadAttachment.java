@@ -1,5 +1,5 @@
 package net.hillsdon.reviki.web.handlers;
 
-public interface UploadAttachment extends PageRequestHandler {
+public interface UploadAttachment extends Page {
 
 }

@@ -1,6 +1,6 @@
 package net.hillsdon.reviki.web.handlers;
 
 
-public interface RecentChanges extends PageRequestHandler {
+public interface RecentChanges extends SpecialPage {
 
 }

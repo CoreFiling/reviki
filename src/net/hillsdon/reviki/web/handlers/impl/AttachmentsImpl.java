@@ -23,13 +23,13 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.Attachments;
-import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.Page;
 
 public class AttachmentsImpl implements Attachments {
 
-  private final PageRequestHandler _list;
-  private final PageRequestHandler _upload;
-  private final PageRequestHandler _get;
+  private final Page _list;
+  private final Page _upload;
+  private final Page _get;
 
   public AttachmentsImpl(final PageStore pageStore) {
     _list = new ListAttachmentsImpl(pageStore);

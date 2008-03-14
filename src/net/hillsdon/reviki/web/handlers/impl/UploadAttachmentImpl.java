@@ -30,7 +30,7 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.PageRequestHandler;
+import net.hillsdon.reviki.web.handlers.Page;
 import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 import org.apache.commons.fileupload.FileItem;
@@ -46,9 +46,9 @@ public class UploadAttachmentImpl implements UploadAttachment {
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
   private static final String PARAM_BASE_REVISION = "baseRevision";
   private final PageStore _store;
-  private final PageRequestHandler _listAttachments;
+  private final Page _listAttachments;
 
-  public UploadAttachmentImpl(final PageStore store, final PageRequestHandler _list) {
+  public UploadAttachmentImpl(final PageStore store, final Page _list) {
     _store = store;
     _listAttachments = _list;
   }

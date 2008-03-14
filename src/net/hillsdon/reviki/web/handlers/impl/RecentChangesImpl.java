@@ -74,4 +74,8 @@ public class RecentChangesImpl implements RecentChanges {
     return majorChanges;
   }
 
+  public String getName() {
+    return "RecentChanges";
+  }
+
 }

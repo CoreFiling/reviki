@@ -24,13 +24,10 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.AllPages;
 import net.hillsdon.reviki.web.handlers.Attachments;
-import net.hillsdon.reviki.web.handlers.FindPage;
-import net.hillsdon.reviki.web.handlers.OrphanedPages;
 import net.hillsdon.reviki.web.handlers.PageHandler;
-import net.hillsdon.reviki.web.handlers.RecentChanges;
 import net.hillsdon.reviki.web.handlers.RegularPage;
+import net.hillsdon.reviki.web.handlers.SpecialPage;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.
@@ -42,20 +39,13 @@ public class PageHandlerImpl implements PageHandler {
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
   
   private final RegularPage _regularPage;
-  private final FindPage _findPage;
   private final Attachments _attachments;
+  private final SpecialPagesImpl _specialPages;
 
-  private final RecentChanges _recentChanges;
-  private final AllPages _allPages;
-  private final OrphanedPages _orphanedPages;
-
-  public PageHandlerImpl(final RecentChanges recentChanges, final AllPages allPages, final Attachments attachments, final RegularPage regularPage, final FindPage findPage, final OrphanedPages orphanedPages) {
-    _recentChanges = recentChanges;
-    _allPages = allPages;
+  public PageHandlerImpl(final RegularPage regularPage, final Attachments attachments, final SpecialPagesImpl specialPages) {
     _attachments = attachments;
     _regularPage = regularPage;
-    _findPage = findPage;
-    _orphanedPages = orphanedPages;
+    _specialPages = specialPages;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -69,21 +59,14 @@ public class PageHandlerImpl implements PageHandler {
     PageReference page = new PageReference(pageName);
     request.setAttribute("page", page);
 
+    final SpecialPage specialPage = _specialPages.get(pageName);
+    // Even special pages can have attachments.
     if ("attachments".equals(path.peek())) {
       path.next();
       return _attachments.handlePage(path, request, response, page);
     }
-    else if ("RecentChanges".equals(pageName)) {
-      return _recentChanges.handlePage(path, request, response, page);
-    }
-    else if ("AllPages".equals(pageName)) {
-      return _allPages.handlePage(path, request, response, page);
-    }
-    else if ("FindPage".equals(pageName)) {
-      return _findPage.handlePage(path, request, response, page);
-    }
-    else if ("OrphanedPages".equals(pageName)) {
-      return _orphanedPages.handle(path, request, response);
+    else if (specialPage != null) {
+      return specialPage.handlePage(path, request, response, page);
     }
     else {
       return _regularPage.handlePage(path, request, response, page);
