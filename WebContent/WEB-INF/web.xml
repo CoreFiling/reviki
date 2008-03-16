@@ -11,6 +11,10 @@
 	</servlet-mapping>
 	<servlet-mapping>
 	  <servlet-name>dispatcher</servlet-name>
+	  <url-pattern>/root</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>dispatcher</servlet-name>
 	  <url-pattern>/list</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

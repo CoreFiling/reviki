@@ -51,7 +51,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected String getUsername() {
-    return System.getProperty("wiki.user");
+    return System.getProperty("wiki.username");
   }
 
   private String getUrl(final String path) {

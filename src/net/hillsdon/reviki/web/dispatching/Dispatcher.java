@@ -25,10 +25,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
+import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.impl.JumpToWikiUrlImpl;
@@ -43,24 +45,24 @@ import org.apache.commons.logging.LogFactory;
  * @author mth
  */
 public class Dispatcher extends HttpServlet {
-  
+
   private static final Log LOG = LogFactory.getLog(Dispatcher.class);
-  
   private static final long serialVersionUID = 1L;
 
   private WikiChoice _choice;
   private ListWikisImpl _list;
   private JumpToWikiUrlImpl _jump;
 
+  private DeploymentConfiguration _configuration;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    DeploymentConfiguration configuration = new PropertiesDeploymentConfiguration();
-    configuration.load();
-    _list = new ListWikisImpl(configuration);
+    _configuration = new PropertiesDeploymentConfiguration();
+    _configuration.load();
+    _list = new ListWikisImpl(_configuration);
     _jump = new JumpToWikiUrlImpl();
-    _choice = new WikiChoice(config.getServletContext(), configuration);
+    _choice = new WikiChoice(config.getServletContext(), _configuration);
   }
 
   @Override
@@ -88,13 +90,26 @@ public class Dispatcher extends HttpServlet {
 
   private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String initial = path.next();
-    if ("pages".equals(initial)) {
+    if ("root".equals(initial)) {
+      // ... an internal hack to enable the dispatcher to handle "/".
+      final String defaultWiki = _configuration.getDefaultWiki();
+      if (defaultWiki != null) {
+        return new RedirectView(getServletContext().getContextPath() + "/pages/" + Escape.url(defaultWiki) + "/FrontPage");
+      }
+      else {
+        return new RedirectView(getServletContext().getContextPath() + "/list");
+      }
+    }
+    else if ("pages".equals(initial)) {
       return _choice.handle(path, request, response);
     }
     else if ("jump".equals(initial)) {
       return _jump.handle(path, request, response);
     }
-    return _list.handle(path, request, response);
+    else if ("list".equals(initial)) {
+      return _list.handle(path, request, response);
+    }
+    throw new NotFoundException();
   }
 
   private void handleException(final HttpServletRequest request, final HttpServletResponse response, Exception ex) throws ServletException, IOException {
@@ -108,5 +123,5 @@ public class Dispatcher extends HttpServlet {
     request.setAttribute("exception", ex);
     request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
   }
-  
+
 }
