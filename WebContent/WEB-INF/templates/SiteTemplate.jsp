@@ -11,6 +11,10 @@
       <c:otherwise>reviki</c:otherwise>
     </c:choose>
   </c:set>
+  <%-- Prevent indexing of 'unusual' pages. --%>
+  <% if (!request.getParameterMap().isEmpty()) { %>
+  <meta name="robots" content="noindex, nofollow" />
+  <% } %>
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
   <c:if test="${wikiIsValid != null and wikiIsValid}">
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml"" />
