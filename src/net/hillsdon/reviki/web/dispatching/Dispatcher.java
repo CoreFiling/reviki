@@ -72,17 +72,7 @@ public class Dispatcher extends HttpServlet {
 
     ConsumedPath path = new ConsumedPath(request);
     try {
-      String initial = path.next();
-      View view;
-      if ("pages".equals(initial)) {
-        view = _choice.handle(path, request, response);
-      }
-      else if ("jump".equals(initial)) {
-        view = _jump.handle(path, request, response);
-      }
-      else {
-        view = _list.handle(path, request, response);
-      }
+      View view = handle(path, request, response);
       if (view != null) {
         view.render(request, response);
       }
@@ -94,6 +84,17 @@ public class Dispatcher extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       handleException(request, response, ex);
     }
+  }
+
+  private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    final String initial = path.next();
+    if ("pages".equals(initial)) {
+      return _choice.handle(path, request, response);
+    }
+    else if ("jump".equals(initial)) {
+      return _jump.handle(path, request, response);
+    }
+    return _list.handle(path, request, response);
   }
 
   private void handleException(final HttpServletRequest request, final HttpServletResponse response, Exception ex) throws ServletException, IOException {
