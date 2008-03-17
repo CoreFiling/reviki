@@ -9,7 +9,7 @@
     </div>
     <hr/>
     <p>
-      <a href="?history">Full history</a>
+      <a href="?history">History</a>
     </p>
   </tiles:putAttribute>
 </tiles:insertTemplate>

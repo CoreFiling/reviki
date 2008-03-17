@@ -27,6 +27,9 @@
         </li>
       </c:if>
     </c:if>
+    <li class="menu">
+      <a name="history" href="?history">History</a>
+    </li>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="wiki-rendering">
@@ -81,7 +84,7 @@
 	  </c:set>
     <c:if test="${not empty lastEditAction}">
 	    <p>
-	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> (<a href="?history">history</a>).
+	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
 	    </p>
 	  </c:if>
   </tiles:putAttribute>
