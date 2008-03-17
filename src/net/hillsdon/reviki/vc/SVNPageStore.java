@@ -84,7 +84,7 @@ public class SVNPageStore implements PageStore {
       changes = new ArrayList<ChangeInfo>(changes);
       changes.add(0, deletedIn);
     }
-    return Functional.list((((filter(changes, IS_CHANGE_TO_PAGE)))));
+    return Functional.list(filter(changes, IS_CHANGE_TO_PAGE));
   }
 
   public Set<PageReference> list() throws PageStoreException {
