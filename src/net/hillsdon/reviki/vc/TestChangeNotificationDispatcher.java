@@ -28,8 +28,8 @@ import junit.framework.TestCase;
 
 public class TestChangeNotificationDispatcher extends TestCase {
 
-  private static final ChangeInfo REVISION_FOUR_CHANGE = new ChangeInfo("PageThreeChange", "PageThreeChange", "", new Date(), 4, "", StoreKind.PAGE, ChangeType.MODIFIED);
-  private static final ChangeInfo REVISION_FIVE_CHANGE = new ChangeInfo("PageFourChange", "PageFourChange", "", new Date(), 5, "", StoreKind.PAGE, ChangeType.MODIFIED);
+  private static final ChangeInfo REVISION_FOUR_CHANGE = new ChangeInfo("PageThreeChange", "PageThreeChange", "", new Date(), 4, "", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
+  private static final ChangeInfo REVISION_FIVE_CHANGE = new ChangeInfo("PageFourChange", "PageFourChange", "", new Date(), 5, "", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
 
   private BasicSVNOperations _operations;
   private ChangeSubscriber _syncedUptoThreeSubscriber;

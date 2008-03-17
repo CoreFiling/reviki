@@ -77,14 +77,25 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
+    final List<ChangeInfo> changes = new ArrayList<ChangeInfo>();
     final ChangeInfo deletedIn = getChangeThatDeleted(ref);
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
-    List<ChangeInfo> changes = _operations.log(ref.getPath(), -1, true, false, 0, lastRevision);
+    
+    // We follow all the previous locations.
+    String path = ref.getPath();
+    while (path != null && changes.addAll(_operations.log(path, -1, true, true, 0, lastRevision))) {
+      if (!changes.isEmpty()) {
+        ChangeInfo last = changes.get(changes.size() - 1);
+        path = last.getCopiedFrom();
+        lastRevision = last.getCopiedFromRevision();
+      }
+    }
     if (deletedIn != null) {
-      changes = new ArrayList<ChangeInfo>(changes);
       changes.add(0, deletedIn);
     }
-    return Functional.list(filter(changes, IS_CHANGE_TO_PAGE));
+    List<ChangeInfo> result = Functional.list(filter(changes, IS_CHANGE_TO_PAGE));
+    Collections.sort(result, DeletesAfterOtherSameRevisionChanges.INSTANCE);
+    return result;
   }
 
   public Set<PageReference> list() throws PageStoreException {
