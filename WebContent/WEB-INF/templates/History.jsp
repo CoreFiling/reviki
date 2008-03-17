@@ -23,10 +23,10 @@
           <td>
             <c:choose>
               <c:when test="${change.deletion}">
-                <del><a href="<c:url value="${change.name}"/>"><c:out value="${change.name}"/></a></del>
+                <del><a href="<c:url value="${change.name}"/>?revision=${change.revision}"><c:out value="${change.name}"/></a></del>
               </c:when>
               <c:otherwise>
-                <a href="<c:url value="${change.name}"/>"><c:out value="${change.name}"/></a>
+                <a href="<c:url value="${change.name}"/>?revision=${change.revision}"><c:out value="${change.name}"/></a>
               </c:otherwise>
             </c:choose>
           </td>
