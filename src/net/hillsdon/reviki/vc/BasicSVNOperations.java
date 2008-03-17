@@ -40,6 +40,7 @@ public interface BasicSVNOperations {
 
   /**
    * Returns the most recent changes first.
+   * @param pathOnly TODO
    */
   List<ChangeInfo> log(String path, long limit, boolean pathOnly, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 

@@ -57,9 +57,9 @@ public class TestSVNPageStore extends TestCase {
   
   public void testHistoryLogsToHeadIfNoDeletedRevision() throws Exception {
     final String path = "ThePage";
-    final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED);
+    final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
     expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(null);
-    expect(_operations.log(path, -1, true, false, 0, -1)).andReturn(asList(previousEdit));
+    expect(_operations.log(path, -1, true, true, 0, -1)).andReturn(asList(previousEdit));
     replay();
     assertEquals(asList(previousEdit), _store.history(new PageReference(path)));
     verify();
@@ -67,13 +67,28 @@ public class TestSVNPageStore extends TestCase {
   
   public void testHistoryLogsUptoDeletedRevisionAndIncludesIt() throws Exception {
     final String path = "ThePage";
-    final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED);
-    final ChangeInfo deleteChange = new ChangeInfo(path, path, "mth", new Date(), 7, "Deleted", StoreKind.PAGE, ChangeType.DELETED);
+    final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
+    final ChangeInfo deleteChange = new ChangeInfo(path, path, "mth", new Date(), 7, "Deleted", StoreKind.PAGE, ChangeType.DELETED, null, -1);
     expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(deleteChange);
-    expect(_operations.log(path, -1, true, false, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
+    expect(_operations.log(path, -1, true, true, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
     replay();
     List<ChangeInfo> history = _store.history(new PageReference(path));
     assertEquals(asList(deleteChange, previousEdit), history);
+    verify();
+  }
+
+  public void testHistoryStepsBackOverCopies() throws Exception {
+    final String originalName = "TheOriginalPage";
+    final String copyName = "TheCopiedPage";
+    final ChangeInfo create  = new ChangeInfo(originalName, originalName, "mth", new Date(), 1, "Initial create", StoreKind.PAGE, ChangeType.ADDED, null, -1);
+    final ChangeInfo copyRemove = new ChangeInfo(copyName, copyName, "mth", new Date(), 2, "Copy delete", StoreKind.PAGE, ChangeType.DELETED, null, -1);
+    final ChangeInfo copyAdd  = new ChangeInfo(copyName, copyName, "mth", new Date(), 2, "Copy add", StoreKind.PAGE, ChangeType.ADDED, originalName, 1);
+    final ChangeInfo edit  = new ChangeInfo(copyName, copyName, "mth", new Date(), 3, "Edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
+    expect(_tracker.getChangeThatDeleted(_operations, copyName)).andReturn(null);
+    expect(_operations.log(copyName, -1, true, true, 0, -1)).andReturn(asList(edit, copyAdd));
+    expect(_operations.log(originalName, -1, true, true, 0, 1)).andReturn(asList(copyRemove, create));
+    replay();
+    assertEquals(asList(edit, copyAdd, copyRemove, create), _store.history(new PageReference(copyName)));
     verify();
   }
   

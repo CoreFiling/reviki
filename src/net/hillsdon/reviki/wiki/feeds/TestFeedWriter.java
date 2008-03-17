@@ -39,7 +39,7 @@ public class TestFeedWriter extends TestCase {
 
   public void test() throws Exception {
     StringWriter out = new StringWriter();
-    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED));
+    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
       public String feed() {
         return "feed";

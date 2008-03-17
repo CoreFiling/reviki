@@ -39,8 +39,10 @@ public class ChangeInfo {
   private final String _commitMessage;
   private final StoreKind _kind;
   private final ChangeType _changeType;
+  private final String _copiedFrom;
+  private final long _copiedFromRevision;
   
-  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType) {
+  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision) {
     _page = page;
     _name = name;
     _user = user;
@@ -48,6 +50,8 @@ public class ChangeInfo {
     _revision = revision;
     _kind = kind;
     _changeType = changeType;
+    _copiedFrom = copiedFrom;
+    _copiedFromRevision = copiedFromRevision;
     _commitMessage = commitMessage.trim();
   }
   
@@ -116,6 +120,14 @@ public class ChangeInfo {
   @Override
   public String toString() {
     return _changeType.toString() + " of " + _page;
+  }
+
+  public String getCopiedFrom() {
+    return _copiedFrom;
+  }
+
+  public long getCopiedFromRevision() {
+    return _copiedFromRevision;
   }
   
 }

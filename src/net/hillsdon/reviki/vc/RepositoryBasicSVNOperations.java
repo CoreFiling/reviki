@@ -70,7 +70,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
         // Start and end reversed to get newest changes first.
         _repository.log(new String[] {path}, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
           public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-            entries.addAll(logEntryToChangeInfos(rootPath, path, pathOnly, logEntry));
+            entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry, pathOnly));
           }
         });
         return entries;
@@ -95,10 +95,11 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String path, final boolean pathOnly, final SVNLogEntry entry) {
-    List<ChangeInfo> results = new LinkedList<ChangeInfo>();
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final boolean pathOnly) {
+    final String fullLoggedPath = SVNPathUtil.append(rootPath, loggedPath);
+    final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (SVNPathUtil.isAncestor(rootPath, changedPath)) {
+      if (SVNPathUtil.isAncestor(rootPath, changedPath) && (!pathOnly || fullLoggedPath.equals(changedPath))) {
         ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
         // something useful with 'other' changes.
@@ -155,7 +156,16 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     String user = entry.getAuthor();
     Date date = entry.getDate();
     SVNLogEntryPath logForPath = (SVNLogEntryPath) entry.getChangedPaths().get(path);
-    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind, ChangeType.forCode(logForPath.getType()));
+    String copiedFrom = logForPath.getCopyPath();
+    long copiedFromRevision = -1;
+    if (SVNPathUtil.isAncestor(rootPath, copiedFrom)) {
+      copiedFrom = SVNPathUtil.tail(copiedFrom);
+      copiedFromRevision = logForPath.getCopyRevision();
+    }
+    else {
+      copiedFrom = null;
+    }
+    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind, ChangeType.forCode(logForPath.getType()), copiedFrom, copiedFromRevision);
   }
 
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreAuthenticationException, PageStoreException {
