@@ -35,9 +35,16 @@
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
+    <p>
     <c:if test="${pageInfo.new and empty pageInfo.content}">
-      <p><em>This page is a new page.  Click 'Edit' to add content.</em></p>
+      <form id="editContent" name="editContent" style="display: inline;" action="" method="post">
+        <input style="display: inline;" type="submit" value="Edit this new page"/>
+      </form> 
     </c:if>
+    </p>
+    <script type="text/javascript">
+      reviki.formAsJavaScriptLink("editContent", "Edit this new page.");
+    </script>
     <hr />
     <p id="backlinks">
     <c:if test="${not empty backlinks}">
