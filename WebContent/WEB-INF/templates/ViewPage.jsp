@@ -27,20 +27,20 @@
         </li>
       </c:if>
     </c:if>
-    <li class="menu">
-      <a name="history" href="?history">History</a>
-    </li>
+      <c:if test="${not pageInfo.new}">
+		    <li class="menu">
+		      <a name="history" href="?history">History</a>
+		    </li>
+		  </c:if>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
     <c:if test="${pageInfo.new and empty pageInfo.content}">
-    <p>
-      <form id="editContent" name="editContent" style="display: inline;" action="" method="post">
-        <input style="display: inline;" type="submit" value="Edit this new page" />
-      </form> 
-    </p>
+    <form id="editContent" name="editContent" action="" method="post">
+      <input type="submit" value="Edit this new page" />
+    </form> 
     <script type="text/javascript">
       reviki.formAsJavaScriptLink("editContent", "Edit this new page.");
     </script>
