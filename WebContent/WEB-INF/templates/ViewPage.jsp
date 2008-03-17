@@ -73,17 +73,16 @@
         </script>
       </c:otherwise>
     </c:choose>
-    <c:choose>
-      <c:when test="${pageInfo.deleted}">
-        <p>
-          <a href="?diff=${pageInfo.lastChangedRevision - 1}">Deleted by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> (<a href="?history">full history</a>).
-        </p>
-      </c:when>
-      <c:when test="${not pageInfo.new}">
-        <p>
-          <a href="?diff=${pageInfo.lastChangedRevision - 1}">Last changed by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> (<a href="?history">full history</a>).
-        </p>
-      </c:when>
-    </c:choose>
+    <c:set var="lastEditAction">
+	    <c:choose>
+	      <c:when test="${pageInfo.deleted}">Deleted</c:when>
+	      <c:when test="${not pageInfo.new}">Last changed</c:when>
+	    </c:choose>
+	  </c:set>
+    <c:if test="${not empty lastEditAction}">
+	    <p>
+	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> (<a href="?history">history</a>).
+	    </p>
+	  </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>
