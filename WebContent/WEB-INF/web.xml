@@ -21,10 +21,18 @@
 	  <servlet-name>dispatcher</servlet-name>
 	  <url-pattern>/jump</url-pattern>
 	</servlet-mapping>
-    <listener>
-      <listener-class>org.apache.tiles.web.startup.TilesListener</listener-class>
-    </listener>
-    <!-- The JSP redirects to a dynamic entry point. -->
+	<filter>
+	  <filter-name>cache-resources</filter-name>
+	  <filter-class>net.hillsdon.reviki.web.filters.CacheResourcesFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	  <filter-name>cache-resources</filter-name>
+	  <url-pattern>*</url-pattern>
+	</filter-mapping>
+  <listener>
+    <listener-class>org.apache.tiles.web.startup.TilesListener</listener-class>
+  </listener>
+  <!-- The JSP redirects to a dynamic entry point. -->
 	<welcome-file-list>
       <welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
