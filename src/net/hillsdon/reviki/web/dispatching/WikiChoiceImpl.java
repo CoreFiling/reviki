@@ -18,31 +18,31 @@ package net.hillsdon.reviki.web.dispatching;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
+import net.hillsdon.reviki.di.ApplicationSession;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 
-public class WikiChoice implements RequestHandler, ActiveWikis {
+public class WikiChoiceImpl implements WikiChoice {
 
   private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
-  private final ServletContext _servletContext;
+  private final ApplicationSession _applicationSession;
 
-  public WikiChoice(ServletContext servletContext, final DeploymentConfiguration configuration) {
-    _servletContext = servletContext;
+  public WikiChoiceImpl(final DeploymentConfiguration configuration, final ApplicationSession applicationSession) {
     _configuration = configuration;
+    _applicationSession = applicationSession;
   }
 
   public WikiHandler addWiki(final WikiConfiguration configuration) {
-    WikiHandler handler = new WikiHandler(configuration, _servletContext.getContextPath());
+    WikiHandler handler = _applicationSession.createWikiSession(configuration).getWikiHandler();
     _wikis.put(configuration, handler);
     return handler;
   }
@@ -50,7 +50,7 @@ public class WikiChoice implements RequestHandler, ActiveWikis {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
-    request.setAttribute(WikiHandler.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
+    request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
     RequestBasedWikiUrls.create(request, configuration);
     RequestHandler handler = getWikiHandler(configuration, path);
     return handler.handle(path, request, response);

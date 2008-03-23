@@ -30,9 +30,9 @@ import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
@@ -51,7 +51,7 @@ public class TestGetRegularPageImpl extends TestCase {
 
   private static final PageReference THE_PAGE = new PageReference("ThePage");
   
-  private PageStore _store;
+  private CachingPageStore _store;
   private MarkupRenderer _renderer;
   private WikiGraph _graph;
 
@@ -64,7 +64,7 @@ public class TestGetRegularPageImpl extends TestCase {
   protected void setUp() throws Exception {
     _request = new MockHttpServletRequest();
     _response = null;
-    _store = createMock(PageStore.class);
+    _store = createMock(CachingPageStore.class);
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
     _page = new GetRegularPageImpl(_store, _renderer, _graph);

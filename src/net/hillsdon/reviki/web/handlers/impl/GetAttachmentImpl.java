@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageReference;
@@ -40,7 +41,7 @@ public class GetAttachmentImpl implements GetAttachment {
 
   private final PageStore _store;
 
-  public GetAttachmentImpl(final PageStore store) {
+  public GetAttachmentImpl(final CachingPageStore store) {
     _store = store;
   }
 

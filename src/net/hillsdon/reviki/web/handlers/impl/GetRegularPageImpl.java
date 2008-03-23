@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.external.diff_match_patch.diff_match_patch;
 import net.hillsdon.reviki.search.QuerySyntaxException;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -69,7 +70,7 @@ public class GetRegularPageImpl implements GetRegularPage {
   private final WikiGraph _graph;
   private final PageStore _store;
 
-  public GetRegularPageImpl(final PageStore store, final MarkupRenderer markupRenderer, final WikiGraph graph) {
+  public GetRegularPageImpl(final CachingPageStore store, final MarkupRenderer markupRenderer, final WikiGraph graph) {
     _store = store;
     _markupRenderer = markupRenderer;
     _graph = graph;

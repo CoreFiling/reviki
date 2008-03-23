@@ -18,8 +18,8 @@ package net.hillsdon.reviki.web.handlers.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.Attachments;
@@ -31,7 +31,7 @@ public class AttachmentsImpl implements Attachments {
   private final Page _upload;
   private final Page _get;
 
-  public AttachmentsImpl(final PageStore pageStore) {
+  public AttachmentsImpl(final CachingPageStore pageStore) {
     _list = new ListAttachmentsImpl(pageStore);
     _upload = new UploadAttachmentImpl(pageStore, _list);
     _get = new GetAttachmentImpl(pageStore);

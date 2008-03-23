@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -58,7 +59,7 @@ public class FindPageImpl implements SpecialPage {
   private final SearchEngine _searchEngine;
   private final Page _regularPage;
 
-  public FindPageImpl(final PageStore store, final SearchEngine searchEngine, final RegularPage regularPage) {
+  public FindPageImpl(final CachingPageStore store, final SearchEngine searchEngine, final RegularPage regularPage) {
     _store = store;
     _searchEngine = searchEngine;
     _regularPage = regularPage;

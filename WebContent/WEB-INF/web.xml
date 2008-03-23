@@ -3,7 +3,7 @@
 	<display-name>reviki</display-name>
 	<servlet>
       <servlet-name>dispatcher</servlet-name>
-	  <servlet-class>net.hillsdon.reviki.web.dispatching.Dispatcher</servlet-class>
+	  <servlet-class>net.hillsdon.reviki.web.dispatching.DispatcherServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 	  <servlet-name>dispatcher</servlet-name>

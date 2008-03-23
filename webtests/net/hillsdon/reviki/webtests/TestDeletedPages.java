@@ -38,7 +38,7 @@ public class TestDeletedPages extends WebTestSupport {
   
   public void testClearTextDeletesPage() throws Exception {
     HtmlPage deleted = createThenDeletePage()._page;
-    assertTrue(deleted.asText().contains("This page is a new page"));
+    assertTrue(deleted.asText().contains("new page"));
   }
 
   public void testCanViewHistoryForDeletedPage() throws Exception {

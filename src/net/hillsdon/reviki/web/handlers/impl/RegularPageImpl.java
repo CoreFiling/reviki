@@ -18,31 +18,28 @@ package net.hillsdon.reviki.web.handlers.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.Page;
+import net.hillsdon.reviki.web.handlers.EditorForPage;
+import net.hillsdon.reviki.web.handlers.GetRegularPage;
+import net.hillsdon.reviki.web.handlers.History;
 import net.hillsdon.reviki.web.handlers.RegularPage;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.web.handlers.SetPage;
 
 public class RegularPageImpl implements RegularPage {
 
-  private final Page _view;
-  private final Page _editor;
-  private final Page _set;
-  private final Page _history;
+  private final GetRegularPage _get;
+  private final History _history;
+  private final SetPage _set;
+  private final EditorForPage _editor;
 
-  public RegularPageImpl(final ConfigPageCachingPageStore cachingPageStore, final MarkupRenderer markupRenderer, final WikiGraph wikiGraph) {
-    _view = new GetRegularPageImpl(cachingPageStore, markupRenderer, wikiGraph);
-    // It is important to use the non-caching page store here.  It is ok to view 
-    // something out of date but users must edit the latest revision or else they
-    // won't be able to commit.
-    _editor = new EditorForPageImpl(cachingPageStore.getUnderlying(), markupRenderer);
-    _set = new SetPageImpl(cachingPageStore);
-    _history = new HistoryImpl(cachingPageStore);
+  public RegularPageImpl(final GetRegularPage get, final EditorForPage editor, final SetPage set, final History history) {
+    _get = get;
+    _editor = editor;
+    _set = set;
+    _history = history;
   }
   
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
@@ -67,7 +64,7 @@ public class RegularPageImpl implements RegularPage {
       else if (request.getParameter(SetPageImpl.SUBMIT_COPY) != null) {
         return new JspView("Copy");
       }
-      return _view.handlePage(path, request, response, page);
+      return _get.handlePage(path, request, response, page);
     }
   }
 

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
  * 
  * @author mth
  */
-public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore {
+public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implements CachingPageStore {
 
   private static final String CONFIG_PREFIX = "Config";
   private final ConcurrentMap<PageReference, PageInfo> _cache = new ConcurrentHashMap<PageReference, PageInfo>();

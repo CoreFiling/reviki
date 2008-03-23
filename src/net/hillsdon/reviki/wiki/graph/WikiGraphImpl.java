@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -32,7 +33,7 @@ public class WikiGraphImpl implements WikiGraph {
   private final SearchEngine _searchEngine;
   private final PageStore _pageStore;
 
-  public WikiGraphImpl(final PageStore pageStore, final SearchEngine searchEngine) {
+  public WikiGraphImpl(final CachingPageStore pageStore, final SearchEngine searchEngine) {
     _pageStore = pageStore;
     _searchEngine = searchEngine;
   }

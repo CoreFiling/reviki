@@ -1,72 +1,49 @@
-/**
- * Copyright 2008 Matthew Hillsdon
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.hillsdon.reviki.web.dispatching;
 
 import static java.lang.String.format;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
-import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.impl.JumpToWikiUrlImpl;
-import net.hillsdon.reviki.web.handlers.impl.ListWikisImpl;
+import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
+import net.hillsdon.reviki.web.handlers.ListWikis;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * We should probably find a web framework that doesn't suck but this'll do for now.
- * 
- * @author mth
- */
-public class Dispatcher extends HttpServlet {
+public class DispatcherImpl implements Dispatcher {
+  
+  private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
-  private static final Log LOG = LogFactory.getLog(Dispatcher.class);
-  private static final long serialVersionUID = 1L;
+  private final DeploymentConfiguration _configuration;
+  private final ServletContext _servletContext;
 
-  private WikiChoice _choice;
-  private ListWikisImpl _list;
-  private JumpToWikiUrlImpl _jump;
+  private final ListWikis _list;
+  private final WikiChoiceImpl _choice;
+  private final JumpToWikiUrl _jumpToWiki;
 
-  private DeploymentConfiguration _configuration;
-
-  @Override
-  public void init(final ServletConfig config) throws ServletException {
-    super.init(config);
-    _configuration = new PropertiesDeploymentConfiguration();
+  public DispatcherImpl(ServletContext servletContext, DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki) {
+    _servletContext = servletContext;
+    _configuration = configuration;
+    _list = list;
+    _choice = choice;
+    _jumpToWiki = jumpToWiki;
+    
     _configuration.load();
-    _list = new ListWikisImpl(_configuration);
-    _jump = new JumpToWikiUrlImpl();
-    _choice = new WikiChoice(config.getServletContext(), _configuration);
   }
 
-  @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+  public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html");
@@ -88,23 +65,24 @@ public class Dispatcher extends HttpServlet {
     }
   }
 
+  // This should be moved out of here...
   private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String initial = path.next();
     if ("root".equals(initial)) {
       // ... an internal hack to enable the dispatcher to handle "/".
       final String defaultWiki = _configuration.getDefaultWiki();
       if (defaultWiki != null) {
-        return new RedirectView(getServletContext().getContextPath() + "/pages/" + Escape.url(defaultWiki) + "/FrontPage");
+        return new RedirectView(_servletContext.getContextPath() + "/pages/" + Escape.url(defaultWiki) + "/FrontPage");
       }
       else {
-        return new RedirectView(getServletContext().getContextPath() + "/list");
+        return new RedirectView(_servletContext.getContextPath() + "/list");
       }
     }
     else if ("pages".equals(initial)) {
       return _choice.handle(path, request, response);
     }
     else if ("jump".equals(initial)) {
-      return _jump.handle(path, request, response);
+      return _jumpToWiki.handle(path, request, response);
     }
     else if ("list".equals(initial)) {
       return _list.handle(path, request, response);
@@ -123,5 +101,5 @@ public class Dispatcher extends HttpServlet {
     request.setAttribute("exception", ex);
     request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
   }
-
+  
 }

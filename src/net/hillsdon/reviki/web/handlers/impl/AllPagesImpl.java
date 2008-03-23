@@ -22,8 +22,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
@@ -31,9 +31,9 @@ import net.hillsdon.reviki.web.handlers.SpecialPage;
 
 public class AllPagesImpl implements SpecialPage {
 
-  private final PageStore _store;
+  private final CachingPageStore _store;
 
-  public AllPagesImpl(final PageStore store) {
+  public AllPagesImpl(final CachingPageStore store) {
     _store = store;
   }
 

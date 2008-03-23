@@ -18,6 +18,7 @@ package net.hillsdon.reviki.wiki;
 import static java.lang.String.format;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -28,7 +29,7 @@ public class InternalLinker {
   private final String _wikiName;
   private final String _contextPath;
 
-  public InternalLinker(final String contextPath, final String wikiName, final PageStore store) {
+  public InternalLinker(final String contextPath, final String wikiName, final CachingPageStore store) {
     _contextPath = contextPath;
     _wikiName = wikiName;
     _store = store;

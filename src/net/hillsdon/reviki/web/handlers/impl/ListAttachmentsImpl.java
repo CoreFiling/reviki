@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.handlers.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -29,7 +30,7 @@ public class ListAttachmentsImpl implements ListAttachments {
 
   private final PageStore _store;
 
-  public ListAttachmentsImpl(final PageStore store) {
+  public ListAttachmentsImpl(final CachingPageStore store) {
     _store = store;
   }
 

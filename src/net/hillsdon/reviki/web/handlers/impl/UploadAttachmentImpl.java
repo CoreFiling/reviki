@@ -21,6 +21,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -48,7 +49,7 @@ public class UploadAttachmentImpl implements UploadAttachment {
   private final PageStore _store;
   private final Page _listAttachments;
 
-  public UploadAttachmentImpl(final PageStore store, final Page _list) {
+  public UploadAttachmentImpl(final CachingPageStore store, final Page _list) {
     _store = store;
     _listAttachments = _list;
   }

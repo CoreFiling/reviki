@@ -28,10 +28,10 @@
       </c:if>
     </c:if>
       <c:if test="${not pageInfo.new}">
-		    <li class="menu">
-		      <a name="history" href="?history">History</a>
-		    </li>
-		  </c:if>
+	    <li class="menu">
+	      <a name="history" href="?history">History</a>
+	    </li>
+    </c:if>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="wiki-rendering">

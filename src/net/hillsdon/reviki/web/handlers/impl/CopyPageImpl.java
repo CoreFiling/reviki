@@ -22,6 +22,7 @@ import static net.hillsdon.reviki.web.handlers.impl.SetPageImpl.PARAM_COMMIT_MES
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -39,7 +40,7 @@ public class CopyPageImpl implements CopyPage {
   private final PageStore _store;
   private final WikiUrls _urls;
 
-  public CopyPageImpl(final PageStore store, final WikiUrls urls) {
+  public CopyPageImpl(final CachingPageStore store, final WikiUrls urls) {
     _store = store;
     _urls = urls;
   }

@@ -20,15 +20,15 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.SimplePageStore;
 
 import org.easymock.EasyMock;
 
 public class TestWikiGraphImpl extends TestCase {
 
-  private PageStore _store;
+  private CachingPageStore _store;
   private SearchEngine _mockedSearchEngine;
   
   private WikiGraph _graph;

@@ -29,7 +29,7 @@ import java.util.Set;
  * 
  * @author mth
  */
-public class SimplePageStore implements PageStore {
+public class SimplePageStore implements CachingPageStore {
 
   private Map<PageReference, PageInfo> _pages = new LinkedHashMap<PageReference, PageInfo>();
   
@@ -94,6 +94,10 @@ public class SimplePageStore implements PageStore {
 
   public long rename(PageReference from, PageReference to, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException {
     throw new UnsupportedOperationException();
+  }
+
+  public PageStore getUnderlying() {
+    return this;
   }
   
 }

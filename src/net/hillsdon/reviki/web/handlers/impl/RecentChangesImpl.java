@@ -21,6 +21,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -41,7 +42,7 @@ public class RecentChangesImpl implements SpecialPage {
 
   private final PageStore _store;
 
-  public RecentChangesImpl(final PageStore store) {
+  public RecentChangesImpl(final CachingPageStore store) {
     _store = store;
   }
 
