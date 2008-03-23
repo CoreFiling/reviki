@@ -2,6 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
+
+<c:set var="lastEditAction">
+  <c:choose>
+    <c:when test="${pageInfo.deleted}">Deleted</c:when>
+    <c:when test="${not pageInfo.new}">Last changed</c:when>
+  </c:choose>
+</c:set>
+
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
@@ -27,7 +35,7 @@
         </li>
       </c:if>
     </c:if>
-      <c:if test="${not pageInfo.new}">
+      <c:if test="${not empty lastEditAction}">
 	    <li class="menu">
 	      <a name="history" href="?history">History</a>
 	    </li>
@@ -83,12 +91,6 @@
         </script>
       </c:otherwise>
     </c:choose>
-    <c:set var="lastEditAction">
-	    <c:choose>
-	      <c:when test="${pageInfo.deleted}">Deleted</c:when>
-	      <c:when test="${not pageInfo.new}">Last changed</c:when>
-	    </c:choose>
-	  </c:set>
     <c:if test="${not empty lastEditAction}">
 	    <p>
 	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
