@@ -80,7 +80,6 @@ public class SVNPageStore implements PageStore {
     final List<ChangeInfo> changes = new ArrayList<ChangeInfo>();
     final ChangeInfo deletedIn = getChangeThatDeleted(ref);
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
-    
     // We follow all the previous locations.
     String path = ref.getPath();
     while (path != null && changes.addAll(_operations.log(path, -1, true, true, 0, lastRevision))) {

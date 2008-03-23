@@ -43,7 +43,7 @@ public class TestDeletedPages extends WebTestSupport {
 
   public void testCanViewHistoryForDeletedPage() throws Exception {
     HtmlPage deleted = createThenDeletePage()._page;
-    HtmlAnchor historyLink = deleted.getAnchorByHref("?history");
+    HtmlAnchor historyLink = deleted.getAnchorByName("history");
     // This used to give an error.
     historyLink.click();
   }

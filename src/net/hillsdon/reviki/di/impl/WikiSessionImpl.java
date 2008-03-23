@@ -80,9 +80,9 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
 
   public void configure(final MutablePicoContainer container) {
     // This is cheating!
+    // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
     final ServletContext servletContext = getParentContainer().getComponent(ServletContext.class);
-    // Some of this is a bit circular.  It needs fixing before we can use the di container.
     
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
@@ -109,6 +109,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
       }
     });
     
+    container.addComponent(tracker);
     container.addComponent(operations);
     container.addComponent(PageStore.class, pageStore);
     container.addComponent(CachingPageStore.class, cachingPageStore);
@@ -116,6 +117,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(wikiGraph);
     container.addComponent(internalLinker);
     container.addComponent(renderedPageFactory);
+    container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_searchEngine);
       
