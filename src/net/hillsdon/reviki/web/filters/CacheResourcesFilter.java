@@ -21,13 +21,17 @@ public class CacheResourcesFilter implements Filter {
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
     if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
       if (isResourceAccess((HttpServletRequest) request)) {
-        ((HttpServletResponse) response).setHeader("Cache-Control", "max-age=120");
+        ((HttpServletResponse) response).setHeader("Cache-Control", "max-age=86400");
       }
     }
     chain.doFilter(request, response);
   }
 
   private boolean isResourceAccess(final HttpServletRequest request) {
+    if (!"GET".equals(request.getMethod())) {
+      return false;
+    }
+    
     String uri = request.getRequestURI();
     // Kludge... this page should cope on its own really.
     if (uri.endsWith("/ConfigCss")) {
