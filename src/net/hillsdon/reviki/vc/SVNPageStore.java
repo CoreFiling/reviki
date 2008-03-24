@@ -36,6 +36,7 @@ import java.util.Set;
 
 import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.core.Predicate;
+import net.hillsdon.fij.io.LazyOutputStream;
 import net.hillsdon.fij.text.Strings;
 
 import org.tmatesoft.svn.core.SVNException;
