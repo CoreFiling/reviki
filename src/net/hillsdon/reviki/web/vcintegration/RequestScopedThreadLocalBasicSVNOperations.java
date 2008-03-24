@@ -17,9 +17,9 @@ package net.hillsdon.reviki.web.vcintegration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.reviki.vc.BasicSVNOperations;
-import net.hillsdon.reviki.vc.BasicSVNOperationsFactory;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.BasicSVNOperations;
+import net.hillsdon.reviki.vc.impl.BasicSVNOperationsFactory;
 import net.hillsdon.reviki.vc.impl.DelegatingBasicSVNOperations;
 
 /**

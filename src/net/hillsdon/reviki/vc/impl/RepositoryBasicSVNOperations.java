@@ -34,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.hillsdon.reviki.vc.AlreadyLockedException;
-import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.InterveningCommitException;

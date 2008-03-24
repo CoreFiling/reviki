@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,8 +21,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.hillsdon.reviki.vc.impl.SVNAction;
-import net.hillsdon.reviki.vc.impl.SVNPageStore;
+import net.hillsdon.reviki.vc.AlreadyLockedException;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;

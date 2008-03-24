@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.AlreadyLockedException;
-import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.NotFoundException;

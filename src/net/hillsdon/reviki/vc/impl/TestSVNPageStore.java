@@ -26,10 +26,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
-import net.hillsdon.reviki.vc.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.StoreKind;
 

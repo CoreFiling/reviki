@@ -24,7 +24,6 @@ import static org.easymock.EasyMock.verify;
 
 import java.util.Date;
 
-import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
 import net.hillsdon.reviki.vc.ChangeType;

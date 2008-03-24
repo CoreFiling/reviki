@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 
 import net.hillsdon.fij.core.Predicate;
-import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
