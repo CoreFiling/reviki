@@ -31,7 +31,7 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.Page;
+import net.hillsdon.reviki.web.handlers.ListAttachments;
 import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 import org.apache.commons.fileupload.FileItem;
@@ -46,12 +46,13 @@ public class UploadAttachmentImpl implements UploadAttachment {
   
   private static final String PARAM_ATTACHMENT_NAME = "attachmentName";
   private static final String PARAM_BASE_REVISION = "baseRevision";
+  
   private final PageStore _store;
-  private final Page _listAttachments;
+  private final ListAttachments _list;
 
-  public UploadAttachmentImpl(final CachingPageStore store, final Page _list) {
+  public UploadAttachmentImpl(final CachingPageStore store, final ListAttachments list) {
     _store = store;
-    _listAttachments = _list;
+    _list = list;
   }
 
   @SuppressWarnings("unchecked")
@@ -86,7 +87,7 @@ public class UploadAttachmentImpl implements UploadAttachment {
       
       if (file == null || file.getSize() == 0) {
         request.setAttribute("flash", ERROR_NO_FILE);
-        return _listAttachments.handlePage(path, request, response, page);
+        return _list.handlePage(path, request, response, page);
       }
       else {
         InputStream in = file.getInputStream();

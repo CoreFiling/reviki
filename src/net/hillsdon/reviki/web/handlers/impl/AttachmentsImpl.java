@@ -18,12 +18,14 @@ package net.hillsdon.reviki.web.handlers.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.Attachments;
+import net.hillsdon.reviki.web.handlers.GetAttachment;
+import net.hillsdon.reviki.web.handlers.ListAttachments;
 import net.hillsdon.reviki.web.handlers.Page;
+import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 public class AttachmentsImpl implements Attachments {
 
@@ -31,10 +33,10 @@ public class AttachmentsImpl implements Attachments {
   private final Page _upload;
   private final Page _get;
 
-  public AttachmentsImpl(final CachingPageStore pageStore) {
-    _list = new ListAttachmentsImpl(pageStore);
-    _upload = new UploadAttachmentImpl(pageStore, _list);
-    _get = new GetAttachmentImpl(pageStore);
+  public AttachmentsImpl(final ListAttachments list, final UploadAttachment upload, final GetAttachment get) {
+    _list = list;
+    _upload = upload;
+    _get = get;
   }
 
   public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
