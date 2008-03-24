@@ -23,8 +23,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.di.impl.ApplicationSessionImpl;
+import net.hillsdon.reviki.di.ApplicationSession;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
+
+import org.picocontainer.PicoBuilder;
 
 /**
  * We should probably find a web framework that doesn't suck but this'll do for now.
@@ -40,7 +42,19 @@ public class DispatcherServlet extends HttpServlet {
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    _dispatcher = new ApplicationSessionImpl(config.getServletContext()).getDispatcher();
+    // This package cycle is fundamental... I figure we'd fix it by
+    // putting the impl class name in the web.xml so this is a reasonable
+    // temporary step to get back to zero cycles.
+    try {
+      _dispatcher = new PicoBuilder().build()
+        .addComponent(Class.forName("net.hillsdon.reviki.di.impl.ApplicationSessionImpl"))
+        .addComponent(config)
+        .addComponent(config.getServletContext())
+        .getComponent(ApplicationSession.class).getDispatcher();
+    }
+    catch (ClassNotFoundException e) {
+      throw new ServletException("Root session class not found", e);
+    }
   }
 
   @Override
