@@ -17,7 +17,7 @@ package net.hillsdon.reviki.web.vcintegration;
 
 import net.hillsdon.fij.core.Factory;
 import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.search.SearchIndexPopulatingPageStore;
+import net.hillsdon.reviki.search.impl.SearchIndexPopulatingPageStore;
 import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.PageListCachingPageStore;

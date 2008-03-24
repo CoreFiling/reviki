@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.search;
+package net.hillsdon.reviki.search.impl;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 

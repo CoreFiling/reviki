@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.search;
+package net.hillsdon.reviki.search.impl;
 
 import static net.hillsdon.fij.core.Functional.map;
 import static net.hillsdon.fij.core.Functional.set;
@@ -29,6 +29,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import net.hillsdon.reviki.search.QuerySyntaxException;
+import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.wiki.RenderedPage;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;

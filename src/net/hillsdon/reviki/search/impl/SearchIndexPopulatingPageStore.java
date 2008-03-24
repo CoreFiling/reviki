@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.search;
+package net.hillsdon.reviki.search.impl;
 
 import java.io.IOException;
 
+import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;

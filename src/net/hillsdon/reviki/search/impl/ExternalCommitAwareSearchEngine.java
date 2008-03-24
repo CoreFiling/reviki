@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.search;
+package net.hillsdon.reviki.search.impl;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.hillsdon.reviki.search.QuerySyntaxException;
+import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
 import net.hillsdon.reviki.vc.PageInfo;
