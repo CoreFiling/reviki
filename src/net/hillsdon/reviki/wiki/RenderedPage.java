@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+
 import org.cyberneko.html.parsers.SAXParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -35,9 +37,9 @@ public class RenderedPage {
   private final String _pageName;
   private final String _rendered; 
 
-  public RenderedPage(final String pageName, final String rendered) {
+  public RenderedPage(final String pageName, final ResultNode resultNode) {
     _pageName = pageName;
-    _rendered = rendered;
+    _rendered = resultNode.toXHTML();
   }
 
   public String getPage() {

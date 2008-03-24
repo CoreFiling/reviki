@@ -16,7 +16,6 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 
 import net.hillsdon.fij.accessors.Accessor;
@@ -29,6 +28,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class SvnWikiRenderer implements MarkupRenderer {
 
@@ -56,8 +56,8 @@ public class SvnWikiRenderer implements MarkupRenderer {
         });
   }
   
-  public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
-    out.write(_creole.render(page, in).toXHTML());
+  public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
+    return _creole.render(page, in);
   }
 
 }

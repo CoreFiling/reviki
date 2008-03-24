@@ -19,7 +19,6 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -44,6 +43,7 @@ import net.hillsdon.reviki.web.handlers.GetRegularPage;
 import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class GetRegularPageImpl implements GetRegularPage {
 
@@ -92,9 +92,8 @@ public class GetRegularPageImpl implements GetRegularPage {
       return new RawPageView(main);
     }
     else {
-      StringWriter writer = new StringWriter();
-      _markupRenderer.render(main, main.getContent(), writer);
-      request.setAttribute(ATTR_RENDERED_CONTENTS, writer.toString());
+      ResultNode rendered = _markupRenderer.render(main, main.getContent());
+      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }
   }

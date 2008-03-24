@@ -112,7 +112,7 @@ public class WikiHandlerImpl implements WikiHandler {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
       StringWriter html = new StringWriter();
       PageInfo page = _cachingPageStore.get(ref, -1);
-      _renderer.render(ref, page.getContent(), html);
+      _renderer.render(ref, page.getContent());
       request.setAttribute(requestVarName, html.toString());
     }
   }

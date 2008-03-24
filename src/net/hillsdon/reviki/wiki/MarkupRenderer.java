@@ -16,10 +16,11 @@
 package net.hillsdon.reviki.wiki;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 /**
  * Interface for something that renders wiki markup in some other format.
@@ -32,11 +33,11 @@ public interface MarkupRenderer {
    * Useful for testing.
    */
   MarkupRenderer AS_IS = new MarkupRenderer() {
-    public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
-      out.write(in);
+    public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
+      return new LiteralResultNode(in);
     }
   };
   
-  void render(PageReference page, String in, Writer out) throws IOException, PageStoreException;
+  ResultNode render(PageReference page, String in) throws IOException, PageStoreException;
     
 }

@@ -1,7 +1,6 @@
 package net.hillsdon.reviki.di.impl;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +65,7 @@ import net.hillsdon.reviki.wiki.macros.SearchMacro;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 import org.picocontainer.MutablePicoContainer;
 
@@ -91,8 +91,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     final ServletContext servletContext = getParentContainer().getComponent(ServletContext.class);
     
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public void render(final PageReference page, final String in, final Writer out) throws IOException, PageStoreException {
-        _renderer.render(page, in, out);
+      public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
+        return _renderer.render(page, in);
       }
     });
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));

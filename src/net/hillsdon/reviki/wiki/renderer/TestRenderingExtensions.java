@@ -16,7 +16,6 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,9 +38,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
     SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker("", "mywiki", new SimplePageStore()), new Holder<List<Macro>>(Collections.<Macro>emptyList()));
-    final StringWriter out = new StringWriter();
-    renderer.render(new PageReference(""), input, out);
-    return out.toString();
+    return renderer.render(new PageReference(""), input).toXHTML();
   }
   
 }

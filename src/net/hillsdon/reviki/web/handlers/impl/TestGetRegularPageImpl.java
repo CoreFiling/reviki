@@ -20,10 +20,7 @@ import static net.hillsdon.reviki.web.handlers.impl.GetRegularPageImpl.MAX_NUMBE
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
 
-import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
 
@@ -39,6 +36,7 @@ import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 
 import org.easymock.EasyMock;
 
@@ -131,8 +129,7 @@ public class TestGetRegularPageImpl extends TestCase {
   }
   
   private void expectRenderContent() throws Exception  {
-    _renderer.render(eq(THE_PAGE), eq("Content"), isA(Writer.class));
-    expectLastCall().once();
+    expect(_renderer.render(eq(THE_PAGE), eq("Content"))).andReturn(new LiteralResultNode("Content")).once();
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {

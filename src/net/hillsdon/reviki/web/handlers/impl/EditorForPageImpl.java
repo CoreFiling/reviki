@@ -18,7 +18,6 @@ package net.hillsdon.reviki.web.handlers.impl;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +34,7 @@ import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.EditorForPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class EditorForPageImpl implements EditorForPage {
 
@@ -59,9 +59,8 @@ public class EditorForPageImpl implements EditorForPage {
       if (request.getParameter(EditorForPageImpl.PARAM_PREVIEW) != null) {
         pageInfo = pageInfo.alternativeContent(getRequiredString(request, SetPageImpl.PARAM_CONTENT));
         request.setAttribute("pageInfo", pageInfo);
-        StringWriter out = new StringWriter();
-        _renderer.render(pageInfo, pageInfo.getContent(), out);
-        request.setAttribute("preview", out.toString());
+        ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent());
+        request.setAttribute("preview", rendered.toXHTML());
       }
       return new JspView("EditPage");
     }
