@@ -28,6 +28,7 @@ import net.hillsdon.reviki.web.handlers.Attachments;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.handlers.RegularPage;
 import net.hillsdon.reviki.web.handlers.SpecialPage;
+import net.hillsdon.reviki.web.handlers.SpecialPages;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here.
@@ -40,9 +41,9 @@ public class PageHandlerImpl implements PageHandler {
   
   private final RegularPage _regularPage;
   private final Attachments _attachments;
-  private final SpecialPagesImpl _specialPages;
+  private final SpecialPages _specialPages;
 
-  public PageHandlerImpl(final RegularPage regularPage, final Attachments attachments, final SpecialPagesImpl specialPages) {
+  public PageHandlerImpl(final RegularPage regularPage, final Attachments attachments, final SpecialPages specialPages) {
     _attachments = attachments;
     _regularPage = regularPage;
     _specialPages = specialPages;
