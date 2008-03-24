@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.dispatching;
+package net.hillsdon.reviki.web.dispatching.impl;
 
 import java.io.IOException;
 
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.di.impl.ApplicationSessionImpl;
+import net.hillsdon.reviki.web.dispatching.Dispatcher;
 
 /**
  * We should probably find a web framework that doesn't suck but this'll do for now.

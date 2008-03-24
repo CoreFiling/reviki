@@ -24,7 +24,7 @@ import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
-import net.hillsdon.reviki.web.dispatching.WikiHandlerImpl;
+import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
 import net.hillsdon.reviki.web.handlers.Attachments;
 import net.hillsdon.reviki.web.handlers.EditorForPage;
 import net.hillsdon.reviki.web.handlers.GetAttachment;

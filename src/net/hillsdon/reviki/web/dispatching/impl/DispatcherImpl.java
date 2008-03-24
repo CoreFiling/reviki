@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.web.dispatching;
+package net.hillsdon.reviki.web.dispatching.impl;
 
 import static java.lang.String.format;
 
@@ -16,6 +16,7 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.dispatching.Dispatcher;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
 

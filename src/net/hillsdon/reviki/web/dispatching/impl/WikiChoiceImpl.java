@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.dispatching;
+package net.hillsdon.reviki.web.dispatching.impl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +29,8 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.dispatching.WikiChoice;
+import net.hillsdon.reviki.web.dispatching.WikiHandler;
 
 public class WikiChoiceImpl implements WikiChoice {
 
