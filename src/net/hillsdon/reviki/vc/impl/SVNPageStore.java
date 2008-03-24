@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import static java.lang.String.format;
 import static net.hillsdon.fij.core.Functional.filter;
@@ -38,6 +38,20 @@ import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.fij.io.LazyOutputStream;
 import net.hillsdon.fij.text.Strings;
+import net.hillsdon.reviki.vc.AlreadyLockedException;
+import net.hillsdon.reviki.vc.AttachmentHistory;
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ContentTypedSink;
+import net.hillsdon.reviki.vc.DeletedRevisionTracker;
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;

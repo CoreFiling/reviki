@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.util.Set;
+
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 
 /**

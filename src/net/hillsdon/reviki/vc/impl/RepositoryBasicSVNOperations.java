@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import static java.util.Collections.singletonMap;
 
@@ -32,6 +32,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.hillsdon.reviki.vc.AlreadyLockedException;
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;

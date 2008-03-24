@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
-import static net.hillsdon.reviki.vc.ConfigPageCachingPageStore.isConfigPage;
+import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isConfigPage;
+import net.hillsdon.reviki.vc.PageReference;
 import junit.framework.TestCase;
 
 public class TestConfigPageCachingPageStore extends TestCase {

@@ -18,9 +18,9 @@ package net.hillsdon.reviki.web.vcintegration;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.core.Factory;
-import net.hillsdon.reviki.vc.AbstractDelegatingPageStore;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AbstractDelegatingPageStore;
 
 /**
  * Allow us to pass a PageStore into various objects but

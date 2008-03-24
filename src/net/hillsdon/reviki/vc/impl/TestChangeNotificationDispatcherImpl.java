@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createMock;
@@ -24,9 +24,15 @@ import static org.easymock.EasyMock.verify;
 
 import java.util.Date;
 
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeSubscriber;
+import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.StoreKind;
+
 import junit.framework.TestCase;
 
-public class TestChangeNotificationDispatcher extends TestCase {
+public class TestChangeNotificationDispatcherImpl extends TestCase {
 
   private static final ChangeInfo REVISION_FOUR_CHANGE = new ChangeInfo("PageThreeChange", "PageThreeChange", "", new Date(), 4, "", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
   private static final ChangeInfo REVISION_FIVE_CHANGE = new ChangeInfo("PageFourChange", "PageFourChange", "", new Date(), 5, "", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);

@@ -20,7 +20,7 @@ import java.util.Collections;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 public class TestPageStoreConfiguration extends TestCase {
 

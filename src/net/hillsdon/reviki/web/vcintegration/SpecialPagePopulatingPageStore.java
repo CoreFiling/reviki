@@ -28,7 +28,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.SimpleDelegatingPageStore;
+import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;

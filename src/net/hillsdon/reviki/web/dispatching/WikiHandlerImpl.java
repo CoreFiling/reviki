@@ -21,12 +21,12 @@ import java.io.StringWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.CachingPageStore;
-import net.hillsdon.reviki.vc.ChangeNotificationDospatcher;
+import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.PageHandler;
@@ -56,11 +56,11 @@ public class WikiHandlerImpl implements WikiHandler {
   private final SvnWikiRenderer _renderer;
   private final CachingPageStore _cachingPageStore;
   private final InternalLinker _internalLinker;
-  private final ChangeNotificationDospatcher _syncUpdater;
+  private final ChangeNotificationDispatcher _syncUpdater;
   private final RequestScopedThreadLocalBasicSVNOperations _operations;
   private final PageHandler _handler;
 
-  public WikiHandlerImpl(RequestScopedThreadLocalPageStore pageStore, CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDospatcher syncUpdater, RequestScopedThreadLocalBasicSVNOperations operations, PageHandler handler) {
+  public WikiHandlerImpl(RequestScopedThreadLocalPageStore pageStore, CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestScopedThreadLocalBasicSVNOperations operations, PageHandler handler) {
     _pageStore = pageStore;
     _cachingPageStore = cachingPageStore;
     _renderer = renderer;

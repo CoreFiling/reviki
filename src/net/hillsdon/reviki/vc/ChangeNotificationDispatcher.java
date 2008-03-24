@@ -17,7 +17,7 @@ package net.hillsdon.reviki.vc;
 
 import java.io.IOException;
 
-public interface ChangeNotificationDospatcher {
+public interface ChangeNotificationDispatcher {
 
   void sync() throws PageStoreAuthenticationException, PageStoreException, IOException;
 

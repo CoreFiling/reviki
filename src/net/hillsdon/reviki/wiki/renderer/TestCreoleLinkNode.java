@@ -17,7 +17,7 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.wiki.InternalLinker;
 
 public class TestCreoleLinkNode extends TestCase {

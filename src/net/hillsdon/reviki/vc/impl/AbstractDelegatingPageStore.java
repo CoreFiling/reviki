@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import net.hillsdon.reviki.vc.AttachmentHistory;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ContentTypedSink;
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 
 

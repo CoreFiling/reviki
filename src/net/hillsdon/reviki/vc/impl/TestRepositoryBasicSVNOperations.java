@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 
 import junit.framework.TestCase;
+
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;

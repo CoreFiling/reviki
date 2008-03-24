@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import static java.util.Arrays.asList;
 import static net.hillsdon.fij.core.Functional.set;
@@ -25,6 +25,13 @@ import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
+
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.DeletedRevisionTracker;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.StoreKind;
 
 import org.easymock.EasyMock;
 

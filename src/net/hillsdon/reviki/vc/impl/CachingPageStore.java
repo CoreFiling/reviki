@@ -1,4 +1,6 @@
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
+
+import net.hillsdon.reviki.vc.PageStore;
 
 /**
  * This store is permitted to cache.

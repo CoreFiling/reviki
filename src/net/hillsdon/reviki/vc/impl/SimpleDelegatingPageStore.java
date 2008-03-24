@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.hillsdon.reviki.vc.impl;
+
+import net.hillsdon.reviki.vc.PageStore;
+
+
+
 /**
+ * A delegating page store that delegates to a given page store.
  * 
+ * @author mth
  */
-package net.hillsdon.reviki.vc;
+public class SimpleDelegatingPageStore extends AbstractDelegatingPageStore implements PageStore {
 
-import java.io.IOException;
+  private final PageStore _delegate;
 
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.io.SVNRepository;
-
-public interface SVNAction<T> {
-  T perform(SVNRepository repository) throws SVNException, PageStoreException, IOException;
+  public SimpleDelegatingPageStore(final PageStore delegate) {
+    _delegate = delegate;
+  }
+  
+  @Override
+  protected PageStore getDelegate() {
+    return _delegate;
+  }
+  
 }

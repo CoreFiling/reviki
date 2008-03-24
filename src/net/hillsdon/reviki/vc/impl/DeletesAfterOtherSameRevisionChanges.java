@@ -1,6 +1,8 @@
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.util.Comparator;
+
+import net.hillsdon.reviki.vc.ChangeInfo;
 
 /**
  * This makes sense as there are often delete / create pairings for rename.

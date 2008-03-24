@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.BasicSVNOperationsFactory;
-import net.hillsdon.reviki.vc.DelegatingBasicSVNOperations;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.DelegatingBasicSVNOperations;
 
 /**
  * Allow us to pass a BasicSVNOperations implementation into various objects but

@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
-
-import org.tmatesoft.svn.core.SVNErrorMessage;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLock;
-import org.tmatesoft.svn.core.io.ISVNLockHandler;
-
 /**
- * Empty implementation.
  * 
- * @author mth
  */
-public class SVNLockHandlerAdapter implements ISVNLockHandler {
-  public void handleLock(final String path, final SVNLock lock, final SVNErrorMessage error) throws SVNException {
-  }
-  public void handleUnlock(final String path, final SVNLock lock, final SVNErrorMessage error) throws SVNException {
-  }
+package net.hillsdon.reviki.vc.impl;
+
+import java.io.IOException;
+
+import net.hillsdon.reviki.vc.PageStoreException;
+
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.io.SVNRepository;
+
+public interface SVNAction<T> {
+  T perform(SVNRepository repository) throws SVNException, PageStoreException, IOException;
 }

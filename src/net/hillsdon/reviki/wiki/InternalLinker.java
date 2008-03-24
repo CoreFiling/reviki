@@ -18,10 +18,10 @@ package net.hillsdon.reviki.wiki;
 import static java.lang.String.format;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
-import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 
 public class InternalLinker {
 

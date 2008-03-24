@@ -20,9 +20,9 @@ import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.impl.SearchIndexPopulatingPageStore;
 import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.DeletedRevisionTracker;
-import net.hillsdon.reviki.vc.PageListCachingPageStore;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.SVNPageStore;
+import net.hillsdon.reviki.vc.impl.PageListCachingPageStore;
+import net.hillsdon.reviki.vc.impl.SVNPageStore;
 
 public class PerRequestPageStoreFactory implements Factory<PageStore> {
 

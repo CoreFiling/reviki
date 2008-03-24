@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;

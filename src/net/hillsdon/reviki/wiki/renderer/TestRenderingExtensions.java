@@ -23,7 +23,7 @@ import java.util.List;
 import net.hillsdon.fij.accessors.Holder;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.renderer.creole.JsonDrivenRenderingTest;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;

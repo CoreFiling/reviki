@@ -23,10 +23,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 
 public class WikiGraphImpl implements WikiGraph {
 

@@ -50,7 +50,7 @@ public class AttachmentHistory {
   /**
    * @return Live list of versions.
    */
-  List<ChangeInfo> getVersions() {
+  public List<ChangeInfo> getVersions() {
     return _versionsMostRecentFirst;
   }
 

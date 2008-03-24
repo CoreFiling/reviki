@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import net.hillsdon.reviki.vc.BasicSVNOperations;
 import net.hillsdon.reviki.vc.BasicSVNOperationsFactory;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.RepositoryBasicSVNOperations;
+import net.hillsdon.reviki.vc.impl.RepositoryBasicSVNOperations;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 
 import org.apache.commons.codec.binary.Base64;

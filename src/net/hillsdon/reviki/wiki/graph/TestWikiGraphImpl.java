@@ -20,9 +20,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 import org.easymock.EasyMock;
 

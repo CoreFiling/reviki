@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.DeletedRevisionTracker;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
  * This initial implementation is an in-memory cache so will repopulate itself on every restart.

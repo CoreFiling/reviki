@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
 import static net.hillsdon.fij.core.Functional.filter;
 import static net.hillsdon.fij.core.Functional.list;
@@ -23,6 +23,12 @@ import java.io.IOException;
 import java.util.List;
 
 import net.hillsdon.fij.core.Predicate;
+import net.hillsdon.reviki.vc.BasicSVNOperations;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
+import net.hillsdon.reviki.vc.ChangeSubscriber;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author mth
  */
-public class ChangeNotificationDispatcherImpl implements ChangeNotificationDospatcher {
+public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispatcher {
 
   private static final Log LOG = LogFactory.getLog(ChangeNotificationDispatcherImpl.class);
   

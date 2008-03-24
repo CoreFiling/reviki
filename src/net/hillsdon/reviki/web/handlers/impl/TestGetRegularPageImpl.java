@@ -30,9 +30,9 @@ import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.CachingPageStore;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;

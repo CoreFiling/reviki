@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.hillsdon.reviki.vc.impl.SVNAction;
+import net.hillsdon.reviki.vc.impl.SVNPageStore;
+
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -40,7 +43,6 @@ public interface BasicSVNOperations {
 
   /**
    * Returns the most recent changes first.
-   * @param pathOnly TODO
    */
   List<ChangeInfo> log(String path, long limit, boolean pathOnly, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 
