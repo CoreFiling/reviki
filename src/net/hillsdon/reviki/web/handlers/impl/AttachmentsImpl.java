@@ -24,14 +24,13 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.Attachments;
 import net.hillsdon.reviki.web.handlers.GetAttachment;
 import net.hillsdon.reviki.web.handlers.ListAttachments;
-import net.hillsdon.reviki.web.handlers.Page;
 import net.hillsdon.reviki.web.handlers.UploadAttachment;
 
 public class AttachmentsImpl implements Attachments {
 
-  private final Page _list;
-  private final Page _upload;
-  private final Page _get;
+  private final ListAttachments _list;
+  private final UploadAttachment _upload;
+  private final GetAttachment _get;
 
   public AttachmentsImpl(final ListAttachments list, final UploadAttachment upload, final GetAttachment get) {
     _list = list;
