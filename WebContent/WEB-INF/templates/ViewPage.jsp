@@ -46,9 +46,11 @@
     ${renderedContents}
     </div>
     <c:if test="${pageInfo.new and empty pageInfo.content}">
+    <div style="margin-top: 1em">
     <form id="editContent" name="editContent" action="" method="post">
       <input type="submit" value="Edit this new page" />
-    </form> 
+    </form>
+    </div>
     <script type="text/javascript">
       reviki.formAsJavaScriptLink("editContent", "Edit this new page.");
     </script>
