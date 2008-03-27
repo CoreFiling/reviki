@@ -13,9 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers;
+package net.hillsdon.reviki.web.pages.impl;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 
-public interface SpecialPages extends Map<String, SpecialPage> {
+import net.hillsdon.reviki.web.pages.SpecialPage;
+import net.hillsdon.reviki.web.pages.SpecialPages;
+
+/**
+ * Aggregates the special pages.
+ * 
+ * @author mth
+ */
+public class SpecialPagesImpl extends LinkedHashMap<String, SpecialPage> implements SpecialPages {
+  
+  private static final long serialVersionUID = 1L;
+
+  public SpecialPagesImpl(final SpecialPage... specialPages) {
+    for (SpecialPage page : specialPages) {
+      put(page.getName(), page);
+    }
+  }
+  
 }

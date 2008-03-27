@@ -15,23 +15,28 @@
  */
 package net.hillsdon.reviki.web.handlers.impl;
 
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
+import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.Attachments;
 import net.hillsdon.reviki.web.handlers.PageHandler;
-import net.hillsdon.reviki.web.handlers.RegularPage;
-import net.hillsdon.reviki.web.handlers.SpecialPage;
-import net.hillsdon.reviki.web.handlers.SpecialPages;
+import net.hillsdon.reviki.web.pages.Page;
+import net.hillsdon.reviki.web.pages.PageSource;
 
 /**
- * Everything that does something to a wiki page or attachment comes through here.
+ * Everything that does something to a wiki page or attachment comes through here
+ * and is dispatched to the relevant method on the appropriate page implementation.
  * 
  * @author mth
  */
@@ -39,14 +44,10 @@ public class PageHandlerImpl implements PageHandler {
 
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
   
-  private final RegularPage _regularPage;
-  private final Attachments _attachments;
-  private final SpecialPages _specialPages;
+  private final PageSource _pageSource;
 
-  public PageHandlerImpl(final RegularPage regularPage, final Attachments attachments, final SpecialPages specialPages) {
-    _attachments = attachments;
-    _regularPage = regularPage;
-    _specialPages = specialPages;
+  public PageHandlerImpl(final PageSource pageSource) {
+    _pageSource = pageSource;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -57,20 +58,47 @@ public class PageHandlerImpl implements PageHandler {
     if (pageName.contains("/")) {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);
     }
-    PageReference page = new PageReference(pageName);
-    request.setAttribute("page", page);
+    
+    final PageReference pageReference = new PageReference(pageName);
+    request.setAttribute("page", pageReference);
 
-    final SpecialPage specialPage = _specialPages.get(pageName);
-    // Even special pages can have attachments.
+    final Page page = _pageSource.get(pageReference);
     if ("attachments".equals(path.peek())) {
       path.next();
-      return _attachments.handlePage(path, request, response, page);
+      if (path.hasNext()) {
+        return page.attachment(pageReference, path, request, response);
+      }
+      else {
+        if (request.getMethod().equals("POST")) {
+          return page.attach(pageReference, path, request, response);
+        }
+        else {
+          return page.attachments(pageReference, path, request, response);
+        }
+      }
     }
-    else if (specialPage != null) {
-      return specialPage.handlePage(path, request, response, page);
+    else if (request.getParameter("history") != null) {
+      return page.history(pageReference, path, request, response);
+    }
+    else if ("POST".equals(request.getMethod())) {
+      if (request.getParameter(SUBMIT_SAVE) != null 
+       || request.getParameter(SUBMIT_COPY) != null
+       || request.getParameter(SUBMIT_RENAME) != null
+       || request.getParameter(SUBMIT_UNLOCK) != null) {
+        return page.set(pageReference, path, request, response);
+      }
+      else {
+        return page.editor(pageReference, path, request, response);
+      }
     }
     else {
-      return _regularPage.handlePage(path, request, response, page);
+      if (request.getParameter(SUBMIT_RENAME) != null) {
+        return new JspView("Rename");
+      }
+      else if (request.getParameter(SUBMIT_COPY) != null) {
+        return new JspView("Copy");
+      }
+      return page.get(pageReference, path, request, response);
     }
   }
 

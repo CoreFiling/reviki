@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers.impl;
+package net.hillsdon.reviki.web.pages.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,29 +23,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.SpecialPage;
-import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.web.pages.DefaultPage;
 
-public class OrphanedPagesImpl implements SpecialPage {
+public class AllPages extends AbstractSpecialPage {
 
-  private final WikiGraph _graph;
+  private final CachingPageStore _store;
 
-  public OrphanedPagesImpl(final WikiGraph graph) {
-    _graph = graph;
+  public AllPages(final CachingPageStore store, final DefaultPage delegate) {
+    super(delegate);
+    _store = store;
+  }
+
+  @Override
+  public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    List<PageReference> alphabetical = new ArrayList<PageReference>(_store.list());
+    Collections.sort(alphabetical);
+    request.setAttribute("pageList", alphabetical);
+    return new JspView("AllPages");
   }
 
   public String getName() {
-    return "OrphanedPages";
-  }
-
-  public View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
-    List<String> alphabetical = new ArrayList<String>(_graph.isolatedPages());
-    Collections.sort(alphabetical);
-    request.setAttribute("pageList", alphabetical);
-    return new JspView("OrphanedPages");
+    return "AllPages";
   }
 
 }

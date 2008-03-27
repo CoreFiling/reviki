@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers.impl;
+package net.hillsdon.reviki.web.pages.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +30,10 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.SpecialPage;
+import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
-public class RecentChangesImpl implements SpecialPage {
+public class RecentChanges extends AbstractSpecialPage {
 
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
@@ -42,11 +42,13 @@ public class RecentChangesImpl implements SpecialPage {
 
   private final PageStore _store;
 
-  public RecentChangesImpl(final CachingPageStore store) {
+  public RecentChanges(final CachingPageStore store, final DefaultPage defaultPage) {
+    super(defaultPage);
     _store = store;
   }
 
-  public View handlePage(ConsumedPath path, HttpServletRequest request, HttpServletResponse response, PageReference page) throws Exception {
+  @Override
+  public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     if ("atom.xml".equals(path.next())) {
       return new View() {
@@ -61,7 +63,7 @@ public class RecentChangesImpl implements SpecialPage {
   }
 
   private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {
-    List<ChangeInfo> allChanges = _store.recentChanges(RecentChangesImpl.RECENT_CHANGES_HISTORY_SIZE);
+    List<ChangeInfo> allChanges = _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
     if (showMinor) {
       return allChanges;
     }

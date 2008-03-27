@@ -24,32 +24,17 @@ import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
-import net.hillsdon.reviki.web.handlers.Attachments;
-import net.hillsdon.reviki.web.handlers.EditorForPage;
-import net.hillsdon.reviki.web.handlers.GetAttachment;
-import net.hillsdon.reviki.web.handlers.GetRegularPage;
-import net.hillsdon.reviki.web.handlers.History;
-import net.hillsdon.reviki.web.handlers.ListAttachments;
 import net.hillsdon.reviki.web.handlers.PageHandler;
-import net.hillsdon.reviki.web.handlers.RegularPage;
-import net.hillsdon.reviki.web.handlers.SetPage;
-import net.hillsdon.reviki.web.handlers.SpecialPages;
-import net.hillsdon.reviki.web.handlers.UploadAttachment;
-import net.hillsdon.reviki.web.handlers.impl.AllPagesImpl;
-import net.hillsdon.reviki.web.handlers.impl.AttachmentsImpl;
-import net.hillsdon.reviki.web.handlers.impl.EditorForPageImpl;
-import net.hillsdon.reviki.web.handlers.impl.FindPageImpl;
-import net.hillsdon.reviki.web.handlers.impl.GetAttachmentImpl;
-import net.hillsdon.reviki.web.handlers.impl.GetRegularPageImpl;
-import net.hillsdon.reviki.web.handlers.impl.HistoryImpl;
-import net.hillsdon.reviki.web.handlers.impl.ListAttachmentsImpl;
-import net.hillsdon.reviki.web.handlers.impl.OrphanedPagesImpl;
 import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
-import net.hillsdon.reviki.web.handlers.impl.RecentChangesImpl;
-import net.hillsdon.reviki.web.handlers.impl.RegularPageImpl;
-import net.hillsdon.reviki.web.handlers.impl.SetPageImpl;
-import net.hillsdon.reviki.web.handlers.impl.SpecialPagesImpl;
-import net.hillsdon.reviki.web.handlers.impl.UploadAttachmentImpl;
+import net.hillsdon.reviki.web.pages.PageSource;
+import net.hillsdon.reviki.web.pages.SpecialPages;
+import net.hillsdon.reviki.web.pages.impl.AllPages;
+import net.hillsdon.reviki.web.pages.impl.DefaultPageImpl;
+import net.hillsdon.reviki.web.pages.impl.FindPage;
+import net.hillsdon.reviki.web.pages.impl.OrphanedPages;
+import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
+import net.hillsdon.reviki.web.pages.impl.RecentChanges;
+import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.PerRequestPageStoreFactory;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
@@ -126,28 +111,20 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_searchEngine);
-      
-    // Special pages.
-    container.addComponent(SpecialPages.class, SpecialPagesImpl.class);
-    container.addComponent(FindPageImpl.class);
-    container.addComponent(OrphanedPagesImpl.class);
-    container.addComponent(AllPagesImpl.class);
-    container.addComponent(RecentChangesImpl.class);
-    
-    // Usual case handlers.
-    container.addComponent(PageHandler.class, PageHandlerImpl.class);
-    container.addComponent(RegularPage.class, RegularPageImpl.class);
-    container.addComponent(GetRegularPage.class, GetRegularPageImpl.class);
-    container.addComponent(EditorForPage.class, EditorForPageImpl.class);
-    container.addComponent(SetPage.class, SetPageImpl.class);
-    container.addComponent(History.class, HistoryImpl.class);
 
-    // Attachments.
-    container.addComponent(ListAttachments.class, ListAttachmentsImpl.class);
-    container.addComponent(GetAttachment.class, GetAttachmentImpl.class);
-    container.addComponent(UploadAttachment.class, UploadAttachmentImpl.class);
-    container.addComponent(Attachments.class, AttachmentsImpl.class);
     
+    // Special pages
+    container.addComponent(SpecialPages.class, SpecialPagesImpl.class);
+    container.addComponent(FindPage.class);
+    container.addComponent(OrphanedPages.class);
+    container.addComponent(AllPages.class);
+    container.addComponent(RecentChanges.class);
+    
+    // Page handling
+    container.addComponent(DefaultPageImpl.class, DefaultPageImpl.class);
+    container.addComponent(PageSource.class, PageSourceImpl.class);
+    container.addComponent(PageHandler.class, PageHandlerImpl.class);
+
     // Allow plugin classes to depend on the core wiki API.
     _plugins.addPluginAccessibleComponent(pageStore);
     _plugins.addPluginAccessibleComponent(wikiGraph);

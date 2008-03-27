@@ -21,6 +21,16 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
+/**
+ * Icky.
+ * 
+ * We should not base the URLs on the request.
+ * 
+ * We need to know the public base URL anyway really* for e.g. atom ids
+ * (we may be proxied through e.g. Apache).
+ * 
+ * @author mth
+ */
 public class RequestBasedWikiUrls implements WikiUrls {
 
   public static void create(final HttpServletRequest request, final WikiConfiguration configuration) {

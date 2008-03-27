@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers.impl;
+package net.hillsdon.reviki.web.pages.impl;
 
 import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
@@ -31,17 +31,14 @@ import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.handlers.Page;
-import net.hillsdon.reviki.web.handlers.RegularPage;
-import net.hillsdon.reviki.web.handlers.SpecialPage;
+import net.hillsdon.reviki.web.pages.DefaultPage;
 
-public class FindPageImpl implements SpecialPage {
+public class FindPage extends AbstractSpecialPage {
 
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -57,15 +54,14 @@ public class FindPageImpl implements SpecialPage {
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
-  private final Page _regularPage;
 
-  public FindPageImpl(final CachingPageStore store, final SearchEngine searchEngine, final RegularPage regularPage) {
+  public FindPage(final PageStore store, final SearchEngine searchEngine, final DefaultPage defaultPage) {
+    super(defaultPage);
     _store = store;
     _searchEngine = searchEngine;
-    _regularPage = regularPage;
   }
 
-  public View handlePage(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final PageReference page) throws Exception {
+  public View get(PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if ("opensearch.xml".equals(path.next())) {
       return new View() {
         public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -79,7 +75,7 @@ public class FindPageImpl implements SpecialPage {
       request.getParameter(PARAM_QUERY_ALTERNATE);
     }
     if (query == null) {
-      return _regularPage.handlePage(path, request, response, page);
+      super.get(page, path, request, response);
     }
     
     boolean pageExists = _store.list().contains(new PageReference(query));

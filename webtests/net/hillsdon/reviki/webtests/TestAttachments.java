@@ -15,11 +15,11 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import net.hillsdon.reviki.web.handlers.impl.UploadAttachmentImpl;
 
 import org.apache.commons.io.IOUtils;
 
@@ -63,7 +63,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
-    assertEquals(UploadAttachmentImpl.ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
+    assertEquals(ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {

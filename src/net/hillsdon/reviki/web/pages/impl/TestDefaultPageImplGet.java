@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.handlers.impl;
+package net.hillsdon.reviki.web.pages.impl;
 
 import static net.hillsdon.fij.core.Functional.set;
-import static net.hillsdon.reviki.web.handlers.impl.GetRegularPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -34,6 +39,7 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
+import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
@@ -45,7 +51,7 @@ import org.easymock.EasyMock;
  * 
  * @author mth
  */
-public class TestGetRegularPageImpl extends TestCase {
+public class TestDefaultPageImplGet extends TestCase {
 
   private static final PageReference THE_PAGE = new PageReference("ThePage");
   
@@ -56,7 +62,7 @@ public class TestGetRegularPageImpl extends TestCase {
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
   
-  private GetRegularPageImpl _page;
+  private DefaultPage _page;
 
   @Override
   protected void setUp() throws Exception {
@@ -65,7 +71,7 @@ public class TestGetRegularPageImpl extends TestCase {
     _store = createMock(CachingPageStore.class);
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
-    _page = new GetRegularPageImpl(_store, _renderer, _graph);
+    _page = new DefaultPageImpl(_store, _renderer, _graph);
   }
 
   /**
@@ -77,13 +83,13 @@ public class TestGetRegularPageImpl extends TestCase {
     PageInfo expectedPageInfo = expectGetContent();
     expectRenderContent();
     replay();
-    JspView view = (JspView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    JspView view = (JspView) _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals("ViewPage", view.getName());
     // Check data provided to view.
-    assertNotNull(_request.getAttribute(GetRegularPageImpl.ATTR_RENDERED_CONTENTS));
-    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(GetRegularPageImpl.ATTR_BACKLINKS)).size());
-    assertNull(_request.getAttribute(GetRegularPageImpl.ATTR_BACKLINKS_LIMITED));
-    assertSame(expectedPageInfo, _request.getAttribute(GetRegularPageImpl.ATTR_PAGE_INFO));
+    assertNotNull(_request.getAttribute(DefaultPageImpl.ATTR_RENDERED_CONTENTS));
+    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(ATTR_BACKLINKS)).size());
+    assertNull(_request.getAttribute(ATTR_BACKLINKS_LIMITED));
+    assertSame(expectedPageInfo, _request.getAttribute(ATTR_PAGE_INFO));
     verify();
   }
 
@@ -92,23 +98,23 @@ public class TestGetRegularPageImpl extends TestCase {
     expectGetContent();
     expectRenderContent();
     replay();
-    _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
-    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(GetRegularPageImpl.ATTR_BACKLINKS)).size());
-    assertNotNull(_request.getAttribute(GetRegularPageImpl.ATTR_BACKLINKS_LIMITED));
+    _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY, ((Collection<?>) _request.getAttribute(ATTR_BACKLINKS)).size());
+    assertNotNull(_request.getAttribute(ATTR_BACKLINKS_LIMITED));
     verify();
   }
 
   public void testProvideRevisionAndDiffViewsDiffBetweenTheRevisions() throws Exception {
     _request.setParameter(RequestParameterReaders.PARAM_REVISION, "6");
-    _request.setParameter(GetRegularPageImpl.PARAM_DIFF_REVISION, "4");
+    _request.setParameter(PARAM_DIFF_REVISION, "4");
     expectGetIncomingLinks();
     expectGetContent(6, "Content at revision six.");
     expectGetContent(4, "Content at revision four.");
     // We don't render anything.
     replay();
-    JspView view = (JspView) _page.handlePage(ConsumedPath.EMPTY, _request, _response, THE_PAGE);
+    JspView view = (JspView) _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals("ViewDiff", view.getName());
-    assertNotNull(_request.getAttribute(GetRegularPageImpl.ATTR_MARKED_UP_DIFF));
+    assertNotNull(_request.getAttribute(ATTR_MARKED_UP_DIFF));
     verify();
   }
   

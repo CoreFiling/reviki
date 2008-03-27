@@ -108,7 +108,7 @@ public class PageInfo extends PageReference {
     return _lastChangedDate;
   }
   
-  public PageInfo alternativeContent(final String content) {
+  public PageInfo withAlternativeContent(final String content) {
     PageInfo other = new PageInfo(this);
     other._content = content;
     return other;
