@@ -15,6 +15,9 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore;
+
 public class TestMisc extends WebTestSupport {
 
   public void testWikiRootRedirectsToFrontPage() throws Exception {
@@ -27,10 +30,12 @@ public class TestMisc extends WebTestSupport {
       .getByXPath("id('backlinks')//a[@href = 'FrontPage']").isEmpty());
   }
   
-  public void testSidebar() throws Exception {
-    String expect = "T" + System.currentTimeMillis();
-    editWikiPage("ConfigSideBar", expect, "Some new content", null);
-    assertTrue(getWikiPage("FrontPage").asText().contains(expect));
+  public void testSidebarEtc() throws Exception {
+    for (PageReference page : SpecialPagePopulatingPageStore.COMPLIMENTARY_CONTENT_PAGES) {
+      final String expect = "T" + System.currentTimeMillis() + page.getPath().toLowerCase();
+      editWikiPage(page.getPath(), expect, "Some new content", null);
+      assertTrue(getWikiPage("FrontPage").asText().contains(expect));
+    }
   }
   
 }
