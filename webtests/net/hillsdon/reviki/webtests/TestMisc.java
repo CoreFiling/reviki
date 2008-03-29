@@ -27,4 +27,10 @@ public class TestMisc extends WebTestSupport {
       .getByXPath("id('backlinks')//a[@href = 'FrontPage']").isEmpty());
   }
   
+  public void testSidebar() throws Exception {
+    String expect = "T" + System.currentTimeMillis();
+    editWikiPage("ConfigSideBar", expect, "Some new content", null);
+    assertTrue(getWikiPage("FrontPage").asText().contains(expect));
+  }
+  
 }

@@ -16,7 +16,6 @@
 package net.hillsdon.reviki.web.dispatching.impl;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,10 +109,8 @@ public class WikiHandlerImpl implements WikiHandler {
   private void addSideBarEtcToRequest(final HttpServletRequest request) throws PageStoreException, IOException {
     for (PageReference ref : SpecialPagePopulatingPageStore.COMPLIMENTARY_CONTENT_PAGES) {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
-      StringWriter html = new StringWriter();
       PageInfo page = _cachingPageStore.get(ref, -1);
-      _renderer.render(ref, page.getContent());
-      request.setAttribute(requestVarName, html.toString());
+      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent()).toXHTML());
     }
   }
 
