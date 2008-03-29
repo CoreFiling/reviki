@@ -21,6 +21,7 @@ import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.ChangeNotificationDispatcherImpl;
 import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
+import net.hillsdon.reviki.vc.impl.FixedMimeIdentifier;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
@@ -84,7 +85,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl()));
     
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
-    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations);
+    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, new FixedMimeIdentifier());
     RequestScopedThreadLocalPageStore pageStore = new RequestScopedThreadLocalPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);

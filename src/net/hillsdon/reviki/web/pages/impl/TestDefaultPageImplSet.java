@@ -28,6 +28,7 @@ import static org.easymock.EasyMock.verify;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
+import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
@@ -125,7 +126,7 @@ public class TestDefaultPageImplSet extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
 
     final String expectedCommitMessage = "Message\n" + _request.getRequestURL();
-    final String expectedContent = "Content" + DefaultPageImpl.CRLF;
+    final String expectedContent = "Content" + Strings.CRLF;
     expect(_store.set(CALLED_ON_PAGE, "dooby", 1, expectedContent, expectedCommitMessage)).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);

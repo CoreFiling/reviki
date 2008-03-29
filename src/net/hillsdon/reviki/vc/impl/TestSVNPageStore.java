@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
-
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.PageReference;
@@ -50,7 +49,7 @@ public class TestSVNPageStore extends TestCase {
   protected void setUp() {
     _tracker = createMock(DeletedRevisionTracker.class);
     _operations = createMock(BasicSVNOperations.class);
-    _store = new SVNPageStore(_tracker, _operations);
+    _store = new SVNPageStore(_tracker, _operations, new FixedMimeIdentifier());
   }
   
   public void testGetLatestRevisionJustDelegates() throws Exception {

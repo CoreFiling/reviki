@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.external.diff_match_patch.diff_match_patch;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.vc.ChangeInfo;
@@ -83,8 +84,6 @@ public class DefaultPageImpl implements DefaultPage {
     }
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + request.getRequestURL();
   }
-  
-  static final String CRLF = "\r\n";
   
   private final CachingPageStore _store;
   private final MarkupRenderer _renderer;
@@ -267,8 +266,8 @@ public class DefaultPageImpl implements DefaultPage {
     if (hasSaveParam) {
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       String content = getRequiredString(request, PARAM_CONTENT);
-      if (!content.endsWith(CRLF)) {
-        content = content + CRLF;
+      if (!content.endsWith(Strings.CRLF)) {
+        content = content + Strings.CRLF;
       }
       _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(request));
     }

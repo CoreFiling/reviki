@@ -43,6 +43,7 @@ import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.MimeIdentifier;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
@@ -73,16 +74,17 @@ public class SVNPageStore implements PageStore {
   };
 
   private final BasicSVNOperations _operations;
-
   private final DeletedRevisionTracker _tracker;
+  private final MimeIdentifier _mimeIdentifier;
 
   /**
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations) {
+  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final MimeIdentifier mimeIdentifier) {
     _tracker = tracker;
     _operations = operations;
+    _mimeIdentifier = mimeIdentifier;
   }
 
   public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
@@ -211,7 +213,19 @@ public class SVNPageStore implements PageStore {
   }
 
   public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
-    String dir = attachmentPath(ref);
+    // It would be better if this was all one commit.
+    if (baseRevision < 0) {
+      final long latestRevision = getLatestRevision();
+      final PageInfo pageInfo = get(ref, latestRevision);
+      if (!pageInfo.isLocked()) {
+        final boolean isImage = _mimeIdentifier.isImage(storeName);
+        final String link = (isImage ? "{{" : "[[") + storeName + (isImage ? "}}" : "]]");
+        final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
+        set(ref, null, latestRevision, newContent, commitMessage);
+      }
+    }
+    
+    final String dir = attachmentPath(ref);
     _operations.ensureDir(dir, commitMessage);
     set(dir + "/" + storeName, null, baseRevision, in, commitMessage);
   }

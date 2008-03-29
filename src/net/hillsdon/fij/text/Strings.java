@@ -70,5 +70,7 @@ public class Strings {
       throw new AssertionError("Java supports UTF8.");
     }
   }
+
+  public static final String CRLF = "\r\n";
   
 }
