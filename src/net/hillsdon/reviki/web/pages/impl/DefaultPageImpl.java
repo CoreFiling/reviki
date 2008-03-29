@@ -24,8 +24,8 @@ import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
@@ -86,11 +86,11 @@ public class DefaultPageImpl implements DefaultPage {
   
   static final String CRLF = "\r\n";
   
-  private final PageStore _store;
+  private final CachingPageStore _store;
   private final MarkupRenderer _renderer;
   private final WikiGraph _graph;
   
-  public DefaultPageImpl(final PageStore store, final MarkupRenderer renderer, final WikiGraph graph) {
+  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph) {
     _store = store;
     _renderer = renderer;
     _graph = graph;
@@ -191,7 +191,7 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   public View editor(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    PageInfo pageInfo = _store.tryToLock(page);
+    PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
     request.setAttribute("pageInfo", pageInfo);
     if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
       request.setAttribute("flash", "Could not lock the page.");
