@@ -35,7 +35,12 @@ public class TestMisc extends WebTestSupport {
       final String expect = "T" + System.currentTimeMillis() + page.getPath().toLowerCase();
       editWikiPage(page.getPath(), expect, "Some new content", null);
       assertTrue(getWikiPage("FrontPage").asText().contains(expect));
+      editWikiPage(page.getPath(), "", "Tidying", null);
     }
+  }
+  
+  public void testConfigSvnLocationShowsFormToEditSvnLocation() throws Exception {
+    getWikiPage("ConfigSvnLocation").getFormByName("configurationForm");
   }
   
 }

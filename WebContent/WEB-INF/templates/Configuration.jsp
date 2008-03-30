@@ -14,7 +14,7 @@
       indexing to complete after you submit this form.
     </p>
     
-    <form action="" method="post">
+    <form name="configurationForm" action="" method="post">
       <table>
         <tr>
           <td><label for="url">SVN URL </label></td>
