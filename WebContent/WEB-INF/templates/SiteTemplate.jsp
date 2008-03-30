@@ -29,9 +29,6 @@
   <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
   <script type="text/javascript">
     reviki.BASE_URL = "<sw:wikiUrl page=""/>"
-    $(document).ready(function() {
-      $("#query").focus();
-    });
   </script>
 </head>
 <body>
