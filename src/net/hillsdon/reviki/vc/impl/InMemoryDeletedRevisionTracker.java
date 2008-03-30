@@ -34,7 +34,7 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
 
   private final Map<String, ChangeInfo> _deletions = new ConcurrentHashMap<String, ChangeInfo>();
  
-  public ChangeInfo getChangeThatDeleted(final BasicSVNOperations helper, final String path) throws PageStoreAuthenticationException, PageStoreException {
+  public ChangeInfo getChangeThatDeleted(final String path) throws PageStoreAuthenticationException, PageStoreException {
     return _deletions.get(path);
   }
 

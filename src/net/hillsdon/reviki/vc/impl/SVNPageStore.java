@@ -167,7 +167,7 @@ public class SVNPageStore implements PageStore {
   }
 
   private ChangeInfo getChangeThatDeleted(final PageReference ref) throws PageStoreAuthenticationException, PageStoreException {
-    return _tracker.getChangeThatDeleted(_operations, ref.getPath());
+    return _tracker.getChangeThatDeleted(ref.getPath());
   }
   
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {

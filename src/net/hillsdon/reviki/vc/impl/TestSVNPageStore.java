@@ -62,7 +62,7 @@ public class TestSVNPageStore extends TestCase {
   public void testHistoryLogsToHeadIfNoDeletedRevision() throws Exception {
     final String path = "ThePage";
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
-    expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(null);
+    expect(_tracker.getChangeThatDeleted(path)).andReturn(null);
     expect(_operations.log(path, -1, true, true, 0, -1)).andReturn(asList(previousEdit));
     replay();
     assertEquals(asList(previousEdit), _store.history(new PageReference(path)));
@@ -73,7 +73,7 @@ public class TestSVNPageStore extends TestCase {
     final String path = "ThePage";
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
     final ChangeInfo deleteChange = new ChangeInfo(path, path, "mth", new Date(), 7, "Deleted", StoreKind.PAGE, ChangeType.DELETED, null, -1);
-    expect(_tracker.getChangeThatDeleted(_operations, path)).andReturn(deleteChange);
+    expect(_tracker.getChangeThatDeleted(path)).andReturn(deleteChange);
     expect(_operations.log(path, -1, true, true, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
     replay();
     List<ChangeInfo> history = _store.history(new PageReference(path));
@@ -88,7 +88,7 @@ public class TestSVNPageStore extends TestCase {
     final ChangeInfo copyRemove = new ChangeInfo(copyName, copyName, "mth", new Date(), 2, "Copy delete", StoreKind.PAGE, ChangeType.DELETED, null, -1);
     final ChangeInfo copyAdd  = new ChangeInfo(copyName, copyName, "mth", new Date(), 2, "Copy add", StoreKind.PAGE, ChangeType.ADDED, originalName, 1);
     final ChangeInfo edit  = new ChangeInfo(copyName, copyName, "mth", new Date(), 3, "Edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
-    expect(_tracker.getChangeThatDeleted(_operations, copyName)).andReturn(null);
+    expect(_tracker.getChangeThatDeleted(copyName)).andReturn(null);
     expect(_operations.log(copyName, -1, true, true, 0, -1)).andReturn(asList(edit, copyAdd));
     expect(_operations.log(originalName, -1, true, true, 0, 1)).andReturn(asList(copyRemove, create));
     replay();

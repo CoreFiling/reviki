@@ -35,6 +35,6 @@ import net.hillsdon.reviki.vc.PageStoreException;
  */
 public interface DeletedRevisionTracker extends ChangeSubscriber {
 
-  ChangeInfo getChangeThatDeleted(BasicSVNOperations helper, String path) throws PageStoreAuthenticationException, PageStoreException;
+  ChangeInfo getChangeThatDeleted(String path) throws PageStoreAuthenticationException, PageStoreException;
 
 }
