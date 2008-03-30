@@ -16,19 +16,17 @@
 package net.hillsdon.reviki.vc.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNProperty;
-import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
 /**
  * Does a commit of some sort.
@@ -36,6 +34,8 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  * @author mth
  */
 public abstract class SVNEditAction implements SVNAction<Long> {
+  
+  private static final Log LOG = LogFactory.getLog(SVNEditAction.class);
   
   private final String _commitMessage;
   private final Map<String, String> _locks;
@@ -49,15 +49,25 @@ public abstract class SVNEditAction implements SVNAction<Long> {
     _locks = locks;
   }
   
-  public Long perform(final SVNRepository repository) throws SVNException, PageStoreException, IOException {
+  public Long perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException, IOException {
+    ISVNEditor commitEditor = null;
     try {
-      final ISVNEditor commitEditor = repository.getCommitEditor(_commitMessage, _locks, false, null);
+      commitEditor = repository.getCommitEditor(_commitMessage, _locks, false, null);
       commitEditor.openRoot(-1);
-      driveCommitEditor(commitEditor);
+      driveCommitEditor(commitEditor, operations);
       commitEditor.closeDir();
       return commitEditor.closeEdit().getNewRevision();
     }
     catch (SVNException ex) {
+      // We try clean-up as advised but re-throw the original error for handling.
+      if (commitEditor != null) {
+        try {
+          commitEditor.abortEdit();
+        }
+        catch (SVNException abortError) {
+          LOG.warn("Failed to abort after failed transaction.", abortError);
+        }
+      }
       checkForInterveningCommit(ex);
       throw ex;
     }
@@ -72,63 +82,10 @@ public abstract class SVNEditAction implements SVNAction<Long> {
 
   /**
    * Actually do something.
+   * @param operations TODO
    * @throws SVNException On failure. 
    * @throws IOException On failure. 
    */
-  protected abstract void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException;
-
-  
-  protected void createDir(final ISVNEditor commitEditor, final String dir) throws SVNException {
-    commitEditor.addDir(dir, null, -1);
-    commitEditor.closeDir();
-  }
-
-  protected void copyFile(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
-    String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openDir(dir, -1);
-    commitEditor.addFile(toPath, fromPath, fromRevision);
-    commitEditor.closeDir();
-  }
-
-  protected void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
-    String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openDir(dir, -1);
-    commitEditor.deleteEntry(fromPath, baseRevision);
-    commitEditor.addFile(toPath, fromPath, baseRevision);
-    commitEditor.closeDir();
-  }
-
-  protected void moveDir(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
-    String dir = SVNPathUtil.removeTail(toPath);
-    commitEditor.openDir(dir, -1);
-    commitEditor.deleteEntry(fromPath, baseRevision);
-    commitEditor.addDir(toPath, fromPath, baseRevision);
-    commitEditor.closeDir();
-  }
-  
-  protected void createFile(final ISVNEditor commitEditor, final String filePath, final String mimeType, final InputStream data) throws SVNException {
-    String dir = SVNPathUtil.removeTail(filePath);
-    commitEditor.openDir(dir, -1);
-    commitEditor.addFile(filePath, null, -1);
-    commitEditor.applyTextDelta(filePath, null);
-    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-    String checksum = deltaGenerator.sendDelta(filePath, data, commitEditor, true);
-    if (mimeType != null) {
-      commitEditor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, mimeType);
-    }
-    commitEditor.closeFile(filePath, checksum);
-    commitEditor.closeDir();
-  }
-
-  protected void editFile(final ISVNEditor commitEditor, final String filePath, final long baseRevision, final InputStream newData) throws SVNException {
-    commitEditor.openRoot(-1);
-    commitEditor.openFile(filePath, baseRevision);
-    commitEditor.applyTextDelta(filePath, null);
-    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-    // We don't keep the base around so we can't provide it here.
-    String checksum = deltaGenerator.sendDelta(filePath, newData, commitEditor, true);
-    commitEditor.closeFile(filePath, checksum);
-    commitEditor.closeDir();
-  }
+  protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException;
   
 }

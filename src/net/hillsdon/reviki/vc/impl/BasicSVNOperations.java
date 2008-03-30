@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -23,14 +24,15 @@ import java.util.Map;
 
 import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.ChangeInfo;
-import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
@@ -58,15 +60,38 @@ public interface BasicSVNOperations {
 
   void getFile(String path, long revision, Map<String, String> properties, OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
-  void ensureDir(String dir, String commitMessage) throws PageStoreException;
 
   <T> T execute(SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException;
 
-  long create(String path, String commitMessage, InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
-  long edit(String path, long baseRevision, String commitMessage, String lockToken, InputStream content) throws PageStoreAuthenticationException, PageStoreException;
-  long delete(String path, long baseRevision, String commitMessage, String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
-  long copy(String fromPath, long fromRevision, String toPath, String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException;
-
+  /**
+   * Caller must openDir.
+   */
+  void create(ISVNEditor commitEditor, String path, InputStream content) throws SVNException, IOException;
+  /**
+   * Caller must openDir.
+   */
+  void edit(ISVNEditor commitEditor, String path, long baseRevision, InputStream content) throws SVNException;
+  /**
+   * Caller must openDir.
+   */
+  void delete(ISVNEditor commitEditor, String path, long baseRevision) throws SVNException;
+  /**
+   * Caller must closeDir afterwards.
+   */
+  void createDirectory(ISVNEditor commitEditor, String dir) throws SVNException;
+  
+  /**
+   * Currently does open/closeDir.
+   */
+  void copy(ISVNEditor commitEditor, String fromPath, long fromRevision, String toPath) throws SVNException;
+  /**
+   * Currently does open/closeDir.
+   */
+  void moveFile(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException;
+  /**
+   * Currently does open/closeDir.
+   */
+  void moveDir(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException;
 
   void unlock(PageReference ref, String lockToken) throws PageStoreAuthenticationException, PageStoreException;
   void lock(PageReference ref, long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException;

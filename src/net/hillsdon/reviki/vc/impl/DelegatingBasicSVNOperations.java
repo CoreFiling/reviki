@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -23,14 +24,15 @@ import java.util.Map;
 
 import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.ChangeInfo;
-import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
  * Delegates to {@link #getDelegate()}.
@@ -43,24 +45,32 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     return getDelegate().checkPath(path, revision);
   }
 
-  public long copy(final String fromPath, final long fromRevision, final String toPath, final String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().copy(fromPath, fromRevision, toPath, commitMessage);
+  public void copy(ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
+    getDelegate().copy(commitEditor, fromPath, fromRevision, toPath);
   }
 
-  public long create(final String path, final String commitMessage, final InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().create(path, commitMessage, content);
+  public void create(ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
+    getDelegate().create(commitEditor, path, content);
   }
 
-  public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().delete(path, baseRevision, commitMessage, lockToken);
+  public void delete(ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
+    getDelegate().delete(commitEditor, path, baseRevision);
   }
 
-  public long edit(final String path, final long baseRevision, final String commitMessage, final String lockToken, final InputStream content) throws PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().edit(path, baseRevision, commitMessage, lockToken, content);
+  public void edit(ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
+    getDelegate().edit(commitEditor, path, baseRevision, content);
   }
 
-  public void ensureDir(final String dir, final String commitMessage) throws PageStoreException {
-    getDelegate().ensureDir(dir, commitMessage);
+  public void createDirectory(ISVNEditor commitEditor, final String dir) throws SVNException {
+    getDelegate().createDirectory(commitEditor, dir);
+  }
+  
+  public void moveDir(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException {
+    getDelegate().moveDir(commitEditor, fromPath, baseRevision, toPath);
+  }
+  
+  public void moveFile(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException {
+    getDelegate().moveFile(commitEditor, fromPath, baseRevision, toPath);
   }
 
   public <T> T execute(final SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException {

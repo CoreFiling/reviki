@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -36,7 +35,6 @@ import java.util.regex.Pattern;
 import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
-import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
@@ -53,10 +51,12 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
 /**
  * The real impl, using an {@link SVNRepository}.
@@ -75,7 +75,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
-      public List<ChangeInfo> perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public List<ChangeInfo> perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         final String rootPath = getRoot();
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
@@ -91,7 +91,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public Collection<String> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<Collection<String>>() {
-      public Collection<String> perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public Collection<String> perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         final Set<String> results = new LinkedHashSet<String>();
         Collection<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
         _repository.getDir(dir, -1, null, SVNDirEntry.DIRENT_KIND, entries);
@@ -124,7 +124,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<String>() {
-      public String perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public String perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         return _repository.getRepositoryPath("");
       }
     });
@@ -132,7 +132,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   public <T> T execute(final SVNAction<T> action) throws PageStoreException, PageStoreAuthenticationException {
     try {
-      return action.perform(_repository);
+      return action.perform(this, _repository);
     }
     catch (PageStoreException ex) {
       throw ex;
@@ -181,7 +181,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<Void>() {
-      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public Void perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         repository.unlock(singletonMap(ref.getPath(), lockToken), false, new SVNLockHandlerAdapter());
         return null;
       }
@@ -190,7 +190,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public void lock(final PageReference ref, final long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<PageInfo>() {
-      public PageInfo perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public PageInfo perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           Map<String, Long> pathsToRevisions = singletonMap(ref.getPath(), revision);
           repository.lock(pathsToRevisions, "Locked by reviki.", false, new SVNLockHandlerAdapter());
@@ -210,7 +210,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<Void>() {
-      public Void perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public Void perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           repository.getFile(path, revision, properties, out);
         }
@@ -228,25 +228,19 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<Long>() {
-      public Long perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public Long perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         return repository.getLatestRevision();
       }
     });
   }
 
-  public void ensureDir(final String dir, final String commitMessage) throws PageStoreException {
-    if (checkPath(dir, -1) == SVNNodeKind.NONE) {
-      execute(new SVNEditAction(commitMessage) {
-        protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-          createDir(commitEditor, dir);
-        }
-      });
-    }
+  public void createDirectory(ISVNEditor commitEditor, final String dir) throws SVNException {
+    commitEditor.addDir(dir, null, -1);
   }
 
   public SVNNodeKind checkPath(final String path, final long revision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<SVNNodeKind>() {
-      public SVNNodeKind perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public SVNNodeKind perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         return repository.checkPath(path, revision);
       }
     });
@@ -263,50 +257,61 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     }
   }
   
-  public long create(final String path, final String commitMessage, final InputStream content) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
+  public void create(ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
     final BufferedInputStream bis = new BufferedInputStream(content);
-    return execute(new SVNEditAction(commitMessage) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-        String mimeType = detectMimeType(bis);
-        createFile(commitEditor, path, mimeType, bis);
-      }
-    });
+    String mimeType = detectMimeType(bis);
+    commitEditor.addFile(path, null, -1);
+    commitEditor.applyTextDelta(path, null);
+    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+    String checksum = deltaGenerator.sendDelta(path, bis, commitEditor, true);
+    if (mimeType != null) {
+      commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, mimeType);
+    }
+    commitEditor.closeFile(path, checksum);
   }
 
-  public long edit(final String path, final long baseRevision, final String commitMessage, final String lockToken, final InputStream content) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-        editFile(commitEditor, path, baseRevision, content);
-      }
-    });
+  public void edit(ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
+    commitEditor.openFile(path, baseRevision);
+    commitEditor.applyTextDelta(path, null);
+    SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+    // We don't keep the base around so we can't provide it here.
+    String checksum = deltaGenerator.sendDelta(path, content, commitEditor, true);
+    commitEditor.closeFile(path, checksum);
   }
 
-  public long copy(final String fromPath, final long fromRevision, final String toPath, final String commitMessage) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNEditAction(commitMessage) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-        copyFile(commitEditor, fromPath, fromRevision, toPath);
-      }
-    });
+  public void copy(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
+    String dir = SVNPathUtil.removeTail(toPath);
+    commitEditor.openDir(dir, -1);
+    commitEditor.addFile(toPath, fromPath, fromRevision);
+    commitEditor.closeDir();
   }
 
-  private Map<String, String> createLocksMap(final String path, final String lockToken) {
-    return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
-  }
-  
-  public long delete(final String path, final long baseRevision, final String commitMessage, final String lockToken) throws InterveningCommitException, PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException {
-        commitEditor.deleteEntry(path, baseRevision);
-      }
-    });
+  public void delete(ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
+    commitEditor.deleteEntry(path, baseRevision);
   }
 
   public SVNLock getLock(final String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<SVNLock>() {
-      public SVNLock perform(final SVNRepository repository) throws SVNException, PageStoreException {
+      public SVNLock perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         return repository.getLock(path);
       }
     });
   }
 
+  public void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
+    String dir = SVNPathUtil.removeTail(toPath);
+    commitEditor.openDir(dir, -1);
+    commitEditor.deleteEntry(fromPath, baseRevision);
+    commitEditor.addFile(toPath, fromPath, baseRevision);
+    commitEditor.closeDir();
+  }
+
+  public void moveDir(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
+    String dir = SVNPathUtil.removeTail(toPath);
+    commitEditor.openDir(dir, -1);
+    commitEditor.deleteEntry(fromPath, baseRevision);
+    commitEditor.addDir(toPath, fromPath, baseRevision);
+    commitEditor.closeDir();
+  }
+  
 }

@@ -17,6 +17,7 @@ package net.hillsdon.reviki.vc.impl;
 
 import static java.lang.String.format;
 import static net.hillsdon.fij.core.Functional.filter;
+import static net.hillsdon.fij.text.Strings.fromUTF8;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -192,42 +193,77 @@ public class SVNPageStore implements PageStore {
   }
 
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    final String path = ref.getPath();
     if (content.trim().length() == 0) {
-      return delete(ref.getPath(), lockToken, baseRevision, commitMessage);
+      return delete(path, lockToken, baseRevision, commitMessage);
     }
-    return set(ref.getPath(), lockToken, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)), commitMessage);
+    return _operations.execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
+      @Override
+      protected void driveCommitEditor(ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException {
+        commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), baseRevision);
+        set(commitEditor, path, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)));
+        commitEditor.closeDir();
+      }
+    });
   }
 
   private long delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    _operations.delete(path, baseRevision, commitMessage, lockToken);
+    _operations.execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
+      @Override
+      protected void driveCommitEditor(ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException {
+        _operations.delete(commitEditor, path, baseRevision);
+      }
+    });
     return PageInfo.DELETED;
   }
 
-  private long set(final String path, final String lockToken, final long baseRevision, final InputStream content, final String commitMessage) throws PageStoreException {
+  private void set(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException, IOException {
     if (baseRevision < 0) {
-      return _operations.create(path, commitMessage, content);
+      _operations.create(commitEditor, path, content);
     }
     else {
-      return _operations.edit(path, baseRevision, commitMessage, lockToken, content);
+      _operations.edit(commitEditor, path, baseRevision, content);
     }
   }
 
   public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
-    // It would be better if this was all one commit.
+    final boolean addLinkToPage;
+    final PageInfo pageInfo;
+    final long latestRevision;
     if (baseRevision < 0) {
-      final long latestRevision = getLatestRevision();
-      final PageInfo pageInfo = get(ref, latestRevision);
-      if (!pageInfo.isLocked()) {
-        final boolean isImage = _mimeIdentifier.isImage(storeName);
-        final String link = (isImage ? "{{" : "[[") + storeName + (isImage ? "}}" : "]]");
-        final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
-        set(ref, null, latestRevision, newContent, commitMessage);
-      }
+      latestRevision = getLatestRevision();
+      pageInfo = get(ref, latestRevision);
+      addLinkToPage = !pageInfo.isLocked();
+    }
+    else {
+      pageInfo = null;
+      addLinkToPage = false;
+      latestRevision = -1;
     }
     
     final String dir = attachmentPath(ref);
-    _operations.ensureDir(dir, commitMessage);
-    set(dir + "/" + storeName, null, baseRevision, in, commitMessage);
+    final boolean needToCreateAttachmentDir =  _operations.checkPath(dir, baseRevision) == SVNNodeKind.NONE;
+    _operations.execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException {
+        if (needToCreateAttachmentDir) {
+          operations.createDirectory(commitEditor, dir);
+        }
+        else {
+          commitEditor.openDir(dir, baseRevision);
+        }
+        set(commitEditor, dir + "/" + storeName, baseRevision, in);
+        commitEditor.closeDir();
+        
+        if (addLinkToPage) {
+          final boolean isImage = _mimeIdentifier.isImage(storeName);
+          final String link = (isImage ? "{{" : "[[") + storeName + (isImage ? "}}" : "]]");
+          final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
+          commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), -1);
+          set(commitEditor, ref.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)));
+          commitEditor.closeDir();
+        }
+      }
+    });
   }
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
@@ -282,7 +318,11 @@ public class SVNPageStore implements PageStore {
   }
 
   public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
-    return _operations.copy(from.getPath(), fromRevision, to.getPath(), commitMessage);
+    return _operations.execute(new SVNEditAction(commitMessage) {
+      protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException {
+        _operations.copy(commitEditor, from.getPath(), fromRevision, to.getPath());
+      }
+    });
   }
 
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
@@ -290,13 +330,17 @@ public class SVNPageStore implements PageStore {
     final String toAttachmentDir = attachmentPath(to);
     final boolean needToMoveAttachmentDir =  _operations.checkPath(fromAttachmentDir, baseRevision) == SVNNodeKind.DIR;
     return _operations.execute(new SVNEditAction(commitMessage) {
-      protected void driveCommitEditor(final ISVNEditor commitEditor) throws SVNException, IOException {
-        moveFile(commitEditor, from.getPath(), baseRevision, to.getPath());
+      protected void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException {
+        operations.moveFile(commitEditor, from.getPath(), baseRevision, to.getPath());
         if (needToMoveAttachmentDir) {
-          moveDir(commitEditor, fromAttachmentDir, baseRevision, toAttachmentDir);
+          operations.moveDir(commitEditor, fromAttachmentDir, baseRevision, toAttachmentDir);
         }
       }
     });
   }
-
+  
+  private Map<String, String> createLocksMap(final String path, final String lockToken) {
+    return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
+  }
+  
 }
