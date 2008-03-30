@@ -23,8 +23,8 @@ public class TestPageInfo extends TestCase {
     PageInfo uncommitted = new PageInfo("name", "content", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
     assertEquals("New", uncommitted.getRevisionName());
     assertTrue(uncommitted.isNew());
-    PageInfo committed = new PageInfo("name", "content", 1, 1, null, null, null, null);
-    assertEquals("r1", committed.getRevisionName());
+    PageInfo committed = new PageInfo("name", "content", 5, 2, null, null, null, null);
+    assertEquals("r2", committed.getRevisionName());
     assertFalse(committed.isNew());
   }
   

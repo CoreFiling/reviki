@@ -69,7 +69,7 @@ public class PageInfo extends PageReference {
     if (isNew()) {
       return "New";
     }
-    return "r" + _revision;
+    return "r" + getLastChangedRevision();
   }
 
   public String getLockedBy() {
