@@ -277,7 +277,7 @@ public class LuceneSearcher implements SearchEngine {
     Highlighter highlighter = null;
     if (provideExtracts) {
       query.rewrite(reader);
-      highlighter = new Highlighter(new SimpleHTMLFormatter(), new SimpleHTMLEncoder(), new QueryScorer(query));
+      highlighter = new Highlighter(new SimpleHTMLFormatter("<strong>", "</strong>"), new SimpleHTMLEncoder(), new QueryScorer(query));
     }
     Hits hits = searcher.search(query);
     LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
