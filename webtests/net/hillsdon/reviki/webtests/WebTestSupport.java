@@ -35,11 +35,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  */
 public abstract class WebTestSupport extends TestCase {
 
-  /**
-   * Contains parser, very non-thread safe but the tests are much faster.
-   */
-  private static final ValidateOnContentChange VALIDATE_ON_CONTENT_CHANGE = new ValidateOnContentChange();
-
   private static final String BASE_URL = "http://localhost:8080/reviki";
   
   private WebClient _client;
@@ -53,7 +48,7 @@ public abstract class WebTestSupport extends TestCase {
     _client.setRedirectEnabled(true);
     _client.setThrowExceptionOnFailingStatusCode(true);
     _client.setThrowExceptionOnScriptError(true);
-    _client.addWebWindowListener(VALIDATE_ON_CONTENT_CHANGE);
+    _client.addWebWindowListener(new ValidateOnContentChange());
   }
 
   protected String getUsername() {
