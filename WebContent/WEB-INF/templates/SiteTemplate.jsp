@@ -52,7 +52,7 @@
         <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
         <li class="menu"><sw:wikiLink page="AllPages"/></li>
         <li class="menu">
-          <form style="display: inline;" id="searchForm" name="searchForm" style="margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
+          <form id="searchForm" name="searchForm" style="display: inline; margin-top:0.2em;" action="<c:url value="/pages/${wikiName}/FindPage"/>" method="get">
             <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
             <input value="Go" type="submit"/>
           </form>
