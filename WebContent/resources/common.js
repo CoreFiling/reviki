@@ -7,15 +7,17 @@ reviki = {};
 reviki.formAsJavaScriptLink = function(formId, linkText) {
   var script = "javascript:document.getElementById('" + formId + "').submit()";
   var form = document.getElementById(formId);
-  form.style.display = "none";
-  var a = document.createElement("a");
-  a.setAttribute("href", script);
-  a.setAttribute("id", formId + "SubmitLink");
-  a.setAttribute("name", formId + "SubmitLink");
-  a.appendChild(document.createTextNode(linkText));
-  var parent = form.parentNode;
-  var space = parent.insertBefore(document.createTextNode(" "), form)
-  parent.insertBefore(a, space);
+  if (form) {
+	  form.style.display = "none";
+	  var a = document.createElement("a");
+	  a.setAttribute("href", script);
+	  a.setAttribute("id", formId + "SubmitLink");
+	  a.setAttribute("name", formId + "SubmitLink");
+	  a.appendChild(document.createTextNode(linkText));
+	  var parent = form.parentNode;
+	  var space = parent.insertBefore(document.createTextNode(" "), form)
+	  parent.insertBefore(a, space);
+	}
 }
 reviki.configureAutoSuggest = function() {
   var queryInput = $("#query");

@@ -20,9 +20,6 @@
           <input type="submit" value="Edit"/>
         </form>
       </li>
-      <script type="text/javascript">
-        reviki.formAsJavaScriptLink("editTop", "Edit");
-      </script>
       <li class="menu">
         <a href="${page.path}/attachments/">Attachments</a>
       </li>
@@ -51,9 +48,6 @@
       <input type="submit" value="Edit this new page" />
     </form>
     </div>
-    <script type="text/javascript">
-      reviki.formAsJavaScriptLink("editContent", "Edit this new page.");
-    </script>
     </c:if>
     <hr />
     <p id="backlinks">
@@ -63,7 +57,7 @@
         <sw:wikiLink page="${backlink}"/>
       </c:forEach>
       <c:if test="${backlinksLimited}">
-        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.path}&force">...</a>
+        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.path}&amp;force">...</a>
       </c:if>
     </c:if>
     </p>
@@ -74,9 +68,6 @@
             <form id="editBottom" name="editBottom" action="" method="post">
               <input type="submit" value="Edit"/>
             </form> 
-            <script type="text/javascript">
-              reviki.formAsJavaScriptLink("editBottom", "Edit");
-            </script>
             <p id="lockedInfo">You have locked this page.</p>
           </c:when>
           <c:otherwise>
@@ -88,9 +79,6 @@
         <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
           <input name="editButton" type="submit" value="Edit"/>
         </form><a href="${page.path}/attachments/">Attachments</a>
-        <script type="text/javascript">
-          reviki.formAsJavaScriptLink("editBottom", "Edit");
-        </script>
       </c:otherwise>
     </c:choose>
     <c:if test="${not empty lastEditAction}">
@@ -98,5 +86,12 @@
 	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
 	    </p>
 	  </c:if>
+  </tiles:putAttribute>
+  <tiles:putAttribute name="body-level">
+	  <script type="text/javascript">
+	    reviki.formAsJavaScriptLink("editBottom", "Edit");
+      reviki.formAsJavaScriptLink("editContent", "Edit this new page.");
+      reviki.formAsJavaScriptLink("editTop", "Edit");
+	  </script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

@@ -74,5 +74,6 @@
   ${renderedFooter}
     <p id="build-details">Built from r$BuildRevision$.</p>
   </div>
+  <tiles:insertAttribute name="body-level" ignore="true" />
 </body>
 </html>

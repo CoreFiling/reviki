@@ -41,7 +41,7 @@
                 <a href="<sw:wikiUrl page="${change.page}"/>/attachments/"><c:out value="${change.description}"/></a>
               </c:when>
               <c:otherwise>
-                <a href="<sw:wikiUrl page="${change.page}"/>?revision=${change.revision}&diff=${change.revision - 1}"><c:out value="${change.description}"/></a>
+                <a href="<sw:wikiUrl page="${change.page}"/>?revision=${change.revision}&amp;diff=${change.revision - 1}"><c:out value="${change.description}"/></a>
               </c:otherwise>
             </c:choose>
           </td>
