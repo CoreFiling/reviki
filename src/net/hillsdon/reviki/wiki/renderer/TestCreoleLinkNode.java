@@ -26,11 +26,14 @@ public class TestCreoleLinkNode extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker("/context", "wiki", new SimplePageStore()), new FakeConfiguration()));
+    SimplePageStore pages = new SimplePageStore();
+    pages.set(new PageReference("ExistingPage"), "", -1, "Content", "");
+    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker("/context", "wiki", pages), new FakeConfiguration()));
   }
   
   public void testInternal() {
-    assertEquals("<a class='new-page' href='/context/pages/wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='/context/pages/wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a class='existing-page' href='/context/pages/wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
   }
 
   public void testInterWiki() {

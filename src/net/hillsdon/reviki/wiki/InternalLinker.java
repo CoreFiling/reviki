@@ -16,8 +16,8 @@
 package net.hillsdon.reviki.wiki;
 
 import static java.lang.String.format;
+import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -53,12 +53,16 @@ public class InternalLinker {
   }
   
   public String link(final String pageName, final String linkText) {
-    boolean exists = exists(pageName);
-    if (!exists && WikiWordUtils.isAcronym(pageName)) {
+    // Special case: only link acronyms with real pages.
+    final boolean exists = exists(pageName);
+    if (!exists && isAcronym(pageName)) {
       return Escape.html(pageName);
     }
-    String cssClass = exists ? "existing-page" : "new-page";
-    return format("<a class='%s' href='%s'>%s</a>",
+    
+    final String otherAttrs = exists ? "" : "rel='nofollow' ";
+    final String cssClass = exists ? "existing-page" : "new-page";
+    return format("<a %sclass='%s' href='%s'>%s</a>",
+      otherAttrs,
       cssClass,
       Escape.html(url(pageName)),
       Escape.html(linkText)
