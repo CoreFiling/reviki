@@ -27,10 +27,12 @@ import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
+import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.pages.PageSource;
 import net.hillsdon.reviki.web.pages.SpecialPages;
 import net.hillsdon.reviki.web.pages.impl.AllPages;
 import net.hillsdon.reviki.web.pages.impl.DefaultPageImpl;
+import net.hillsdon.reviki.web.pages.impl.DiffGeneratorImpl;
 import net.hillsdon.reviki.web.pages.impl.FindPage;
 import net.hillsdon.reviki.web.pages.impl.OrphanedPages;
 import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
@@ -112,7 +114,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_searchEngine);
-
+    container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
     
     // Special pages
     container.addComponent(SpecialPages.class, SpecialPagesImpl.class);

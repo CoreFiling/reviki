@@ -57,7 +57,7 @@ public class TestDefaultPageImplSet extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _store = createMock(CachingPageStore.class);
-    _page = new DefaultPageImpl(_store, null, null);
+    _page = new DefaultPageImpl(_store, null, null, null);
     _request = new MockHttpServletRequest();
     _request.setContextPath("/reviki");
     _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());

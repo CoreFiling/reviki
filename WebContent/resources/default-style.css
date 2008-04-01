@@ -70,6 +70,16 @@ hr {
   clear: both;
 }
 
+/* Diff display */
+span.diff {
+}
+ins.diff {
+	background:#E6FFE6;
+}
+del.diff {
+	background:#FFE6E6;
+}
+
 /* JHighlighter styles */
 code {
   color: rgb(0,0,0); font-family: monospace; font-size: 12px; white-space: nowrap;

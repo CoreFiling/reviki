@@ -40,6 +40,7 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
@@ -64,6 +65,8 @@ public class TestDefaultPageImplGet extends TestCase {
   
   private DefaultPage _page;
 
+  private DiffGenerator _diffGenerator;
+
   @Override
   protected void setUp() throws Exception {
     _request = new MockHttpServletRequest();
@@ -71,7 +74,8 @@ public class TestDefaultPageImplGet extends TestCase {
     _store = createMock(CachingPageStore.class);
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
-    _page = new DefaultPageImpl(_store, _renderer, _graph);
+    _diffGenerator = createMock(DiffGenerator.class);
+    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator);
   }
 
   /**
@@ -108,13 +112,17 @@ public class TestDefaultPageImplGet extends TestCase {
     _request.setParameter(RequestParameterReaders.PARAM_REVISION, "6");
     _request.setParameter(PARAM_DIFF_REVISION, "4");
     expectGetIncomingLinks();
-    expectGetContent(6, "Content at revision six.");
-    expectGetContent(4, "Content at revision four.");
+    String sixContent = "Content at revision six.";
+    String fourContent = "Content at revision four.";
+    expectGetContent(6, sixContent);
+    expectGetContent(4, fourContent);
+    String theDiff = "It's changed!";
+    expect(_diffGenerator.getDiffMarkup(fourContent, sixContent)).andReturn(theDiff);
     // We don't render anything.
     replay();
     JspView view = (JspView) _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals("ViewDiff", view.getName());
-    assertNotNull(_request.getAttribute(ATTR_MARKED_UP_DIFF));
+    assertEquals(theDiff, _request.getAttribute(ATTR_MARKED_UP_DIFF));
     verify();
   }
   
@@ -127,11 +135,11 @@ public class TestDefaultPageImplGet extends TestCase {
   }
   
   private void verify() {
-    EasyMock.verify(_store, _renderer, _graph);
+    EasyMock.verify(_store, _renderer, _graph, _diffGenerator);
   }
 
   private void replay() {
-    EasyMock.replay(_store, _renderer, _graph);
+    EasyMock.replay(_store, _renderer, _graph, _diffGenerator);
   }
   
   private void expectRenderContent() throws Exception  {

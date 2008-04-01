@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.text.Strings;
-import net.hillsdon.reviki.external.diff_match_patch.diff_match_patch;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
@@ -37,6 +35,7 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
@@ -88,11 +87,13 @@ public class DefaultPageImpl implements DefaultPage {
   private final CachingPageStore _store;
   private final MarkupRenderer _renderer;
   private final WikiGraph _graph;
+  private final DiffGenerator _diffGenerator;
   
-  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph) {
+  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator) {
     _store = store;
     _renderer = renderer;
     _graph = graph;
+    _diffGenerator = diffGenerator;
   }
   
   public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -207,15 +208,6 @@ public class DefaultPageImpl implements DefaultPage {
     }
   }
 
-  @SuppressWarnings("unchecked") // Diff library is odd...
-  private static String getDiffMarkup(final PageInfo head, final PageInfo base) {
-    diff_match_patch api = new diff_match_patch();
-    // Diff isn't public!
-    LinkedList diffs = api.diff_main(base.getContent(), head.getContent());
-    api.diff_cleanupSemantic(diffs);
-    return api.diff_prettyHtml(diffs);
-  }
-  
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     long revison = getRevision(request);
     Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
@@ -225,7 +217,7 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_PAGE_INFO, main);
     if (diffRevision != null) {
       PageInfo base = _store.get(page, diffRevision);
-      request.setAttribute(ATTR_MARKED_UP_DIFF, getDiffMarkup(main, base));
+      request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(base.getContent(), main.getContent()));
       return new JspView("ViewDiff");
     }
     else if (request.getParameter("raw") != null) {
