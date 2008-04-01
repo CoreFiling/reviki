@@ -7,6 +7,8 @@ import java.io.StringReader;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import junit.framework.AssertionFailedError;
+
 import org.apache.xml.resolver.tools.CatalogResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -75,10 +77,7 @@ class ValidateOnContentChange extends WebWindowAdapter {
     catch (SAXException e) {
       System.err.println("\n XHTML validation error: " + e.getMessage() + "\n\n");
       System.err.println(content);
-      // TODO: Enable me!
-      // AssertionFailedError failure = new AssertionFailedError(response.getUrl().toString() + "\n" + e.getMessage());
-      // failure.initCause(e);
-      // throw failure;
+      throw new AssertionFailedError("XHTML validation error, see console output.");
     }
     catch (IOException e) {
       throw new RuntimeException("I/O error reading from a String!", e);
