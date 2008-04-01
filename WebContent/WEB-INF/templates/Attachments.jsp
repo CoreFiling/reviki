@@ -20,7 +20,7 @@
            </td>
             <td>
               <form name="replaceAttachmentUpload" action="" method="post" enctype="multipart/form-data">
-                <input id="file" type="file" name="file"/>
+                <input type="file" name="file"/>
                 <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>"/>
                 <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"/>
                 <input type="submit" value="Upload new version"/>
@@ -29,13 +29,15 @@
           </tr>
           <tr>
             <td>
-              <ul>
-                <c:forEach var="version" items="${attachment.previousVersions}">
-                  <li>
-                    <a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})"/></a>
-                  </li>
-                </c:forEach>
-              </ul>
+              <c:if test="${not empty attachment.previousVersions}">
+	              <ul>
+	                <c:forEach var="version" items="${attachment.previousVersions}">
+	                  <li>
+	                    <a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})"/></a>
+	                  </li>
+	                </c:forEach>
+	              </ul>
+	            </c:if>
             </td>
           </tr>
         </c:forEach>
