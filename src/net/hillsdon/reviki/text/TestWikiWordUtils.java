@@ -90,6 +90,12 @@ public class TestWikiWordUtils extends TestCase {
     assertSplits(asList("ON", "Eor", "TWO"), "ONEorTWO");
   }
   
+  public void testIsAcronym() {
+    assertTrue(WikiWordUtils.isAcronym("TLA"));
+    assertTrue(WikiWordUtils.isAcronym("TLAs"));
+    assertFalse(WikiWordUtils.isAcronym("TLAss"));
+  }
+  
   private void assertSplits(List<String> expected, String input) {
     assertEquals(expected, splitCamelCase(input));
   }
