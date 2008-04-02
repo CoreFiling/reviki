@@ -79,11 +79,10 @@ public class CreoleRenderer {
     }
   }
 
-
   private final RenderNode _root;
   
   public CreoleRenderer(final RenderNode[] customBlock, final RenderNode[] customInline) {
-    RenderNode root = new RegexMatchToTag("", "", 0);
+    RegexMatchToTag root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
     RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
     RenderNode italic = new RegexMatchToTag("(?s)//(.*?)(?<=[^:])//", "em", 1);
@@ -105,26 +104,32 @@ public class CreoleRenderer {
     table.addChildren(tableRow);
     tableRow.addChildren(tableHeading, tableCell);
     tableCell.addChildren(concat(inline, noWiki));
+
+    italic.addChildren(inline); 
+    bold.addChildren(inline);
+    strikethrough.addChildren(inline);
+    
+    paragraph.addChildren(inline);
+    RenderNode fallback = new RegexMatchToTag("", "", 0);
+    fallback.addChildren(paragraph);
     
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(inline);
     root.addChildren(customBlock);
+    root.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule);
+    root.setFallback(fallback);
     root.addChildren(
         noWiki, 
         horizontalRule,
         table,
+        orderedList.addChildren(listItem),
+        unorderedList.addChildren(listItem),
         new Heading(6).addChildren(inline),
         new Heading(5).addChildren(inline),
         new Heading(4).addChildren(inline), 
         new Heading(3).addChildren(inline), 
         new Heading(2).addChildren(inline), 
-        new Heading(1).addChildren(inline),
-        orderedList.addChildren(listItem),
-        unorderedList.addChildren(listItem),
-        paragraph.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule).addChildren(inline), 
-        italic.addChildren(inline), 
-        bold.addChildren(inline),
-        strikethrough.addChildren(inline)
+        new Heading(1).addChildren(inline)
      );
     _root = root;
   }

@@ -29,6 +29,7 @@ public abstract class AbstractRegexNode implements RenderNode {
 
   private final List<RenderNode> _children = new ArrayList<RenderNode>();
   private final Pattern _matchRe;
+  private RenderNode _fallback = null;
 
   public AbstractRegexNode(final String matchRe) {
     _matchRe = Pattern.compile(matchRe);
@@ -38,6 +39,10 @@ public abstract class AbstractRegexNode implements RenderNode {
     return _children;
   }
 
+  public void setFallback(final RenderNode fallback) {
+    _fallback = fallback;
+  }
+  
   public AbstractRegexNode addChildren(final RenderNode... rules) {
     _children.addAll(asList(rules));
     return this;
@@ -62,16 +67,25 @@ public abstract class AbstractRegexNode implements RenderNode {
       if (earliestRule != null) {
         String beforeMatch = text.substring(0, earliestMatch.start());
         String afterMatch = text.substring(earliestMatch.end());
-        result.add(new HtmlEscapeResultNode(beforeMatch));
+        fallback(page, result, beforeMatch);
         result.add(earliestRule.handle(page, earliestMatch, this));
         text = afterMatch;
       }
       else {
-        result.add(new HtmlEscapeResultNode(text));
+        fallback(page, result, text);
         text = "";
       }
     }
     return result;
+  }
+
+  private void fallback(final PageReference page, final List<ResultNode> result, final String text) {
+    if (_fallback != null) {
+      result.addAll(_fallback.render(page, text, this));
+    }
+    else {
+      result.add(new HtmlEscapeResultNode(text));
+    }
   }
 
   public Matcher find(final String text) {

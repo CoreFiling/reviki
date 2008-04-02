@@ -1,20 +1,13 @@
 package net.hillsdon.reviki.webtests;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import junit.framework.AssertionFailedError;
+import net.hillsdon.xhtmlvalidator.XHTMLValidator;
 
-import org.apache.xml.resolver.tools.CatalogResolver;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindowAdapter;
@@ -27,42 +20,7 @@ import com.gargoylesoftware.htmlunit.WebWindowEvent;
  */
 class ValidateOnContentChange extends WebWindowAdapter {
 
-  private final XMLReader _reader;
-
-  public ValidateOnContentChange() {
-    try {
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      factory.setNamespaceAware(true);
-      factory.setValidating(true);
-      SAXParser parser;
-      parser = factory.newSAXParser();
-      _reader = parser.getXMLReader();
-      _reader.setErrorHandler(new ErrorHandler() {
-        public void error(SAXParseException e) throws SAXException {
-          throw e;
-        }
-
-        public void fatalError(SAXParseException e) throws SAXException {
-          throw e;
-        }
-
-        public void warning(SAXParseException e) throws SAXException {
-          throw e;
-        }
-      });
-      final CatalogResolver cr = new CatalogResolver(true);
-      cr.getCatalog().getCatalogManager().setIgnoreMissingProperties(true);
-      cr.getCatalog().parseCatalog(ValidateOnContentChange.class.getResource("resources/catalog.xml"));
-      _reader.setEntityResolver(cr);
-    }
-    catch (Exception ex) {
-      throw new RuntimeException("Parser configuration error", ex);
-    }
-  }
-
-  private void validate(final Reader in) throws SAXException, IOException {
-    _reader.parse(new InputSource(in));
-  }
+  private final XHTMLValidator _validator = new XHTMLValidator();
 
   public void webWindowContentChanged(final WebWindowEvent event) {
     WebResponse response = event.getNewPage().getWebResponse();
@@ -71,7 +29,7 @@ class ValidateOnContentChange extends WebWindowAdapter {
       // We leave documents without a doctype alone for now.  These include
       // tomcat's default error pages.
       if (content.indexOf("<!DOCTYPE") != -1) {
-        validate(new StringReader(content));
+        _validator.validate(new InputSource(new StringReader(content)));
       }
     }
     catch (SAXException e) {

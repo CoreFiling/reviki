@@ -17,19 +17,27 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import net.hillsdon.xhtmlvalidator.XHTMLValidator;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JavaTypeMapper;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public abstract class JsonDrivenRenderingTest extends TestCase {
 
-  private List<Map<String, String>> _tests;
+  private static final String XHTML_PREFIX = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+                                           + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>XHTML prefix</title></head><body>";
+  private static final String XHTML_SUFFIX = "</body></html>";
+  private final XHTMLValidator _validator = new XHTMLValidator();
+  private final List<Map<String, String>> _tests;
 
   @SuppressWarnings("unchecked")
   public JsonDrivenRenderingTest(final URL url) throws JsonParseException, IOException {
@@ -46,6 +54,7 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
       final String expected = test.get("output");
       final String input = test.get("input");
       final String actual = render(input);
+      validate(caseName, actual);
       final boolean match = expected.equals(actual);
       if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);
@@ -62,6 +71,20 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
     }
     if (errors > 0) {
       fail("Rendering errors, please see stderr.");
+    }
+  }
+
+  private void validate(final String caseName, final String actual) {
+    // Put the content in a <body> tag first.
+    final String content = XHTML_PREFIX + actual + XHTML_SUFFIX;
+    try {
+      _validator.validate(new InputSource(new StringReader(content)));
+    }
+    catch (SAXException e) {
+      fail(caseName + ": " + e.getMessage());
+    }
+    catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

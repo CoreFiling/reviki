@@ -40,7 +40,6 @@
     "output": "<ul><li> Item<ol><li> Subitem</li></ol></li></ul>"
   },
   {
-    "bug":    "We put the hr within the paragraph, not sure if that's ok.",
     "name":   "Horizontal rule",
     "input":  "Some text\n----\nSome more text",
     "output": "<p>Some text</p><hr /><p>Some more text</p>"
@@ -280,6 +279,11 @@
     "name":   "Difficult emphasis #16",
     "input":  "//ftp://link.org//",
     "output": "<p><em><a href='ftp://link.org'>ftp://link.org</a></em></p>"
+  },
+  {
+    "name":   "No ul in paragraph",
+    "input":  "Foo\n* One\n* Two",
+    "output": "<p>Foo</p><ul><li> One</li>\n<li> Two</li></ul>"
   }
 ]
 
