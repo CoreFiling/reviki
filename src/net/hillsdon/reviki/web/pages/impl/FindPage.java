@@ -40,6 +40,7 @@ import net.hillsdon.reviki.web.pages.DefaultPage;
 
 public class FindPage extends AbstractSpecialPage {
 
+  // TODO: "<Image height='16' width='16' type='image/x-icon'>%s</Image>"
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
   + "<OpenSearchDescription xmlns='http://a9.com/-/spec/opensearch/1.1/'>\n"
@@ -75,7 +76,7 @@ public class FindPage extends AbstractSpecialPage {
       request.getParameter(PARAM_QUERY_ALTERNATE);
     }
     if (query == null) {
-      super.get(page, path, request, response);
+      return super.get(page, path, request, response);
     }
     
     boolean pageExists = _store.list().contains(new PageReference(query));
