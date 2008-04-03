@@ -59,11 +59,10 @@ ul.menu {
 #build-details {
   text-align: right;
   font-size: 75%;
-  color: grey;
+  color: gray;
 }
 hr {
   color: black;
-  background-color: black;
   height: 1px;
   border: 0px;
   border-style: solid;
