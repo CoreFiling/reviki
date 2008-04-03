@@ -19,7 +19,6 @@ import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -90,15 +89,7 @@ public class FindPage extends AbstractSpecialPage {
       results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));
     }
     if ("txt".equals(request.getParameter("ctype"))) {
-      return new View() {
-        public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
-          response.setContentType("text/plain");
-          PrintWriter writer = response.getWriter();
-          for (SearchMatch matcher : results) {
-            writer.println(matcher.getPage());
-          }
-        }
-      };
+      return new TextFormatSearchResults(results);
     }
     else {
       if (!pageExists && isWikiWord(query)) {
