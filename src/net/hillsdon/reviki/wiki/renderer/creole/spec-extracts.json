@@ -52,12 +52,12 @@
   {
     "name":   "bulleted list",
     "input":  "* Item 1\n** Item 1.1\n* Item 2",
-    "output": "<ul><li> Item 1<ul><li> Item 1.1</li></ul></li>\n<li> Item 2</li></ul>"
+    "output": "<ul><li> Item 1<ul>\n<li> Item 1.1</li></ul></li>\n<li> Item 2</li></ul>"
   },
   {
     "name":   "numbered list",
     "input":  "# Item 1\n## Item 1.1\n# Item 2",
-    "output": "<ol><li> Item 1<ol><li> Item 1.1</li></ol></li>\n<li> Item 2</li></ol>"
+    "output": "<ol><li> Item 1<ol>\n<li> Item 1.1</li></ol></li>\n<li> Item 2</li></ol>"
   },
   {
     "name":   "horizontal rule",

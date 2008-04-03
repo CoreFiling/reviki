@@ -17,7 +17,7 @@
   { "comment": "Test an ul item with a sublist",
     "name":   "Unordered item with unordered sublist",
     "input":  "* Item\n** Subitem",
-    "output": "<ul><li> Item<ul><li> Subitem</li></ul></li></ul>"
+    "output": "<ul><li> Item<ul>\n<li> Subitem</li></ul></li></ul>"
   },
   { "comment": "Test a sublist without an initial tag (should not make a list)",
     "name":   "Unordered sublist without initial tag",
@@ -27,7 +27,7 @@
   { "comment": "Test an ol item with a sublist",
     "name":   "Ordered item with ordered sublist",
     "input":  "# Item\n## Subitem",
-    "output": "<ol><li> Item<ol><li> Subitem</li></ol></li></ol>"
+    "output": "<ol><li> Item<ol>\n<li> Subitem</li></ol></li></ol>"
   },
   { "comment": "Test a sublist without an initial tag (should not make a list)",
     "name":   "Ordered sublist without initial tag",
@@ -37,7 +37,7 @@
   { "comment": "Test an unordered list with an ordered sublist",
     "name":   "Unordered item with ordered sublist",
     "input":  "* Item\n*# Subitem",
-    "output": "<ul><li> Item<ol><li> Subitem</li></ol></li></ul>"
+    "output": "<ul><li> Item<ol>\n<li> Subitem</li></ol></li></ul>"
   },
   {
     "name":   "Horizontal rule",
@@ -283,7 +283,12 @@
   {
     "name":   "No ul in paragraph",
     "input":  "Foo\n* One\n* Two",
-    "output": "<p>Foo</p><ul><li> One</li>\n<li> Two</li></ul>"
+    "output": "<p>Foo</p><ul>\n<li> One</li>\n<li> Two</li></ul>"
+  },
+  {
+    "name":   "List breaks on blank line",
+    "input":  "* One\n* Two\n\n* Three",
+    "output": "<ul><li> One</li>\n<li> Two</li>\n</ul><ul>\n<li> Three</li></ul>"
   }
 ]
 
