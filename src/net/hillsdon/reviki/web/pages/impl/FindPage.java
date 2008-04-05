@@ -39,10 +39,10 @@ import net.hillsdon.reviki.web.pages.DefaultPage;
 
 public class FindPage extends AbstractSpecialPage {
 
-  // TODO: "<Image height='16' width='16' type='image/x-icon'>%s</Image>"
   private static final String OPENSEARCH_DESCRIPTION =
     "<?xml version='1.0' encoding='UTF-8'?>\n"
   + "<OpenSearchDescription xmlns='http://a9.com/-/spec/opensearch/1.1/'>\n"
+  + "<Image height='16' width='16' type='image/x-icon'>%s</Image>"
   + "<ShortName>Wiki Search</ShortName>\n"
   + "<Description>Wiki Search</Description>\n"
   + "<Url type='text/html' template='%s?query={searchTerms}'/>\n"
@@ -66,7 +66,9 @@ public class FindPage extends AbstractSpecialPage {
       return new View() {
         public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
           response.setContentType("application/opensearchdescription+xml");
-          response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(RequestBasedWikiUrls.get(request).search())));
+          String searchURL = RequestBasedWikiUrls.get(request).search();
+          String faviconURL = RequestBasedWikiUrls.get(request).favicon();
+          response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(faviconURL), Escape.html(searchURL)));
         }
       };
     }

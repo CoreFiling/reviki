@@ -53,6 +53,9 @@ public class TestFeedWriter extends TestCase {
       public String search() {
         return "search";
       }
+      public String favicon() {
+        return "favicon";
+      }
     };
     FeedWriter.writeAtom(urls, new PrintWriter(out), changes);
     

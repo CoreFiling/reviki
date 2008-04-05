@@ -33,5 +33,7 @@ public interface WikiUrls {
   String page(String name);
 
   String feed();
+
+  String favicon();
   
 }

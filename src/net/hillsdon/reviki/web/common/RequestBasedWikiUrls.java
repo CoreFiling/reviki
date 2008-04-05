@@ -72,4 +72,8 @@ public class RequestBasedWikiUrls implements WikiUrls {
     return page("RecentChanges") + "/atom.xml";
   }
 
+  public String favicon() {
+    return _base + "/resources/favicon.ico";
+  }
+
 }
