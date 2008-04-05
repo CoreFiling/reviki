@@ -34,7 +34,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
 
   private final Configuration _configuration;
   private final InternalLinker _internalLinker;
-  private CreoleRenderer _creole;
+  private final CreoleRenderer _creole;
   
   public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker,  final Accessor<List<Macro>> macros) {
     _configuration = configuration;
