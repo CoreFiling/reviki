@@ -63,6 +63,7 @@ ul.menu {
 }
 hr {
   color: black;
+  background-color: black;
   height: 1px;
   border: 0px;
   border-style: solid;
