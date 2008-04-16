@@ -15,7 +15,7 @@
  */
 package net.hillsdon.reviki.wiki.plugin;
 
-import static net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore.PLUGINS_PAGE;
+import static net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore.CONFIG_PLUGINS;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -83,7 +83,7 @@ public class PluginsImpl implements Plugins {
   public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
     // We want to do the most recent first to prevent repeated work.
     for (ChangeInfo change : IterableUtils.reversed(chronological)) {
-      if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(PLUGINS_PAGE.getPath())) {
+      if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(CONFIG_PLUGINS.getPath())) {
         PluginAtRevision plugin = _active.get(change.getName());
         if (plugin == null || plugin._revision < change.getRevision()) {
           updatePlugin(change.getName(), change.getRevision());
@@ -98,7 +98,7 @@ public class PluginsImpl implements Plugins {
     jar.deleteOnExit();
     final OutputStream stream = new FileOutputStream(jar);
     try {
-      _store.attachment(PLUGINS_PAGE, name, revision, new ContentTypedSink() {
+      _store.attachment(CONFIG_PLUGINS, name, revision, new ContentTypedSink() {
         public void setContentType(final String contentType) {
         }
         public void setFileName(final String attachment) {

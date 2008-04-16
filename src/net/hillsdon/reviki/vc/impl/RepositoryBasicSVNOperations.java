@@ -68,9 +68,11 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   private final SVNRepository _repository;
+  private final AutoPropertiesApplier _autoPropertiesApplier;
 
-  public RepositoryBasicSVNOperations(final SVNRepository repository) {
+  public RepositoryBasicSVNOperations(final SVNRepository repository, final AutoPropertiesApplier autoPropertiesApplier) {
     _repository = repository;
+    _autoPropertiesApplier = autoPropertiesApplier;
   }
 
   public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
@@ -259,14 +261,21 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public void create(ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
     final BufferedInputStream bis = new BufferedInputStream(content);
-    String mimeType = detectMimeType(bis);
+    final String autoDetectedMimeType = detectMimeType(bis);
+    
     commitEditor.addFile(path, null, -1);
     commitEditor.applyTextDelta(path, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
     String checksum = deltaGenerator.sendDelta(path, bis, commitEditor, true);
-    if (mimeType != null) {
-      commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, mimeType);
+    
+    final Map<String, String> autoprops = _autoPropertiesApplier.apply(path);
+    for (Map.Entry<String, String> entry : autoprops.entrySet()) {
+      commitEditor.changeFileProperty(path, entry.getKey(), entry.getValue());
     }
+    if (!autoprops.containsKey(SVNProperty.MIME_TYPE) && autoDetectedMimeType != null) {
+      commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, autoDetectedMimeType);
+    }
+    
     commitEditor.closeFile(path, checksum);
   }
 

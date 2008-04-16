@@ -17,6 +17,8 @@ import net.hillsdon.reviki.search.impl.LuceneSearcher;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.ChangeNotificationDispatcherImpl;
 import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
@@ -38,6 +40,7 @@ import net.hillsdon.reviki.web.pages.impl.OrphanedPages;
 import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
 import net.hillsdon.reviki.web.pages.impl.RecentChanges;
 import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
+import net.hillsdon.reviki.web.vcintegration.AutoProperiesFromConfigPage;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.PerRequestPageStoreFactory;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
@@ -84,14 +87,17 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
       }
     });
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));
-    RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl()));
+    AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
+    AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
+    RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
     
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
-    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, new FixedMimeIdentifier());
+    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     RequestScopedThreadLocalPageStore pageStore = new RequestScopedThreadLocalPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
+    autoProperties.setPageStore(cachingPageStore);
     InternalLinker internalLinker = new InternalLinker(servletContext.getContextPath(), configuration.getGivenWikiName(), cachingPageStore);
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);

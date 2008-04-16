@@ -49,7 +49,7 @@ public class TestSVNPageStore extends TestCase {
   protected void setUp() {
     _tracker = createMock(DeletedRevisionTracker.class);
     _operations = createMock(BasicSVNOperations.class);
-    _store = new SVNPageStore(_tracker, _operations, new FixedMimeIdentifier());
+    _store = new SVNPageStore(_tracker, _operations, createMock(AutoPropertiesApplier.class), new FixedMimeIdentifier());
   }
   
   public void testGetLatestRevisionJustDelegates() throws Exception {

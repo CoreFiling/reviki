@@ -77,14 +77,16 @@ public class SVNPageStore implements PageStore {
   private final BasicSVNOperations _operations;
   private final DeletedRevisionTracker _tracker;
   private final MimeIdentifier _mimeIdentifier;
+  private final AutoPropertiesApplier _autoPropertiesApplier;
 
   /**
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final MimeIdentifier mimeIdentifier) {
+  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
     _tracker = tracker;
     _operations = operations;
+    _autoPropertiesApplier = autoPropertiesApplier;
     _mimeIdentifier = mimeIdentifier;
   }
 
@@ -227,6 +229,8 @@ public class SVNPageStore implements PageStore {
   }
 
   public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+    _autoPropertiesApplier.read();
+    
     final boolean addLinkToPage;
     final PageInfo pageInfo;
     final long latestRevision;

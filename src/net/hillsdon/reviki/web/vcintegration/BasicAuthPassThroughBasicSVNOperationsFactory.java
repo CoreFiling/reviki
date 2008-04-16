@@ -21,6 +21,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.BasicSVNOperations;
 import net.hillsdon.reviki.vc.impl.BasicSVNOperationsFactory;
 import net.hillsdon.reviki.vc.impl.RepositoryBasicSVNOperations;
@@ -75,12 +76,11 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
   }
 
   private final SVNURL _url;
+  private final AutoPropertiesApplier _autoPropertiesApplier;
   
-  /**
-   * @param url Repository URL.
-   */
-  public BasicAuthPassThroughBasicSVNOperationsFactory(final SVNURL url) {
+  public BasicAuthPassThroughBasicSVNOperationsFactory(final SVNURL url, final AutoPropertiesApplier autoPropertiesApplier) {
     _url = url;
+    _autoPropertiesApplier = autoPropertiesApplier;
   }
 
   static UsernamePassword getBasicAuthCredentials(String authorization) {
@@ -117,7 +117,7 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
       UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
       repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
       request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new RepositoryBasicSVNOperations(repository);
+      return new RepositoryBasicSVNOperations(repository, _autoPropertiesApplier);
     }
     catch (SVNException ex) {
       throw new PageStoreException(ex);
