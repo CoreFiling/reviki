@@ -117,7 +117,7 @@ public class SVNPageStore implements PageStore {
 
   public Set<PageReference> list() throws PageStoreException {
     Set<PageReference> names = new LinkedHashSet<PageReference>();
-    for (String page : _operations.listFiles("")) {
+    for (String page : _tracker.currentExistingEntries()) {
       names.add(new PageReference(page));
     }
     return names;

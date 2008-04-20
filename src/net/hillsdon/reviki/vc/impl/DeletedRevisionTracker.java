@@ -15,10 +15,10 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.util.Set;
+
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
-import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
-import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
  * SVN provides no way to do svn log or similar on a deleted URL
@@ -36,6 +36,15 @@ import net.hillsdon.reviki.vc.PageStoreException;
  */
 public interface DeletedRevisionTracker extends ChangeSubscriber {
 
-  ChangeInfo getChangeThatDeleted(String path) throws PageStoreAuthenticationException, PageStoreException;
+  /**
+   * @param path A path.
+   * @return If path does not currently exist return the change that last deleted path, if any, otherwise null.
+   */
+  ChangeInfo getChangeThatDeleted(String path);
+
+  /**
+   * @return All known existing (i.e. not deleted) pages.
+   */
+  Set<String> currentExistingEntries();
 
 }

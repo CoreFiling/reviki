@@ -16,13 +16,11 @@
 package net.hillsdon.reviki.vc.impl;
 
 import static java.util.Arrays.asList;
-import static net.hillsdon.fij.core.Functional.set;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
@@ -93,14 +91,6 @@ public class TestSVNPageStore extends TestCase {
     expect(_operations.log(originalName, -1, true, true, 0, 1)).andReturn(asList(copyRemove, create));
     replay();
     assertEquals(asList(edit, copyAdd, copyRemove, create), _store.history(new PageReference(copyName)));
-    verify();
-  }
-  
-  public void testListReturnsPageReferenceForEveryFileInRepoRoot() throws Exception {
-    expect(_operations.listFiles("")).andReturn(asList("FooPage", "BarPage", "random.stuff"));
-    replay();
-    final Set<PageReference> expected = set(new PageReference("FooPage"), new PageReference("BarPage"), new PageReference("random.stuff"));
-    assertEquals(expected, _store.list());
     verify();
   }
   

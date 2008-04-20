@@ -16,13 +16,13 @@
 package net.hillsdon.reviki.vc.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.hillsdon.reviki.vc.ChangeInfo;
-import net.hillsdon.reviki.vc.ChangeType;
-import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
@@ -32,21 +32,31 @@ import net.hillsdon.reviki.vc.PageStoreException;
  */
 public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
 
-  private final Map<String, ChangeInfo> _deletions = new ConcurrentHashMap<String, ChangeInfo>();
+  private final Map<String, ChangeInfo> _lastChangeForPath = new ConcurrentHashMap<String, ChangeInfo>();
+  private final Map<String, ChangeInfo> _lastChangeForPathExistingOnly = new ConcurrentHashMap<String, ChangeInfo>();
  
-  public ChangeInfo getChangeThatDeleted(final String path) throws PageStoreAuthenticationException, PageStoreException {
-    return _deletions.get(path);
+  public ChangeInfo getChangeThatDeleted(final String path) {
+    final ChangeInfo lastChangeForPath = _lastChangeForPath.get(path);
+    if (lastChangeForPath != null && lastChangeForPath.isDeletion()) {
+      return lastChangeForPath;
+    }
+    return null;
+  }
+  
+  public Set<String> currentExistingEntries() {
+    return Collections.unmodifiableSet(_lastChangeForPathExistingOnly.keySet());
   }
 
-  public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+  public synchronized void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
     for (ChangeInfo change : chronological) {
       final String page = change.getPage();
       if (page != null) {
-        if (change.getChangeType() == ChangeType.DELETED) {
-          _deletions.put(page, change);
+        _lastChangeForPath.put(page, change);
+        if (change.isDeletion()) {
+          _lastChangeForPathExistingOnly.remove(page);
         }
         else {
-          _deletions.remove(page);
+          _lastChangeForPathExistingOnly.put(page, change);
         }
       }
     }
