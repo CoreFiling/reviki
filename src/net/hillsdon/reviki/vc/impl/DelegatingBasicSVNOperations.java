@@ -18,7 +18,6 @@ package net.hillsdon.reviki.vc.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -91,10 +90,6 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
 
   public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
     return getDelegate().getRoot();
-  }
-
-  public Collection<String> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().listFiles(dir);
   }
 
   public void lock(final PageReference ref, final long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException {

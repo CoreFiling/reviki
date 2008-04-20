@@ -18,7 +18,6 @@ package net.hillsdon.reviki.vc.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,6 @@ public interface BasicSVNOperations {
    */
   List<ChangeInfo> log(String path, long limit, boolean pathOnly, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 
-  Collection<String> listFiles(String dir) throws PageStoreAuthenticationException, PageStoreException;
   String getRoot() throws PageStoreAuthenticationException, PageStoreException;
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   SVNNodeKind checkPath(String path, long revision) throws PageStoreAuthenticationException, PageStoreException;

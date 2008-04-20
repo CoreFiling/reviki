@@ -15,20 +15,14 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
-import static java.util.Collections.singletonMap;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +38,6 @@ import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
-import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
@@ -57,6 +50,8 @@ import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
+
+import static java.util.Collections.singletonMap;
 
 /**
  * The real impl, using an {@link SVNRepository}.
@@ -91,22 +86,6 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
   }
   
-  public Collection<String> listFiles(final String dir) throws PageStoreAuthenticationException, PageStoreException {
-    return execute(new SVNAction<Collection<String>>() {
-      public Collection<String> perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
-        final Set<String> results = new LinkedHashSet<String>();
-        Collection<SVNDirEntry> entries = new ArrayList<SVNDirEntry>();
-        _repository.getDir(dir, -1, null, SVNDirEntry.DIRENT_KIND, entries);
-        for (SVNDirEntry e : entries) {
-          if (SVNNodeKind.FILE.equals(e.getKind())) {
-            results.add(e.getName());
-          }
-        }
-        return results;
-      }
-    });
-  }
-
   @SuppressWarnings("unchecked")
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final boolean pathOnly) {
     final String fullLoggedPath = SVNPathUtil.append(rootPath, loggedPath);
