@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -68,7 +69,9 @@ public class FeedWriter {
   }
 
   private static String rfc3339DateFormat(final Date date) {
-    return new SimpleDateFormat("yyyy-MM-dd hh:mm:ssZ").format(date);
+    final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return dateFormat.format(date);
   }
 
   public static void writeAtom(final WikiUrls wikiUrls, final PrintWriter out, final Collection<ChangeInfo> changes) throws TransformerConfigurationException, SAXException {
@@ -103,7 +106,11 @@ public class FeedWriter {
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
         addLink(handler, wikiUrls.page(change.getPage()), null);
         addElement(handler, "id", wikiUrls.page(change.getPage()));
-        addElement(handler, "author", change.getUser());
+        
+        handler.startElement(ATOM_NS, "author", "author", NO_ATTRIBUTES);
+        addElement(handler, "name", change.getUser());
+        handler.endElement(ATOM_NS, "author", "author");
+        
         addElement(handler, "summary", change.getDescription());
         addUpdated(handler, change.getDate());
         handler.endElement(ATOM_NS, "entry", "entry");
