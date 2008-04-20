@@ -64,7 +64,11 @@ public class FeedWriter {
   }
 
   private static void addUpdated(TransformerHandler handler, Date date) throws SAXException {
-    addElement(handler, "updated", new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ").format(date));
+    addElement(handler, "updated", rfc3339DateFormat(date));
+  }
+
+  private static String rfc3339DateFormat(final Date date) {
+    return new SimpleDateFormat("yyyy-MM-dd hh:mm:ssZ").format(date);
   }
 
   public static void writeAtom(final WikiUrls wikiUrls, final PrintWriter out, final Collection<ChangeInfo> changes) throws TransformerConfigurationException, SAXException {
@@ -87,6 +91,7 @@ public class FeedWriter {
     handler.startPrefixMapping("", ATOM_NS);
     handler.endPrefixMapping("");
     handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
+    addElement(handler, "id", wikiUrls.feed());
     addElement(handler, "title", "reviki feed");
     addLink(handler, wikiUrls.feed(), "self");
     addLink(handler, wikiUrls.root(), null);
@@ -98,6 +103,7 @@ public class FeedWriter {
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
         addLink(handler, wikiUrls.page(change.getPage()), null);
         addElement(handler, "id", wikiUrls.page(change.getPage()));
+        addElement(handler, "author", change.getUser());
         addElement(handler, "summary", change.getDescription());
         addUpdated(handler, change.getDate());
         handler.endElement(ATOM_NS, "entry", "entry");
