@@ -17,10 +17,8 @@ package net.hillsdon.reviki.di.impl;
 
 import javax.servlet.ServletContext;
 
-import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
-import net.hillsdon.reviki.configuration.RequestScopedApplicationUrls;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.ApplicationSession;
 import net.hillsdon.reviki.di.WikiSession;
@@ -31,6 +29,8 @@ import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
 import net.hillsdon.reviki.web.handlers.impl.JumpToWikiUrlImpl;
 import net.hillsdon.reviki.web.handlers.impl.ListWikisImpl;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.impl.RequestScopedApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
 

@@ -21,7 +21,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import net.hillsdon.reviki.wiki.InternalLinker;
+import net.hillsdon.reviki.web.urls.InternalLinker;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.

@@ -13,18 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
-
-import net.hillsdon.reviki.vc.PageStoreException;
+package net.hillsdon.reviki.web.urls;
 
 /**
- * Configuration that is available once we have an SVN repository configured.
- *
- * @see PropertiesDeploymentConfiguration
+ * Wikis are rather tied up with the web.  At the moment we assume the public URL
+ * is the servlet container URL which is probably dubious if apache is fronting
+ * tomcat etc.  Probably need a configurable base URL.
+ * 
+ * These methods return fully qualified URLs.
+ * 
  * @author mth
  */
-public interface Configuration {
+public interface WikiUrls {
 
-  InterWikiLinker getInterWikiLinker() throws PageStoreException;
+  String root();
+  
+  String search();
+  
+  String page(String name);
+
+  String feed();
+
+  String favicon();
   
 }

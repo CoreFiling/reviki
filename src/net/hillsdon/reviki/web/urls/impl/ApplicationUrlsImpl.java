@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
+package net.hillsdon.reviki.web.urls.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.reviki.web.common.WikiUrlsImpl;
-import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
+
 
 public class ApplicationUrlsImpl implements ApplicationUrls {
 

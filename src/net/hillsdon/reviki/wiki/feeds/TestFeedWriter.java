@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
-import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

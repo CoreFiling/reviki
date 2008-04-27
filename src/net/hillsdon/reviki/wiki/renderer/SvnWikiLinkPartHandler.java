@@ -16,11 +16,11 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.configuration.Configuration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.wiki.InternalLinker;
-import net.hillsdon.reviki.wiki.UnknownWikiException;
+import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;

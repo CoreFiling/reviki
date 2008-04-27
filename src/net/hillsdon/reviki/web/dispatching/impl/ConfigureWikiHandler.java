@@ -23,10 +23,10 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ActiveWikis;
+import net.hillsdon.reviki.web.redirect.RedirectToRequestURLView;
 
 public class ConfigureWikiHandler implements RequestHandler {
   

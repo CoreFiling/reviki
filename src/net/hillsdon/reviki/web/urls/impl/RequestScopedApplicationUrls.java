@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
+package net.hillsdon.reviki.web.urls.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.core.Transform;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAware;
 import net.hillsdon.reviki.web.vcintegration.RequestLocal;
-import net.hillsdon.reviki.wiki.WikiUrls;
 
 public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLifecycleAware {
 

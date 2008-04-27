@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
+package net.hillsdon.reviki.web.urls.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +23,8 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InterWikiLinker;
 
 /**
  * Configuration derived from ConfigXXX pages in the wiki.

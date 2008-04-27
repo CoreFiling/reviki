@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.common;
+package net.hillsdon.reviki.web.redirect;
 
 import java.io.IOException;
 
@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
  * Communicates a redirect to a wiki page.

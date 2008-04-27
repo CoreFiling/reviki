@@ -13,31 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
+package net.hillsdon.reviki.web.urls;
 
-import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
+import net.hillsdon.reviki.vc.PageStoreException;
 
-public interface ApplicationUrls {
+/**
+ * Configuration that is available once we have an SVN repository configured.
+ *
+ * @see PropertiesDeploymentConfiguration
+ * @author mth
+ */
+public interface Configuration {
 
-  /**
-   * Prefer adding methods to using this one.
-   * 
-   * @param relative With leading '/'.
-   * @return An absolute URL within this application.
-   */
-  String url(String relative);
-  
-  /**
-   * @return URL for the wiki list.
-   */
-  String list();
-  
-  /**
-   * Note the returned value may be specific to the current request.
-   * 
-   * @param name The wiki name (null for default).
-   * @return The relevant URLs.
-   */
-  WikiUrls get(String name);
+  InterWikiLinker getInterWikiLinker() throws PageStoreException;
   
 }

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.common;
+package net.hillsdon.reviki.web.urls.impl;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.configuration.ApplicationUrlsImpl;
+import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 
 /**
  * Test for {@link WikiUrlsImpl}.

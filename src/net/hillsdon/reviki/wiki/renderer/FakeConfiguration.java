@@ -18,9 +18,9 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
-import net.hillsdon.reviki.configuration.Configuration;
-import net.hillsdon.reviki.configuration.InterWikiLinker;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InterWikiLinker;
 
 public class FakeConfiguration implements Configuration {
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {

@@ -13,19 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.common;
+package net.hillsdon.reviki.web.redirect;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class RedirectToRequestURLView implements View {
+import net.hillsdon.reviki.web.common.View;
 
-  public static final View INSTANCE = new RedirectToRequestURLView();
+/**
+ * Communicates a redirect.
+ * 
+ * @author mth
+ */
+public class RedirectView implements View {
+
+  private final String _url;
+
+  public RedirectView(final String url) {
+    _url = url;
+  }
   
-  public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    response.sendRedirect(request.getRequestURL().toString());
+  public String getURL() {
+    return _url;
   }
 
+  public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    response.sendRedirect(_url);
+  }
+  
 }

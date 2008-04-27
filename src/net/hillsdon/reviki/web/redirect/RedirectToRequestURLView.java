@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.wiki;
+package net.hillsdon.reviki.web.redirect;
 
-/**
- * Wikis are rather tied up with the web.  At the moment we assume the public URL
- * is the servlet container URL which is probably dubious if apache is fronting
- * tomcat etc.  Probably need a configurable base URL.
- * 
- * These methods return fully qualified URLs.
- * 
- * @author mth
- */
-public interface WikiUrls {
+import java.io.IOException;
 
-  String root();
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.hillsdon.reviki.web.common.View;
+
+public class RedirectToRequestURLView implements View {
+
+  public static final View INSTANCE = new RedirectToRequestURLView();
   
-  String search();
-  
-  String page(String name);
+  public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    response.sendRedirect(request.getRequestURL().toString());
+  }
 
-  String feed();
-
-  String favicon();
-  
 }

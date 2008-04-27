@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.util.List;
 
 import net.hillsdon.fij.accessors.Accessor;
-import net.hillsdon.reviki.configuration.Configuration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.wiki.InternalLinker;
+import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;

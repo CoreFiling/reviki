@@ -22,13 +22,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
-import net.hillsdon.reviki.web.common.RedirectToPageView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
+import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.common;
+package net.hillsdon.reviki.web.urls.impl;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
-import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
  * We should not base the URLs on the request.

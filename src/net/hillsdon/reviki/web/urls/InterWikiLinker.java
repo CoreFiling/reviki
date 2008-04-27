@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.configuration;
+package net.hillsdon.reviki.web.urls;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.wiki.UnknownWikiException;
 
 /**
  * Can create links to external wikis given a wiki name and page name.
@@ -58,7 +57,7 @@ public class InterWikiLinker {
    * Exposed for testing.
    * @return Unmodifiable map from wiki name for format string as provided in {@link #addWiki(String, String)}. 
    */
-  Map<String, String> getWikiToFormatStringMap() {
+  public Map<String, String> getWikiToFormatStringMap() {
     return Collections.unmodifiableMap(_links);
   }
   

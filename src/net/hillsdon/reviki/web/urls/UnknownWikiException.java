@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.wiki;
+package net.hillsdon.reviki.web.urls;
 
 /**
  * Thrown if we're asked to produce an inter-wiki link for a wiki
