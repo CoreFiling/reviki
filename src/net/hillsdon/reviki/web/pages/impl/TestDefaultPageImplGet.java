@@ -15,17 +15,6 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
-import static net.hillsdon.fij.core.Functional.set;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-
 import java.util.Collection;
 import java.util.Date;
 
@@ -42,10 +31,23 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.WikiUrls;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 
 import org.easymock.EasyMock;
+
+import static net.hillsdon.fij.core.Functional.set;
+
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 
 /**
  * Tests for {@link GetRegularPageImpl}.
@@ -59,13 +61,11 @@ public class TestDefaultPageImplGet extends TestCase {
   private CachingPageStore _store;
   private MarkupRenderer _renderer;
   private WikiGraph _graph;
-
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
-  
   private DefaultPage _page;
-
   private DiffGenerator _diffGenerator;
+  private WikiUrls _wikiUrls;
 
   @Override
   protected void setUp() throws Exception {
@@ -75,7 +75,8 @@ public class TestDefaultPageImplGet extends TestCase {
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
-    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator);
+    _wikiUrls = createMock(WikiUrls.class);
+    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator, _wikiUrls);
   }
 
   /**

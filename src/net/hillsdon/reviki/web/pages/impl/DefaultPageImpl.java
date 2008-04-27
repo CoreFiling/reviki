@@ -1,10 +1,5 @@
 package net.hillsdon.reviki.web.pages.impl;
 
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,13 +25,13 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.WikiUrls;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
@@ -46,6 +41,11 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -88,12 +88,14 @@ public class DefaultPageImpl implements DefaultPage {
   private final MarkupRenderer _renderer;
   private final WikiGraph _graph;
   private final DiffGenerator _diffGenerator;
+  private final WikiUrls _wikiUrls;
   
-  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator) {
+  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls) {
     _store = store;
     _renderer = renderer;
     _graph = graph;
     _diffGenerator = diffGenerator;
+    _wikiUrls = wikiUrls;
   }
   
   public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -280,12 +282,12 @@ public class DefaultPageImpl implements DefaultPage {
         toRef = new PageReference(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
-      return new RedirectView(RequestBasedWikiUrls.get(request).page(toRef.getPath()));
+      return new RedirectView(_wikiUrls.page(toRef.getPath()));
     }
     else if (hasRenameParam) {
       final String toPage = getRequiredString(request, PARAM_TO_PAGE);
       _store.rename(page, new PageReference(toPage), -1, createLinkingCommitMessage(request));
-      return new RedirectView(RequestBasedWikiUrls.get(request).page(toPage));
+      return new RedirectView(_wikiUrls.page(toPage));
     }
     else if (hasUnlockParam) {
       String lockToken = request.getParameter(PARAM_LOCK_TOKEN);

@@ -15,11 +15,6 @@
  */
 package net.hillsdon.reviki.web.handlers.impl;
 
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,11 +23,15 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.pages.Page;
 import net.hillsdon.reviki.web.pages.PageSource;
+import net.hillsdon.reviki.wiki.WikiUrls;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here
@@ -45,15 +44,17 @@ public class PageHandlerImpl implements PageHandler {
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
   
   private final PageSource _pageSource;
+  private final WikiUrls _wikiUrls;
 
-  public PageHandlerImpl(final PageSource pageSource) {
+  public PageHandlerImpl(final PageSource pageSource, final WikiUrls wikiUrls) {
     _pageSource = pageSource;
+    _wikiUrls = wikiUrls;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String pageName = path.next();
     if (pageName == null || "".equals(pageName)) {
-      return new RedirectView(RequestBasedWikiUrls.get(request).page("FrontPage"));
+      return new RedirectView(_wikiUrls.page("FrontPage"));
     }
     if (pageName.contains("/")) {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);

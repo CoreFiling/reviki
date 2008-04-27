@@ -15,10 +15,6 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
-import static java.lang.String.format;
-import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
-
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -33,9 +29,12 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RedirectView;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.wiki.WikiUrls;
+import static java.lang.String.format;
+import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 
 public class FindPage extends AbstractSpecialPage {
 
@@ -54,11 +53,13 @@ public class FindPage extends AbstractSpecialPage {
   
   private final PageStore _store;
   private final SearchEngine _searchEngine;
+  private final WikiUrls _wikiUrls;
 
-  public FindPage(final PageStore store, final SearchEngine searchEngine, final DefaultPage defaultPage) {
+  public FindPage(final PageStore store, final SearchEngine searchEngine, final WikiUrls wikiUrls, final DefaultPage defaultPage) {
     super(defaultPage);
     _store = store;
     _searchEngine = searchEngine;
+    _wikiUrls = wikiUrls;
   }
 
   public View get(PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -66,8 +67,8 @@ public class FindPage extends AbstractSpecialPage {
       return new View() {
         public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
           response.setContentType("application/opensearchdescription+xml");
-          String searchURL = RequestBasedWikiUrls.get(request).search();
-          String faviconURL = RequestBasedWikiUrls.get(request).favicon();
+          String searchURL = _wikiUrls.search();
+          String faviconURL = _wikiUrls.favicon();
           response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(faviconURL), Escape.html(searchURL)));
         }
       };
@@ -82,7 +83,7 @@ public class FindPage extends AbstractSpecialPage {
     
     boolean pageExists = _store.list().contains(new PageReference(query));
     if (request.getParameter("force") == null && pageExists) {
-      return new RedirectView(RequestBasedWikiUrls.get(request).page(query));
+      return new RedirectView(_wikiUrls.page(query));
     }
     
     final Set<SearchMatch> results = _searchEngine.search(query, true);

@@ -22,8 +22,6 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
 /**
- * Icky.
- * 
  * We should not base the URLs on the request.
  * 
  * We need to know the public base URL anyway really* for e.g. atom ids
@@ -31,31 +29,31 @@ import net.hillsdon.reviki.wiki.WikiUrls;
  * 
  * @author mth
  */
-public class RequestBasedWikiUrls implements WikiUrls {
+public class WikiUrlsImpl implements WikiUrls {
 
-  public static void create(final HttpServletRequest request, final WikiConfiguration configuration) {
-    request.setAttribute(RequestBasedWikiUrls.class.getName(), new RequestBasedWikiUrls(request, configuration));
-  }
-  
-  public static WikiUrls get(final HttpServletRequest request) {
-    return (WikiUrls) request.getAttribute(RequestBasedWikiUrls.class.getName());
-  }
-  
-  private String _base;
-  private final WikiConfiguration _configuration;
-
-  public RequestBasedWikiUrls(final HttpServletRequest request, final WikiConfiguration configuration) {
-    _configuration = configuration;
+  private static String getBaseUrl(final HttpServletRequest request) {
     String requestURL = request.getRequestURL().toString();
     String path = request.getRequestURI().substring(request.getContextPath().length());
-    _base = requestURL.substring(0, requestURL.length() - path.length());
+    String base = requestURL.substring(0, requestURL.length() - path.length());
+    return base;
+  }
+
+  private final String _base;
+  private final String _givenWikiName;
+
+  public WikiUrlsImpl(final HttpServletRequest request, final WikiConfiguration configuration) {
+    this(getBaseUrl(request), configuration.getGivenWikiName());
+  }
+  
+  public WikiUrlsImpl(final String base, final String givenWikiName) {
+    _base = base;
+    _givenWikiName = givenWikiName;
   }
   
   public String root() {
-    String givenWikiName = _configuration.getGivenWikiName();
     String result = _base + "/pages/";
-    if (givenWikiName != null) {
-      result += Escape.url(givenWikiName) + "/";
+    if (_givenWikiName != null) {
+      result += Escape.url(_givenWikiName) + "/";
     }
     return result;
   }

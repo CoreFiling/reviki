@@ -15,16 +15,6 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_LOCK_TOKEN;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
@@ -36,8 +26,18 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RedirectView;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
+import net.hillsdon.reviki.web.common.WikiUrlsImpl;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.wiki.WikiUrls;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_LOCK_TOKEN;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * Test for {@link SetPageImpl}.
@@ -53,11 +53,13 @@ public class TestDefaultPageImplSet extends TestCase {
   private HttpServletResponse _response;
 
   private DefaultPage _page;
+  private WikiUrls _wikiUrls;
 
   @Override
   protected void setUp() throws Exception {
     _store = createMock(CachingPageStore.class);
-    _page = new DefaultPageImpl(_store, null, null, null);
+    _wikiUrls = new WikiUrlsImpl("http://www.example.com/", "foo");
+    _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls);
     _request = new MockHttpServletRequest();
     _request.setContextPath("/reviki");
     _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());
@@ -66,7 +68,6 @@ public class TestDefaultPageImplSet extends TestCase {
     WikiConfiguration configuration = createMock(WikiConfiguration.class);
     expect(configuration.getGivenWikiName()).andReturn("foo").anyTimes();
     replay(configuration);
-    RequestBasedWikiUrls.create(_request, configuration);
   }
   
   public void testNoActionIsInvalidInputException() throws Exception {
@@ -159,7 +160,7 @@ public class TestDefaultPageImplSet extends TestCase {
     expect(_store.copy(CALLED_ON_PAGE, -1, new PageReference("ToPage"), "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(RequestBasedWikiUrls.get(_request).page("ToPage"), view.getURL());
+    assertEquals(_wikiUrls.page("ToPage"), view.getURL());
     verify(_store);
   }
   
@@ -169,7 +170,7 @@ public class TestDefaultPageImplSet extends TestCase {
     expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(RequestBasedWikiUrls.get(_request).page(CALLED_ON_PAGE.getPath()), view.getURL());
+    assertEquals(_wikiUrls.page(CALLED_ON_PAGE.getPath()), view.getURL());
     verify(_store);
   }
   
@@ -190,7 +191,7 @@ public class TestDefaultPageImplSet extends TestCase {
     expect(_store.rename(CALLED_ON_PAGE, new PageReference("ToPage"), -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(RequestBasedWikiUrls.get(_request).page("ToPage"), view.getURL());
+    assertEquals(_wikiUrls.page("ToPage"), view.getURL());
     verify(_store);
   }
 

@@ -26,7 +26,6 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.ApplicationSession;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiChoice;
@@ -53,7 +52,6 @@ public class WikiChoiceImpl implements WikiChoice {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
     request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
-    RequestBasedWikiUrls.create(request, configuration);
     RequestHandler handler = getWikiHandler(configuration, path);
     return handler.handle(path, request, response);
   }

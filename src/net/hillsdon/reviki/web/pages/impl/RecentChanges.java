@@ -28,9 +28,9 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RequestBasedWikiUrls;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.wiki.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
 public class RecentChanges extends AbstractSpecialPage {
@@ -41,10 +41,12 @@ public class RecentChanges extends AbstractSpecialPage {
   private static final int RECENT_CHANGES_HISTORY_SIZE = 50;
 
   private final PageStore _store;
+  private final WikiUrls _wikiUrls;
 
-  public RecentChanges(final CachingPageStore store, final DefaultPage defaultPage) {
+  public RecentChanges(final CachingPageStore store, final WikiUrls wikiUrls, final DefaultPage defaultPage) {
     super(defaultPage);
     _store = store;
+    _wikiUrls = wikiUrls;
   }
 
   @Override
@@ -52,9 +54,10 @@ public class RecentChanges extends AbstractSpecialPage {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     if ("atom.xml".equals(path.next())) {
       return new View() {
+
         public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
           response.setContentType("application/atom+xml");
-          FeedWriter.writeAtom(RequestBasedWikiUrls.get(request), response.getWriter(), recentChanges);
+          FeedWriter.writeAtom(_wikiUrls, response.getWriter(), recentChanges);
         }
       };
     }

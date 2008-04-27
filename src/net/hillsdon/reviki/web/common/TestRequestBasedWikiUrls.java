@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 /**
- * Test for {@link RequestBasedWikiUrls}.
+ * Test for {@link WikiUrlsImpl}.
  * 
  * @author mth
  */
@@ -41,7 +41,7 @@ public class TestRequestBasedWikiUrls extends TestCase {
   }
 
   public void testNullWiki() {
-    RequestBasedWikiUrls urls = createURLs("foo", null);
+    WikiUrlsImpl urls = createURLs("foo", null);
     assertEquals("http://www.example.com/reviki/pages/", urls.root());
     assertEquals("http://www.example.com/reviki/pages/Spaced+Out", urls.page("Spaced Out"));
     assertEquals("http://www.example.com/reviki/pages/RecentChanges/atom.xml", urls.feed());
@@ -49,18 +49,18 @@ public class TestRequestBasedWikiUrls extends TestCase {
   }
 
   public void testGivenNameWiki() {
-    RequestBasedWikiUrls urls = createURLs("foo", "foo");
+    WikiUrlsImpl urls = createURLs("foo", "foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.root());
     assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
     assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges/atom.xml", urls.feed());
     assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
   }
   
-  private RequestBasedWikiUrls createURLs(final String actual, final String given) {
+  private WikiUrlsImpl createURLs(final String actual, final String given) {
     expect(_configuration.getWikiName()).andReturn(actual).anyTimes();
     expect(_configuration.getGivenWikiName()).andReturn(given).anyTimes();
     replay(_configuration);
-    return new RequestBasedWikiUrls(_request, _configuration);
+    return new WikiUrlsImpl(_request, _configuration);
   }
   
 }
