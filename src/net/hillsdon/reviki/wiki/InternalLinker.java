@@ -15,23 +15,21 @@
  */
 package net.hillsdon.reviki.wiki;
 
-import static java.lang.String.format;
-import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import static java.lang.String.format;
+import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 
 public class InternalLinker {
 
   private final PageStore _store;
-  private final String _wikiName;
-  private final String _contextPath;
+  private final WikiUrls _wikiUrls;
 
-  public InternalLinker(final String contextPath, final String wikiName, final CachingPageStore store) {
-    _contextPath = contextPath;
-    _wikiName = wikiName;
+  public InternalLinker(final WikiUrls wikiUrls, final CachingPageStore store) {
+    _wikiUrls = wikiUrls;
     _store = store;
   }
 
@@ -45,11 +43,7 @@ public class InternalLinker {
   }
   
   public String url(final String pageName) {
-    return String.format("%s/pages/%s%s", 
-      _contextPath,
-      _wikiName != null ? Escape.url(_wikiName) + "/" : "", 
-      Escape.url(pageName)
-    );
+    return _wikiUrls.page(pageName);
   }
   
   public String link(final String pageName, final String linkText) {

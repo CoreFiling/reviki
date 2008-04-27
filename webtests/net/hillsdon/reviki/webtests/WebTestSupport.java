@@ -35,7 +35,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  */
 public abstract class WebTestSupport extends TestCase {
 
-  private static final String BASE_URL = "http://localhost:8080/reviki";
+  public static final String BASE_URL = "http://localhost:8080/reviki";
   
   private WebClient _client;
 
@@ -139,7 +139,7 @@ public abstract class WebTestSupport extends TestCase {
   
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
     HtmlPage results = search(page, query);
-    results.getAnchorByHref("/reviki/pages/test/" + name);
+    results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
   }
 
   protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {

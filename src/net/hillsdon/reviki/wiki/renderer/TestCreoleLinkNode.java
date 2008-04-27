@@ -18,6 +18,7 @@ package net.hillsdon.reviki.wiki.renderer;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.common.WikiUrlsImpl;
 import net.hillsdon.reviki.wiki.InternalLinker;
 
 public class TestCreoleLinkNode extends TestCase {
@@ -28,7 +29,7 @@ public class TestCreoleLinkNode extends TestCase {
   protected void setUp() throws Exception {
     SimplePageStore pages = new SimplePageStore();
     pages.set(new PageReference("ExistingPage"), "", -1, "Content", "");
-    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker("/context", "wiki", pages), new FakeConfiguration()));
+    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker(new WikiUrlsImpl("/context", "wiki"), pages), new FakeConfiguration()));
   }
   
   public void testInternal() {

@@ -30,6 +30,7 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
+import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
@@ -68,11 +69,11 @@ public class WikiHandlerImpl implements WikiHandler {
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    request.setAttribute("cssUrl", _internalLinker.url("ConfigCss") + "?raw");
-    request.setAttribute("internalLinker", _internalLinker);
     try {
       _requestLifecycleAwareManager.requestStarted(request);
       try {
+        request.setAttribute("cssUrl", _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?raw");
+        request.setAttribute("internalLinker", _internalLinker);
         _syncUpdater.sync();
         addSideBarEtcToRequest(request);
         // We need to complete the rendering here, so the view can call back into the page store.

@@ -31,7 +31,7 @@ public class TestAllPages extends WebTestSupport {
 
     HtmlPage allPages = getWikiPage("AllPages");
     assertTrue(allPages.getTitleText().endsWith("All Pages"));
-    HtmlAnchor link = allPages.getAnchorByHref("/reviki/pages/test/" + name);
+    HtmlAnchor link = allPages.getAnchorByHref(BASE_URL + "/pages/test/" + name);
     assertEquals(name, link.asText());
   }
   

@@ -80,6 +80,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
   }
 
   public void configure(final MutablePicoContainer container) {
+    container.addComponent(WikiUrls.class, RequestScopedWikiUrls.class);
+    
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
@@ -102,7 +104,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
-    InternalLinker internalLinker = new InternalLinker(servletContext.getContextPath(), configuration.getGivenWikiName(), cachingPageStore);
+    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class), cachingPageStore);
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore), internalLinker, new Accessor<List<Macro>>() {
@@ -118,7 +120,6 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(PageStore.class, pageStore);
     container.addComponent(CachingPageStore.class, cachingPageStore);
     container.addComponent(RequestLifecycleAwareManager.class, RequestLifecycleAwareManagerImpl.class);
-    container.addComponent(WikiUrls.class, RequestScopedWikiUrls.class);
     
     container.addComponent(wikiGraph);
     container.addComponent(internalLinker);

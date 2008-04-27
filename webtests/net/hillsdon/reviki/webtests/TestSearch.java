@@ -27,7 +27,7 @@ public class TestSearch extends WebTestSupport {
     HtmlPage results = getWikiPage("FrontPage");
     HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
     // Session crap on the end.
-    assertTrue(link.getHrefAttribute().startsWith("/reviki/pages/test/FindPage/opensearch.xml"));
+    assertTrue(link.getHrefAttribute().startsWith(BASE_URL + "/pages/test/FindPage/opensearch.xml"));
     @SuppressWarnings("unused")
     XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
   }
