@@ -23,12 +23,24 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+/**
+ * Writes out Atom 1.0 using SAX.
+ * 
+ * Perhaps worth extracting an AtomBuilder or something from here.
+ * 
+ * @author mth
+ */
 public class AtomFeedWriter implements FeedWriter {
-
-  public static final String ATOM_NS = "http://www.w3.org/2005/Atom";
   
+  public static final String ATOM_NS = "http://www.w3.org/2005/Atom";
   private static final Attributes NO_ATTRIBUTES = new AttributesImpl();
 
+  private final WikiUrls _wikiUrls;
+  
+  public AtomFeedWriter(final WikiUrls wikiUrls) {
+    _wikiUrls = wikiUrls;
+  }
+  
   private void addElement(final ContentHandler handler, final String name, final String content) throws SAXException {
     handler.startElement(ATOM_NS, name, name, NO_ATTRIBUTES);
     handler.characters(content.toCharArray(), 0, content.length());
@@ -55,7 +67,7 @@ public class AtomFeedWriter implements FeedWriter {
     return dateFormat.format(date);
   }
 
-  public void writeAtom(final WikiUrls wikiUrls, final PrintWriter out, final Collection<ChangeInfo> changes) throws TransformerConfigurationException, SAXException {
+  public void writeAtom(final Collection<ChangeInfo> changes, final PrintWriter out) throws TransformerConfigurationException, SAXException {
     StreamResult streamResult = new StreamResult(out);
     SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     
@@ -75,18 +87,18 @@ public class AtomFeedWriter implements FeedWriter {
     handler.startPrefixMapping("", ATOM_NS);
     handler.endPrefixMapping("");
     handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
-    addElement(handler, "id", wikiUrls.feed());
+    addElement(handler, "id", _wikiUrls.feed());
     addElement(handler, "title", "reviki feed");
-    addLink(handler, wikiUrls.feed(), "self");
-    addLink(handler, wikiUrls.root(), null);
+    addLink(handler, _wikiUrls.feed(), "self");
+    addLink(handler, _wikiUrls.root(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
     for (ChangeInfo change : changes) {
       // For now.
       if (change.getKind() == StoreKind.PAGE) {
         handler.startElement(ATOM_NS, "entry", "entry", NO_ATTRIBUTES);
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
-        addLink(handler, wikiUrls.page(change.getPage()), null);
-        addElement(handler, "id", wikiUrls.page(change.getPage()));
+        addLink(handler, _wikiUrls.page(change.getPage()), null);
+        addElement(handler, "id", _wikiUrls.page(change.getPage()));
         
         handler.startElement(ATOM_NS, "author", "author", NO_ATTRIBUTES);
         addElement(handler, "name", change.getUser());

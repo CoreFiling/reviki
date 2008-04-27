@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 public final class BuiltInPageReferences {
 
   public static final PageReference PAGE_FRONT_PAGE = new PageReference("FrontPage");
+  public static final PageReference PAGE_RECENT_CHANGES = new PageReference("RecentChanges");
   
   public static final PageReference PAGE_SIDEBAR = new PageReference("ConfigSideBar");
   public static final PageReference PAGE_HEADER = new PageReference("ConfigHeader");
@@ -27,6 +28,7 @@ public final class BuiltInPageReferences {
   public static final PageReference CONFIG_CSS = new PageReference("ConfigCss");
 
   public static final Collection<PageReference> COMPLIMENTARY_CONTENT_PAGES = unmodifiableCollection(asList(PAGE_SIDEBAR, PAGE_HEADER, PAGE_FOOTER));
+
 
 
   private BuiltInPageReferences() {

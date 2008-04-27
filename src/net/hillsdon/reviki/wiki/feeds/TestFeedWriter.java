@@ -57,7 +57,7 @@ public class TestFeedWriter extends TestCase {
         return "favicon";
       }
     };
-    new AtomFeedWriter().writeAtom(urls, new PrintWriter(out), changes);
+    new AtomFeedWriter(urls).writeAtom(changes, new PrintWriter(out));
     
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);

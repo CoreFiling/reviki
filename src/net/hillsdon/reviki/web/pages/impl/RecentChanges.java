@@ -30,7 +30,6 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.pages.DefaultPage;
-import net.hillsdon.reviki.wiki.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
 public class RecentChanges extends AbstractSpecialPage {
@@ -38,16 +37,14 @@ public class RecentChanges extends AbstractSpecialPage {
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
-  private static final int RECENT_CHANGES_HISTORY_SIZE = 50;
+  static final int RECENT_CHANGES_HISTORY_SIZE = 50;
 
   private final PageStore _store;
-  private final WikiUrls _wikiUrls;
   private final FeedWriter _feedWriter;
 
-  public RecentChanges(final CachingPageStore store, final WikiUrls wikiUrls, final DefaultPage defaultPage, final FeedWriter feedWriter) {
+  public RecentChanges(final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter) {
     super(defaultPage);
     _store = store;
-    _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
   }
 
@@ -55,14 +52,7 @@ public class RecentChanges extends AbstractSpecialPage {
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     if ("atom.xml".equals(path.next())) {
-      return new View() {
-
-
-        public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
-          response.setContentType("application/atom+xml");
-          _feedWriter.writeAtom(_wikiUrls, response.getWriter(), recentChanges);
-        }
-      };
+      return new FeedView(_feedWriter, recentChanges);
     }
     request.setAttribute("recentChanges", recentChanges);
     return new JspView("RecentChanges");
