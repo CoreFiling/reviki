@@ -17,8 +17,16 @@ package net.hillsdon.reviki.di;
 
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 
+/**
+ * A per-wiki session.
+ * 
+ * @author mth
+ */
 public interface WikiSession extends Session {
   
+  /**
+   * @return The handler for wiki-specific web requests.
+   */
   WikiHandler getWikiHandler();
   
 }

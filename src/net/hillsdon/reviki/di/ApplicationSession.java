@@ -18,11 +18,23 @@ package net.hillsdon.reviki.di;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 
-
+/**
+ * One per deployment.  Has N child WikiSessions which have most
+ * of the interesting objects.
+ * 
+ * @author mth
+ */
 public interface ApplicationSession extends Session {
   
+  /**
+   * @return The global web dispatcher.
+   */
   Dispatcher getDispatcher();
   
+  /**
+   * @param configuration The wiki specific configuration.
+   * @return A new session for that wiki.
+   */
   WikiSession createWikiSession(WikiConfiguration configuration);
   
 }

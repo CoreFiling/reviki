@@ -17,6 +17,11 @@ package net.hillsdon.reviki.di;
 
 import org.picocontainer.MutablePicoContainer;
 
+/**
+ * PicoContainer DI based sessions.
+ * 
+ * @author mth
+ */
 public interface Session {
   
   void configure(MutablePicoContainer container);
