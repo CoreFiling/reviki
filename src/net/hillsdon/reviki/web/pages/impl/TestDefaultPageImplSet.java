@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 import net.hillsdon.fij.text.Strings;
+import net.hillsdon.reviki.configuration.ApplicationUrlsImpl;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -60,7 +61,7 @@ public class TestDefaultPageImplSet extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _store = createMock(CachingPageStore.class);
-    _wikiUrls = new WikiUrlsImpl("http://www.example.com/", "foo");
+    _wikiUrls = new WikiUrlsImpl(new ApplicationUrlsImpl("http://www.example.com/"), "foo");
     _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls);
     _request = new MockHttpServletRequest();
     _response = null;

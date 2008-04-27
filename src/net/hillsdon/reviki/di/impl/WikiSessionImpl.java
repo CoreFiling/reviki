@@ -23,7 +23,7 @@ import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.FixedMimeIdentifier;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
-import net.hillsdon.reviki.web.common.RequestScopedWikiUrls;
+import net.hillsdon.reviki.web.common.WikiUrlsImpl;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
 import net.hillsdon.reviki.web.handlers.PageHandler;
@@ -78,7 +78,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
   }
 
   public void configure(final MutablePicoContainer container) {
-    container.addComponent(WikiUrls.class, RequestScopedWikiUrls.class);
+    container.addComponent(WikiUrls.class, WikiUrlsImpl.class);
     
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.

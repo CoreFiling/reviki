@@ -15,29 +15,37 @@
  */
 package net.hillsdon.reviki.web.common;
 
+import junit.framework.TestCase;
+import net.hillsdon.reviki.configuration.ApplicationUrls;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
+
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import junit.framework.TestCase;
-import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 /**
  * Test for {@link WikiUrlsImpl}.
  * 
  * @author mth
  */
-public class TestRequestBasedWikiUrls extends TestCase {
+public class TestWikiUrlsImpl extends TestCase {
 
   private WikiConfiguration _configuration;
-  private MockHttpServletRequest _request;
+  private ApplicationUrls _applicationUrls;
 
   @Override
   protected void setUp() throws Exception {
-    _request = new MockHttpServletRequest();
     _configuration = createMock(WikiConfiguration.class);
-    _request.setContextPath("/reviki");
-    _request.setRequestURL("http://www.example.com/reviki/some/page");
-    _request.setRequestURI("/reviki/some/page");
+    _applicationUrls = createMock(ApplicationUrls.class);
+    expect(_applicationUrls.url((String) EasyMock.anyObject())).andAnswer(new IAnswer<String>() {
+      public String answer() {
+        String relative = (String) EasyMock.getCurrentArguments()[0];
+        return "http://www.example.com/reviki" + relative;
+      }
+    }).anyTimes();
   }
 
   public void testNullWiki() {
@@ -59,8 +67,8 @@ public class TestRequestBasedWikiUrls extends TestCase {
   private WikiUrlsImpl createURLs(final String actual, final String given) {
     expect(_configuration.getWikiName()).andReturn(actual).anyTimes();
     expect(_configuration.getGivenWikiName()).andReturn(given).anyTimes();
-    replay(_configuration);
-    return new WikiUrlsImpl(_request, _configuration);
+    replay(_configuration, _applicationUrls);
+    return new WikiUrlsImpl(_applicationUrls, _configuration);
   }
   
 }

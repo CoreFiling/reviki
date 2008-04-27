@@ -27,6 +27,10 @@ public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLif
     return _requestLocal.get().list();
   }
 
+  public String url(final String relative) {
+    return _requestLocal.get().url(relative);
+  }
+
   public void create(final HttpServletRequest request) {
     _requestLocal.create(request);
   }

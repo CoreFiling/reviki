@@ -15,41 +15,42 @@
  */
 package net.hillsdon.reviki.web.common;
 
-import javax.servlet.http.HttpServletRequest;
-
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.configuration.ApplicationUrlsImpl;
+import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
 /**
  * We should not base the URLs on the request.
  * 
- * We need to know the public base URL anyway really* for e.g. atom ids
+ * We need to know the public base URL anyway really for e.g. atom ids
  * (we may be proxied through e.g. Apache).
  * 
  * @author mth
  */
 public class WikiUrlsImpl implements WikiUrls {
 
-  private final String _base;
+  private final ApplicationUrls _applicationUrls;
   private final String _givenWikiName;
 
-  public WikiUrlsImpl(final HttpServletRequest request, final WikiConfiguration configuration) {
-    this(ApplicationUrlsImpl.getBaseUrl(request), configuration.getGivenWikiName());
+  /**
+   * For DI.
+   */
+  public WikiUrlsImpl(final ApplicationUrls applicationUrls, final WikiConfiguration configuration) {
+    this(applicationUrls, configuration.getGivenWikiName());
   }
   
-  public WikiUrlsImpl(final String base, final String givenWikiName) {
-    _base = base;
+  public WikiUrlsImpl(final ApplicationUrls applicationUrls, final String givenWikiName) {
+    _applicationUrls = applicationUrls;
     _givenWikiName = givenWikiName;
   }
-  
+
   public String root() {
-    String result = _base + "/pages/";
+    String relative = "/pages/";
     if (_givenWikiName != null) {
-      result += Escape.url(_givenWikiName) + "/";
+      relative += Escape.url(_givenWikiName) + "/";
     }
-    return result;
+    return _applicationUrls.url(relative);
   }
   
   public String page(final String name) {
@@ -65,7 +66,7 @@ public class WikiUrlsImpl implements WikiUrls {
   }
 
   public String favicon() {
-    return _base + "/resources/favicon.ico";
+    return _applicationUrls.url("/resources/favicon.ico");
   }
 
 }

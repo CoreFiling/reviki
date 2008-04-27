@@ -7,7 +7,7 @@ import net.hillsdon.reviki.wiki.WikiUrls;
 
 public class ApplicationUrlsImpl implements ApplicationUrls {
 
-  public static String getBaseUrl(final HttpServletRequest request) {
+  private static String getBaseUrl(final HttpServletRequest request) {
     String requestURL = request.getRequestURL().toString();
     String path = request.getRequestURI().substring(request.getContextPath().length());
     String base = requestURL.substring(0, requestURL.length() - path.length());
@@ -25,11 +25,15 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
   }
 
   public WikiUrls get(final String name) {
-    return new WikiUrlsImpl(_base, name);
+    return new WikiUrlsImpl(this, name);
   }
 
   public String list() {
-    return _base + "/list";
+    return url("/list");
+  }
+
+  public String url(String relative) {
+    return _base + relative;
   }
 
 }
