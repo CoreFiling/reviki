@@ -17,10 +17,7 @@ package net.hillsdon.reviki.vc.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.fij.core.Transform;
 
-public interface BasicSVNOperationsFactory {
-
-  BasicSVNOperations newInstance(HttpServletRequest request) throws PageStoreException;
-  
+public interface BasicSVNOperationsFactory extends Transform<HttpServletRequest, BasicSVNOperations> {
 }

@@ -18,8 +18,8 @@ package net.hillsdon.reviki.web.vcintegration;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.core.Factory;
+import net.hillsdon.fij.core.Transform;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AbstractDelegatingPageStore;
 
 /**
@@ -30,26 +30,30 @@ import net.hillsdon.reviki.vc.impl.AbstractDelegatingPageStore;
  * 
  * @author mth
  */
-public final class RequestScopedThreadLocalPageStore extends AbstractDelegatingPageStore {
+public final class RequestScopedPageStore extends AbstractDelegatingPageStore implements RequestLifecycleAware {
 
-  private final ThreadLocal<PageStore> _threadLocal = new ThreadLocal<PageStore>();
-  private final Factory<PageStore> _factory;
+  private final RequestLocal<PageStore> _requestLocal;
   
-  public RequestScopedThreadLocalPageStore(final Factory<PageStore> factory) {
-    _factory = factory;
+  public RequestScopedPageStore(final Factory<PageStore> factory) {
+    _requestLocal = new RequestLocal<PageStore>(new Transform<HttpServletRequest, PageStore>() {
+      public PageStore transform(final HttpServletRequest in) {
+        // We don't care about the request.
+        return factory.newInstance();
+      }
+    });
   }
   
-  public void create(final HttpServletRequest request) throws PageStoreException {
-    _threadLocal.set(_factory.newInstance());
+  public void create(final HttpServletRequest request) {
+    _requestLocal.create(request);
   }
   
   public void destroy() {
-    _threadLocal.set(null);
+    _requestLocal.destroy();
   }
   
   @Override
   protected PageStore getDelegate() {
-    return _threadLocal.get();
+    return _requestLocal.get();
   }
   
 }

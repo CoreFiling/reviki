@@ -30,8 +30,7 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
-import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
-import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalPageStore;
+import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore;
 import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
@@ -52,21 +51,19 @@ public class WikiHandlerImpl implements WikiHandler {
 
   public static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
 
-  private final RequestScopedThreadLocalPageStore _pageStore;
+  private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
   private final SvnWikiRenderer _renderer;
   private final CachingPageStore _cachingPageStore;
   private final InternalLinker _internalLinker;
   private final ChangeNotificationDispatcher _syncUpdater;
-  private final RequestScopedThreadLocalBasicSVNOperations _operations;
   private final PageHandler _handler;
 
-  public WikiHandlerImpl(RequestScopedThreadLocalPageStore pageStore, CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestScopedThreadLocalBasicSVNOperations operations, PageHandler handler) {
-    _pageStore = pageStore;
+  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, PageHandler handler) {
     _cachingPageStore = cachingPageStore;
     _renderer = renderer;
     _internalLinker = internalLinker;
     _syncUpdater = syncUpdater;
-    _operations = operations;
+    _requestLifecycleAwareManager = requestLifecycleAwareManager;
     _handler = handler;
   }
 
@@ -74,10 +71,7 @@ public class WikiHandlerImpl implements WikiHandler {
     request.setAttribute("cssUrl", _internalLinker.url("ConfigCss") + "?raw");
     request.setAttribute("internalLinker", _internalLinker);
     try {
-      // Handle the lifecycle of the thread-local stuff.
-      // Should have common interfaces and a new class...
-      _operations.create(request);
-      _pageStore.create(request);
+      _requestLifecycleAwareManager.requestStarted(request);
       try {
         _syncUpdater.sync();
         addSideBarEtcToRequest(request);
@@ -86,8 +80,7 @@ public class WikiHandlerImpl implements WikiHandler {
         return View.NULL;
       }
       finally {
-        _operations.destroy();
-        _pageStore.destroy();
+        _requestLifecycleAwareManager.requestComplete();
       }
     }
     catch (PageStoreAuthenticationException ex) {

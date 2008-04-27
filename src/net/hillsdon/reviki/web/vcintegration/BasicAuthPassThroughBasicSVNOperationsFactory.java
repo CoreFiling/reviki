@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.BasicSVNOperations;
 import net.hillsdon.reviki.vc.impl.BasicSVNOperationsFactory;
@@ -46,29 +45,34 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
   static class UsernamePassword {
     private final String _username;
     private final String _password;
+
     public UsernamePassword(final String username, final String password) {
       _username = username;
       _password = password;
     }
+
     public String getUsername() {
       return _username;
     }
+
     public String getPassword() {
       return _password;
     }
+
     @Override
     public boolean equals(final Object obj) {
       if (obj instanceof UsernamePassword) {
         UsernamePassword other = (UsernamePassword) obj;
-        return (_username == null ? other._username == null : _username.equals(other._username))
-           && (_password == null ? other._password == null : _password.equals(other._password));
+        return (_username == null ? other._username == null : _username.equals(other._username)) && (_password == null ? other._password == null : _password.equals(other._password));
       }
       return false;
     }
+
     @Override
     public int hashCode() {
       return (_username == null ? 0 : _username.hashCode()) ^ (_password == null ? 0 : _password.hashCode());
     }
+
     @Override
     public String toString() {
       return _username + " " + _password;
@@ -77,7 +81,7 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
 
   private final SVNURL _url;
   private final AutoPropertiesApplier _autoPropertiesApplier;
-  
+
   public BasicAuthPassThroughBasicSVNOperationsFactory(final SVNURL url, final AutoPropertiesApplier autoPropertiesApplier) {
     _url = url;
     _autoPropertiesApplier = autoPropertiesApplier;
@@ -109,19 +113,23 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
     }
     return new UsernamePassword(username, password);
   }
-  
-  public BasicSVNOperations newInstance(final HttpServletRequest request) throws PageStoreException {
+
+  public BasicSVNOperations transform(final HttpServletRequest request) {
+    DAVRepositoryFactory.setup();
+    SVNRepository repository = createRepository();
+    UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
+    repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
+    request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
+    return new RepositoryBasicSVNOperations(repository, _autoPropertiesApplier);
+  }
+
+  private SVNRepository createRepository() {
     try {
-      DAVRepositoryFactory.setup();
-      SVNRepository repository = SVNRepositoryFactory.create(_url);
-      UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
-      repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
-      request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
-      return new RepositoryBasicSVNOperations(repository, _autoPropertiesApplier);
+      return SVNRepositoryFactory.create(_url);
     }
     catch (SVNException ex) {
-      throw new PageStoreException(ex);
+      throw new RuntimeException("Invalid repository.", ex);
     }
   }
-  
+
 }

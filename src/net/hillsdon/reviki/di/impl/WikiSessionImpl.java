@@ -43,8 +43,10 @@ import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.vcintegration.AutoProperiesFromConfigPage;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.PerRequestPageStoreFactory;
+import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
+import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
+import net.hillsdon.reviki.web.vcintegration.RequestScopedPageStore;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
-import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalPageStore;
 import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
@@ -93,7 +95,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
     Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
-    RequestScopedThreadLocalPageStore pageStore = new RequestScopedThreadLocalPageStore(pageStoreFactory);
+    RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
@@ -113,6 +115,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(operations);
     container.addComponent(PageStore.class, pageStore);
     container.addComponent(CachingPageStore.class, cachingPageStore);
+    container.addComponent(RequestLifecycleAwareManager.class, RequestLifecycleAwareManagerImpl.class);
     
     container.addComponent(wikiGraph);
     container.addComponent(internalLinker);

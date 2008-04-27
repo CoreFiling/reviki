@@ -30,26 +30,25 @@ import net.hillsdon.reviki.vc.impl.DelegatingBasicSVNOperations;
  * 
  * @author mth
  */
-public final class RequestScopedThreadLocalBasicSVNOperations extends DelegatingBasicSVNOperations {
+public final class RequestScopedThreadLocalBasicSVNOperations extends DelegatingBasicSVNOperations implements RequestLifecycleAware {
 
-  private final ThreadLocal<BasicSVNOperations> _threadLocal = new ThreadLocal<BasicSVNOperations>();
-  private final BasicSVNOperationsFactory _factory;
+  private final RequestLocal<BasicSVNOperations> _requestLocal;
   
   public RequestScopedThreadLocalBasicSVNOperations(final BasicSVNOperationsFactory factory) {
-    _factory = factory;
+    _requestLocal = new RequestLocal<BasicSVNOperations>(factory);
   }
   
-  public void create(final HttpServletRequest request) throws PageStoreException {
-    _threadLocal.set(_factory.newInstance(request));
+  public void create(final HttpServletRequest request) {
+    _requestLocal.create(request);
   }
   
   public void destroy() {
-    _threadLocal.set(null);
+    _requestLocal.destroy();
   }
   
   @Override
   protected BasicSVNOperations getDelegate() {
-    return _threadLocal.get();
+    return _requestLocal.get();
   }
   
 }
