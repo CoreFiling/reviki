@@ -19,6 +19,7 @@ import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.wiki.WikiUrls;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -28,13 +29,13 @@ public class AtomFeedWriter implements FeedWriter {
   
   private static final Attributes NO_ATTRIBUTES = new AttributesImpl();
 
-  private void addElement(final TransformerHandler handler, final String name, final String content) throws SAXException {
+  private void addElement(final ContentHandler handler, final String name, final String content) throws SAXException {
     handler.startElement(ATOM_NS, name, name, NO_ATTRIBUTES);
     handler.characters(content.toCharArray(), 0, content.length());
     handler.endElement(ATOM_NS, name, name);
   }
 
-  private void addLink(final TransformerHandler handler, final String href, final String rel) throws SAXException {
+  private void addLink(final ContentHandler handler, final String href, final String rel) throws SAXException {
     AttributesImpl attrs = new AttributesImpl();
     attrs.addAttribute("", "href", "href", "CDATA", href);
     if (rel != null) {
@@ -44,7 +45,7 @@ public class AtomFeedWriter implements FeedWriter {
     handler.endElement(ATOM_NS, "link", "link");
   }
 
-  private void addUpdated(TransformerHandler handler, Date date) throws SAXException {
+  private void addUpdated(final ContentHandler handler, Date date) throws SAXException {
     addElement(handler, "updated", rfc3339DateFormat(date));
   }
 
