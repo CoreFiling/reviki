@@ -19,13 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 import net.hillsdon.fij.text.Strings;
-import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
+import net.hillsdon.reviki.web.common.RedirectToRequestURLView;
+import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.WikiUrlsImpl;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.wiki.WikiUrls;
@@ -47,6 +48,7 @@ import static org.easymock.EasyMock.verify;
 public class TestDefaultPageImplSet extends TestCase {
 
   private static final PageReference CALLED_ON_PAGE = new PageReference("CalledOnPage");
+  private static final PageReference TO_PAGE = new PageReference("ToPage");
   
   private CachingPageStore _store;
   private MockHttpServletRequest _request;
@@ -61,13 +63,7 @@ public class TestDefaultPageImplSet extends TestCase {
     _wikiUrls = new WikiUrlsImpl("http://www.example.com/", "foo");
     _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls);
     _request = new MockHttpServletRequest();
-    _request.setContextPath("/reviki");
-    _request.setRequestURL("http://www.example.com/reviki/pages/" + CALLED_ON_PAGE.getPath());
-    _request.setRequestURI("/reviki/pages/" + CALLED_ON_PAGE.getPath());
     _response = null;
-    WikiConfiguration configuration = createMock(WikiConfiguration.class);
-    expect(configuration.getGivenWikiName()).andReturn("foo").anyTimes();
-    replay(configuration);
   }
   
   public void testNoActionIsInvalidInputException() throws Exception {
@@ -130,8 +126,8 @@ public class TestDefaultPageImplSet extends TestCase {
     final String expectedContent = "Content" + Strings.CRLF;
     expect(_store.set(CALLED_ON_PAGE, "dooby", 1, expectedContent, expectedCommitMessage)).andReturn(2L).once();
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_request.getRequestURL().toString(), view.getURL());
+    View view = _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(RedirectToRequestURLView.INSTANCE, view);
     verify(_store);
   }
 
@@ -156,11 +152,11 @@ public class TestDefaultPageImplSet extends TestCase {
   
   public void testCopyTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_COPY, "");
-    _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, "ToPage");
-    expect(_store.copy(CALLED_ON_PAGE, -1, new PageReference("ToPage"), "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
+    expect(_store.copy(CALLED_ON_PAGE, -1, TO_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_wikiUrls.page("ToPage"), view.getURL());
+    RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(TO_PAGE, view.getPage());
     verify(_store);
   }
   
@@ -169,8 +165,8 @@ public class TestDefaultPageImplSet extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_FROM_PAGE, "FromPage");
     expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_wikiUrls.page(CALLED_ON_PAGE.getPath()), view.getURL());
+    RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(CALLED_ON_PAGE, view.getPage());
     verify(_store);
   }
   
@@ -187,19 +183,19 @@ public class TestDefaultPageImplSet extends TestCase {
   
   public void testRenameTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_RENAME, "");
-    _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, "ToPage");
-    expect(_store.rename(CALLED_ON_PAGE, new PageReference("ToPage"), -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
+    expect(_store.rename(CALLED_ON_PAGE, TO_PAGE, -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_wikiUrls.page("ToPage"), view.getURL());
+    RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(TO_PAGE, view.getPage());
     verify(_store);
   }
 
   public void testUnlockDoesNothingIfNoLockTokenProvided() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_UNLOCK, "");
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_request.getRequestURL().toString(), view.getURL());
+    View view = _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(RedirectToRequestURLView.INSTANCE, view);
     verify(_store);
   }
 
@@ -209,8 +205,8 @@ public class TestDefaultPageImplSet extends TestCase {
     _store.unlock(CALLED_ON_PAGE, "dooby");
     expectLastCall().once();
     replay(_store);
-    RedirectView view = (RedirectView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
-    assertEquals(_request.getRequestURL().toString(), view.getURL());
+    View view = _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals(RedirectToRequestURLView.INSTANCE, view);
     verify(_store);
   }
   

@@ -23,7 +23,8 @@ import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
+import net.hillsdon.reviki.web.common.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
@@ -133,7 +134,7 @@ public class DefaultPageImpl implements DefaultPage {
         InputStream in = file.getInputStream();
         try {
           storeAttachment(page, attachmentName, baseRevision, file.getName(), in);
-          return new RedirectView(request.getRequestURL().toString());
+          return RedirectToRequestURLView.INSTANCE;
         }
         finally {
           IOUtils.closeQuietly(in);
@@ -282,12 +283,12 @@ public class DefaultPageImpl implements DefaultPage {
         toRef = new PageReference(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
-      return new RedirectView(_wikiUrls.page(toRef.getPath()));
+      return new RedirectToPageView(_wikiUrls, toRef);
     }
     else if (hasRenameParam) {
-      final String toPage = getRequiredString(request, PARAM_TO_PAGE);
-      _store.rename(page, new PageReference(toPage), -1, createLinkingCommitMessage(request));
-      return new RedirectView(_wikiUrls.page(toPage));
+      final PageReference toPage = new PageReference(getRequiredString(request, PARAM_TO_PAGE));
+      _store.rename(page, toPage, -1, createLinkingCommitMessage(request));
+      return new RedirectToPageView(_wikiUrls, toPage);
     }
     else if (hasUnlockParam) {
       String lockToken = request.getParameter(PARAM_LOCK_TOKEN);
@@ -299,7 +300,7 @@ public class DefaultPageImpl implements DefaultPage {
     else {
       throw new InvalidInputException("No action specified.");
     }
-    return new RedirectView(request.getRequestURL().toString());
+    return RedirectToRequestURLView.INSTANCE;
   }
   
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {

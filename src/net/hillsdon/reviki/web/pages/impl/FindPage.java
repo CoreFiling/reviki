@@ -28,7 +28,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.wiki.WikiUrls;
@@ -81,9 +81,10 @@ public class FindPage extends AbstractSpecialPage {
       return super.get(page, path, request, response);
     }
     
-    boolean pageExists = _store.list().contains(new PageReference(query));
+    final PageReference queryPage = new PageReference(query);
+    boolean pageExists = _store.list().contains(queryPage);
     if (request.getParameter("force") == null && pageExists) {
-      return new RedirectView(_wikiUrls.page(query));
+      return new RedirectToPageView(_wikiUrls, queryPage);
     }
     
     final Set<SearchMatch> results = _searchEngine.search(query, true);

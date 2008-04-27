@@ -23,7 +23,7 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ActiveWikis;
@@ -53,7 +53,7 @@ public class ConfigureWikiHandler implements RequestHandler {
         if (_perWikiConfiguration.isComplete()) {
           _activeWikis.addWiki(_perWikiConfiguration);
         }
-        return new RedirectView(request.getRequestURI());
+        return RedirectToRequestURLView.INSTANCE;
       }
       catch (IllegalArgumentException ex) {
         request.setAttribute("error", ex.getMessage());

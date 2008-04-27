@@ -1,15 +1,12 @@
 package net.hillsdon.reviki.web.dispatching.impl;
 
-import static java.lang.String.format;
-
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -19,27 +16,32 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
+import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static java.lang.String.format;
 
 public class DispatcherImpl implements Dispatcher {
   
   private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
   private final DeploymentConfiguration _configuration;
-  private final ServletContext _servletContext;
 
   private final ListWikis _list;
   private final WikiChoiceImpl _choice;
   private final JumpToWikiUrl _jumpToWiki;
+  private final ApplicationUrls _urls;
+  private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
 
-  public DispatcherImpl(ServletContext servletContext, DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki) {
-    _servletContext = servletContext;
+  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls urls, RequestLifecycleAwareManager requestLifecycleAwareManager) {
     _configuration = configuration;
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
+    _urls = urls;
+    _requestLifecycleAwareManager = requestLifecycleAwareManager;
     
     _configuration.load();
   }
@@ -52,6 +54,7 @@ public class DispatcherImpl implements Dispatcher {
 
     ConsumedPath path = new ConsumedPath(request);
     try {
+      _requestLifecycleAwareManager.requestStarted(request);
       View view = handle(path, request, response);
       if (view != null) {
         view.render(request, response);
@@ -64,6 +67,9 @@ public class DispatcherImpl implements Dispatcher {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       handleException(request, response, ex);
     }
+    finally {
+      _requestLifecycleAwareManager.requestComplete();
+    }
   }
 
   // This should be moved out of here...
@@ -73,11 +79,9 @@ public class DispatcherImpl implements Dispatcher {
       // ... an internal hack to enable the dispatcher to handle "/".
       final String defaultWiki = _configuration.getDefaultWiki();
       if (defaultWiki != null) {
-        return new RedirectView(_servletContext.getContextPath() + "/pages/" + Escape.url(defaultWiki) + "/FrontPage");
+        return new RedirectView(_urls.get(defaultWiki).page("FrontPage"));
       }
-      else {
-        return new RedirectView(_servletContext.getContextPath() + "/list");
-      }
+      return new RedirectView(_urls.list());
     }
     else if ("pages".equals(initial)) {
       return _choice.handle(path, request, response);

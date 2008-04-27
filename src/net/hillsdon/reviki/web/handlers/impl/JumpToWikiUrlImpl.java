@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.web.handlers.impl;
 
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -24,18 +22,26 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 
 public class JumpToWikiUrlImpl implements JumpToWikiUrl {
 
+  private ApplicationUrls _urls;
+
+  public JumpToWikiUrlImpl(final ApplicationUrls urls) {
+    _urls = urls;
+  }
+  
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
-    String name = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");
-    return new RedirectView(request.getContextPath() + "/pages/" + name + "/FrontPage");
+    final String wiki = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");
+    return new RedirectView(_urls.get(wiki).page("FrontPage"));
   }
 
 }

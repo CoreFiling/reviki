@@ -22,7 +22,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.pages.Page;
@@ -54,7 +54,7 @@ public class PageHandlerImpl implements PageHandler {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String pageName = path.next();
     if (pageName == null || "".equals(pageName)) {
-      return new RedirectView(_wikiUrls.page("FrontPage"));
+      return new RedirectToPageView(_wikiUrls, new PageReference("FrontPage"));
     }
     if (pageName.contains("/")) {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);
