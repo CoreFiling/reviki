@@ -42,11 +42,13 @@ public class RecentChanges extends AbstractSpecialPage {
 
   private final PageStore _store;
   private final WikiUrls _wikiUrls;
+  private final FeedWriter _feedWriter;
 
-  public RecentChanges(final CachingPageStore store, final WikiUrls wikiUrls, final DefaultPage defaultPage) {
+  public RecentChanges(final CachingPageStore store, final WikiUrls wikiUrls, final DefaultPage defaultPage, final FeedWriter feedWriter) {
     super(defaultPage);
     _store = store;
     _wikiUrls = wikiUrls;
+    _feedWriter = feedWriter;
   }
 
   @Override
@@ -55,9 +57,10 @@ public class RecentChanges extends AbstractSpecialPage {
     if ("atom.xml".equals(path.next())) {
       return new View() {
 
+
         public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
           response.setContentType("application/atom+xml");
-          FeedWriter.writeAtom(_wikiUrls, response.getWriter(), recentChanges);
+          _feedWriter.writeAtom(_wikiUrls, response.getWriter(), recentChanges);
         }
       };
     }

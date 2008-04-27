@@ -57,7 +57,7 @@ public class TestFeedWriter extends TestCase {
         return "favicon";
       }
     };
-    FeedWriter.writeAtom(urls, new PrintWriter(out), changes);
+    new AtomFeedWriter().writeAtom(urls, new PrintWriter(out), changes);
     
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
@@ -65,7 +65,7 @@ public class TestFeedWriter extends TestCase {
     Element selfLink = (Element) dom.getElementsByTagName("link").item(0);
     assertEquals(selfLink.getAttributeNS(null, "href"), "feed");
     
-    NodeList entries = dom.getElementsByTagNameNS(FeedWriter.ATOM_NS, "entry");
+    NodeList entries = dom.getElementsByTagNameNS(AtomFeedWriter.ATOM_NS, "entry");
     assertEquals(1, entries.getLength());
     // TODO, actually assert something useful.
   }

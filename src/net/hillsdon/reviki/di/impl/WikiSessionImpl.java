@@ -50,6 +50,8 @@ import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 import net.hillsdon.reviki.wiki.WikiUrls;
+import net.hillsdon.reviki.wiki.feeds.FeedWriter;
+import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.graph.WikiGraphImpl;
 import net.hillsdon.reviki.wiki.macros.IncomingLinksMacro;
@@ -125,6 +127,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_renderer);
     container.addComponent(_searchEngine);
     container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
+    container.addComponent(FeedWriter.class, AtomFeedWriter.class);
     
     // Special pages
     container.addComponent(SpecialPages.class, SpecialPagesImpl.class);
