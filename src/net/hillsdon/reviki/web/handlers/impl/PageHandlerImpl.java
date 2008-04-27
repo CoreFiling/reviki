@@ -32,6 +32,7 @@ import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here
@@ -54,7 +55,7 @@ public class PageHandlerImpl implements PageHandler {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     String pageName = path.next();
     if (pageName == null || "".equals(pageName)) {
-      return new RedirectToPageView(_wikiUrls, new PageReference("FrontPage"));
+      return new RedirectToPageView(_wikiUrls, PAGE_FRONT_PAGE);
     }
     if (pageName.contains("/")) {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);

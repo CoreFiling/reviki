@@ -31,9 +31,9 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
-import net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore;
 import net.hillsdon.reviki.wiki.InternalLinker;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -100,7 +100,7 @@ public class WikiHandlerImpl implements WikiHandler {
   }
 
   private void addSideBarEtcToRequest(final HttpServletRequest request) throws PageStoreException, IOException {
-    for (PageReference ref : SpecialPagePopulatingPageStore.COMPLIMENTARY_CONTENT_PAGES) {
+    for (PageReference ref : COMPLIMENTARY_CONTENT_PAGES) {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
       PageInfo page = _cachingPageStore.get(ref, -1);
       request.setAttribute(requestVarName, _renderer.render(ref, page.getContent()).toXHTML());

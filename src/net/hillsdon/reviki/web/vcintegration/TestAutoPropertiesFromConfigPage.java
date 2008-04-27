@@ -6,6 +6,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
 
 public class TestAutoPropertiesFromConfigPage extends TestCase {
 
@@ -31,7 +32,7 @@ public class TestAutoPropertiesFromConfigPage extends TestCase {
     + "" + Strings.CRLF
     + "README = svn:mime-type=text/plain;svn:eol-style=native" + Strings.CRLF;
     
-    _store.set(SpecialPagePopulatingPageStore.CONFIG_AUTO_PROPERTIES, "", 0, text, "");
+    _store.set(CONFIG_AUTO_PROPERTIES, "", 0, text, "");
     Map<String, String> expected = new LinkedHashMap<String, String>();
     expected.put("*.png", "svn:mime-type=image/png");
     expected.put("README", "svn:mime-type=text/plain;svn:eol-style=native");

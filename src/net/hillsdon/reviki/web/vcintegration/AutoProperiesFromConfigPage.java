@@ -13,6 +13,8 @@ import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
+
 /**
  * Currently we re-parse all the while (but use the caching page store).
  * 
@@ -27,7 +29,7 @@ public class AutoProperiesFromConfigPage implements AutoProperties {
 
   public Map<String, String> read() {
     try {
-      PageInfo text = _store.get(SpecialPagePopulatingPageStore.CONFIG_AUTO_PROPERTIES, -1);
+      PageInfo text = _store.get(CONFIG_AUTO_PROPERTIES, -1);
       return parseAutoProperties(text.getContent());
     }
     catch (PageStoreException e) {

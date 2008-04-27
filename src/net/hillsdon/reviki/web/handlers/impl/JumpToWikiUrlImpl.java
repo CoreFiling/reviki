@@ -26,10 +26,11 @@ import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
-import net.hillsdon.reviki.web.common.RedirectView;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 public class JumpToWikiUrlImpl implements JumpToWikiUrl {
 
@@ -41,7 +42,7 @@ public class JumpToWikiUrlImpl implements JumpToWikiUrl {
   
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
     final String wiki = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");
-    return new RedirectView(_urls.get(wiki).page("FrontPage"));
+    return new RedirectToPageView(_urls.get(wiki), PAGE_FRONT_PAGE);
   }
 
 }

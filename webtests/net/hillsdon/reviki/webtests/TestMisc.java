@@ -16,7 +16,7 @@
 package net.hillsdon.reviki.webtests;
 
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
 public class TestMisc extends WebTestSupport {
 
@@ -31,7 +31,7 @@ public class TestMisc extends WebTestSupport {
   }
   
   public void testSidebarEtc() throws Exception {
-    for (PageReference page : SpecialPagePopulatingPageStore.COMPLIMENTARY_CONTENT_PAGES) {
+    for (PageReference page : COMPLIMENTARY_CONTENT_PAGES) {
       final String expect = "T" + System.currentTimeMillis() + page.getPath().toLowerCase();
       editWikiPage(page.getPath(), expect, "Some new content", null);
       assertTrue(getWikiPage("FrontPage").asText().contains(expect));

@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.web.vcintegration;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
@@ -22,7 +23,6 @@ import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 public class TestSpecialPagePopulatingPageStore extends TestCase {
 
-  private static final PageReference FRONT_PAGE_REF = new PageReference("FrontPage");
   private SimplePageStore _delegate;
   private SpecialPagePopulatingPageStore _special;
 
@@ -37,15 +37,15 @@ public class TestSpecialPagePopulatingPageStore extends TestCase {
   }
   
   public void testPopulatesSomePages() throws Exception {
-    PageInfo frontPage = _special.get(FRONT_PAGE_REF, -1);
+    PageInfo frontPage = _special.get(PAGE_FRONT_PAGE, -1);
     assertTrue(frontPage.isNew());
     assertEquals(PageInfo.UNCOMMITTED, frontPage.getLastChangedRevision());
     assertTrue(frontPage.getContent().contains("Welcome to"));
   }
   
   public void testOnlyPopulatedThePageIfTheUnderlyingStoreDoesntHaveIt() throws Exception {
-    _delegate.set(FRONT_PAGE_REF, "", -1, "foo", "an edit");
-    assertEquals("foo", _special.get(FRONT_PAGE_REF, -1).getContent());
+    _delegate.set(PAGE_FRONT_PAGE, "", -1, "foo", "an edit");
+    assertEquals("foo", _special.get(PAGE_FRONT_PAGE, -1).getContent());
   }
   
 }

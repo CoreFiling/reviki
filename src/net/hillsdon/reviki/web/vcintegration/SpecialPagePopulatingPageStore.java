@@ -15,9 +15,6 @@
  */
 package net.hillsdon.reviki.web.vcintegration;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableCollection;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +31,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_INTER_WIKI_LINKS;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FOOTER;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_SIDEBAR;
+
 /**
  * Returns default FrontPage etc if there isn't one in the repository.
  * 
@@ -41,19 +46,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
-  private static final PageReference PAGE_SIDEBAR = new PageReference("ConfigSideBar");
-  private static final PageReference PAGE_HEADER = new PageReference("ConfigHeader");
-  private static final PageReference PAGE_FOOTER = new PageReference("ConfigFooter");
-
-  public static final PageReference CONFIG_AUTO_PROPERTIES = new PageReference("ConfigAutoProperties");
-  public static final PageReference CONFIG_INTER_WIKI_LINKS = new PageReference("ConfigInterWikiLinks");
-  public static final PageReference CONFIG_PLUGINS = new PageReference("ConfigPlugins");
-
-  public static final Collection<PageReference> COMPLIMENTARY_CONTENT_PAGES = unmodifiableCollection(asList(PAGE_SIDEBAR, PAGE_HEADER, PAGE_FOOTER));
   
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
-      new PageReference("FrontPage"),
+      PAGE_FRONT_PAGE,
       new PageReference("FindPage"),
       new PageReference("ConfigCss"),
       PAGE_SIDEBAR,

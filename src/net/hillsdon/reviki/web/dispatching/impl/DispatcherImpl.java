@@ -10,6 +10,7 @@ import net.hillsdon.reviki.configuration.ApplicationUrls;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
+import net.hillsdon.reviki.web.common.RedirectToPageView;
 import net.hillsdon.reviki.web.common.RedirectView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
@@ -22,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import static java.lang.String.format;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 public class DispatcherImpl implements Dispatcher {
   
@@ -79,7 +81,7 @@ public class DispatcherImpl implements Dispatcher {
       // ... an internal hack to enable the dispatcher to handle "/".
       final String defaultWiki = _configuration.getDefaultWiki();
       if (defaultWiki != null) {
-        return new RedirectView(_urls.get(defaultWiki).page("FrontPage"));
+        return new RedirectToPageView(_urls.get(defaultWiki), PAGE_FRONT_PAGE);
       }
       return new RedirectView(_urls.list());
     }

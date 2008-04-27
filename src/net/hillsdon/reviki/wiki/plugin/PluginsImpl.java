@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.wiki.plugin;
 
-import static net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore.CONFIG_PLUGINS;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +37,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.picocontainer.DefaultPicoContainer;
+
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
 
 /**
  * An aggregate of all the current plugins.
