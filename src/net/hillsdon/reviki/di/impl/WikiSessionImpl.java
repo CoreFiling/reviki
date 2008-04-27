@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.fij.core.Factory;
 import net.hillsdon.reviki.configuration.PageStoreConfiguration;
@@ -85,7 +83,6 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
-    final ServletContext servletContext = getParentContainer().getComponent(ServletContext.class);
     
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
