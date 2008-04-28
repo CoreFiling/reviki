@@ -39,6 +39,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   private static final String CONFIG_FILE_NAME = "reviki.properties";
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
+  private static final String KEY_PREFIX_BASE_URL = "base-url";
   private static final String KEY_DEFAULT_WIKI = "default-wiki";
 
   /**
@@ -134,6 +135,10 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       return PropertiesDeploymentConfiguration.this.isEditable();
     }
     
+    public String getFixedBaseUrl() {
+      return PropertiesDeploymentConfiguration.this.getFixedBaseUrl(_wikiName);
+    }
+    
     @Override
     public boolean equals(final Object obj) {
       if (obj instanceof PropertiesPerWikiConfiguration) {
@@ -147,7 +152,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     public int hashCode() {
       return getClass().hashCode() ^ (_givenWikiName == null ? 0 : _givenWikiName.hashCode());
     }
-    
+
   }
 
   private final PersistentStringMap _properties;
@@ -155,7 +160,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   public PropertiesDeploymentConfiguration() {
     this(new PropertiesFile(getConfigurationFile()));
   }
-  
+
   PropertiesDeploymentConfiguration(final PersistentStringMap properties) {
     _properties = properties;
   }
@@ -172,6 +177,10 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     catch (SVNException ex) {
       return null;
     }
+  }
+  
+  public String getFixedBaseUrl(final String wikiName) {
+    return _properties.get(KEY_PREFIX_BASE_URL + wikiName);
   }
 
   private File getSearchIndexDirectory(final String wikiName) {

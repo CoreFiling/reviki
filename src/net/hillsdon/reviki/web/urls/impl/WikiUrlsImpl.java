@@ -27,30 +27,27 @@ import net.hillsdon.reviki.web.urls.ApplicationUrls;
 public class WikiUrlsImpl extends AbstractWikiUrls {
 
   private final ApplicationUrls _applicationUrls;
-  private final String _givenWikiName;
+  private final WikiConfiguration _configuration;
 
-  /**
-   * For DI.
-   */
   public WikiUrlsImpl(final ApplicationUrls applicationUrls, final WikiConfiguration configuration) {
-    this(applicationUrls, configuration.getGivenWikiName());
+    _applicationUrls = applicationUrls;
+    _configuration = configuration;
   }
   
-  private WikiUrlsImpl(final ApplicationUrls applicationUrls, final String givenWikiName) {
-    _applicationUrls = applicationUrls;
-    _givenWikiName = givenWikiName;
-  }
-
   public String pagesRoot() {
-    String relative = "/pages/";
-    if (_givenWikiName != null) {
-      relative += Escape.url(_givenWikiName) + "/";
+    String fixedBaseUrl = _configuration.getFixedBaseUrl();
+    if (fixedBaseUrl != null) {
+     if (!fixedBaseUrl.endsWith("/")) {
+       fixedBaseUrl += "/";
+     }
+     return fixedBaseUrl; 
     }
-    return url(relative);
-  }
-
-  @Override
-  protected String url(final String relative) {
+    
+    final String givenWikiName = _configuration.getGivenWikiName();
+    String relative = "/pages/";
+    if (givenWikiName != null) {
+      relative += Escape.url(givenWikiName) + "/";
+    }
     return _applicationUrls.url(relative);
   }
 

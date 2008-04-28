@@ -25,8 +25,6 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
  */
 public abstract class AbstractWikiUrls implements WikiUrls {
 
-  protected abstract String url(String relative);
-  
   public final String page(final String name) {
     return pagesRoot() + Escape.url(name);
   }
