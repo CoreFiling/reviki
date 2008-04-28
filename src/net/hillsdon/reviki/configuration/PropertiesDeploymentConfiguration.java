@@ -39,7 +39,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   private static final String CONFIG_FILE_NAME = "reviki.properties";
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
-  private static final String KEY_PREFIX_BASE_URL = "base-url";
+  private static final String KEY_PREFIX_BASE_URL = "base-url-";
   private static final String KEY_DEFAULT_WIKI = "default-wiki";
 
   /**
