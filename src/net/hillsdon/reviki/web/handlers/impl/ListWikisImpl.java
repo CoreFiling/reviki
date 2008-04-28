@@ -16,6 +16,8 @@
 package net.hillsdon.reviki.web.handlers.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,17 +29,65 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.ListWikis;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class ListWikisImpl implements ListWikis {
 
+  /**
+   * Used by the UI to render the list of wikis.
+   * 
+   * @author mth
+   */
+  public static class WikiDescriptor {
+
+    private final String _name;
+    private final String _frontPage;
+    private final String _defaultFrontPage;
+
+    public WikiDescriptor(final String name, final String frontPage, final String defaultFrontPage) {
+      _name = name;
+      _frontPage = frontPage;
+      _defaultFrontPage = defaultFrontPage;
+    }
+    
+    public String getName() {
+      return _name;
+    }
+    
+    public String getFrontPageUrl() {
+      return _frontPage;
+    }
+    
+    public boolean isDefault() {
+      return _defaultFrontPage != null;
+    }
+    
+    public String getDefaultFrontPageUrl() {
+      return _defaultFrontPage;
+    }
+    
+  }
+  
+  private final ApplicationUrls _applicationUrls;
   private final DeploymentConfiguration _configuration;
 
-  public ListWikisImpl(final DeploymentConfiguration configuration) {
+  public ListWikisImpl(final DeploymentConfiguration configuration, final ApplicationUrls applicationUrls) {
     _configuration = configuration;
+    _applicationUrls = applicationUrls;
   }
   
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
-    request.setAttribute("configuration", _configuration);
+    final List<WikiDescriptor> descriptors = new ArrayList<WikiDescriptor>();
+    for (String name : _configuration.getWikiNames()) {
+      String frontPage = _applicationUrls.get(name).page(BuiltInPageReferences.PAGE_FRONT_PAGE.getPath());
+      String defaultFrontPage = null;
+      if (name.equals(_configuration.getDefaultWiki())) {
+        defaultFrontPage = _applicationUrls.get(name, null).page(BuiltInPageReferences.PAGE_FRONT_PAGE.getPath());
+      }
+      descriptors.add(new WikiDescriptor(name, frontPage, defaultFrontPage));
+    }
+    request.setAttribute("descriptors", descriptors);
     return new JspView("ListWikis");
   }
 

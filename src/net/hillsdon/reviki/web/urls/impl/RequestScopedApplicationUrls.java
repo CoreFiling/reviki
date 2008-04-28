@@ -56,4 +56,8 @@ public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLif
     _requestLocal.destroy();
   }
 
+  public WikiUrls get(String name, String givenWikiName) {
+    return _requestLocal.get().get(name, givenWikiName);
+  }
+
 }

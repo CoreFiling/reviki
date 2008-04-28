@@ -32,11 +32,17 @@ public interface ApplicationUrls {
   String list();
   
   /**
+   * Same as {@link #get(String, String)} with same argument for each parameter.
+   */
+  WikiUrls get(String name);
+
+  /**
    * Note the returned value may be specific to the current request.
    * 
    * @param name The wiki name (null for default).
+   * @param givenWikiName The given wiki name.
    * @return The relevant URLs.
    */
-  WikiUrls get(String name);
+  WikiUrls get(String name, String givenWikiName);
   
 }

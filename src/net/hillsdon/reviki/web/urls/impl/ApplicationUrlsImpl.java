@@ -48,7 +48,7 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
   }
 
   public WikiUrls get(final String name) {
-    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name, name));
+    return get(name, name);
   }
 
   public String list() {
@@ -57,6 +57,10 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
 
   public String url(final String relative) {
     return _base + relative;
+  }
+
+  public WikiUrls get(String name, String givenWikiName) {
+    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name, givenWikiName));
   }
 
 }
