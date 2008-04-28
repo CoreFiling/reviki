@@ -24,8 +24,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
-import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
+import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 import net.hillsdon.reviki.wiki.renderer.creole.JsonDrivenRenderingTest;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -39,7 +38,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
-    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker(new WikiUrlsImpl(new ApplicationUrlsImpl(""), "mywiki"), new SimplePageStore()), new Holder<List<Macro>>(Collections.<Macro>emptyList()));
+    SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new InternalLinker(new ExampleDotComWikiUrls(), new SimplePageStore()), new Holder<List<Macro>>(Collections.<Macro>emptyList()));
     return renderer.render(new PageReference(""), input).toXHTML();
   }
   

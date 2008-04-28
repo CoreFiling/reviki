@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.urls.impl;
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.fij.core.Transform;
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAware;
@@ -27,10 +28,10 @@ public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLif
 
   private RequestLocal<ApplicationUrls> _requestLocal;
 
-  public RequestScopedApplicationUrls() {
+  public RequestScopedApplicationUrls(final DeploymentConfiguration deploymentConfiguration) {
     _requestLocal = new RequestLocal<ApplicationUrls>(new Transform<HttpServletRequest, ApplicationUrls>() {
       public ApplicationUrls transform(final HttpServletRequest in) {
-        return new ApplicationUrlsImpl(in);
+        return new ApplicationUrlsImpl(in, deploymentConfiguration);
       }
     });
   }

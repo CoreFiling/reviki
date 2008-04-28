@@ -17,10 +17,15 @@ package net.hillsdon.reviki.web.urls.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
-
+/**
+ * Determines base URL from the request.
+ * 
+ * @author mth
+ */
 public class ApplicationUrlsImpl implements ApplicationUrls {
 
   private static String getBaseUrl(final HttpServletRequest request) {
@@ -31,24 +36,26 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
   }
 
   private final String _base;
+  private final DeploymentConfiguration _deploymentConfiguration;
 
-  public ApplicationUrlsImpl(final HttpServletRequest request) {
-    this(getBaseUrl(request));
+  public ApplicationUrlsImpl(final HttpServletRequest request, final DeploymentConfiguration deploymentConfiguration) {
+    this(getBaseUrl(request), deploymentConfiguration);
   }
   
-  public ApplicationUrlsImpl(final String base) {
+  public ApplicationUrlsImpl(final String base, final DeploymentConfiguration deploymentConfiguration) {
     _base = base;
+    _deploymentConfiguration = deploymentConfiguration;
   }
 
   public WikiUrls get(final String name) {
-    return new WikiUrlsImpl(this, name);
+    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name, name));
   }
 
   public String list() {
     return url("/list");
   }
 
-  public String url(String relative) {
+  public String url(final String relative) {
     return _base + relative;
   }
 

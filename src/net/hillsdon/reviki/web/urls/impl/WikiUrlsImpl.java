@@ -18,17 +18,13 @@ package net.hillsdon.reviki.web.urls.impl;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
- * We should not base the URLs on the request.
- * 
- * We need to know the public base URL anyway really for e.g. atom ids
- * (we may be proxied through e.g. Apache).
+ * Wiki URLs with a base URL determined by the ApplicationUrls.
  * 
  * @author mth
  */
-public class WikiUrlsImpl implements WikiUrls {
+public class WikiUrlsImpl extends AbstractWikiUrls {
 
   private final ApplicationUrls _applicationUrls;
   private final String _givenWikiName;
@@ -40,33 +36,25 @@ public class WikiUrlsImpl implements WikiUrls {
     this(applicationUrls, configuration.getGivenWikiName());
   }
   
+  /**
+   * For testing, for now.
+   */
   public WikiUrlsImpl(final ApplicationUrls applicationUrls, final String givenWikiName) {
     _applicationUrls = applicationUrls;
     _givenWikiName = givenWikiName;
   }
 
-  public String root() {
+  public String pagesRoot() {
     String relative = "/pages/";
     if (_givenWikiName != null) {
       relative += Escape.url(_givenWikiName) + "/";
     }
+    return url(relative);
+  }
+
+  @Override
+  protected String url(final String relative) {
     return _applicationUrls.url(relative);
-  }
-  
-  public String page(final String name) {
-    return root() + Escape.url(name);
-  }
-
-  public String search() {
-    return page("FindPage");
-  }
-
-  public String feed() {
-    return page("RecentChanges") + "/atom.xml";
-  }
-
-  public String favicon() {
-    return _applicationUrls.url("/resources/favicon.ico");
   }
 
 }

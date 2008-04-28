@@ -105,7 +105,7 @@ public class AtomFeedWriter implements FeedWriter {
     addElement(handler, "id", _wikiUrls.feed());
     addElement(handler, "title", "reviki feed");
     addLink(handler, _wikiUrls.feed(), "self");
-    addLink(handler, _wikiUrls.root(), null);
+    addLink(handler, _wikiUrls.pagesRoot(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
     for (ChangeInfo change : changes) {
       // For now.

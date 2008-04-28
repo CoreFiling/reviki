@@ -47,7 +47,7 @@ public class TestFeedWriter extends TestCase {
       public String page(final String name) {
         return "page";
       }
-      public String root() {
+      public String pagesRoot() {
         return "root";
       }
       public String search() {

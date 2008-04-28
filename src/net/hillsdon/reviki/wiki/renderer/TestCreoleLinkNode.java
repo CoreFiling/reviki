@@ -19,8 +19,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
-import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
+import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 
 public class TestCreoleLinkNode extends TestCase {
 
@@ -30,12 +29,12 @@ public class TestCreoleLinkNode extends TestCase {
   protected void setUp() throws Exception {
     SimplePageStore pages = new SimplePageStore();
     pages.set(new PageReference("ExistingPage"), "", -1, "Content", "");
-    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker(new WikiUrlsImpl(new ApplicationUrlsImpl("/context"), "wiki"), pages), new FakeConfiguration()));
+    _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, new InternalLinker(new ExampleDotComWikiUrls(), pages), new FakeConfiguration()));
   }
   
   public void testInternal() {
-    assertEquals("<a rel='nofollow' class='new-page' href='/context/pages/wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
-    assertEquals("<a class='existing-page' href='/context/pages/wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReference("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
   }
 
   public void testInterWiki() {

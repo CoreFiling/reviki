@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.web.urls.impl;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 
 /**
@@ -27,6 +28,7 @@ public class TestApplicationUrls extends TestCase {
 
   private MockHttpServletRequest _request;
   private ApplicationUrlsImpl _urls;
+  private DeploymentConfiguration _deploymentConfiguration;
 
   @Override
   protected void setUp() throws Exception {
@@ -34,7 +36,7 @@ public class TestApplicationUrls extends TestCase {
     _request.setContextPath("/reviki");
     _request.setRequestURL("http://www.example.com/reviki/some/page");
     _request.setRequestURI("/reviki/some/page");
-    _urls = new ApplicationUrlsImpl(_request);
+    _urls = new ApplicationUrlsImpl(_request, _deploymentConfiguration);
   }
 
   public void testUrl() {

@@ -13,27 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.web.urls;
+package net.hillsdon.reviki.web.urls.impl;
+
+import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
- * Wikis are rather tied up with the web.  At the moment we assume the public URL
- * is the servlet container URL which is probably dubious if apache is fronting
- * tomcat etc.  Probably need a configurable base URL.
- * 
- * These methods return fully qualified URLs.
+ * Common super-class without base URL knowledge.
  * 
  * @author mth
  */
-public interface WikiUrls {
+public abstract class AbstractWikiUrls implements WikiUrls {
 
-  String pagesRoot();
+  protected abstract String url(String relative);
   
-  String search();
-  
-  String page(String name);
+  public final String page(final String name) {
+    return pagesRoot() + Escape.url(name);
+  }
 
-  String feed();
+  public final String search() {
+    return page("FindPage");
+  }
 
-  String favicon();
-  
+  public final String feed() {
+    return page("RecentChanges") + "/atom.xml";
+  }
+
+  public final String favicon() {
+    return url("/resources/favicon.ico");
+  }
+
 }
