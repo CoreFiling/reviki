@@ -36,10 +36,7 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
     this(applicationUrls, configuration.getGivenWikiName());
   }
   
-  /**
-   * For testing, for now.
-   */
-  public WikiUrlsImpl(final ApplicationUrls applicationUrls, final String givenWikiName) {
+  private WikiUrlsImpl(final ApplicationUrls applicationUrls, final String givenWikiName) {
     _applicationUrls = applicationUrls;
     _givenWikiName = givenWikiName;
   }
