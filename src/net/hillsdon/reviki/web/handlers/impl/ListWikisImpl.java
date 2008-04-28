@@ -88,6 +88,7 @@ public class ListWikisImpl implements ListWikis {
       descriptors.add(new WikiDescriptor(name, frontPage, defaultFrontPage));
     }
     request.setAttribute("descriptors", descriptors);
+    request.setAttribute("configuration", _configuration);
     return new JspView("ListWikis");
   }
 

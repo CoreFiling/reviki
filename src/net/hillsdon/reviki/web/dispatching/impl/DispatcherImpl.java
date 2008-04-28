@@ -15,9 +15,6 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
-import static java.lang.String.format;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -40,6 +37,9 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static java.lang.String.format;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+
 public class DispatcherImpl implements Dispatcher {
   
   private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
@@ -49,15 +49,15 @@ public class DispatcherImpl implements Dispatcher {
   private final ListWikis _list;
   private final WikiChoiceImpl _choice;
   private final JumpToWikiUrl _jumpToWiki;
-  private final ApplicationUrls _urls;
+  private final ApplicationUrls _applicationUrls;
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
 
-  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls urls, RequestLifecycleAwareManager requestLifecycleAwareManager) {
+  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager) {
     _configuration = configuration;
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
-    _urls = urls;
+    _applicationUrls = applicationUrls;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
     
     _configuration.load();
@@ -65,6 +65,7 @@ public class DispatcherImpl implements Dispatcher {
 
   public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
+    request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
     ConsumedPath path = new ConsumedPath(request);
     try {
       _requestLifecycleAwareManager.requestStarted(request);
@@ -92,9 +93,9 @@ public class DispatcherImpl implements Dispatcher {
       // ... an internal hack to enable the dispatcher to handle "/".
       final String defaultWiki = _configuration.getDefaultWiki();
       if (defaultWiki != null) {
-        return new RedirectToPageView(_urls.get(defaultWiki), PAGE_FRONT_PAGE);
+        return new RedirectToPageView(_applicationUrls.get(defaultWiki), PAGE_FRONT_PAGE);
       }
-      return new RedirectView(_urls.list());
+      return new RedirectView(_applicationUrls.list());
     }
     else if ("pages".equals(initial)) {
       return _choice.handle(path, request, response);

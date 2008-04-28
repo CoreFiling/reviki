@@ -23,11 +23,11 @@
   </c:if>
   <link href="${cssUrl}" rel="stylesheet" media="screen" type="text/css" />
   <link href="<c:url value="/resources/jquery.suggest.css"/>" rel="stylesheet" media="screen" type="text/css" />
-  <script type="text/javascript" src="<c:url value="/resources/jquery.js"/>"></script>
-  <script type="text/javascript" src="<c:url value="/resources/jquery.dimensions.js"/>"></script>
-  <script type="text/javascript" src="<c:url value="/resources/jquery.bgiframe.js"/>"></script>
-  <script type="text/javascript" src="<c:url value="/resources/jquery.suggest.js"/>"></script>
-  <script type="text/javascript" src="<c:url value="/resources/common.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.dimensions.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.bgiframe.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.suggest.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
   <script type="text/javascript">
     reviki.BASE_URL = "<sw:wikiUrl page=""/>"
   </script>

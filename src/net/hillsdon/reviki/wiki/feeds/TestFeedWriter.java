@@ -53,7 +53,7 @@ public class TestFeedWriter extends TestCase {
       public String search() {
         return "search";
       }
-      public String favicon() {
+      public String resource(String path) {
         return "favicon";
       }
     };

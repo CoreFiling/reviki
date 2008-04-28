@@ -16,7 +16,12 @@
 package net.hillsdon.reviki.web.urls;
 
 
-public interface ApplicationUrls {
+public interface ApplicationUrls extends ResourceUrls {
+
+  /**
+   * Key for instance of this in the request.
+   */
+  String KEY = ApplicationUrls.class.getName();
 
   /**
    * Prefer adding methods to using this one.

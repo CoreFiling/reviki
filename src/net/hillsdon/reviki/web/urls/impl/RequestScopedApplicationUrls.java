@@ -60,4 +60,8 @@ public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLif
     return _requestLocal.get().get(name, givenWikiName);
   }
 
+  public String resource(String path) {
+    return _requestLocal.get().resource(path);
+  }
+  
 }

@@ -63,4 +63,8 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
     return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name, givenWikiName));
   }
 
+  public String resource(String path) {
+    return url("/resources/" + path);
+  }
+
 }

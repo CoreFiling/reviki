@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +32,11 @@ import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -59,10 +59,11 @@ public class WikiHandlerImpl implements WikiHandler {
   private final CachingPageStore _cachingPageStore;
   private final InternalLinker _internalLinker;
   private final ChangeNotificationDispatcher _syncUpdater;
+  private final WikiUrls _wikiUrls;
   private final ResourceHandler _resources;
   private final PageHandler _handler;
 
-  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler) {
+  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls) {
     _cachingPageStore = cachingPageStore;
     _renderer = renderer;
     _internalLinker = internalLinker;
@@ -70,18 +71,21 @@ public class WikiHandlerImpl implements WikiHandler {
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
     _resources = resources;
     _handler = handler;
+    _wikiUrls = wikiUrls;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     try {
+      request.setAttribute(WikiUrls.KEY, _wikiUrls);
+      request.setAttribute("cssUrl", _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?raw");
+      request.setAttribute("internalLinker", _internalLinker);
+      
       _requestLifecycleAwareManager.requestStarted(request);
       try {
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);
         }
         
-        request.setAttribute("cssUrl", _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?raw");
-        request.setAttribute("internalLinker", _internalLinker);
         _syncUpdater.sync();
         addSideBarEtcToRequest(request);
         // We need to complete the rendering here, so the view can call back into the page store.

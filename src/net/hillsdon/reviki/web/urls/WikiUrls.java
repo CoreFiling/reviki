@@ -24,7 +24,12 @@ package net.hillsdon.reviki.web.urls;
  * 
  * @author mth
  */
-public interface WikiUrls {
+public interface WikiUrls extends ResourceUrls {
+
+  /**
+   * Key for instance of this in the request.
+   */
+  String KEY = WikiUrls.class.getName();
 
   String pagesRoot();
   
@@ -33,7 +38,5 @@ public interface WikiUrls {
   String page(String name);
 
   String feed();
-
-  String favicon();
   
 }

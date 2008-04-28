@@ -39,8 +39,8 @@ public abstract class AbstractWikiUrls implements WikiUrls {
     return page("RecentChanges") + "/atom.xml";
   }
 
-  public final String favicon() {
-    return url("/resources/favicon.ico");
+  public final String resource(final String path) {
+    return pagesRoot() + "resources/" + path;
   }
 
 }

@@ -36,7 +36,7 @@ public class TestSearch extends WebTestSupport {
     String name = uniqueWikiPageName("ThisDoesNotExist");
     HtmlPage results = search(getWikiPage("FrontPage"), name);
     assertTrue(results.asText().contains("Create new page " + name));
-    results.getAnchorByHref("/reviki/pages/test/" + name);
+    results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
   }
   
   /**
