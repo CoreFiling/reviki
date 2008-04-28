@@ -15,6 +15,9 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
+import static java.lang.String.format;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -36,9 +39,6 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static java.lang.String.format;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 public class DispatcherImpl implements Dispatcher {
   
@@ -65,10 +65,6 @@ public class DispatcherImpl implements Dispatcher {
 
   public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("text/html");
-    request.setAttribute("cssUrl", request.getContextPath() + "/resources/default-style.css");
-
     ConsumedPath path = new ConsumedPath(request);
     try {
       _requestLifecycleAwareManager.requestStarted(request);

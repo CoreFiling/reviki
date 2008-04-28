@@ -37,7 +37,9 @@ import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.FixedMimeIdentifier;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
+import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
+import net.hillsdon.reviki.web.dispatching.impl.ResourceHandlerImpl;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
@@ -65,8 +67,8 @@ import net.hillsdon.reviki.web.vcintegration.RequestScopedPageStore;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
-import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
+import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.graph.WikiGraphImpl;
 import net.hillsdon.reviki.wiki.macros.IncomingLinksMacro;
@@ -165,6 +167,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
 
     container.addComponent(WikiSession.class, this);
     container.addComponent(WikiHandlerImpl.class, WikiHandlerImpl.class);
+    container.addComponent(ResourceHandler.class, ResourceHandlerImpl.class);
   }
 
 }

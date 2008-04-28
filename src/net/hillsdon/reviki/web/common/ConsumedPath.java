@@ -88,5 +88,13 @@ public class ConsumedPath {
   public boolean hasNext() {
     return _iterator.hasNext();
   }
+
+  /**
+   * @return This, after calling {@link #next()}.
+   */
+  public ConsumedPath consume() {
+    next();
+    return this;
+  }
   
 }
