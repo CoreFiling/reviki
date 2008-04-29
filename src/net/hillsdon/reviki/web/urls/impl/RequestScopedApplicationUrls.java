@@ -21,15 +21,12 @@ import net.hillsdon.fij.core.Transform;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAware;
-import net.hillsdon.reviki.web.vcintegration.RequestLocal;
+import net.hillsdon.reviki.web.vcintegration.AbstractRequestLifecycleAware;
 
-public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLifecycleAware {
-
-  private RequestLocal<ApplicationUrls> _requestLocal;
+public class RequestScopedApplicationUrls extends AbstractRequestLifecycleAware<ApplicationUrls> implements ApplicationUrls {
 
   public RequestScopedApplicationUrls(final DeploymentConfiguration deploymentConfiguration) {
-    _requestLocal = new RequestLocal<ApplicationUrls>(new Transform<HttpServletRequest, ApplicationUrls>() {
+    super(new Transform<HttpServletRequest, ApplicationUrls>() {
       public ApplicationUrls transform(final HttpServletRequest in) {
         return new ApplicationUrlsImpl(in, deploymentConfiguration);
       }
@@ -37,31 +34,23 @@ public class RequestScopedApplicationUrls implements ApplicationUrls, RequestLif
   }
   
   public WikiUrls get(final String name) {
-    return _requestLocal.get().get(name);
+    return get().get(name);
   }
 
   public String list() {
-    return _requestLocal.get().list();
+    return get().list();
   }
 
   public String url(final String relative) {
-    return _requestLocal.get().url(relative);
-  }
-
-  public void create(final HttpServletRequest request) {
-    _requestLocal.create(request);
-  }
-
-  public void destroy() {
-    _requestLocal.destroy();
+    return get().url(relative);
   }
 
   public WikiUrls get(String name, String givenWikiName) {
-    return _requestLocal.get().get(name, givenWikiName);
+    return get().get(name, givenWikiName);
   }
 
   public String resource(String path) {
-    return _requestLocal.get().resource(path);
+    return get().resource(path);
   }
   
 }
