@@ -20,11 +20,10 @@ import java.util.Collection;
 public interface DeploymentConfiguration {
 
   /**
-   * @param actualWikiName The wiki name to store data under.
-   * @param givenWikiName The wiki name to use, possibly null for the default.
-   * @return A wiki configuration specific to <code>actualWikiName</code>
+   * @param wikiName The wiki name to store data under.
+   * @return A wiki configuration specific to <code>wikiName</code>
    */
-  WikiConfiguration getConfiguration(String actualWikiName, String givenWikiName);
+  WikiConfiguration getConfiguration(String wikiName);
 
   /**
    * Load the configuration into memory.
@@ -41,18 +40,6 @@ public interface DeploymentConfiguration {
    *              (note it is possible for this to change over time).
    */
   boolean isEditable();
-
-  /**
-   * Sets a wiki as default.
-   * 
-   * @param wikiName The name of a wiki.
-   */
-  void setDefaultWiki(String wikiName);
-
-  /**
-   * @return The default wiki or null if none.
-   */
-  String getDefaultWiki();
 
   /**
    * @return Names of the configured wikis.

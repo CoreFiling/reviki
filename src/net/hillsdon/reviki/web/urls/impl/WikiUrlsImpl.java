@@ -43,7 +43,7 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
      return fixedBaseUrl; 
     }
     
-    final String givenWikiName = _configuration.getGivenWikiName();
+    final String givenWikiName = _configuration.getWikiName();
     String relative = "/pages/";
     if (givenWikiName != null) {
       relative += Escape.url(givenWikiName) + "/";

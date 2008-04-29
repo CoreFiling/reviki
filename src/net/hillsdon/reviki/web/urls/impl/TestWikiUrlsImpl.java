@@ -48,35 +48,26 @@ public class TestWikiUrlsImpl extends TestCase {
     }).anyTimes();
   }
 
-  public void testNullWiki() {
-    WikiUrlsImpl urls = createURLs("foo", null);
-    assertEquals("http://www.example.com/reviki/pages/", urls.pagesRoot());
-    assertEquals("http://www.example.com/reviki/pages/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/reviki/pages/RecentChanges/atom.xml", urls.feed());
-    assertEquals("http://www.example.com/reviki/pages/FindPage", urls.search());
-  }
-
-  public void testGivenNameWiki() {
-    WikiUrlsImpl urls = createURLs("foo", "foo");
+  public void testNoFixedBaseUrl() {
+    WikiUrlsImpl urls = createURLs("foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
     assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
     assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges/atom.xml", urls.feed());
     assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
   }
-  
-  private WikiUrlsImpl createURLs(final String actual, final String given) {
-    expect(_configuration.getFixedBaseUrl()).andReturn(null).anyTimes();
-    expect(_configuration.getWikiName()).andReturn(actual).anyTimes();
-    expect(_configuration.getGivenWikiName()).andReturn(given).anyTimes();
-    replay(_configuration, _applicationUrls);
-    return new WikiUrlsImpl(_applicationUrls, _configuration);
-  }
-  
+
   public void testFixedBaseUrlJustGoesAheadAndUsesIt() {
     expect(_configuration.getFixedBaseUrl()).andReturn("http://www.example.com/wiki").anyTimes();
     replay(_configuration);
     WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);
     assertEquals("http://www.example.com/wiki/FooPage", urls.page("FooPage"));
+  }
+  
+  private WikiUrlsImpl createURLs(final String wikiName) {
+    expect(_configuration.getFixedBaseUrl()).andReturn(null).anyTimes();
+    expect(_configuration.getWikiName()).andReturn(wikiName).anyTimes();
+    replay(_configuration, _applicationUrls);
+    return new WikiUrlsImpl(_applicationUrls, _configuration);
   }
   
 }

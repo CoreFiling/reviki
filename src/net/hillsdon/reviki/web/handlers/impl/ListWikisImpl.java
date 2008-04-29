@@ -43,12 +43,10 @@ public class ListWikisImpl implements ListWikis {
 
     private final String _name;
     private final String _frontPage;
-    private final String _defaultFrontPage;
 
-    public WikiDescriptor(final String name, final String frontPage, final String defaultFrontPage) {
+    public WikiDescriptor(final String name, final String frontPage) {
       _name = name;
       _frontPage = frontPage;
-      _defaultFrontPage = defaultFrontPage;
     }
     
     public String getName() {
@@ -57,14 +55,6 @@ public class ListWikisImpl implements ListWikis {
     
     public String getFrontPageUrl() {
       return _frontPage;
-    }
-    
-    public boolean isDefault() {
-      return _defaultFrontPage != null;
-    }
-    
-    public String getDefaultFrontPageUrl() {
-      return _defaultFrontPage;
     }
     
   }
@@ -81,11 +71,7 @@ public class ListWikisImpl implements ListWikis {
     final List<WikiDescriptor> descriptors = new ArrayList<WikiDescriptor>();
     for (String name : _configuration.getWikiNames()) {
       String frontPage = _applicationUrls.get(name).page(BuiltInPageReferences.PAGE_FRONT_PAGE.getPath());
-      String defaultFrontPage = null;
-      if (name.equals(_configuration.getDefaultWiki())) {
-        defaultFrontPage = _applicationUrls.get(name, null).page(BuiltInPageReferences.PAGE_FRONT_PAGE.getPath());
-      }
-      descriptors.add(new WikiDescriptor(name, frontPage, defaultFrontPage));
+      descriptors.add(new WikiDescriptor(name, frontPage));
     }
     request.setAttribute("descriptors", descriptors);
     request.setAttribute("configuration", _configuration);

@@ -46,7 +46,7 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
   private final DeploymentConfiguration _configuration = new PropertiesDeploymentConfiguration(_properties);
   
   public void testSetURLThrowsIllegalArgumentExceptionOnRubbishInput() {
-    WikiConfiguration wiki = _configuration.getConfiguration("SomeWiki", "SomeWiki");
+    WikiConfiguration wiki = _configuration.getConfiguration("SomeWiki");
     try {
       wiki.setUrl("foo bar");
       fail();
@@ -55,24 +55,18 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
     }
   }
 
-  public void testDefaultWiki() {
-    _configuration.setDefaultWiki("foo");
-    assertEquals("foo", _configuration.getDefaultWiki());
-  }
-  
   public void testNames() {
-    WikiConfiguration wiki = _configuration.getConfiguration("actual", "given");
-    assertEquals("given", wiki.getGivenWikiName());
-    assertEquals("actual", wiki.getWikiName());
+    WikiConfiguration wiki = _configuration.getConfiguration("wikiName");
+    assertEquals("wikiName", wiki.getWikiName());
   }
   
   public void testLoadSave() throws Exception {
-    WikiConfiguration config = _configuration.getConfiguration("foo", "bar");
+    WikiConfiguration config = _configuration.getConfiguration("foo");
     String url = "http://svn.example.com/svn";
     config.setUrl(url);
     config.save();
     _configuration.load();
-    assertEquals(SVNURL.parseURIDecoded(url), _configuration.getConfiguration("foo", "bar").getUrl());
+    assertEquals(SVNURL.parseURIDecoded(url), _configuration.getConfiguration("foo").getUrl());
   }
   
 }

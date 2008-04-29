@@ -40,7 +40,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
   private static final String KEY_PREFIX_BASE_URL = "base-url-";
-  private static final String KEY_DEFAULT_WIKI = "default-wiki";
 
   /**
    * @return A configuration location if we can, otherwise null.
@@ -96,10 +95,8 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   private class PropertiesPerWikiConfiguration implements WikiConfiguration {
 
     private final String _wikiName;
-    private final String _givenWikiName;
 
-    public PropertiesPerWikiConfiguration(final String givenWikiName, final String wikiName) {
-      _givenWikiName = givenWikiName;
+    public PropertiesPerWikiConfiguration(final String wikiName) {
       _wikiName = wikiName;
     }
     
@@ -127,10 +124,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       return PropertiesDeploymentConfiguration.this.isComplete(_wikiName);
     }
 
-    public String getGivenWikiName() {
-      return _givenWikiName;
-    }
-    
     public boolean isEditable() {
       return PropertiesDeploymentConfiguration.this.isEditable();
     }
@@ -142,15 +135,15 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     @Override
     public boolean equals(final Object obj) {
       if (obj instanceof PropertiesPerWikiConfiguration) {
-        String givenWikiName = ((PropertiesPerWikiConfiguration) obj)._givenWikiName;
-        return _givenWikiName == null ? givenWikiName == null : _givenWikiName.equals(givenWikiName);
+        String givenWikiName = ((PropertiesPerWikiConfiguration) obj)._wikiName;
+        return _wikiName == null ? givenWikiName == null : _wikiName.equals(givenWikiName);
       }
       return false;
     }
     
     @Override
     public int hashCode() {
-      return getClass().hashCode() ^ (_givenWikiName == null ? 0 : _givenWikiName.hashCode());
+      return getClass().hashCode() ^ (_wikiName == null ? 0 : _wikiName.hashCode());
     }
 
   }
@@ -165,8 +158,8 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     _properties = properties;
   }
   
-  public WikiConfiguration getConfiguration(final String actualWikiName, final String givenWikiName) {
-    return new PropertiesPerWikiConfiguration(givenWikiName, actualWikiName);
+  public WikiConfiguration getConfiguration(final String wikiName) {
+    return new PropertiesPerWikiConfiguration(wikiName);
   }
   
   public SVNURL getUrl(final String wikiName) {
@@ -209,9 +202,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     catch (SVNException e) {
       throw new IllegalArgumentException("Invalid SVN URL", e);
     }
-    if (getDefaultWiki() == null) {
-      setDefaultWiki(wikiName);
-    }
   }
 
   private boolean isComplete(final String wikiName) {
@@ -245,14 +235,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return false;
   }
 
-  public void setDefaultWiki(final String wikiName) {
-    _properties.put(KEY_DEFAULT_WIKI, wikiName);
-  }
-
-  public String getDefaultWiki() {
-    return _properties.get(KEY_DEFAULT_WIKI);
-  }
-  
   public Collection<String> getWikiNames() {
     List<String> names = new ArrayList<String>();
     for (String key : _properties.keySet()) {

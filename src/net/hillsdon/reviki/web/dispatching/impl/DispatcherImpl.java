@@ -29,7 +29,6 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
-import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.redirect.RedirectView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
@@ -38,7 +37,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import static java.lang.String.format;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 public class DispatcherImpl implements Dispatcher {
   
@@ -89,12 +87,8 @@ public class DispatcherImpl implements Dispatcher {
   // This should be moved out of here...
   private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String initial = path.next();
+    // An internal hack (see index.jsp) to allow us to handle "/".
     if ("root".equals(initial)) {
-      // ... an internal hack to enable the dispatcher to handle "/".
-      final String defaultWiki = _configuration.getDefaultWiki();
-      if (defaultWiki != null) {
-        return new RedirectToPageView(_applicationUrls.get(defaultWiki), PAGE_FRONT_PAGE);
-      }
       return new RedirectView(_applicationUrls.list());
     }
     else if ("pages".equals(initial)) {

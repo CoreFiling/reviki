@@ -10,7 +10,6 @@
       <c:forEach var="descriptor" items="${descriptors}">
         <li>
           <a href="<c:out value="${descriptor.frontPageUrl}"/>"><c:out value="${descriptor.name}"/></a>
-          <c:if test="${descriptor.default}">(also available at the <a href="<c:out value="${descriptor.defaultFrontPageUrl}"/>">default location</a>)</c:if>
         </li>
       </c:forEach>
     </ul>

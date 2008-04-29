@@ -32,11 +32,6 @@ public interface WikiConfiguration {
   String getWikiName();
 
   /**
-   * @return The given wiki name, null if we're the default wiki.
-   */
-  String getGivenWikiName();
-  
-  /**
    * @return The fixed base URL, if any.  Otherwise the base URL should be derived
    *         from the request.
    */

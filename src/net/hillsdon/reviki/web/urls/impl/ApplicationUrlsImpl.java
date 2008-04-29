@@ -60,7 +60,7 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
   }
 
   public WikiUrls get(String name, String givenWikiName) {
-    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name, givenWikiName));
+    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name));
   }
 
   public String resource(String path) {

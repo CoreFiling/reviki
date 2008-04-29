@@ -70,24 +70,11 @@ public class WikiChoiceImpl implements WikiChoice {
   }
 
   private WikiConfiguration getWikiConfiguration(final ConsumedPath path) throws NotFoundException {
-    boolean asDefault = false;
-    String wikiName = path.peek();
+    String wikiName = path.next();
     if (wikiName == null) {
       throw new NotFoundException();
     }
-    if (wikiName.matches("^\\p{Lu}.*")) {
-      // It's not a subwiki, rather a request for a page in the default wiki.
-      asDefault = true;
-      wikiName = _configuration.getDefaultWiki();
-      if (wikiName == null) {
-        throw new NotFoundException();
-      }
-    }
-    else {
-      path.next();
-    }
-    String givenWikiName = asDefault ? null : wikiName;
-    return _configuration.getConfiguration(wikiName, givenWikiName);
+    return _configuration.getConfiguration(wikiName);
   }
 
 }
