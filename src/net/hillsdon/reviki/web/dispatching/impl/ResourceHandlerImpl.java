@@ -33,7 +33,7 @@ public class ResourceHandlerImpl implements ResourceHandler {
     }
     return new View() {
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        request.getRequestDispatcher("/resources/" + Escape.url(resource)).include(request, response);
+        request.getRequestDispatcher("/resources/" + Escape.url(resource)).forward(request, response);
       }
     };
   }
