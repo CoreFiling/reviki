@@ -16,7 +16,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <% } %>
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
-  <link rel="shortcut icon" href="<c:url value="/resources/favicon.ico"/>" />
+  <link rel="shortcut icon" href="<sw:resourceUrl path="favicon.ico"/>" />
   <c:if test="${wikiIsValid != null and wikiIsValid}">
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>/atom.xml" />
     <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
