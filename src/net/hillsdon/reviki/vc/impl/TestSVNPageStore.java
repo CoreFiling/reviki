@@ -25,7 +25,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.StoreKind;
 
 import org.easymock.EasyMock;
@@ -63,7 +62,7 @@ public class TestSVNPageStore extends TestCase {
     expect(_tracker.getChangeThatDeleted(path)).andReturn(null);
     expect(_operations.log(path, -1, true, true, 0, -1)).andReturn(asList(previousEdit));
     replay();
-    assertEquals(asList(previousEdit), _store.history(new PageReference(path)));
+    assertEquals(asList(previousEdit), _store.history(new PageReferenceImpl(path)));
     verify();
   }
   
@@ -74,7 +73,7 @@ public class TestSVNPageStore extends TestCase {
     expect(_tracker.getChangeThatDeleted(path)).andReturn(deleteChange);
     expect(_operations.log(path, -1, true, true, 0, deleteChange.getRevision() - 1)).andReturn(asList(previousEdit));
     replay();
-    List<ChangeInfo> history = _store.history(new PageReference(path));
+    List<ChangeInfo> history = _store.history(new PageReferenceImpl(path));
     assertEquals(asList(deleteChange, previousEdit), history);
     verify();
   }
@@ -90,7 +89,7 @@ public class TestSVNPageStore extends TestCase {
     expect(_operations.log(copyName, -1, true, true, 0, -1)).andReturn(asList(edit, copyAdd));
     expect(_operations.log(originalName, -1, true, true, 0, 1)).andReturn(asList(copyRemove, create));
     replay();
-    assertEquals(asList(edit, copyAdd, copyRemove, create), _store.history(new PageReference(copyName)));
+    assertEquals(asList(edit, copyAdd, copyRemove, create), _store.history(new PageReferenceImpl(copyName)));
     verify();
   }
   

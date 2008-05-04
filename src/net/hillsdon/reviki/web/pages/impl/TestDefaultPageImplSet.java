@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
@@ -47,8 +48,8 @@ import static org.easymock.EasyMock.verify;
  */
 public class TestDefaultPageImplSet extends TestCase {
 
-  private static final PageReference CALLED_ON_PAGE = new PageReference("CalledOnPage");
-  private static final PageReference TO_PAGE = new PageReference("ToPage");
+  private static final PageReference CALLED_ON_PAGE = new PageReferenceImpl("CalledOnPage");
+  private static final PageReference TO_PAGE = new PageReferenceImpl("ToPage");
   
   private CachingPageStore _store;
   private MockHttpServletRequest _request;
@@ -163,7 +164,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testCopyFrom() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_COPY, "");
     _request.setParameter(DefaultPageImpl.PARAM_FROM_PAGE, "FromPage");
-    expect(_store.copy(new PageReference("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.copy(new PageReferenceImpl("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
     replay(_store);
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(CALLED_ON_PAGE, view.getPage());

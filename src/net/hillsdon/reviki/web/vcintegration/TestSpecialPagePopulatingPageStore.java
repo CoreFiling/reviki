@@ -18,7 +18,7 @@ package net.hillsdon.reviki.web.vcintegration;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 public class TestSpecialPagePopulatingPageStore extends TestCase {
@@ -33,7 +33,7 @@ public class TestSpecialPagePopulatingPageStore extends TestCase {
   }
   
   public void testAddsSpecialPagesToList() throws Exception {
-    assertTrue(_special.list().contains(new PageReference("ConfigSvnLocation")));
+    assertTrue(_special.list().contains(new PageReferenceImpl("ConfigSvnLocation")));
   }
   
   public void testPopulatesSomePages() throws Exception {

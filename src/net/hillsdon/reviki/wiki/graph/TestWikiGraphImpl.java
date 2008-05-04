@@ -20,8 +20,8 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 import org.easymock.EasyMock;
@@ -36,7 +36,7 @@ public class TestWikiGraphImpl extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _store = new SimplePageStore();
-    _store.set(new PageReference("FooPage"), "", -1, "Foo content", "");
+    _store.set(new PageReferenceImpl("FooPage"), "", -1, "Foo content", "");
     _mockedSearchEngine = EasyMock.createMock(SearchEngine.class);
     _graph = new WikiGraphImpl(_store, _mockedSearchEngine);
   }

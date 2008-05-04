@@ -15,10 +15,6 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
-import static java.lang.String.format;
-import static net.hillsdon.fij.core.Functional.filter;
-import static net.hillsdon.fij.text.Strings.fromUTF8;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,6 +56,12 @@ import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
+
+import static java.lang.String.format;
+
+import static net.hillsdon.fij.core.Functional.filter;
+
+import static net.hillsdon.fij.text.Strings.fromUTF8;
 
 /**
  * Stores pages in an SVN repository.
@@ -118,7 +120,7 @@ public class SVNPageStore implements PageStore {
   public Set<PageReference> list() throws PageStoreException {
     Set<PageReference> names = new LinkedHashSet<PageReference>();
     for (String page : _tracker.currentExistingEntries()) {
-      names.add(new PageReference(page));
+      names.add(new PageReferenceImpl(page));
     }
     return names;
   }
@@ -147,7 +149,7 @@ public class SVNPageStore implements PageStore {
       catch (NotFoundException ex) {
         // It was a file at 'revision' but is now deleted so we can't get the lock information.
       }
-      return new PageInfo(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
+      return new PageInfoImpl(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
     }
     else if (SVNNodeKind.NONE.equals(kind)) {
       long pseudoRevision = PageInfo.UNCOMMITTED;
@@ -161,7 +163,7 @@ public class SVNPageStore implements PageStore {
         lastChangedAuthor = deletingChange.getUser();
         lastChangedDate = deletingChange.getDate();
       }
-      return new PageInfo(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null);
+      return new PageInfoImpl(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null);
     }
     else {
       throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
@@ -311,7 +313,7 @@ public class SVNPageStore implements PageStore {
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {
-        pages.add(new PageReference(info.getPage()));
+        pages.add(new PageReferenceImpl(info.getPage()));
       }
     }
     return pages;

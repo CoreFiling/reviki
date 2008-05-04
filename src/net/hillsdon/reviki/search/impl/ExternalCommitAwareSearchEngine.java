@@ -30,6 +30,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 
 /**
  * Notifies the search engine of page changes immediately after they happen.
@@ -72,7 +73,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
     for (ChangeInfo change : chronological) {
       if (change.getKind() == StoreKind.PAGE) {
-        minimized.add(new PageReference(change.getPage()));
+        minimized.add(new PageReferenceImpl(change.getPage()));
       }
     }
     for (PageReference page : minimized) {

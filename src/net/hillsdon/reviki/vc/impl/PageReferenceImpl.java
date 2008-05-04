@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.hillsdon.reviki.vc;
+package net.hillsdon.reviki.vc.impl;
 
-import net.hillsdon.fij.core.Transform;
 import net.hillsdon.reviki.text.WikiWordUtils;
+import net.hillsdon.reviki.vc.PageReference;
 
 /**
  * Quite possibly this class is more trouble that it is worth.
  * 
  * @author mth
  */
-public class PageReference implements Comparable<PageReference> {
+public class PageReferenceImpl implements PageReference {
 
-  public static final Transform<PageReference, String> TO_NAME = new Transform<PageReference, String>() {
-    public String transform(PageReference in) {
-      return in.getPath();
-    }
-  };
-  
   private final String _path;
 
-  public PageReference(final String path) {
+  public PageReferenceImpl(final String path) {
     _path = path;
   }
 
@@ -46,7 +40,7 @@ public class PageReference implements Comparable<PageReference> {
   }
 
   public int compareTo(final PageReference o) {
-    return _path.compareTo(o._path);
+    return _path.compareTo(o.getPath());
   }
 
   @Override
@@ -57,7 +51,7 @@ public class PageReference implements Comparable<PageReference> {
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof PageReference) {
-      return ((PageReference) obj)._path.equals(_path);
+      return ((PageReference) obj).getPath().equals(_path);
     }
     return false;
   }
@@ -66,6 +60,6 @@ public class PageReference implements Comparable<PageReference> {
   public int hashCode() {
     return _path.hashCode();
   }
-  
+
 }
 

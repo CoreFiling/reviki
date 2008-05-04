@@ -19,7 +19,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.PageSource;
 import net.hillsdon.reviki.web.pages.SpecialPage;
@@ -43,13 +43,13 @@ public class TestPageSourceImpl extends TestCase {
     SpecialPage specialPage = createMock(SpecialPage.class);
     expect(_specialPages.get("TheSpecialPage")).andReturn(specialPage).atLeastOnce();
     replay(_specialPages, specialPage, _defaultPage);
-    assertSame(specialPage, _pageSource.get(new PageReference("TheSpecialPage")));
+    assertSame(specialPage, _pageSource.get(new PageReferenceImpl("TheSpecialPage")));
   }
   
   public void testFallsbackToDefaultPage() {
     expect(_specialPages.get("AnOrdinaryPage")).andReturn(null).atLeastOnce();
     replay(_specialPages, _defaultPage);
-    assertSame(_defaultPage, _pageSource.get(new PageReference("AnOrdinaryPage")));
+    assertSame(_defaultPage, _pageSource.get(new PageReferenceImpl("AnOrdinaryPage")));
   }
   
 }

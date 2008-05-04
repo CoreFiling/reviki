@@ -15,14 +15,15 @@
  */
 package net.hillsdon.reviki.search.impl;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class TestSearchIndexPopulatingPageStore extends TestCase {
 
@@ -38,7 +39,7 @@ public class TestSearchIndexPopulatingPageStore extends TestCase {
   }
   
   public void testDelegatesThenIndexesAgainstNewRevisionNumber() throws Exception {
-    final PageReference ref = new PageReference("SomePage");
+    final PageReference ref = new PageReferenceImpl("SomePage");
     final String lockToken = "";
     final long baseRevision = 12;
     final String content = "New content";

@@ -24,6 +24,8 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
@@ -56,7 +58,7 @@ import static org.easymock.EasyMock.expect;
  */
 public class TestDefaultPageImplGet extends TestCase {
 
-  private static final PageReference THE_PAGE = new PageReference("ThePage");
+  private static final PageReference THE_PAGE = new PageReferenceImpl("ThePage");
   
   private CachingPageStore _store;
   private MarkupRenderer _renderer;
@@ -156,7 +158,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
   
   private PageInfo expectGetContent(final int revision, final String content) throws Exception  {
-    PageInfo pageInfo = new PageInfo(THE_PAGE.getPath(), content, revision, revision, "", new Date(), "", "");
+    PageInfo pageInfo = new PageInfoImpl(THE_PAGE.getPath(), content, revision, revision, "", new Date(), "", "");
     expect(_store.get(THE_PAGE, revision)).andReturn(pageInfo).once();
     return pageInfo;
   }

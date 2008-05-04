@@ -15,9 +15,9 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
-import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isConfigPage;
-import net.hillsdon.reviki.vc.PageReference;
 import junit.framework.TestCase;
+import net.hillsdon.reviki.vc.PageReference;
+import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isConfigPage;
 
 public class TestConfigPageCachingPageStore extends TestCase {
 
@@ -28,7 +28,7 @@ public class TestConfigPageCachingPageStore extends TestCase {
   }
   
   public void testDoesntCacheOldRevisionsOfConfigPages() throws Exception {
-    PageReference ref = new PageReference("ConfigFoo");
+    PageReference ref = new PageReferenceImpl("ConfigFoo");
     ConfigPageCachingPageStore store = new ConfigPageCachingPageStore(new SimplePageStore());
     store.getUnderlying().set(ref, "", 1, "Hey there", "Initial commit");
     assertFalse(store.get(ref, 2).isNew());

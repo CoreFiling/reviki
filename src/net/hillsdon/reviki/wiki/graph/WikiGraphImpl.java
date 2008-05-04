@@ -15,9 +15,6 @@
  */
 package net.hillsdon.reviki.wiki.graph;
 
-import static net.hillsdon.fij.core.Functional.list;
-import static net.hillsdon.fij.core.Functional.map;
-
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,6 +24,9 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+
+import static net.hillsdon.fij.core.Functional.list;
+import static net.hillsdon.fij.core.Functional.map;
 
 public class WikiGraphImpl implements WikiGraph {
 

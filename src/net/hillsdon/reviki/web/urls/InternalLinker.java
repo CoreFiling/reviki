@@ -16,10 +16,10 @@
 package net.hillsdon.reviki.web.urls;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 
@@ -35,7 +35,7 @@ public class InternalLinker {
 
   private boolean exists(final String name) {
     try {
-      return _store.list().contains(new PageReference(name));
+      return _store.list().contains(new PageReferenceImpl(name));
     }
     catch (PageStoreException e) {
       throw new RuntimeException(e);

@@ -17,8 +17,8 @@ package net.hillsdon.reviki.wiki;
 
 import java.io.IOException;
 
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 
 public class RenderedPageFactory {
 
@@ -29,7 +29,7 @@ public class RenderedPageFactory {
   }
   
   public RenderedPage create(final String pageName, final String content) throws IOException, PageStoreException {
-    return new RenderedPage(pageName, _renderer.render(new PageReference(pageName), content));
+    return new RenderedPage(pageName, _renderer.render(new PageReferenceImpl(pageName), content));
   }
   
 }

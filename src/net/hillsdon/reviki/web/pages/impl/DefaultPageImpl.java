@@ -35,6 +35,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
@@ -290,18 +291,18 @@ public class DefaultPageImpl implements DefaultPage {
       final PageReference toRef;
       final PageReference fromRef;
       if (fromPage != null) {
-        fromRef = new PageReference(fromPage);
+        fromRef = new PageReferenceImpl(fromPage);
         toRef = page;
       }
       else {
         fromRef = page;
-        toRef = new PageReference(toPage);
+        toRef = new PageReferenceImpl(toPage);
       }
       _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
       return new RedirectToPageView(_wikiUrls, toRef);
     }
     else if (hasRenameParam) {
-      final PageReference toPage = new PageReference(getRequiredString(request, PARAM_TO_PAGE));
+      final PageReference toPage = new PageReferenceImpl(getRequiredString(request, PARAM_TO_PAGE));
       _store.rename(page, toPage, -1, createLinkingCommitMessage(request));
       return new RedirectToPageView(_wikiUrls, toPage);
     }

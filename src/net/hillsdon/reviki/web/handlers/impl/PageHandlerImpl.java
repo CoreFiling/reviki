@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
@@ -61,7 +62,7 @@ public class PageHandlerImpl implements PageHandler {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);
     }
     
-    final PageReference pageReference = new PageReference(pageName);
+    final PageReference pageReference = new PageReferenceImpl(pageName);
     request.setAttribute("page", pageReference);
 
     final Page page = _pageSource.get(pageReference);

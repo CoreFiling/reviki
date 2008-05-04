@@ -25,6 +25,8 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 
 import org.apache.commons.io.IOUtils;
@@ -50,19 +52,19 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       PAGE_FRONT_PAGE,
-      new PageReference("FindPage"),
-      new PageReference("ConfigCss"),
+      new PageReferenceImpl("FindPage"),
+      new PageReferenceImpl("ConfigCss"),
       PAGE_SIDEBAR,
       CONFIG_PLUGINS,
       CONFIG_AUTO_PROPERTIES,
       CONFIG_INTER_WIKI_LINKS
    )); 
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
-      new PageReference("AllPages"),
-      new PageReference("ConfigSvnLocation"),
-      new PageReference("OrphanedPages"),
-      new PageReference("RecentChanges"), 
-      new PageReference("RecentChanges"),
+      new PageReferenceImpl("AllPages"),
+      new PageReferenceImpl("ConfigSvnLocation"),
+      new PageReferenceImpl("OrphanedPages"),
+      new PageReferenceImpl("RecentChanges"), 
+      new PageReferenceImpl("RecentChanges"),
       PAGE_HEADER,
       PAGE_FOOTER
     );
@@ -83,7 +85,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     try {
       if (page.isNew() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
         String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
-        page = new PageInfo(page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken());
+        page = new PageInfoImpl(page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken());
       }
     }
     catch (IOException ex) {
