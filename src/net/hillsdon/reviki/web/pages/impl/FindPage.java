@@ -30,12 +30,14 @@ import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_TEXT;
 
 public class FindPage extends AbstractSpecialPage {
 
@@ -93,7 +95,7 @@ public class FindPage extends AbstractSpecialPage {
     if (limit != null) {
       results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));
     }
-    if ("txt".equals(request.getParameter("ctype"))) {
+    if (ViewTypeConstants.is(request, CTYPE_TEXT)) {
       return new TextFormatSearchResults(results);
     }
     else {

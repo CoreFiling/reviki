@@ -52,7 +52,7 @@ public class TestWikiUrlsImpl extends TestCase {
     WikiUrlsImpl urls = createURLs("foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
     assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges/atom.xml", urls.feed());
+    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed());
     assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
   }
 

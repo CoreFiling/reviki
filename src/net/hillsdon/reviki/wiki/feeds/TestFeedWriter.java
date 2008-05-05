@@ -19,10 +19,9 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
@@ -30,10 +29,12 @@ import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import static net.hillsdon.reviki.wiki.feeds.ReturnAs.NODE;
+import static net.hillsdon.reviki.wiki.feeds.ReturnAs.NUMBER;
+import static net.hillsdon.reviki.wiki.feeds.ReturnAs.STRING;
 
 public class TestFeedWriter extends TestCase {
 
@@ -58,16 +59,14 @@ public class TestFeedWriter extends TestCase {
       }
     };
     new AtomFeedWriter(urls).writeAtom(changes, new PrintWriter(out));
+    InputSource input = new InputSource(new StringReader(out.toString()));
     
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    dbf.setNamespaceAware(true);
-    Document dom = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(out.toString())));
-    Element selfLink = (Element) dom.getElementsByTagName("link").item(0);
-    assertEquals(selfLink.getAttributeNS(null, "href"), "feed");
-    
-    NodeList entries = dom.getElementsByTagNameNS(AtomFeedWriter.ATOM_NS, "entry");
-    assertEquals(1, entries.getLength());
-    // TODO, actually assert something useful.
+    XPathAccess xpa = new XPathAccess(input);
+    xpa.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
+    assertEquals("feed", xpa.evaluate("atom:feed/atom:link/@href", STRING));
+    assertEquals(1.0, xpa.evaluate("count(//atom:entry)", NUMBER));
+    Element entry = (Element) xpa.evaluate("atom:feed/atom:entry", NODE);
+    assertEquals("page?revision=123", xpa.evaluate(entry, "atom:id", STRING));
   }
-  
+
 }

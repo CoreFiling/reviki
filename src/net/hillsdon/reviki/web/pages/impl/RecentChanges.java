@@ -29,8 +29,10 @@ import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class RecentChanges extends AbstractSpecialPage {
 
@@ -51,10 +53,10 @@ public class RecentChanges extends AbstractSpecialPage {
   @Override
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
-    if ("atom.xml".equals(path.next())) {
+    request.setAttribute("recentChanges", recentChanges);
+    if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
       return new FeedView(_feedWriter, recentChanges);
     }
-    request.setAttribute("recentChanges", recentChanges);
     return new JspView("RecentChanges");
   }
 

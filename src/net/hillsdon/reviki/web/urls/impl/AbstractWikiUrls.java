@@ -34,7 +34,7 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   }
 
   public final String feed() {
-    return page("RecentChanges") + "/atom.xml";
+    return page("RecentChanges") + "?ctype=atom";
   }
 
   public final String resource(final String path) {
