@@ -15,13 +15,6 @@
  */
 package net.hillsdon.fij.core;
 
-import static java.util.Arrays.asList;
-import static net.hillsdon.fij.core.Functional.filter;
-import static net.hillsdon.fij.core.Functional.iter;
-import static net.hillsdon.fij.core.Functional.list;
-import static net.hillsdon.fij.core.Functional.map;
-import static net.hillsdon.fij.core.Functional.set;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,13 +24,21 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import static java.util.Arrays.asList;
+
+import static net.hillsdon.fij.core.Functional.filter;
+import static net.hillsdon.fij.core.Functional.iter;
+import static net.hillsdon.fij.core.Functional.list;
+import static net.hillsdon.fij.core.Functional.map;
+import static net.hillsdon.fij.core.Functional.set;
+
 public class TestFunctional extends TestCase {
 
   public void testIter() {
     assertEquals(asList("1", "2", "3"), list(iter("1", "2", "3")));
-    assertFalse(iter().hasNext());
+    assertFalse(iter(new Object[0]).hasNext());
     try {
-      iter().next();
+      iter(new Object[0]).next();
       fail();
     }
     catch (NoSuchElementException ex) {

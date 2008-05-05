@@ -47,8 +47,8 @@
   </target>
 
   <target name="compile" depends="init">
-    <javac srcdir="${source}"
-           destdir="${build-classes}">
+    <javac srcdir="${source}" destdir="${build-classes}" fork="yes">
+      <compilerarg value="-Xlint:unchecked" />
       <classpath refid="classpath" />
     </javac>
     <copy todir="${build-web}">
