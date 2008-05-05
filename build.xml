@@ -1,16 +1,23 @@
 <project name="reviki" default="war" basedir=".">
 
   <property name="source" value="src" />   
-  <property name="webtests-source" value="webtests" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
-  <property name="build-webtests" value="ant-build/webtests" />   
   <property name="reports" value="reports" />   
   <property name="war" value="${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
+
+  <property name="webtests-source" value="webtests" />   
+  <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
   <property name="tomcat-url" value="http://mirror.fubra.com/ftp.apache.org/tomcat/tomcat-6/v6.0.16/bin/apache-tomcat-6.0.16.zip"/>
+  <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
+       The wiki should be called 'test' (with no base URL set).
+
+       An external properties file is used to retrieve the username and password to use.
+       Supply the testwiki.username and testwiki.password properties in build.properties. -->
+  <property file="build.properties" />
 
   <path id="classpath">
      <fileset dir="lib">
@@ -136,7 +143,24 @@
     <waitfor maxwait="30" maxwaitunit="second" checkevery="500">
       <http url="http://localhost:8080/reviki/"/>
     </waitfor>
+    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="webtests-failed">
+      <jvmarg value="-Dwiki.username=${testwiki.username}" />
+      <jvmarg value="-Dwiki.password=${testwiki.password}" />
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement location="${build-classes}"/>
+        <pathelement location="${build-webtests}"/>
+      </classpath>
+      <formatter type="xml"/>
+      <batchtest todir="${reports}">
+        <fileset dir="${webtests-source}">
+          <include name="**/Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
     <exec executable="${tomcat}/bin/shutdown.sh"/>
+    <fail if="webtests-failed" />
   </target>
 
 </project>
