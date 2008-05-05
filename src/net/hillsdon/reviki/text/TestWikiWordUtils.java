@@ -15,14 +15,15 @@
  */
 package net.hillsdon.reviki.text;
 
-import static java.util.Arrays.asList;
-import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
-import static net.hillsdon.reviki.text.WikiWordUtils.pathToTitle;
-import static net.hillsdon.reviki.text.WikiWordUtils.splitCamelCase;
-
 import java.util.List;
 
 import junit.framework.TestCase;
+
+import static java.util.Arrays.asList;
+
+import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
+import static net.hillsdon.reviki.text.WikiWordUtils.pathToTitle;
+import static net.hillsdon.reviki.text.WikiWordUtils.splitCamelCase;
 
 public class TestWikiWordUtils extends TestCase { 
 
@@ -38,9 +39,9 @@ public class TestWikiWordUtils extends TestCase {
   }
   
   public void testOddCharacters() {
-    String happyu = "JürgenHabermas";
-    assertEquals(asList("Jürgen", "Habermas"), splitCamelCase(happyu));
-    assertEquals("Jürgen Habermas", pathToTitle(happyu));
+    String happyu = "J\u00FCrgenHabermas";
+    assertEquals(asList("J\u00FCrgen", "Habermas"), splitCamelCase(happyu));
+    assertEquals("J\u00FCrgen Habermas", pathToTitle(happyu));
   }
   
   public void testLabel() {
