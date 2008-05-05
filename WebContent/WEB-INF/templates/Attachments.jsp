@@ -4,7 +4,7 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${page.title}"/> attachments</tiles:putAttribute>
-  <tiles:putAttribute name="heading"><a href="<sw:wikiUrl page="${page.path}"/>"><c:out value="${page.title}"/></a> attachments</tiles:putAttribute>
+  <tiles:putAttribute name="heading"><a href="<sw:wikiUrl page="${page}"/>"><c:out value="${page.title}"/></a> attachments</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <c:choose>
       <c:when test="${not empty attachments}">

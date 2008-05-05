@@ -21,7 +21,7 @@
         </form>
       </li>
       <li class="menu">
-        <a href="${page.path}/attachments/">Attachments</a>
+        <a href="${page.name}/attachments/">Attachments</a>
       </li>
       <c:if test="${not pageInfo.new}">
         <li class="menu">
@@ -57,7 +57,7 @@
         <sw:wikiLink page="${backlink}"/>
       </c:forEach>
       <c:if test="${backlinksLimited}">
-        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.path}&amp;force">...</a>
+        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.name}&amp;force">...</a>
       </c:if>
     </c:if>
     </p>
@@ -78,7 +78,7 @@
       <c:otherwise>
         <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
           <input name="editButton" type="submit" value="Edit"/>
-        </form><a href="${page.path}/attachments/">Attachments</a>
+        </form><a href="${page.name}/attachments/">Attachments</a>
       </c:otherwise>
     </c:choose>
     <c:if test="${not empty lastEditAction}">

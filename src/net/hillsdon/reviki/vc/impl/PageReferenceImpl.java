@@ -18,8 +18,10 @@ package net.hillsdon.reviki.vc.impl;
 import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
 
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
+
 /**
- * Quite possibly this class is more trouble that it is worth.
+ * Impl.
  * 
  * @author mth
  */
@@ -31,25 +33,25 @@ public class PageReferenceImpl implements PageReference {
     _path = path;
   }
 
-  public String getTitle() {
-    return WikiWordUtils.pathToTitle(getPath());
+  public final String getTitle() {
+    return WikiWordUtils.pathToTitle(getName());
   }
   
-  public String getPath() {
+  public final String getPath() {
     return _path;
   }
 
-  public int compareTo(final PageReference o) {
+  public final int compareTo(final PageReference o) {
     return _path.compareTo(o.getPath());
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return _path;
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     if (obj instanceof PageReference) {
       return ((PageReference) obj).getPath().equals(_path);
     }
@@ -57,8 +59,12 @@ public class PageReferenceImpl implements PageReference {
   }
   
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return _path.hashCode();
+  }
+
+  public final String getName() {
+    return SVNPathUtil.tail(_path);
   }
 
 }

@@ -30,9 +30,25 @@ public interface PageReference extends Comparable<PageReference> {
     }
   };
   
+  /**
+   * @return A user friendly title.
+   */
   String getTitle();
   
+  /**
+   * @return The name of the page.
+   */
+  String getName();
+  
+  /**
+   * @return The path used by the page store to store the page.
+   */
   String getPath();
+  
+  /**
+   * @return {@link #getPath()}.
+   */
+  String toString();
 
 }
 
