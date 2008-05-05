@@ -1,12 +1,16 @@
 <project name="reviki" default="war" basedir=".">
 
   <property name="source" value="src" />   
+  <property name="webtests-source" value="webtests" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
+  <property name="build-webtests" value="ant-build/webtests" />   
   <property name="reports" value="reports" />   
   <property name="war" value="${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
+  <property name="tomcat" value="tomcat"/>
+  <property name="tomcat-url" value="http://mirror.fubra.com/ftp.apache.org/tomcat/tomcat-6/v6.0.16/bin/apache-tomcat-6.0.16.zip"/>
 
   <path id="classpath">
      <fileset dir="lib">
@@ -20,6 +24,7 @@
   <target name="init">
      <mkdir dir="${build-classes}" />
      <mkdir dir="${build-web}" />
+     <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
      <exec outputproperty="revision" executable="svnversion"/>
   </target>
@@ -27,8 +32,11 @@
   <target name="clean">
     <delete dir="${build-classes}" />
     <delete dir="${build-web}" />
+    <delete dir="${build-webtests}" />
     <delete dir="${reports}" />
     <delete file="${war}"/>
+    <delete dir="${tomcat}" />
+    <!-- We leave the tomcat zip as it is a large download. -->
   </target>
 
   <target name="compile" depends="init">
@@ -51,6 +59,16 @@
         <include name="net/hillsdon/reviki/web/taglib/reviki.tld"/>
       </fileset>
     </copy>
+  </target>
+
+  <target name="compile-webtests" depends="compile">
+    <javac srcdir="${webtests-source}"
+           destdir="${build-webtests}">
+      <classpath>
+        <path refid="classpath" />
+        <pathelement location="${build-classes}"/>
+      </classpath>
+    </javac>
   </target>
 
   <target name="taglibJar" depends="compile">
@@ -95,6 +113,30 @@
        </fileset>
        <webinf dir="${build-web}/WEB-INF" includes="**" />
     </war>
+  </target>
+
+  <target name="tomcat">
+    <mkdir dir="${tomcat}"/>
+    <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true"/>
+    <unzip src="tomcat.zip" dest="${tomcat}">
+      <regexpmapper handledirsep="true" from="apache-tomcat-.*?/(.*)" to="\1"/>
+    </unzip>
+    <!-- Would be really useful to munge the port numbers to something unusual here,
+         8080 will often conflict with something else.  Perhaps some XSLT? -->
+    <chmod dir="${tomcat}/bin" includes="**/*.sh" perm="u+x" />
+  </target>
+
+  <target name="deploy" depends="war, tomcat">
+    <copy file="${war}" todir="${tomcat}/webapps"/>
+  </target>
+
+  <target name="functionalTests" depends="deploy, compile-webtests">
+    <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
+    <exec executable="${tomcat}/bin/startup.sh"/>
+    <waitfor maxwait="3" maxwaitunit="minute" checkevery="500">
+      <http url="http://localhost:8080/reviki/"/>
+    </waitfor>
+    <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
 </project>
