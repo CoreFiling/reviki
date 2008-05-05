@@ -133,7 +133,7 @@
   <target name="functionalTests" depends="deploy, compile-webtests">
     <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
     <exec executable="${tomcat}/bin/startup.sh"/>
-    <waitfor maxwait="3" maxwaitunit="minute" checkevery="500">
+    <waitfor maxwait="30" maxwaitunit="second" checkevery="500">
       <http url="http://localhost:8080/reviki/"/>
     </waitfor>
     <exec executable="${tomcat}/bin/shutdown.sh"/>
