@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JspView implements View {
 
+  public static final String ATTR_CSS_URL = "cssUrl";
+  
   private final String _name;
 
   public JspView(final String name) {
@@ -41,7 +43,9 @@ public class JspView implements View {
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html");
-    request.setAttribute("cssUrl", request.getContextPath() + "/resources/default-style.css");
+    if (request.getAttribute(ATTR_CSS_URL) == null) {
+      request.setAttribute(ATTR_CSS_URL, request.getContextPath() + "/resources/default-style.css");
+    }
 
     request.getRequestDispatcher("/WEB-INF/templates/" + _name + ".jsp").include(request, response);
   }

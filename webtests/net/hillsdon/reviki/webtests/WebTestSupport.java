@@ -145,5 +145,9 @@ public abstract class WebTestSupport extends TestCase {
   protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {
     assertTrue(search(start, pageName).asText().contains("No results found"));
   }
+  
+  protected HtmlPage getWikiList() throws IOException {
+    return getWebPage("list");
+  }
 
 }

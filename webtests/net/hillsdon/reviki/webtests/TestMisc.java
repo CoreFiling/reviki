@@ -39,6 +39,15 @@ public class TestMisc extends WebTestSupport {
     }
   }
   
+  public void testCssFromWikiUsedInsideWikisUrlSpaceOtherwiseDefaultCss() throws Exception {
+    String defaultCss = "/resources/default-style.css";
+    String perWikiCss = BASE_URL + "/pages/test/ConfigCss?raw";
+    assertTrue(getWikiList().asXml().contains(defaultCss));
+    String whatever = getWikiPage("WhatEver").asXml();
+    assertTrue(whatever.contains(perWikiCss));
+    assertFalse(whatever.contains(defaultCss));
+  }
+  
   public void testConfigSvnLocationShowsFormToEditSvnLocation() throws Exception {
     getWikiPage("ConfigSvnLocation").getFormByName("configurationForm");
   }

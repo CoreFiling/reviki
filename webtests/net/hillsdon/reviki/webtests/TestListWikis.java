@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.webtests;
 
-import java.io.IOException;
-
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlListItem;
@@ -25,10 +23,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 
 public class TestListWikis extends WebTestSupport {
-
-  private HtmlPage getWikiList() throws IOException {
-    return getWebPage("list");
-  }
 
   public void testWikiListContainsTestWiki() throws Exception {
     HtmlPage list = getWikiList();
