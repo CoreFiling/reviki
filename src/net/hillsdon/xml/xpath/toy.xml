@@ -1,0 +1,11 @@
+<!-- An XML file used to exercise XPathContext. -->
+<toy xmlns="http://www.example.com/ns/toy" xmlns:id="http://www.example.com/ns/ids">
+  <manufacturer>
+    <id:guid>1234</id:guid>
+    <name>Ted</name>
+  </manufacturer>
+  <components count="2">
+    <component ref="component1" />
+    <component ref="component2" />
+  </components>
+</toy>

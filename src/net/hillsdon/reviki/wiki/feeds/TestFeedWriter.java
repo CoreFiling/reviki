@@ -28,13 +28,14 @@ import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.xml.xpath.XPathContext;
+import net.hillsdon.xml.xpath.XPathContextFactory;
 
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import static net.hillsdon.reviki.wiki.feeds.ReturnAs.NODE;
-import static net.hillsdon.reviki.wiki.feeds.ReturnAs.NUMBER;
-import static net.hillsdon.reviki.wiki.feeds.ReturnAs.STRING;
+import static net.hillsdon.xml.xpath.Coercion.CONTEXT;
+import static net.hillsdon.xml.xpath.Coercion.NUMBER;
+import static net.hillsdon.xml.xpath.Coercion.STRING;
 
 public class TestFeedWriter extends TestCase {
 
@@ -61,12 +62,13 @@ public class TestFeedWriter extends TestCase {
     new AtomFeedWriter(urls).writeAtom(changes, new PrintWriter(out));
     InputSource input = new InputSource(new StringReader(out.toString()));
     
-    XPathAccess xpa = new XPathAccess(input);
-    xpa.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
-    assertEquals("feed", xpa.evaluate("atom:feed/atom:link/@href", STRING));
-    assertEquals(1.0, xpa.evaluate("count(//atom:entry)", NUMBER));
-    Element entry = (Element) xpa.evaluate("atom:feed/atom:entry", NODE);
-    assertEquals("page?revision=123", xpa.evaluate(entry, "atom:id", STRING));
+    XPathContext feed = XPathContextFactory.newInstance().newXPathContext(input);
+    feed.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
+    
+    assertEquals("feed", feed.evaluate("atom:feed/atom:link/@href", STRING));
+    assertEquals(1.0, feed.evaluate("count(//atom:entry)", NUMBER));
+    XPathContext entry = feed.evaluate("atom:feed/atom:entry", CONTEXT);
+    assertEquals("page?revision=123", entry.evaluate("atom:id", STRING));
   }
 
 }
