@@ -125,9 +125,16 @@
   <target name="tomcat">
     <mkdir dir="${tomcat}"/>
     <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true"/>
-    <unzip src="tomcat.zip" dest="${tomcat}">
+
+    <!-- Use regexpmapper directly with unzip when we can depend on Ant 1.7. -->    
+    <mkdir dir="${tomcat}-unziphelper"/>
+    <unzip src="tomcat.zip" dest="${tomcat}-unziphelper"/>
+    <copy todir="${tomcat}">
+      <fileset dir="${tomcat}-unziphelper" includes="**/*"/>
       <regexpmapper handledirsep="true" from="apache-tomcat-.*?/(.*)" to="\1"/>
-    </unzip>
+    </copy>
+    <delete dir="${tomcat}-unziphelper"/>
+
     <!-- Would be really useful to munge the port numbers to something unusual here,
          8080 will often conflict with something else.  Perhaps some XSLT? -->
     <chmod dir="${tomcat}/bin" includes="**/*.sh" perm="u+x" />
