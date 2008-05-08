@@ -15,6 +15,7 @@
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="lib/resolver.jar" sourcepath="/home/mth/Desktop/downloads/xml-commons-resolver-1.2"/>
 	<classpathentry kind="lib" path="lib/xhtmlvalidate.jar"/>
+	<classpathentry kind="lib" path="lib/xpathcontext.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

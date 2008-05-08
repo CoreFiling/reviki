@@ -47,7 +47,7 @@
   </target>
 
   <target name="compile" depends="init">
-    <javac srcdir="${source}" destdir="${build-classes}" fork="yes">
+    <javac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5">
       <compilerarg value="-Xlint:unchecked" />
       <classpath refid="classpath" />
     </javac>
@@ -69,8 +69,7 @@
   </target>
 
   <target name="compile-webtests" depends="compile">
-    <javac srcdir="${webtests-source}"
-           destdir="${build-webtests}">
+    <javac srcdir="${webtests-source}" destdir="${build-webtests}" target="1.5" >
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-classes}"/>
@@ -124,7 +123,7 @@
 
   <target name="tomcat">
     <mkdir dir="${tomcat}"/>
-    <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true"/>
+    <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true" />
 
     <!-- Use regexpmapper directly with unzip when we can depend on Ant 1.7. -->    
     <mkdir dir="${tomcat}-unziphelper"/>

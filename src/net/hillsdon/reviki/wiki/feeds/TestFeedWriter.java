@@ -28,14 +28,14 @@ import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.xml.xpath.XPathContext;
-import net.hillsdon.xml.xpath.XPathContextFactory;
+import net.hillsdon.xml.xpathcontext.XPathContext;
+import net.hillsdon.xml.xpathcontext.XPathContextFactory;
 
 import org.xml.sax.InputSource;
 
-import static net.hillsdon.xml.xpath.Coercion.CONTEXT;
-import static net.hillsdon.xml.xpath.Coercion.NUMBER;
-import static net.hillsdon.xml.xpath.Coercion.STRING;
+import static net.hillsdon.xml.xpathcontext.Coercion.CONTEXT;
+import static net.hillsdon.xml.xpathcontext.Coercion.NUMBER;
+import static net.hillsdon.xml.xpathcontext.Coercion.STRING;
 
 public class TestFeedWriter extends TestCase {
 
