@@ -21,8 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+
+import static org.apache.commons.lang.StringUtils.trimToNull;
 
 /**
  * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
@@ -34,30 +38,32 @@ import org.tmatesoft.svn.core.SVNURL;
  */
 public class PropertiesDeploymentConfiguration implements DeploymentConfiguration {
 
+  /**
+   * Declared in web.xml.
+   */
+  public static final String DATA_DIR_CONTEXT_PARAM = "reviki-data-dir";
+  
   private static final String DEFAULT_CONFIG_DIR_NAME = "reviki-data";
   private static final String SEARCH_INDEX_DIR_NAME = "search-index";
   private static final String CONFIG_FILE_NAME = "reviki.properties";
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
   private static final String KEY_PREFIX_BASE_URL = "base-url-";
+  
+  
+  private final PersistentStringMap _properties;
+  private final ServletContext _servletContext;
+
+  public PropertiesDeploymentConfiguration(final ServletContext servletContext) {
+    _servletContext = servletContext;
+    _properties = new PropertiesFile(getConfigurationFile());
+  }
 
   /**
    * @return A configuration location if we can, otherwise null.
    */
-  private static File getConfigurationLocation() {
-    String location = null;
-    try {
-      location = System.getProperty("reviki.data");
-    }
-    catch (SecurityException ex) {
-    }
-    if (location == null) {
-      try {
-        location = System.getenv("REVIKI_DATA");
-      }
-      catch (SecurityException ex) {
-      }
-    }
+  private File getConfigurationLocation() {
+    String location = trimToNull(_servletContext.getInitParameter(DATA_DIR_CONTEXT_PARAM));
     if (location == null) {
       try {
         String home = System.getProperty("user.home");
@@ -83,7 +89,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return dir;
   }
 
-  private static File getConfigurationFile() {
+  private File getConfigurationFile() {
     File location = getConfigurationLocation();
     if (location != null) {
       File file = new File(location, CONFIG_FILE_NAME);
@@ -91,75 +97,9 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     }
     return null;
   }
-
-  private class PropertiesPerWikiConfiguration implements WikiConfiguration {
-
-    private final String _wikiName;
-
-    public PropertiesPerWikiConfiguration(final String wikiName) {
-      _wikiName = wikiName;
-    }
-    
-    public File getSearchIndexDirectory() {
-      return PropertiesDeploymentConfiguration.this.getSearchIndexDirectory(_wikiName);
-    }
-
-    public void setUrl(final String location) {
-      PropertiesDeploymentConfiguration.this.setUrl(_wikiName, location);
-    }
-    
-    public SVNURL getUrl() {
-      return PropertiesDeploymentConfiguration.this.getUrl(_wikiName);
-    }
-
-    public String getWikiName() {
-      return _wikiName;
-    }
-
-    public void save() {
-      PropertiesDeploymentConfiguration.this.save();
-    }
-
-    public boolean isComplete() {
-      return PropertiesDeploymentConfiguration.this.isComplete(_wikiName);
-    }
-
-    public boolean isEditable() {
-      return PropertiesDeploymentConfiguration.this.isEditable();
-    }
-    
-    public String getFixedBaseUrl() {
-      return PropertiesDeploymentConfiguration.this.getFixedBaseUrl(_wikiName);
-    }
-    
-    @Override
-    public boolean equals(final Object obj) {
-      if (obj instanceof PropertiesPerWikiConfiguration) {
-        String givenWikiName = ((PropertiesPerWikiConfiguration) obj)._wikiName;
-        return _wikiName == null ? givenWikiName == null : _wikiName.equals(givenWikiName);
-      }
-      return false;
-    }
-    
-    @Override
-    public int hashCode() {
-      return getClass().hashCode() ^ (_wikiName == null ? 0 : _wikiName.hashCode());
-    }
-
-  }
-
-  private final PersistentStringMap _properties;
-
-  public PropertiesDeploymentConfiguration() {
-    this(new PropertiesFile(getConfigurationFile()));
-  }
-
-  PropertiesDeploymentConfiguration(final PersistentStringMap properties) {
-    _properties = properties;
-  }
   
   public WikiConfiguration getConfiguration(final String wikiName) {
-    return new PropertiesPerWikiConfiguration(wikiName);
+    return new PropertiesPerWikiConfiguration(this, wikiName);
   }
   
   public SVNURL getUrl(final String wikiName) {
@@ -176,7 +116,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return _properties.get(KEY_PREFIX_BASE_URL + wikiName);
   }
 
-  private File getSearchIndexDirectory(final String wikiName) {
+  File getSearchIndexDirectory(final String wikiName) {
     File searchDir = getWritableChildDir(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
     return searchDir == null ? null : getWritableChildDir(searchDir, wikiName);
   }
@@ -194,7 +134,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return null;
   }
   
-  private void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
+  void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
     try {
       SVNURL svnUrl = SVNURL.parseURIDecoded(url);
       _properties.put(KEY_PREFIX_SVN_URL + wikiName, svnUrl.toDecodedString());
@@ -204,7 +144,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     }
   }
 
-  private boolean isComplete(final String wikiName) {
+  boolean isComplete(final String wikiName) {
     return getUrl(wikiName) != null;
   }
   

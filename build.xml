@@ -140,16 +140,27 @@
   </target>
 
   <target name="deploy" depends="war, tomcat">
-    <copy file="${war}" todir="${tomcat}/webapps"/>
+    <property name="deploy-dir" value="${tomcat}/conf/Catalina/localhost"/>
+    <mkdir dir="${deploy-dir}"/>
+    <copy file="context.xml" tofile="${deploy-dir}/reviki.xml"/>
+  </target>
+
+  <target name="start-tomcat">
+    <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
+    <exec executable="${tomcat}/bin/startup.sh"/>
+    <waitfor maxwait="15" maxwaitunit="second" checkevery="500" timeoutproperty="start-tomcat-failed">
+      <http url="http://localhost:8080/reviki/"/>
+    </waitfor>
+    <fail if="start-tomcat-failed" />
+  </target>
+
+  <target name="stop-tomcat">
+    <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
   <target name="functionalTests" depends="deploy, compile-webtests">
-    <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
-    <exec executable="${tomcat}/bin/startup.sh"/>
-    <waitfor maxwait="30" maxwaitunit="second" checkevery="500">
-      <http url="http://localhost:8080/reviki/"/>
-    </waitfor>
-    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="webtests-failed">
+    <antcall target="start-tomcat" />
+    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functionalTests-failed">
       <jvmarg value="-Dwiki.username=${testwiki.username}" />
       <jvmarg value="-Dwiki.password=${testwiki.password}" />
       <formatter type="plain" usefile="false"/>
@@ -165,8 +176,8 @@
         </fileset>
       </batchtest>
     </junit>
-    <exec executable="${tomcat}/bin/shutdown.sh"/>
-    <fail if="webtests-failed" />
+    <antcall target="stop-tomcat" />
+    <fail if="functionalTests-failed" />
   </target>
 
   <target name="allTests" depends="unitTests, functionalTests"/>

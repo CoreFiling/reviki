@@ -1,0 +1,7 @@
+<!-- A context for tomcat.  Used in the functional tests and
+     may be used as a template for production deployments
+    (though if you're happy with the default settings you
+     can just use auto-deploy). -->
+<Context docBase="../../reviki.war">
+  <Parameter name="reviki-data-dir" value="reviki-test-data" />
+</Context>
