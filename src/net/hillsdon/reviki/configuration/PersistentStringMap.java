@@ -29,5 +29,7 @@ public interface PersistentStringMap extends Map<String, String> {
   void load() throws IOException;
   
   void save() throws IOException;
+
+  boolean isPersistable();
   
 }

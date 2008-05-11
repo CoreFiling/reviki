@@ -21,12 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
-
-import static org.apache.commons.lang.StringUtils.trimToNull;
 
 /**
  * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
@@ -38,66 +36,20 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
  */
 public class PropertiesDeploymentConfiguration implements DeploymentConfiguration {
 
-  /**
-   * Declared in web.xml.
-   */
-  public static final String DATA_DIR_CONTEXT_PARAM = "reviki-data-dir";
+  private static final Log LOG = LogFactory.getLog(PropertiesDeploymentConfiguration.class);
   
-  private static final String DEFAULT_CONFIG_DIR_NAME = "reviki-data";
-  private static final String SEARCH_INDEX_DIR_NAME = "search-index";
-  private static final String CONFIG_FILE_NAME = "reviki.properties";
   // Properties file keys:
   private static final String KEY_PREFIX_SVN_URL = "svn-url-";
   private static final String KEY_PREFIX_BASE_URL = "base-url-";
   
-  
   private final PersistentStringMap _properties;
-  private final ServletContext _servletContext;
+  private final DataDir _dataDir;
 
-  public PropertiesDeploymentConfiguration(final ServletContext servletContext) {
-    _servletContext = servletContext;
-    _properties = new PropertiesFile(getConfigurationFile());
+  public PropertiesDeploymentConfiguration(final DataDir dataDir) {
+    _dataDir = dataDir;
+    _properties = dataDir.getProperties();
   }
 
-  /**
-   * @return A configuration location if we can, otherwise null.
-   */
-  private File getConfigurationLocation() {
-    String location = trimToNull(_servletContext.getInitParameter(DATA_DIR_CONTEXT_PARAM));
-    if (location == null) {
-      try {
-        String home = System.getProperty("user.home");
-        location = home + File.separator + DEFAULT_CONFIG_DIR_NAME;
-      }
-      catch (SecurityException ex) {
-      }
-    }
-    if (location == null) {
-      return null;
-    }
-    File dir = new File(location);
-    try {
-      if (!dir.exists()) {
-        if (!dir.mkdir()) {
-          return null;
-        }
-      }
-    }
-    catch (SecurityException ex) {
-      return null;
-    }
-    return dir;
-  }
-
-  private File getConfigurationFile() {
-    File location = getConfigurationLocation();
-    if (location != null) {
-      File file = new File(location, CONFIG_FILE_NAME);
-      return file;
-    }
-    return null;
-  }
-  
   public WikiConfiguration getConfiguration(final String wikiName) {
     return new PropertiesPerWikiConfiguration(this, wikiName);
   }
@@ -108,6 +60,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       return SVNURL.parseURIDecoded(url);
     }
     catch (SVNException ex) {
+      LOG.error("Invalid URL in properties.", ex);
       return null;
     }
   }
@@ -117,21 +70,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   }
 
   File getSearchIndexDirectory(final String wikiName) {
-    File searchDir = getWritableChildDir(getConfigurationLocation(), SEARCH_INDEX_DIR_NAME);
-    return searchDir == null ? null : getWritableChildDir(searchDir, wikiName);
-  }
-  
-  private File getWritableChildDir(final File dir, final String child) {
-    File indexDir = new File(dir, child);
-    if (!indexDir.exists()) {
-      if (!indexDir.mkdir()) {
-        return null;
-      }
-    }
-    if (indexDir.isDirectory() && indexDir.canWrite()) {
-      return indexDir;
-    }
-    return null;
+    return _dataDir.getSearchIndexDirectory(wikiName);
   }
   
   void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
@@ -148,33 +87,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return getUrl(wikiName) != null;
   }
   
-  public synchronized void load() {
-    try {
-      _properties.load();
-    }
-    catch (IOException e) {
-      // We ignore errors for now.
-    }
-  }
-
-  public synchronized void save() {
-    try {
-      _properties.save();
-    }
-    catch (IOException e) {
-      // We ignore errors for now.
-    }
-  }
-  
-  public boolean isEditable() {
-    final File parent = getConfigurationLocation();
-    if (parent != null) {
-      final File file = new File(parent, CONFIG_FILE_NAME);
-      return file.exists() ? file.canWrite() : parent.canWrite();
-    }
-    return false;
-  }
-
   public Collection<String> getWikiNames() {
     List<String> names = new ArrayList<String>();
     for (String key : _properties.keySet()) {
@@ -183,6 +95,29 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       }
     }
     return names;
+  }
+
+  
+  public synchronized void load() {
+    try {
+      _properties.load();
+    }
+    catch (IOException ex) {
+      LOG.error("Failed to load properties.", ex);
+    }
+  }
+
+  public synchronized void save() {
+    try {
+      _properties.save();
+    }
+    catch (IOException ex) {
+      LOG.error("Failed to save properties.", ex);
+    }
+  }
+  
+  public boolean isEditable() {
+    return _properties.isPersistable();
   }
 
 }

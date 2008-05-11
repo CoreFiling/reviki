@@ -44,5 +44,13 @@ public class PropertiesFile extends AbstractPropertiesStore implements Persisten
   protected OutputStream outputStream() throws IOException {
     return _file == null ? null : new FileOutputStream(_file);
   }
+
+  public boolean isPersistable() {
+    return _file != null && (_file.exists() ? _file.canWrite() : _file.getParentFile().canWrite());
+  }
+
+  public File getFile() {
+    return _file;
+  }
   
 }

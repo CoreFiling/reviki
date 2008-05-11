@@ -17,6 +17,8 @@ package net.hillsdon.reviki.di.impl;
 
 import javax.servlet.ServletContext;
 
+import net.hillsdon.reviki.configuration.DataDir;
+import net.hillsdon.reviki.configuration.DataDirImpl;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
@@ -53,6 +55,7 @@ public class ApplicationSessionImpl extends AbstractSession implements Applicati
   public void configure(final MutablePicoContainer container) {
     container.addComponent(ApplicationSession.class, this);
     container.addComponent(Dispatcher.class, DispatcherImpl.class);
+    container.addComponent(DataDir.class, DataDirImpl.class);
     container.addComponent(DeploymentConfiguration.class, PropertiesDeploymentConfiguration.class);
     container.addComponent(ListWikis.class, ListWikisImpl.class);
     container.addComponent(JumpToWikiUrl.class, JumpToWikiUrlImpl.class);
