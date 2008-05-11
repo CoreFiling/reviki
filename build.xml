@@ -8,7 +8,7 @@
   <property name="war" value="${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
-  <property name="webtests-source" value="webtests" />   
+  <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
   <property name="tomcat-url" value="http://mirror.fubra.com/ftp.apache.org/tomcat/tomcat-6/v6.0.16/bin/apache-tomcat-6.0.16.zip"/>
@@ -68,8 +68,8 @@
     </copy>
   </target>
 
-  <target name="compile-webtests" depends="compile">
-    <javac srcdir="${webtests-source}" destdir="${build-webtests}" target="1.5" >
+  <target name="functional-tests-compile" depends="compile">
+    <javac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" >
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-classes}"/>
@@ -77,7 +77,7 @@
     </javac>
   </target>
 
-  <target name="taglibJar" depends="compile">
+  <target name="taglib-jar" depends="compile">
     <mkdir dir="${build-classes}/META-INF"/>
     <move file="${build-classes}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-classes}/META-INF/reviki.tld"/>
     <jar destfile="WebContent/WEB-INF/lib/reviki-tlds.jar" >
@@ -90,7 +90,7 @@
     </jar>
   </target>
 
-  <target name="unitTests" depends="compile">
+  <target name="unit-tests" depends="compile">
     <junit printsummary="yes" haltonfailure="yes">
       <formatter type="plain" usefile="false"/>
       <classpath>
@@ -121,7 +121,7 @@
     </war>
   </target>
 
-  <target name="tomcat">
+  <target name="prepare-tomcat">
     <mkdir dir="${tomcat}"/>
     <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true" />
 
@@ -139,7 +139,7 @@
     <chmod dir="${tomcat}/bin" includes="**/*.sh" perm="u+x" />
   </target>
 
-  <target name="deploy" depends="war, tomcat">
+  <target name="deploy" depends="war, prepare-tomcat">
     <property name="deploy-dir" value="${tomcat}/conf/Catalina/localhost"/>
     <mkdir dir="${deploy-dir}"/>
     <copy file="context.xml" tofile="${deploy-dir}/reviki.xml"/>
@@ -158,9 +158,9 @@
     <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
-  <target name="functionalTests" depends="deploy, compile-webtests">
+  <target name="functional-tests" depends="deploy, functional-tests-compile">
     <antcall target="start-tomcat" />
-    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functionalTests-failed">
+    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functional-tests-failed">
       <jvmarg value="-Dwiki.username=${testwiki.username}" />
       <jvmarg value="-Dwiki.password=${testwiki.password}" />
       <formatter type="plain" usefile="false"/>
@@ -171,16 +171,16 @@
       </classpath>
       <formatter type="xml"/>
       <batchtest todir="${reports}">
-        <fileset dir="${webtests-source}">
+        <fileset dir="${source-webtests}">
           <include name="**/Test*.java"/>
         </fileset>
       </batchtest>
     </junit>
     <antcall target="stop-tomcat" />
-    <fail if="functionalTests-failed" />
+    <fail if="functional-tests-failed" />
   </target>
 
-  <target name="allTests" depends="unitTests, functionalTests"/>
+  <target name="all-tests" depends="unit-tests, functional-tests"/>
 
 </project>
 

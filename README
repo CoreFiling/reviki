@@ -1,0 +1,6 @@
+This is the Java source code for reviki, an Apache 2.0 licensed
+wiki that uses Subversion as a data store.
+
+Please see http://reviki.org for more details, including build instructions.
+
+-- Matt Hillsdon
