@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -92,6 +93,23 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
     assertTrue(_configuration.isEditable());
     _persistable = false;
     assertFalse(_configuration.isEditable());
+  }
+
+  public void testGetFixedBaseUrlWhenNoneSetIsNull() {
+    assertNull(_configuration.getConfiguration("foo").getFixedBaseUrl());
+  }
+
+  public void testWhenGenericBaseUrlSetOneIsCreatedForTheWikiTrimmedAndFixedForTrailingSlash() {
+    for (String url : Arrays.asList("http://www.example.com/wikis ", " http://www.example.com/wikis/")) {
+      _properties.put(PropertiesDeploymentConfiguration.KEY_BASE_URL, url);
+      assertEquals("http://www.example.com/wikis/foo", _configuration.getConfiguration("foo").getFixedBaseUrl());
+    }
+  }
+  
+  public void testSpecificBaseUrlPreferredOverGeneric() {
+    _properties.put(PropertiesDeploymentConfiguration.KEY_BASE_URL, "http://www.example.com/bad");
+    _properties.put(PropertiesDeploymentConfiguration.KEY_PREFIX_BASE_URL + "foo", "http://www.example.com/good/foo");
+    assertEquals("http://www.example.com/good/foo", _configuration.getConfiguration("foo").getFixedBaseUrl());
   }
   
 }
