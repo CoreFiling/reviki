@@ -64,7 +64,7 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
     if not os.path.isdir(attachmentDir):
       os.mkdir(attachmentDir)
     shutil.copyfile(join(inDir, name), join(attachmentDir, cleanName))
-    if cleanName.rpartition('.')[2].lower() in IMAGE_EXTENSIONS:
+    if cleanName[cleanName.rfind('.') + 1:].lower() in IMAGE_EXTENSIONS:
       return "{{" + cleanName + "}}"
     else:
       return "[[" + cleanName + "]]"
@@ -104,7 +104,7 @@ def translate_markup(markup):
   def translate_tables(markup):
     def handle_table(match):
       content = match.group(2).replace('##', ' | ').strip()
-      return '\n' + ('\n'.join('| ' + line for line in content.splitlines()))
+      return '\n' + ('\n'.join(['| ' + line for line in content.splitlines()]))
     return TABLE_RE.sub(handle_table, markup)
 
   def wrap_group_with(group, before, after):
