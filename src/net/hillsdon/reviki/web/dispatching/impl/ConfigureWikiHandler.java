@@ -26,18 +26,23 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ActiveWikis;
-import net.hillsdon.reviki.web.redirect.RedirectToRequestURLView;
+import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
+import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class ConfigureWikiHandler implements RequestHandler {
   
   private final WikiConfiguration _perWikiConfiguration;
   private final DeploymentConfiguration _configuration;
   private final ActiveWikis _activeWikis;
+  private final ApplicationUrls _applicationUrls;
 
-  public ConfigureWikiHandler(final DeploymentConfiguration configuration, final ActiveWikis activeWikis, final WikiConfiguration perWikiConfiguration) {
+  public ConfigureWikiHandler(final DeploymentConfiguration configuration, final ActiveWikis activeWikis, final WikiConfiguration perWikiConfiguration, final ApplicationUrls applicationUrls) {
     _configuration = configuration;
     _activeWikis = activeWikis;
     _perWikiConfiguration = perWikiConfiguration;
+    _applicationUrls = applicationUrls;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -53,7 +58,7 @@ public class ConfigureWikiHandler implements RequestHandler {
         if (_perWikiConfiguration.isComplete()) {
           _activeWikis.addWiki(_perWikiConfiguration);
         }
-        return RedirectToRequestURLView.INSTANCE;
+        return new RedirectToPageView(new WikiUrlsImpl(_applicationUrls, _perWikiConfiguration), BuiltInPageReferences.PAGE_FRONT_PAGE);
       }
       catch (IllegalArgumentException ex) {
         request.setAttribute("error", ex.getMessage());

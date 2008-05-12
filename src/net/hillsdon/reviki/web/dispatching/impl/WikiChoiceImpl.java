@@ -30,16 +30,19 @@ import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiChoice;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 
 public class WikiChoiceImpl implements WikiChoice {
 
   private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
   private final ApplicationSession _applicationSession;
+  private final ApplicationUrls _applicationUrls;
 
-  public WikiChoiceImpl(final DeploymentConfiguration configuration, final ApplicationSession applicationSession) {
+  public WikiChoiceImpl(final DeploymentConfiguration configuration, final ApplicationSession applicationSession, final ApplicationUrls applicationUrls) {
     _configuration = configuration;
     _applicationSession = applicationSession;
+    _applicationUrls = applicationUrls;
   }
 
   public WikiHandler addWiki(final WikiConfiguration configuration) {
@@ -64,7 +67,7 @@ public class WikiChoiceImpl implements WikiChoice {
       if (perWikiConfiguration.isComplete() && !reconfigure) {
         return addWiki(perWikiConfiguration);
       }
-      return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration);
+      return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration, _applicationUrls);
     }
     return wiki;
   }

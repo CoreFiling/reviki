@@ -47,7 +47,6 @@ import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
-import net.hillsdon.reviki.web.redirect.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
@@ -155,7 +154,7 @@ public class DefaultPageImpl implements DefaultPage {
         InputStream in = file.getInputStream();
         try {
           storeAttachment(page, attachmentName, baseRevision, file.getName(), in);
-          return RedirectToRequestURLView.INSTANCE;
+          return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {
           IOUtils.closeQuietly(in);
@@ -325,7 +324,7 @@ public class DefaultPageImpl implements DefaultPage {
     else {
       throw new InvalidInputException("No action specified.");
     }
-    return RedirectToRequestURLView.INSTANCE;
+    return new RedirectToPageView(_wikiUrls, page);
   }
   
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {

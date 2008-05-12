@@ -33,18 +33,24 @@ public class RedirectToPageView implements View {
 
   private final PageReference _page;
   private final WikiUrls _wikiUrls;
+  private final String _appended;
 
   public RedirectToPageView(final WikiUrls wikiUrls, final PageReference page) {
-    _wikiUrls = wikiUrls;
-    _page = page;
+    this(wikiUrls, page, "");
   }
   
+  public RedirectToPageView(final WikiUrls wikiUrls, final PageReference page, final String appended) {
+    _wikiUrls = wikiUrls;
+    _page = page;
+    _appended = appended;
+  }
+
   public PageReference getPage() {
     return _page;
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    response.sendRedirect(_wikiUrls.page(_page.getPath()));
+    response.sendRedirect(_wikiUrls.page(_page.getPath()) + _appended);
   }
   
 }
