@@ -32,6 +32,6 @@ import org.xml.sax.SAXException;
  */
 public interface FeedWriter {
   
-  void writeAtom(Collection<ChangeInfo> changes, PrintWriter out) throws TransformerConfigurationException, SAXException;
+  void writeAtom(String feedUrl, Collection<ChangeInfo> changes, PrintWriter out) throws TransformerConfigurationException, SAXException;
 
 }

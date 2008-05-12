@@ -42,6 +42,7 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
@@ -49,6 +50,7 @@ import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.redirect.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
@@ -63,6 +65,7 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -106,13 +109,15 @@ public class DefaultPageImpl implements DefaultPage {
   private final WikiGraph _graph;
   private final DiffGenerator _diffGenerator;
   private final WikiUrls _wikiUrls;
+  private final FeedWriter _feedWriter;
   
-  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls) {
+  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _store = store;
     _renderer = renderer;
     _graph = graph;
     _diffGenerator = diffGenerator;
     _wikiUrls = wikiUrls;
+    _feedWriter = feedWriter;
   }
   
   public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -261,6 +266,10 @@ public class DefaultPageImpl implements DefaultPage {
 
   public View history(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
+    if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
+      final String feedUrl = _wikiUrls.page(page.getName()) + "?history&ctype=atom";
+      return new FeedView(_feedWriter, changes, feedUrl);
+    }
     request.setAttribute("changes", changes);
     return new JspView("History");
   }

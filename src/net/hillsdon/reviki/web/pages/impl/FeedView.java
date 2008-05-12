@@ -28,15 +28,17 @@ public class FeedView implements View {
   
   private final FeedWriter _feedWriter;
   private final List<ChangeInfo> _changes;
+  private final String _feedUrl;
 
-  public FeedView(final FeedWriter feedWriter, final List<ChangeInfo> changes) {
+  public FeedView(final FeedWriter feedWriter, final List<ChangeInfo> changes, final String feedUrl) {
     _feedWriter = feedWriter;
     _changes = changes;
+    _feedUrl = feedUrl;
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     response.setContentType("application/atom+xml");
-    _feedWriter.writeAtom(_changes, response.getWriter());
+    _feedWriter.writeAtom(_feedUrl, _changes, response.getWriter());
   }
   
 }

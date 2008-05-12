@@ -34,6 +34,7 @@ import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 
@@ -69,6 +70,8 @@ public class TestDefaultPageImplGet extends TestCase {
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
 
+  private FeedWriter _feedWriter;
+
   @Override
   protected void setUp() throws Exception {
     _request = new MockHttpServletRequest();
@@ -78,7 +81,8 @@ public class TestDefaultPageImplGet extends TestCase {
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
-    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator, _wikiUrls);
+    _feedWriter = createMock(FeedWriter.class);
+    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
   }
 
   /**

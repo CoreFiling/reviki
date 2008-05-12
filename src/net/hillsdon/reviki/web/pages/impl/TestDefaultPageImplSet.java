@@ -31,6 +31,7 @@ import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.redirect.RedirectToRequestURLView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
+import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_LOCK_TOKEN;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
@@ -57,12 +58,14 @@ public class TestDefaultPageImplSet extends TestCase {
 
   private DefaultPage _page;
   private WikiUrls _wikiUrls;
+  private FeedWriter _feedWriter;
 
   @Override
   protected void setUp() throws Exception {
+    _feedWriter = createMock(FeedWriter.class);
     _store = createMock(CachingPageStore.class);
     _wikiUrls = new ExampleDotComWikiUrls();
-    _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls);
+    _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls, _feedWriter);
     _request = new MockHttpServletRequest();
     _response = null;
   }

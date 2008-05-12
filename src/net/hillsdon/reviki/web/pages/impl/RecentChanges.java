@@ -15,12 +15,13 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.core.Predicate;
+import net.hillsdon.fij.core.Predicates;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -31,7 +32,12 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
+
+import static net.hillsdon.fij.core.Functional.filter;
+import static net.hillsdon.fij.core.Functional.list;
+
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class RecentChanges extends AbstractSpecialPage {
@@ -40,14 +46,22 @@ public class RecentChanges extends AbstractSpecialPage {
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
   static final int RECENT_CHANGES_HISTORY_SIZE = 50;
+  
+  private static final Predicate<ChangeInfo> MAJOR_ONLY = new Predicate<ChangeInfo>() {
+    public Boolean transform(final ChangeInfo in) {
+      return !in.isMinorEdit();
+    }
+  };
 
   private final PageStore _store;
   private final FeedWriter _feedWriter;
+  private final WikiUrls _wikiUrls;
 
-  public RecentChanges(final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter) {
+  public RecentChanges(final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter, final WikiUrls wikiUrls) {
     super(defaultPage);
     _store = store;
     _feedWriter = feedWriter;
+    _wikiUrls = wikiUrls;
   }
 
   @Override
@@ -55,24 +69,13 @@ public class RecentChanges extends AbstractSpecialPage {
     final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      return new FeedView(_feedWriter, recentChanges);
+      return new FeedView(_feedWriter, recentChanges, _wikiUrls.feed());
     }
     return new JspView("RecentChanges");
   }
 
   private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {
-    List<ChangeInfo> allChanges = _store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE);
-    if (showMinor) {
-      return allChanges;
-    }
-    
-    List<ChangeInfo> majorChanges = new ArrayList<ChangeInfo>();
-    for (ChangeInfo change : allChanges) {
-      if (!change.isMinorEdit()) {
-        majorChanges.add(change);
-      }
-    }
-    return majorChanges;
+    return list(filter(_store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE), showMinor ? Predicates.<ChangeInfo>all() : MAJOR_ONLY));
   }
 
   public String getName() {

@@ -82,7 +82,7 @@ public class AtomFeedWriter implements FeedWriter {
     return dateFormat.format(date);
   }
 
-  public void writeAtom(final Collection<ChangeInfo> changes, final PrintWriter out) throws TransformerConfigurationException, SAXException {
+  public void writeAtom(String feedUrl, final Collection<ChangeInfo> changes, final PrintWriter out) throws TransformerConfigurationException, SAXException {
     StreamResult streamResult = new StreamResult(out);
     SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     
@@ -102,9 +102,9 @@ public class AtomFeedWriter implements FeedWriter {
     handler.startPrefixMapping("", ATOM_NS);
     handler.endPrefixMapping("");
     handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
-    addElement(handler, "id", _wikiUrls.feed());
+    addElement(handler, "id", feedUrl);
     addElement(handler, "title", "reviki feed");
-    addLink(handler, _wikiUrls.feed(), "self");
+    addLink(handler, feedUrl, "self");
     addLink(handler, _wikiUrls.pagesRoot(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
     for (ChangeInfo change : changes) {

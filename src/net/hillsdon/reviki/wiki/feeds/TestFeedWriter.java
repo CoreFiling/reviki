@@ -39,12 +39,14 @@ import static net.hillsdon.xml.xpathcontext.Coercion.STRING;
 
 public class TestFeedWriter extends TestCase {
 
+  private static final String FEED_URL = "http://www.example.com/dooby/RecentChanges/feed";
+
   public void test() throws Exception {
     StringWriter out = new StringWriter();
     List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
       public String feed() {
-        return "feed";
+        return "this isn't used";
       }
       public String page(final String name) {
         return "page";
@@ -59,13 +61,14 @@ public class TestFeedWriter extends TestCase {
         return "favicon";
       }
     };
-    new AtomFeedWriter(urls).writeAtom(changes, new PrintWriter(out));
+    new AtomFeedWriter(urls).writeAtom(FEED_URL, changes, new PrintWriter(out));
     InputSource input = new InputSource(new StringReader(out.toString()));
     
     XPathContext feed = XPathContextFactory.newInstance().newXPathContext(input);
     feed.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
     
-    assertEquals("feed", feed.evaluate("atom:feed/atom:link/@href", STRING));
+    assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:link/@href", STRING));
+    assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:id", STRING));
     assertEquals(1.0, feed.evaluate("count(//atom:entry)", NUMBER));
     XPathContext entry = feed.evaluate("atom:feed/atom:entry", CONTEXT);
     assertEquals("page?revision=123", entry.evaluate("atom:id", STRING));
