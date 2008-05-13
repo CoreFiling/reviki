@@ -44,7 +44,7 @@ def get_wikis(dir):
 IMAGE_EXTENSIONS = ['png', 'gif', 'jpg', 'jpeg', 'bmp']
 
 ATTACH_QUOTED_RE = re.compile(r'attach:"([0-9-]*)(.*?)"')
-ATTACH_RE = re.compile(r'attach:([0-9-]*)(.*?)\s')
+ATTACH_RE = re.compile(r'attach:([0-9-]*)(.*?)(?=[\s}])')
 
 def fix_attachment_references(wiki, inDir, outDir, page, markup):
   """
@@ -63,6 +63,9 @@ def fix_attachment_references(wiki, inDir, outDir, page, markup):
     attachmentDir = join(outDir, page + '-attachments');
     if not os.path.isdir(attachmentDir):
       os.mkdir(attachmentDir)
+    if os.path.exists(join(attachmentDir, cleanName)):
+      # Oh well, we tried.
+      cleanName = name
     shutil.copyfile(join(inDir, name), join(attachmentDir, cleanName))
     if cleanName[cleanName.rfind('.') + 1:].lower() in IMAGE_EXTENSIONS:
       return "{{" + cleanName + "}}"
