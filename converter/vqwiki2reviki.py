@@ -155,6 +155,13 @@ for wiki in get_wikis(inputDir):
   outputDataDir = join(outputDir, wiki.name)
   os.mkdir(outputDataDir)
   for page in wiki.pages():
-    markup = fix_attachment_references(wiki, wiki.uploadDir, outputDataDir, page, translate_markup(wiki.get(page)))
-    open(join(outputDataDir, page), 'w').write(markup)
+    markup = wiki.get(page)
+    try:
+      markup = translate_markup(wiki.get(page))
+      markup = fix_attachment_references(wiki, wiki.uploadDir, outputDataDir, page, markup)
+      open(join(outputDataDir, page), 'w').write(markup)
+    except:
+      print >> sys.stderr, "Error converting", page, "dumping markup:"
+      print >> sys.stderr, markup
+      raise
 
