@@ -123,6 +123,7 @@
 
   <target name="prepare-tomcat">
     <mkdir dir="${tomcat}"/>
+    <get src="${tomcat-url}" dest="tomcat.zip" usetimestamp="true" />
 
     <!-- Use regexpmapper directly with unzip when we can depend on Ant 1.7. -->    
     <mkdir dir="${tomcat}-unziphelper"/>
