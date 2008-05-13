@@ -112,4 +112,12 @@ public class TestPropertiesDeploymentConfiguration extends TestCase {
     assertEquals("http://www.example.com/good/foo", _configuration.getConfiguration("foo").getFixedBaseUrl());
   }
   
+  public void testRandomWikiIsntComplete() {
+    WikiConfiguration configuration = _configuration.getConfiguration("moodle");
+    assertEquals("moodle", configuration.getWikiName());
+    assertNull(configuration.getFixedBaseUrl());
+    assertNull(configuration.getUrl());
+    assertFalse(configuration.isComplete());
+  }
+  
 }
