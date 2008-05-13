@@ -58,6 +58,9 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   
   public SVNURL getUrl(final String wikiName) {
     String url = _properties.get(KEY_PREFIX_SVN_URL + wikiName);
+    if (url == null) {
+      return null;
+    }
     try {
       return SVNURL.parseURIDecoded(url);
     }
