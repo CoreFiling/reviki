@@ -15,19 +15,21 @@
  */
 package net.hillsdon.reviki.search.impl;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
+
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Tests for {@link LuceneSearcher}.
@@ -86,6 +88,15 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(PAGE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME, true));
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
+  }
+  
+  public void testFindsCaseInsensitivelyByPath() throws Exception {
+    try {
+      assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME.toLowerCase(Locale.US), true));
+      throw new Error("Fixed bug!");
+    }
+    catch (AssertionFailedError bug) {
+    }
   }
   
   public void testCaseInsensitiveLowerFindsMixed() throws Exception {
