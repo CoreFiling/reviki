@@ -25,6 +25,13 @@ import java.util.Iterator;
 public class Strings {
 
   private static final String UTF8_ENCODING = "UTF8";
+
+  public static String sCharAt(String s, int index) {
+    if (index >= 0 && index < s.length()) {
+      return String.valueOf(s.charAt(index));
+    }
+    return "";
+  }
   
   public static String join(final Iterator<?> iter, final String between) {
     return join(iter, null, null, between);

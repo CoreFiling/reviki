@@ -25,4 +25,11 @@ public class TestStrings extends TestCase {
     assertEquals("1, 2, 3", join(iter(1, 2, 3), ", "));
   }
   
+  public void testSCharAt() {
+    String s = "a"; 
+    assertEquals("", Strings.sCharAt(s, -1));
+    assertEquals("a", Strings.sCharAt(s, 0));
+    assertEquals("", Strings.sCharAt(s, 1));
+  }
+  
 }

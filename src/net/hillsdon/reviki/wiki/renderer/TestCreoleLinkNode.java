@@ -43,6 +43,10 @@ public class TestCreoleLinkNode extends TestCase {
   
   public void testExternal() {
     assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null).toXHTML());
+    // No text, we use URL.  Useful if we fail to match some links.
+    assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null).toXHTML());
+    // Backward external link!
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null).toXHTML());
   }
   
   public void testAttachments() {

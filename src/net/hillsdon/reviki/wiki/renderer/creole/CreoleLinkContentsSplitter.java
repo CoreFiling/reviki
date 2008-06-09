@@ -17,23 +17,31 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.regex.MatchResult;
 
+import net.hillsdon.fij.text.Strings;
+
+import org.apache.commons.lang.StringUtils;
+
 public class CreoleLinkContentsSplitter implements LinkContentSplitter {
 
   public LinkParts split(final MatchResult match) {
     String in = match.group(1);
-    // [[wiki:PageName|Show this text]]
-    // [[http://somewhere|Show this text]], so we have an ambiguity here.
-    int pipeIndex = in.lastIndexOf("|");
-    int colonIndex = in.indexOf(":");
-    
-    String text = pipeIndex == -1 ? in : in.substring(pipeIndex + 1);
-    String wiki = colonIndex == -1 ? null : in.substring(0, colonIndex);
-    String refd = in.substring(colonIndex + 1, pipeIndex == -1 ? in.length() : pipeIndex);
-    if (refd.startsWith("/")) {
-      refd = wiki + ":" + refd;
-      wiki = null;
+    return split(in);
+  }
+
+  LinkParts split(final String in) {
+    String link = StringUtils.trimToNull(StringUtils.substringBefore(in, "|"));
+    String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
+    if (text == null) {
+      text = link;
     }
-    return new LinkParts(text, wiki, refd);
+    String[] parts = link == null ? new String[] {""} : StringUtils.split(link, ":", 2);
+    String wiki = null;
+    // Link can be PageName, wiki:PageName or a URL.  Assume URL based on ':/'.
+    if (parts.length == 2 && !"/".equals(Strings.sCharAt(parts[1], 0))) {
+      wiki = parts[0];
+      link = parts[1];
+    }
+    return new LinkParts(text, wiki, link);
   }
 
 }
