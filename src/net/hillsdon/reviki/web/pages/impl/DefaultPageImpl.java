@@ -94,15 +94,6 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
-  static String createLinkingCommitMessage(final HttpServletRequest request) {
-    boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
-    String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
-    if (commitMessage == null || commitMessage.trim().length() == 0) {
-      commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
-    }
-    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + request.getRequestURL();
-  }
-  
   private final CachingPageStore _store;
   private final MarkupRenderer _renderer;
   private final WikiGraph _graph;
@@ -288,7 +279,7 @@ public class DefaultPageImpl implements DefaultPage {
       if (!content.endsWith(Strings.CRLF)) {
         content = content + Strings.CRLF;
       }
-      _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(request));
+      _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
     }
     else if (hasCopyParam) {
       final String fromPage = getString(request, PARAM_FROM_PAGE);
@@ -306,12 +297,12 @@ public class DefaultPageImpl implements DefaultPage {
         fromRef = page;
         toRef = new PageReferenceImpl(toPage);
       }
-      _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(request));
+      _store.copy(fromRef, -1, toRef, createLinkingCommitMessage(toRef, request));
       return new RedirectToPageView(_wikiUrls, toRef);
     }
     else if (hasRenameParam) {
       final PageReference toPage = new PageReferenceImpl(getRequiredString(request, PARAM_TO_PAGE));
-      _store.rename(page, toPage, -1, createLinkingCommitMessage(request));
+      _store.rename(page, toPage, -1, createLinkingCommitMessage(toPage, request));
       return new RedirectToPageView(_wikiUrls, toPage);
     }
     else if (hasUnlockParam) {
@@ -330,5 +321,15 @@ public class DefaultPageImpl implements DefaultPage {
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
     return getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
   }
+  
+  String createLinkingCommitMessage(PageReference page, final HttpServletRequest request) {
+    boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
+    String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
+    if (commitMessage == null || commitMessage.trim().length() == 0) {
+      commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
+    }
+    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName());
+  }
+  
 
 }

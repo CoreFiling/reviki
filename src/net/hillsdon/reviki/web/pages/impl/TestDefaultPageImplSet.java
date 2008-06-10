@@ -25,7 +25,6 @@ import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
-import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
@@ -54,7 +53,7 @@ public class TestDefaultPageImplSet extends TestCase {
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
 
-  private DefaultPage _page;
+  private DefaultPageImpl _page;
   private WikiUrls _wikiUrls;
   private FeedWriter _feedWriter;
 
@@ -66,6 +65,10 @@ public class TestDefaultPageImplSet extends TestCase {
     _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls, _feedWriter);
     _request = new MockHttpServletRequest();
     _response = null;
+  }
+
+  private String getURLOfCalledOnPage() {
+    return _wikiUrls.page(CALLED_ON_PAGE.getName());
   }
   
   public void testNoActionIsInvalidInputException() throws Exception {
@@ -124,7 +127,7 @@ public class TestDefaultPageImplSet extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, "Content");
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
 
-    final String expectedCommitMessage = "Message\n" + _request.getRequestURL();
+    final String expectedCommitMessage = "Message\n" + getURLOfCalledOnPage();
     final String expectedContent = "Content" + Strings.CRLF;
     expect(_store.set(CALLED_ON_PAGE, "dooby", 1, expectedContent, expectedCommitMessage)).andReturn(2L).once();
     replay(_store);
@@ -135,9 +138,9 @@ public class TestDefaultPageImplSet extends TestCase {
 
   public void testCommitMessageIndicatesMinorEditIfAndOnlyIfParameterSet() throws Exception {
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
-    assertEquals("Message\n" + _request.getRequestURL(), DefaultPageImpl.createLinkingCommitMessage(_request));
+    assertEquals("Message\n" + getURLOfCalledOnPage(), _page.createLinkingCommitMessage(CALLED_ON_PAGE, _request));
     _request.setParameter(DefaultPageImpl.PARAM_MINOR_EDIT, "");
-    assertEquals("[minor edit]\nMessage\n" + _request.getRequestURL(), DefaultPageImpl.createLinkingCommitMessage(_request));
+    assertEquals("[minor edit]\nMessage\n" + getURLOfCalledOnPage(), _page.createLinkingCommitMessage(CALLED_ON_PAGE, _request));
   }
   
   public void testCopyRequiresOneOfToPageOrFromPage() throws Exception {
@@ -155,7 +158,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testCopyTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_COPY, "");
     _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
-    expect(_store.copy(CALLED_ON_PAGE, -1, TO_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.copy(CALLED_ON_PAGE, -1, TO_PAGE, "[reviki commit]\n" + _wikiUrls.page(TO_PAGE.getName()))).andReturn(2L).once();
     replay(_store);
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(TO_PAGE, view.getPage());
@@ -165,7 +168,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testCopyFrom() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_COPY, "");
     _request.setParameter(DefaultPageImpl.PARAM_FROM_PAGE, "FromPage");
-    expect(_store.copy(new PageReferenceImpl("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.copy(new PageReferenceImpl("FromPage"), -1, CALLED_ON_PAGE, "[reviki commit]\n" + getURLOfCalledOnPage())).andReturn(2L).once();
     replay(_store);
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(CALLED_ON_PAGE, view.getPage());
@@ -186,7 +189,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testRenameTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_RENAME, "");
     _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
-    expect(_store.rename(CALLED_ON_PAGE, TO_PAGE, -1, "[reviki commit]\n" + _request.getRequestURL())).andReturn(2L).once();
+    expect(_store.rename(CALLED_ON_PAGE, TO_PAGE, -1, "[reviki commit]\n" + _wikiUrls.page(TO_PAGE.getName()))).andReturn(2L).once();
     replay(_store);
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(TO_PAGE, view.getPage());
