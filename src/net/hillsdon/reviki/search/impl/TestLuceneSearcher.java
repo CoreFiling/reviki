@@ -15,6 +15,10 @@
  */
 package net.hillsdon.reviki.search.impl;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -23,13 +27,10 @@ import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import net.hillsdon.fij.io.Lsof;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
-
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
 
 /**
  * Tests for {@link LuceneSearcher}.
@@ -72,6 +73,15 @@ public class TestLuceneSearcher extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {
+    // Nothing in _dir should be open.  Note this only works on Linux-like
+    // machines at the moment (silently passing on others).
+    for (File file : Lsof.lsof()) {
+      final String dir = _dir.getAbsolutePath() + File.separator;
+      final String filePath = file.getAbsolutePath();
+      if (filePath.startsWith(dir)) {
+        fail(file.toString() + " should be closed!");
+      }
+    }
     recursivelyDelete(_dir);
   }
 
@@ -123,6 +133,12 @@ public class TestLuceneSearcher extends TestCase {
   public void testFindsByTokenizedPath() throws Exception {
     _searcher.index(PAGE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
+  }
+
+  // FIXME: This doesn't actually test anything interesting, just added for the tearDown check.
+  public void testIncomingOutgoingLinks() throws Exception {
+    assertEquals(Collections.emptySet(), _searcher.incomingLinks(PAGE_NAME));
+    assertEquals(Collections.emptySet(), _searcher.outgoingLinks(PAGE_NAME));
   }
   
   /**
