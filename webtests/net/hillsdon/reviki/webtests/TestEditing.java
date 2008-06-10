@@ -17,7 +17,9 @@ package net.hillsdon.reviki.webtests;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 
 public class TestEditing extends WebTestSupport {
   
@@ -40,6 +42,34 @@ public class TestEditing extends WebTestSupport {
     String name = uniqueWikiPageName("EditPageTest");
     editWikiPage(name, "Whatever", "", true);
     editThenCancel(name);
+  }
+  
+  public void testPreview() throws Exception {
+    String name = uniqueWikiPageName("PreviewPageTest");
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlInput minorEdit = form.getInputByName("minorEdit");
+    assertFalse(minorEdit.isChecked());
+    minorEdit.setChecked(true);
+    HtmlInput description = form.getInputByName("description");
+    String expectedDescription = "My test change";
+    description.setValueAttribute(expectedDescription);
+    HtmlTextArea content = form.getTextAreaByName("content");
+    String expectedContent = "http://www.example.com";
+    content.setText(expectedContent);
+    
+    // Now if we preview we should get the previewed text rendered, and in
+    // the edit area.  The other options should be preserved too.
+    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    form = editPage.getFormByName(ID_EDIT_FORM);
+    minorEdit = form.getInputByName("minorEdit");
+    description = form.getInputByName("description");
+    content = form.getTextAreaByName("content");
+    assertEquals(expectedDescription, description.getValueAttribute());
+    assertTrue(minorEdit.isChecked());
+    assertEquals(expectedContent, content.getText());
+    // This checks for the rendering...
+    assertNotNull(editPage.getAnchorByHref(expectedContent));
   }
 
   private void editThenCancel(final String name) throws Exception {

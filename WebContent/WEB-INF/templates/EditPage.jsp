@@ -16,12 +16,13 @@
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <hr/>
-      <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text"/>
+      <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
       <input style="width:5em;" name="save" type="submit" value="Save"/>
       <input style="width:5em;" name="unlock" type="submit" value="Cancel"/>
       <input style="width:5em;" name="preview" type="submit" value="Preview"/>
       <br />
-      <label for="minorEdit">Minor edit?</label><input type="checkbox" id="minorEdit" name="minorEdit"/>
+      <label for="minorEdit">Minor edit?</label>
+      <input type="checkbox" id="minorEdit" name="minorEdit" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if> />
     </form>
     <c:if test="${empty preview}">
       <script type='text/javascript'>
