@@ -21,7 +21,7 @@ http://svnkit.com/
 The following open source third-party libraries are used for 
 testing (i.e. not part of the WAR file):
 
-HTMLUnit htmlunit.sourceforge.net
+HTMLUnit http://htmlunit.sourceforge.net
 EasyMock http://www.easymock.org
 Jackson JSON Processor http://www.cowtowncoder.com/hatchery/jackson/index.html
 
