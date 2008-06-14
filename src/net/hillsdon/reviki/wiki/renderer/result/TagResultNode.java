@@ -26,6 +26,8 @@ import java.util.List;
  */
 public class TagResultNode extends CompositeResultNode {
   
+  public static final String CSS_CLASS_ATTR = "class='wiki-content'";
+  
   private final String _tag;
 
   public TagResultNode(final String tag) {
@@ -43,9 +45,9 @@ public class TagResultNode extends CompositeResultNode {
   
   public String toXHTML() {
     if (getChildren().isEmpty()) {
-      return "<" + _tag + " />";
+      return "<" + _tag + " " + CSS_CLASS_ATTR + " />";
     }
-    return "<" + _tag + ">" +  super.toXHTML() + "</" + _tag + ">";
+    return "<" + _tag + " " + CSS_CLASS_ATTR + ">" +  super.toXHTML() + "</" + _tag + ">";
   }
 
 }
