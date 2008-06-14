@@ -15,6 +15,10 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import static java.lang.String.format;
+import static net.hillsdon.fij.core.Functional.filter;
+import static net.hillsdon.fij.text.Strings.fromUTF8;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,12 +60,6 @@ import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
-
-import static java.lang.String.format;
-
-import static net.hillsdon.fij.core.Functional.filter;
-
-import static net.hillsdon.fij.text.Strings.fromUTF8;
 
 /**
  * Stores pages in an SVN repository.
@@ -137,19 +135,21 @@ public class SVNPageStore implements PageStore {
       String lastChangedAuthor = properties.get(SVNProperty.LAST_AUTHOR);
       String lockOwner = null;
       String lockToken = null;
+      Date lockedSince = null;
       try {
         if (revision == -1 || _operations.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
           SVNLock lock = _operations.getLock(ref.getPath());
           if (lock != null) {
             lockOwner = lock.getOwner();
             lockToken = lock.getID();
+            lockedSince = lock.getCreationDate();
           }
         }
       }
       catch (NotFoundException ex) {
         // It was a file at 'revision' but is now deleted so we can't get the lock information.
       }
-      return new PageInfoImpl(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken);
+      return new PageInfoImpl(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken, lockedSince);
     }
     else if (SVNNodeKind.NONE.equals(kind)) {
       long pseudoRevision = PageInfo.UNCOMMITTED;
@@ -163,7 +163,7 @@ public class SVNPageStore implements PageStore {
         lastChangedAuthor = deletingChange.getUser();
         lastChangedDate = deletingChange.getDate();
       }
-      return new PageInfoImpl(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null);
+      return new PageInfoImpl(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
     }
     else {
       throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));

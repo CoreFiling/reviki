@@ -34,10 +34,12 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   private final long _lastChangedRevision;
   private final String _lastChangedAuthor;
   private final Date _lastChangedDate;
+  
   private final String _lockedBy;
   private final String _lockToken;
+  private final Date _lockedSince;
   
-  public PageInfoImpl(final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken) {
+  public PageInfoImpl(final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
     super(path);
     _content = content;
     _revision = revision;
@@ -46,6 +48,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     _lastChangedDate = lastChangedDate;
     _lockedBy = lockedBy;
     _lockToken = lockToken;
+    _lockedSince = lockedSince;
   }
 
   public PageInfoImpl(final PageInfo pageInfo) {
@@ -57,6 +60,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     _lastChangedDate = pageInfo.getLastChangedDate();
     _lockedBy = pageInfo.getLockedBy();
     _lockToken = pageInfo.getLockToken();
+    _lockedSince = pageInfo.getLockedSince();
   }
 
   public String getContent() {
@@ -84,6 +88,10 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
 
   public String getLockToken() {
     return _lockToken;
+  }
+  
+  public Date getLockedSince() {
+    return _lockedSince;
   }
   
   public boolean isNew() {
@@ -115,5 +123,5 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     other._content = content;
     return other;
   }
-  
+
 }

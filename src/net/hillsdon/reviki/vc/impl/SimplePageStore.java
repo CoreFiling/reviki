@@ -45,7 +45,7 @@ public class SimplePageStore implements CachingPageStore {
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     PageInfo page = _pages.get(ref);
     if (page == null) {
-      page = new PageInfoImpl(ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null);
+      page = new PageInfoImpl(ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null, null);
       _pages.put(ref, page);
     }
     return page;
@@ -61,7 +61,7 @@ public class SimplePageStore implements CachingPageStore {
 
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
     long revision = baseRevision + 1;
-    PageInfo page = new PageInfoImpl(ref.getPath(), content, revision, revision, null, null, null, null);
+    PageInfo page = new PageInfoImpl(ref.getPath(), content, revision, revision, null, null, null, null, null);
     _pages.put(ref, page);
     return revision;
   }

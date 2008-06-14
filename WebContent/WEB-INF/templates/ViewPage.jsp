@@ -71,7 +71,7 @@
             <p id="lockedInfo">You have locked this page.</p>
           </c:when>
           <c:otherwise>
-            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/>.</p>
+            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
           </c:otherwise>
         </c:choose>
       </c:when>

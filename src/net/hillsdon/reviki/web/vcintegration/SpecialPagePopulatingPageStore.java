@@ -15,6 +15,14 @@
  */
 package net.hillsdon.reviki.web.vcintegration;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_INTER_WIKI_LINKS;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FOOTER;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_SIDEBAR;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,14 +40,6 @@ import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_INTER_WIKI_LINKS;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FOOTER;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_SIDEBAR;
 
 /**
  * Returns default FrontPage etc if there isn't one in the repository.
@@ -85,7 +85,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     try {
       if (page.isNew() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
         String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
-        page = new PageInfoImpl(page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken());
+        page = new PageInfoImpl(page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
       }
     }
     catch (IOException ex) {

@@ -41,10 +41,12 @@ public interface PageInfo extends PageReference  {
   String getLockToken();
   boolean isLocked();
   boolean lockedByUserIfNeeded(String user);
+  Date getLockedSince();
   
   boolean isNew();
   boolean isDeleted();
   
   PageInfo withAlternativeContent(String content);
+
   
 }
