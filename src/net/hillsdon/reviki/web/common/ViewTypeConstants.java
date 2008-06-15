@@ -41,9 +41,20 @@ public final class ViewTypeConstants {
    */
   public static final String CTYPE_ATOM = "atom";
   
+  /**
+   * Hmm.  A little dubious.
+   */
+  public static final String CTYPE_RAW = "raw";
+
+  /**
+   * Hmm.  A little dubious.
+   */
+  public static final String CTYPE_PRINTABLE = "printable";
+
   public static boolean is(final HttpServletRequest request, final String type) {
     return type != null && type.equals(request.getParameter(PARAM_CTYPE));
   }
+
   
   private ViewTypeConstants() {
   }

@@ -78,7 +78,7 @@ public class WikiHandlerImpl implements WikiHandler {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     try {
       request.setAttribute(WikiUrls.KEY, _wikiUrls);
-      request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?raw");
+      request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?ctype=raw");
       request.setAttribute("internalLinker", _internalLinker);
       
       _requestLifecycleAwareManager.requestStarted(request);

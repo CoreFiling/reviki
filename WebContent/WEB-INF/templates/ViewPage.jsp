@@ -32,11 +32,12 @@
         </li>
       </c:if>
     </c:if>
-      <c:if test="${not empty lastEditAction}">
+    <c:if test="${not empty lastEditAction}">
 	    <li class="menu">
 	      <a name="history" href="?history">History</a>
 	    </li>
     </c:if>
+    <li class="menu"><a name="printable" href="?ctype=printable">Print</a></li>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="wiki-rendering">

@@ -65,6 +65,7 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequired
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_PRINTABLE;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -234,12 +235,15 @@ public class DefaultPageImpl implements DefaultPage {
       request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(base.getContent(), main.getContent()));
       return new JspView("ViewDiff");
     }
-    else if (request.getParameter("raw") != null) {
+    else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
       return new RawPageView(main);
     }
     else {
       ResultNode rendered = _renderer.render(main, main.getContent());
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
+      if (ViewTypeConstants.is(request, CTYPE_PRINTABLE)) {
+        return new JspView("ViewPagePrintable");
+      }
       return new JspView("ViewPage");
     }
   }
