@@ -21,7 +21,7 @@
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>?ctype=atom" />
     <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
-  <link rel="stylesheet" href="${cssUrl}" media="screen" type="text/css" />
+  <link rel="stylesheet" href="${cssUrl}" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="jquery.suggest.css"/>" media="screen" type="text/css" />
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.dimensions.js"/>"></script>
@@ -40,7 +40,7 @@
       </p>
     </div>
   </c:if>
-  <div id="topbar">
+  <div id="topbar" class="auxillary">
     <c:if test="${wikiIsValid != null and wikiIsValid}">
       <ul class="menu">
         <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
@@ -60,17 +60,17 @@
       </ul>
     </c:if>
   </div>
-  <div id="header">
+  <div id="header" class="auxillary">
   ${renderedHeader}
   </div>
   <div id="content-area">
     <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
-    <div id="sidebar" style="float:right">
+    <div id="sidebar" class="auxillary" style="float:right">
     ${renderedSideBar}
     </div>
     <tiles:insertAttribute name="content"/>
   </div>
-  <div id="footer">
+  <div id="footer" class="auxillary">
   ${renderedFooter}
     <p id="build-details">Built from r$BuildRevision$.</p>
   </div>

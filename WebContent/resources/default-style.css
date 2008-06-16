@@ -133,3 +133,28 @@ div#MarkupHelp h3 {
 div#MarkupHelp p {
   font-size: 70%;
 }
+
+@media print {
+	body {
+	  float: none !important;
+	  width: auto !important;
+	  background: none !important;
+	}
+	h1.title {
+    border: 0 !important;
+  }
+  .auxillary { 
+    display: none !important; 
+  }
+}
+
+/* Wiki markup specific */
+
+table.wiki-content {
+  border: 1px solid gray;
+}
+th.wiki-content, td.wiki-content {
+  text-align: left;
+  border: 1px solid gray;
+  padding: 4px;
+}

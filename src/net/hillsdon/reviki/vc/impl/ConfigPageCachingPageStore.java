@@ -58,7 +58,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
 
   @Override
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    if (isConfigPage(ref.getPath())) {
+    if (isConfigPage(ref.getName())) {
       _cache.remove(ref);
     }
     return super.set(ref, lockToken, baseRevision, content, commitMessage);

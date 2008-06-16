@@ -65,7 +65,6 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequired
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
-import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_PRINTABLE;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -241,9 +240,6 @@ public class DefaultPageImpl implements DefaultPage {
     else {
       ResultNode rendered = _renderer.render(main, main.getContent());
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
-      if (ViewTypeConstants.is(request, CTYPE_PRINTABLE)) {
-        return new JspView("ViewPagePrintable");
-      }
       return new JspView("ViewPage");
     }
   }

@@ -16,10 +16,6 @@
 package net.hillsdon.reviki.webtests;
 
 import net.hillsdon.reviki.vc.PageReference;
-
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
 public class TestMisc extends WebTestSupport {
@@ -50,20 +46,6 @@ public class TestMisc extends WebTestSupport {
     String whatever = getWikiPage("WhatEver").asXml();
     assertTrue(whatever.contains(perWikiCss));
     assertFalse(whatever.contains(defaultCss));
-  }
-  
-  public void testPrintablePage() throws Exception {
-    String text = "Print me";
-    HtmlPage page = editWikiPage(uniqueWikiPageName("PrintablePage"), text, "", true);
-    page.getHtmlElementById("topbar");
-    page = (HtmlPage) page.getAnchorByName("printable").click();
-    assertTrue(page.asText().contains(text));
-    try {
-      page.getHtmlElementById("topbar");
-      fail();
-    }
-    catch (ElementNotFoundException desired) {
-    }
   }
   
   public void testConfigSvnLocationShowsFormToEditSvnLocation() throws Exception {

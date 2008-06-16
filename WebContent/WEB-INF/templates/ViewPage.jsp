@@ -37,56 +37,57 @@
 	      <a name="history" href="?history">History</a>
 	    </li>
     </c:if>
-    <li class="menu"><a name="printable" href="?ctype=printable">Print</a></li>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
-    <c:if test="${pageInfo.new and empty pageInfo.content}">
-    <div style="margin-top: 1em">
-    <form id="editContent" name="editContent" action="" method="post">
-      <input type="submit" value="Edit this new page" />
-    </form>
-    </div>
-    </c:if>
-    <hr />
-    <p id="backlinks">
-    <c:if test="${not empty backlinks}">
-      Referenced on:
-      <c:forEach var="backlink" items="${backlinks}">
-        <sw:wikiLink page="${backlink}"/>
-      </c:forEach>
-      <c:if test="${backlinksLimited}">
-        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.name}&amp;force">...</a>
-      </c:if>
-    </c:if>
-    </p>
-    <c:choose>
-      <c:when test="${pageInfo.locked}">
-        <c:choose>
-          <c:when test="${pageInfo.lockedBy == username}">
-            <form id="editBottom" name="editBottom" action="" method="post">
-              <input type="submit" value="Edit"/>
-            </form> 
-            <p id="lockedInfo">You have locked this page.</p>
-          </c:when>
-          <c:otherwise>
-            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
-          </c:otherwise>
-        </c:choose>
-      </c:when>
-      <c:otherwise>
-        <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
-          <input name="editButton" type="submit" value="Edit"/>
-        </form><a href="${page.name}/attachments/">Attachments</a>
-      </c:otherwise>
-    </c:choose>
-    <c:if test="${not empty lastEditAction}">
-	    <p>
-	      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
+    <div class="auxillary">
+	    <c:if test="${pageInfo.new and empty pageInfo.content}">
+	    <div style="margin-top: 1em">
+	    <form id="editContent" name="editContent" action="" method="post">
+	      <input type="submit" value="Edit this new page" />
+	    </form>
+	    </div>
+	    </c:if>
+	    <hr />
+	    <p id="backlinks">
+	    <c:if test="${not empty backlinks}">
+	      Referenced on:
+	      <c:forEach var="backlink" items="${backlinks}">
+	        <sw:wikiLink page="${backlink}"/>
+	      </c:forEach>
+	      <c:if test="${backlinksLimited}">
+	        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.name}&amp;force">...</a>
+	      </c:if>
+	    </c:if>
 	    </p>
-	  </c:if>
+	    <c:choose>
+	      <c:when test="${pageInfo.locked}">
+	        <c:choose>
+	          <c:when test="${pageInfo.lockedBy == username}">
+	            <form id="editBottom" name="editBottom" action="" method="post">
+	              <input type="submit" value="Edit"/>
+	            </form> 
+	            <p id="lockedInfo">You have locked this page.</p>
+	          </c:when>
+	          <c:otherwise>
+	            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
+	          </c:otherwise>
+	        </c:choose>
+	      </c:when>
+	      <c:otherwise>
+	        <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
+	          <input name="editButton" type="submit" value="Edit"/>
+	        </form><a href="${page.name}/attachments/">Attachments</a>
+	      </c:otherwise>
+	    </c:choose>
+	    <c:if test="${not empty lastEditAction}">
+		    <p>
+		      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
+		    </p>
+		  </c:if>
+		</div>
   </tiles:putAttribute>
   <tiles:putAttribute name="body-level">
 	  <script type="text/javascript">
