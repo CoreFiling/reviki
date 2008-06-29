@@ -31,6 +31,7 @@ import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
 import net.hillsdon.reviki.web.redirect.RedirectView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.vcintegration.RequestCompletedHandler;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 
 import org.apache.commons.logging.Log;
@@ -49,14 +50,16 @@ public class DispatcherImpl implements Dispatcher {
   private final JumpToWikiUrl _jumpToWiki;
   private final ApplicationUrls _applicationUrls;
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
+  private final RequestCompletedHandler _requestCompletedHandler;
 
-  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager) {
+  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
     _configuration = configuration;
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
     _applicationUrls = applicationUrls;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
+    _requestCompletedHandler = requestCompletedHandler;
     
     _configuration.load();
   }
@@ -80,7 +83,7 @@ public class DispatcherImpl implements Dispatcher {
       handleException(request, response, ex);
     }
     finally {
-      _requestLifecycleAwareManager.requestComplete();
+      _requestCompletedHandler.requestComplete();
     }
   }
 

@@ -82,20 +82,13 @@ public class WikiHandlerImpl implements WikiHandler {
       request.setAttribute("internalLinker", _internalLinker);
       
       _requestLifecycleAwareManager.requestStarted(request);
-      try {
-        if ("resources".equals(path.peek())) {
-          return _resources.handle(path.consume(), request, response);
-        }
-        
-        _syncUpdater.sync();
-        addSideBarEtcToRequest(request);
-        // We need to complete the rendering here, so the view can call back into the page store.
-        _handler.handle(path, request, response).render(request, response);
-        return View.NULL;
+      if ("resources".equals(path.peek())) {
+        return _resources.handle(path.consume(), request, response);
       }
-      finally {
-        _requestLifecycleAwareManager.requestComplete();
-      }
+      
+      _syncUpdater.sync();
+      addSideBarEtcToRequest(request);
+      return _handler.handle(path, request, response);
     }
     catch (PageStoreAuthenticationException ex) {
       return new RequestAuthenticationView();

@@ -33,6 +33,8 @@ import net.hillsdon.reviki.web.handlers.impl.JumpToWikiUrlImpl;
 import net.hillsdon.reviki.web.handlers.impl.ListWikisImpl;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.impl.RequestScopedApplicationUrls;
+import net.hillsdon.reviki.web.vcintegration.RequestCompletedHandler;
+import net.hillsdon.reviki.web.vcintegration.RequestCompletedHandlerImpl;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
 
@@ -54,6 +56,7 @@ public class ApplicationSessionImpl extends AbstractSession implements Applicati
 
   public void configure(final MutablePicoContainer container) {
     container.addComponent(ApplicationSession.class, this);
+    container.addComponent(RequestCompletedHandler.class, RequestCompletedHandlerImpl.class);
     container.addComponent(Dispatcher.class, DispatcherImpl.class);
     container.addComponent(DataDir.class, DataDirImpl.class);
     container.addComponent(DeploymentConfiguration.class, PropertiesDeploymentConfiguration.class);

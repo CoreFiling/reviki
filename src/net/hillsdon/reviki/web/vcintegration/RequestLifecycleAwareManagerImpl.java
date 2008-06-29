@@ -21,8 +21,9 @@ public class RequestLifecycleAwareManagerImpl implements RequestLifecycleAwareMa
 
   private final RequestLifecycleAware[] _requestLifecycleAware;
 
-  public RequestLifecycleAwareManagerImpl(final RequestLifecycleAware... requestLifecycleAware) {
+  public RequestLifecycleAwareManagerImpl(final RequestCompletedHandler handler, final RequestLifecycleAware... requestLifecycleAware) {
     _requestLifecycleAware = requestLifecycleAware;
+    handler.register(this);
   }
   
   public void requestStarted(final HttpServletRequest request) {
