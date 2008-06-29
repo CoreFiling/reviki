@@ -163,7 +163,16 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<Void>() {
       public Void perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
-        repository.unlock(singletonMap(ref.getPath(), lockToken), false, new SVNLockHandlerAdapter());
+        try {
+          repository.unlock(singletonMap(ref.getPath(), lockToken), false, new SVNLockHandlerAdapter());
+        }
+        catch (SVNException ex) {
+          // FIXME: Presumably this code would be different for non-http repositories.
+          if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(ex.getErrorMessage().getErrorCode())) {
+            // We get this when the page has already been unlocked.
+            return null;
+          }
+        }
         return null;
       }
     });
