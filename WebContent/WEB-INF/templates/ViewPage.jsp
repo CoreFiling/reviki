@@ -75,6 +75,10 @@
 	            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
 	          </c:otherwise>
 	        </c:choose>
+          <form id="unlock" name="unlock" action="" method="post" style="display:inline;">
+            <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
+            <input name="unlock" type="submit" value="Unlock"/>
+          </form>
 	      </c:when>
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
