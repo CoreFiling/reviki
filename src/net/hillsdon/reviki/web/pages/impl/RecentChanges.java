@@ -28,7 +28,9 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
+import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
+import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
@@ -45,7 +47,8 @@ public class RecentChanges extends AbstractSpecialPage {
   /**
    * We don't actually do 'recent' in terms of date as that's less useful.
    */
-  static final int RECENT_CHANGES_HISTORY_SIZE = 50;
+  static final long RECENT_CHANGES_DEFAULT_HISTORY_SIZE = 50;
+  static final long RECENT_CHANGES_MAX_HISTORY_SIZE = 250;
   
   private static final Predicate<ChangeInfo> MAJOR_ONLY = new Predicate<ChangeInfo>() {
     public Boolean transform(final ChangeInfo in) {
@@ -66,7 +69,8 @@ public class RecentChanges extends AbstractSpecialPage {
 
   @Override
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    final List<ChangeInfo> recentChanges = getRecentChanges(request.getParameter("showMinor") != null);
+    final boolean showMinor = request.getParameter("showMinor") != null;
+    final List<ChangeInfo> recentChanges = getRecentChanges(getLimit(request), showMinor);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
       return new FeedView(_feedWriter, recentChanges, _wikiUrls.feed());
@@ -74,8 +78,17 @@ public class RecentChanges extends AbstractSpecialPage {
     return new JspView("RecentChanges");
   }
 
-  private List<ChangeInfo> getRecentChanges(final boolean showMinor) throws PageStoreException {
-    return list(filter(_store.recentChanges(RecentChanges.RECENT_CHANGES_HISTORY_SIZE), showMinor ? Predicates.<ChangeInfo>all() : MAJOR_ONLY));
+  private Long getLimit(HttpServletRequest request) throws InvalidInputException {
+    Long limit = RequestParameterReaders.getLong(request, "limit");
+    if (limit == null) {
+      limit = RECENT_CHANGES_DEFAULT_HISTORY_SIZE;
+    }
+    limit = Math.min(limit, RECENT_CHANGES_MAX_HISTORY_SIZE);
+    return limit;
+  }
+
+  private List<ChangeInfo> getRecentChanges(final long limit, final boolean showMinor) throws PageStoreException {
+    return list(filter(_store.recentChanges(limit), showMinor ? Predicates.<ChangeInfo>all() : MAJOR_ONLY));
   }
 
   public String getName() {

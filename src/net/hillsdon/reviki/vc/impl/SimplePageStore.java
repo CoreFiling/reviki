@@ -55,7 +55,7 @@ public class SimplePageStore implements CachingPageStore {
     return new LinkedHashSet<PageReference>(_pages.keySet());
   }
 
-  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
     return Collections.emptyList();
   }
 

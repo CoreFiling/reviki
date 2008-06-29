@@ -90,7 +90,7 @@ public class SVNPageStore implements PageStore {
     _mimeIdentifier = mimeIdentifier;
   }
 
-  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
     return _operations.log("", limit, false, true, 0, -1);
   }
 

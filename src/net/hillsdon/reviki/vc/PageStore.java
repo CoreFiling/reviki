@@ -48,7 +48,7 @@ public interface PageStore {
    * @param limit Maximum number of entries to return.
    * @return Names of recently changed pages.
    */
-  List<ChangeInfo> recentChanges(int limit) throws PageStoreException;
+  List<ChangeInfo> recentChanges(long limit) throws PageStoreException;
 
   /**
    * @param ref The path.

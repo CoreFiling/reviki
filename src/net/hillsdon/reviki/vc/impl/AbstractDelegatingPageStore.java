@@ -65,7 +65,7 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
     return getDelegateInternal().list();
   }
 
-  public List<ChangeInfo> recentChanges(final int limit) throws PageStoreException {
+  public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
     return getDelegateInternal().recentChanges(limit);
   }
 

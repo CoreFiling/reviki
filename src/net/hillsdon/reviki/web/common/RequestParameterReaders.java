@@ -39,6 +39,9 @@ public final class RequestParameterReaders {
     return value == null ? null : value.trim();
   }
   
+  public static Long getLong(final HttpServletRequest request, final String parameter) throws InvalidInputException {
+    return getLong(request.getParameter(parameter), parameter);
+  }
   public static Long getLong(final String value, final String parameter) throws InvalidInputException {
     if (value == null) {
       return null;
