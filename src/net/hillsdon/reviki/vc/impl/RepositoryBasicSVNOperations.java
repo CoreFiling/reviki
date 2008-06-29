@@ -164,7 +164,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     execute(new SVNAction<Void>() {
       public Void perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         try {
-          repository.unlock(singletonMap(ref.getPath(), lockToken), false, new SVNLockHandlerAdapter());
+          repository.unlock(singletonMap(ref.getPath(), lockToken), true, new SVNLockHandlerAdapter());
         }
         catch (SVNException ex) {
           // FIXME: Presumably this code would be different for non-http repositories.
