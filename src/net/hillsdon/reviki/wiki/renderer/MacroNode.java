@@ -43,13 +43,10 @@ public class MacroNode extends AbstractRegexNode {
   
   private final Accessor<List<Macro>> _macros;
 
-  private final boolean _block;
-
   public MacroNode(final Accessor<List<Macro>> macros, final boolean block) {
     super(block ? "(?s)(?:^|\\n)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>(^|\\n)"
                 : "(?s)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>");
     _macros = macros;
-    _block = block;
   }
 
   private String getMacroName(final Matcher matcher) {
@@ -79,7 +76,6 @@ public class MacroNode extends AbstractRegexNode {
         case WIKI:
           // Use the parent as renderer if possible as that has the appropriate child nodes.
           RenderNode renderer = parent != null ? parent : this;
-          System.err.println(_block + " / " + parent);
           return new CompositeResultNode(renderer.render(page, content, this));
         default:
           return new HtmlEscapeResultNode(content);
