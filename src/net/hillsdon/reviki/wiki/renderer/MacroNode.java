@@ -43,17 +43,20 @@ public class MacroNode extends AbstractRegexNode {
   
   private final Accessor<List<Macro>> _macros;
 
+  private final boolean _block;
+
   public MacroNode(final Accessor<List<Macro>> macros, final boolean block) {
-    super(block ? "(?s)(?:^|\\n)<<([-\\p{Digit}\\p{L}]+?):(.+?)(^|\\n)>>"
-                : "(?s)\\<<([-\\p{Digit}\\p{L}]+?):(.+?)>>");
+    super(block ? "(?s)(?:^|\\n)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>(^|\\n)"
+                : "(?s)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>");
     _macros = macros;
+    _block = block;
   }
 
   private String getMacroName(final Matcher matcher) {
     return matcher.group(1).trim();
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, final RenderNode parent) {
     // We need to move to a push system for updating macros to avoid this.
     final String macroName = getMacroName(matcher);
     Macro macro = null;
@@ -76,6 +79,7 @@ public class MacroNode extends AbstractRegexNode {
         case WIKI:
           // Use the parent as renderer if possible as that has the appropriate child nodes.
           RenderNode renderer = parent != null ? parent : this;
+          System.err.println(_block + " / " + parent);
           return new CompositeResultNode(renderer.render(page, content, this));
         default:
           return new HtmlEscapeResultNode(content);
