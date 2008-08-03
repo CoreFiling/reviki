@@ -27,7 +27,7 @@ public class TestSearch extends WebTestSupport {
     HtmlPage results = getWikiPage("FrontPage");
     HtmlLink link = (HtmlLink) results.getByXPath("/html/head/link[@rel='search']").iterator().next();
     // Session crap on the end.
-    assertTrue(link.getHrefAttribute().startsWith(BASE_URL + "/pages/test/FindPage/opensearch.xml"));
+    assertTrue(link.getHrefAttribute().startsWith(BASE_URL + "/test/FindPage/opensearch.xml"));
     @SuppressWarnings("unused")
     XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
   }
@@ -36,7 +36,7 @@ public class TestSearch extends WebTestSupport {
     String name = uniqueWikiPageName("ThisDoesNotExist");
     HtmlPage results = search(getWikiPage("FrontPage"), name);
     assertTrue(results.asText().contains("Create new page " + name));
-    results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
+    results.getAnchorByHref(BASE_URL + "/test/" + name);
   }
   
   /**

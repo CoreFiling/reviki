@@ -29,7 +29,6 @@ import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.urls.InternalLinker;
@@ -61,16 +60,14 @@ public class WikiHandlerImpl implements WikiHandler {
   private final InternalLinker _internalLinker;
   private final ChangeNotificationDispatcher _syncUpdater;
   private final WikiUrls _wikiUrls;
-  private final ResourceHandler _resources;
   private final PageHandler _handler;
 
-  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls) {
+  public WikiHandlerImpl(final CachingPageStore cachingPageStore, final SvnWikiRenderer renderer, final InternalLinker internalLinker, final ChangeNotificationDispatcher syncUpdater, final RequestLifecycleAwareManager requestLifecycleAwareManager, final PageHandler handler, final WikiUrls wikiUrls) {
     _cachingPageStore = cachingPageStore;
     _renderer = renderer;
     _internalLinker = internalLinker;
     _syncUpdater = syncUpdater;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
-    _resources = resources;
     _handler = handler;
     _wikiUrls = wikiUrls;
   }
@@ -82,10 +79,6 @@ public class WikiHandlerImpl implements WikiHandler {
       request.setAttribute("internalLinker", _internalLinker);
       
       _requestLifecycleAwareManager.requestStarted(request);
-      if ("resources".equals(path.peek())) {
-        return _resources.handle(path.consume(), request, response);
-      }
-      
       _syncUpdater.sync();
       addSideBarEtcToRequest(request);
       return _handler.handle(path, request, response);

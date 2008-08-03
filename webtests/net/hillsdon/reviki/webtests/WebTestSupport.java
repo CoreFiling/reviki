@@ -69,7 +69,7 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On error.
    */
   protected HtmlPage getWikiPage(final String name) throws IOException {
-    return getWebPage("pages/test/" + name);
+    return getWebPage("test/" + name);
   }
 
   private int _counter = 0;
@@ -139,10 +139,10 @@ public abstract class WebTestSupport extends TestCase {
   
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
     HtmlPage results = search(page, query);
-    results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
+    results.getAnchorByHref(BASE_URL + "/test/" + name);
   }
 
-  protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {
+  protected void assertSearchDoesNotFindPage(final HtmlPage start, final String pageName) throws IOException {
     assertTrue(search(start, pageName).asText().contains("No results found"));
   }
   

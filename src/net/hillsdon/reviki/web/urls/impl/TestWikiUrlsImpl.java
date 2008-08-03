@@ -50,10 +50,10 @@ public class TestWikiUrlsImpl extends TestCase {
 
   public void testNoFixedBaseUrl() {
     WikiUrlsImpl urls = createURLs("foo");
-    assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
-    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed());
-    assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
+    assertEquals("http://www.example.com/reviki/foo/", urls.pagesRoot());
+    assertEquals("http://www.example.com/reviki/foo/Spaced+Out", urls.page("Spaced Out"));
+    assertEquals("http://www.example.com/reviki/foo/RecentChanges?ctype=atom", urls.feed());
+    assertEquals("http://www.example.com/reviki/foo/FindPage", urls.search());
   }
 
   public void testFixedBaseUrlJustGoesAheadAndUsesIt() {

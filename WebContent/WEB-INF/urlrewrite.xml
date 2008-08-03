@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.1//EN"
+        "http://tuckey.org/res/dtds/urlrewrite3.1.dtd">
+<urlrewrite>
+
+  <rule>
+    <note>Don't mess with the resources.</note>
+    <from>^/resources/.*$</from>
+    <to last="true">$0</to>
+  </rule>
+  
+  <rule>
+    <note>Per wiki resource URLs just go to /resources.</note>
+    <from>^/(.*?)/resources/(.*)$</from>
+    <to last="true">/resources/$2</to>
+  </rule>
+
+  <rule>
+    <note>Temporarily redirect 'pages' paths due to URL space change.</note>
+    <from>^/pages/(.*)$</from>
+    <to type="permanent-redirect" last="true">%{context-path}/$1</to>
+  </rule>
+  
+  <rule>
+    <note>For now send everything else to the dispatcher.</note>
+    <from>^.*$</from>
+    <to>/dispatcher$0</to>
+  </rule>
+
+</urlrewrite>

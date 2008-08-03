@@ -33,8 +33,8 @@ public class TestCreoleLinkNode extends TestCase {
   }
   
   public void testInternal() {
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
-    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
   }
 
   public void testInterWiki() {
@@ -46,7 +46,7 @@ public class TestCreoleLinkNode extends TestCase {
     // No text, we use URL.  Useful if we fail to match some links.
     assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null).toXHTML());
     // Backward external link!
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null).toXHTML());
   }
   
   public void testAttachments() {

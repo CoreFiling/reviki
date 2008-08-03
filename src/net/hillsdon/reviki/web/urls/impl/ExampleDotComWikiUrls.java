@@ -18,7 +18,7 @@ package net.hillsdon.reviki.web.urls.impl;
 public class ExampleDotComWikiUrls extends AbstractWikiUrls {
 
   public String pagesRoot() {
-    return "http://www.example.com/reviki/pages/test-wiki/";
+    return "http://www.example.com/reviki/test-wiki/";
   }
 
 }

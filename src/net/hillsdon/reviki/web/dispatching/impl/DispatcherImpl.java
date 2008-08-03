@@ -29,7 +29,6 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
-import net.hillsdon.reviki.web.redirect.RedirectView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestCompletedHandler;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
@@ -52,7 +51,7 @@ public class DispatcherImpl implements Dispatcher {
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
   private final RequestCompletedHandler _requestCompletedHandler;
 
-  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
+  public DispatcherImpl(final DeploymentConfiguration configuration, final ListWikis list, final WikiChoiceImpl choice, final JumpToWikiUrl jumpToWiki, final ApplicationUrls applicationUrls, final RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
     _configuration = configuration;
     _list = list;
     _choice = choice;
@@ -64,7 +63,7 @@ public class DispatcherImpl implements Dispatcher {
     _configuration.load();
   }
 
-  public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
     ConsumedPath path = new ConsumedPath(request);
@@ -87,26 +86,21 @@ public class DispatcherImpl implements Dispatcher {
     }
   }
 
-  // This should be moved out of here...
-  private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    final String initial = path.next();
-    // An internal hack (see index.jsp) to allow us to handle "/".
-    if ("root".equals(initial)) {
-      return new RedirectView(_applicationUrls.list());
+  private View handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    // Skip the 'dispatcher' path we're bound to and process the rest.
+    path = path.consume();
+    
+    // These special URLs don't really fit...
+    if ("jump".equals(path.peek())) {
+      return _jumpToWiki.handle(path.consume(), request, response);
     }
-    else if ("pages".equals(initial)) {
-      return _choice.handle(path, request, response);
+    else if ("list".equals(path.peek())) {
+      return _list.handle(path.consume(), request, response);
     }
-    else if ("jump".equals(initial)) {
-      return _jumpToWiki.handle(path, request, response);
-    }
-    else if ("list".equals(initial)) {
-      return _list.handle(path, request, response);
-    }
-    throw new NotFoundException();
+    return _choice.handle(path, request, response);
   }
 
-  private void handleException(final HttpServletRequest request, final HttpServletResponse response, Exception ex) throws ServletException, IOException {
+  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex) throws ServletException, IOException {
     String user = (String) request.getAttribute(RequestAttributes.USERNAME);
     if (user == null) {
       user = "[none]";

@@ -29,8 +29,8 @@ public class ConsumedPath {
 
   public static final ConsumedPath EMPTY = new ConsumedPath(Collections.<String>emptyList());
   
-  private ListIterator<String> _iterator;
-  private List<String> _list;
+  private final ListIterator<String> _iterator;
+  private final List<String> _list;
 
   public ConsumedPath(final HttpServletRequest request) {
     this(request.getRequestURI(), request.getContextPath());
@@ -95,6 +95,11 @@ public class ConsumedPath {
   public ConsumedPath consume() {
     next();
     return this;
+  }
+  
+  @Override
+  public String toString() {
+    return _list.toString();
   }
   
 }

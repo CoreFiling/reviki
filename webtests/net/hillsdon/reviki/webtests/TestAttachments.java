@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.webtests;
 
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,6 +27,8 @@ import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
 
 
 public class TestAttachments extends WebTestSupport {
@@ -49,7 +49,7 @@ public class TestAttachments extends WebTestSupport {
 
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
     try {
-      getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
+      getWebPage("test/FrontPage/attachments/DoesntExist.txt");
       fail();
     }
     catch (FailingHttpStatusCodeException ex) {
