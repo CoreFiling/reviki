@@ -73,11 +73,16 @@ public class WikiChoiceImpl implements WikiChoice {
   }
 
   private WikiConfiguration getWikiConfiguration(final ConsumedPath path) throws NotFoundException {
-    String wikiName = path.next();
-    if (wikiName == null) {
+    final String wikiName = path.next();
+    if (!isValidWikiName(wikiName)) {
       throw new NotFoundException();
     }
     return _configuration.getConfiguration(wikiName);
+  }
+
+  boolean isValidWikiName(final String wikiName) {
+    return wikiName != null && wikiName.length() != 0 
+        && Character.isLowerCase(wikiName.charAt(0));
   }
 
 }
