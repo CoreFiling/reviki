@@ -20,6 +20,12 @@
     <from>^/pages/(.*)$</from>
     <to type="permanent-redirect" last="true">%{context-path}/$1</to>
   </rule>
+
+  <rule>
+    <note>Send the root to the wiki list.</note>
+    <from>^/$</from>
+    <to type="temporary-redirect" last="true">%{context-path}/list</to>
+  </rule>
   
   <rule>
     <note>For now send everything else to the dispatcher.</note>

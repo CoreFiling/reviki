@@ -20,6 +20,10 @@ import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLI
 
 public class TestMisc extends WebTestSupport {
 
+  public void testRootRedirectsToList() throws Exception {
+    assertTrue(getWebPage("").getTitleText().contains("List"));
+  }
+
   public void testWikiRootRedirectsToFrontPage() throws Exception {
     assertTrue(getWebPage("test/").getTitleText().contains("Front Page"));
     assertTrue(getWebPage("test").getTitleText().contains("Front Page"));
