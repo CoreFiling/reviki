@@ -26,7 +26,7 @@
       <p>
       Enter a wiki name below to go to the FrontPage for that wiki. 
       </p>
-      <form id="jump" name="jump" action="<c:url value="/jump"/>">
+      <form id="jump" name="jump" action="<sw:url path="/jump"/>">
       <input type="text" name="name"/><input type="submit" name="go" value="Go"/>
       </form>
     </c:if>

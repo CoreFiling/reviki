@@ -35,5 +35,15 @@
         <rtexprvalue>true</rtexprvalue>
       </attribute>
     </tag>
+    <tag>
+      <name>url</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.UrlTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+        <name>path</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+    </tag>
     
 </taglib>

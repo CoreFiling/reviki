@@ -10,6 +10,14 @@
     <url-pattern>/dispatcher/*</url-pattern>
   </servlet-mapping>
   <filter>
+    <filter-name>baseUrlFilter</filter-name>
+    <filter-class>net.hillsdon.reviki.web.dispatching.impl.BaseUrlFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>baseUrlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter>
     <filter-name>UrlRewriteFilter</filter-name>
     <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
     <init-param>

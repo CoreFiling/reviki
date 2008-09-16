@@ -18,13 +18,13 @@
   <rule>
     <note>Temporarily redirect 'pages' paths due to URL space change.</note>
     <from>^/pages/(.*)$</from>
-    <to type="permanent-redirect" last="true">%{context-path}/$1</to>
+    <to type="permanent-redirect" last="true">%{attribute:baseURL}/$1</to>
   </rule>
 
   <rule>
     <note>Send the root to the wiki list.</note>
     <from>^/$</from>
-    <to type="temporary-redirect" last="true">%{context-path}/list</to>
+    <to type="temporary-redirect" last="true">%{attribute:baseURL}/list</to>
   </rule>
   
   <rule>

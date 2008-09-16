@@ -34,7 +34,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * @author mth
  */
 public abstract class WebTestSupport extends TestCase {
-
+  
+//  // For testing against an Apache proxy.
+//  public static final String BASE_URL = "http://demo.localhost/here";
   public static final String BASE_URL = "http://localhost:8080/reviki";
   
   private WebClient _client;
