@@ -32,12 +32,6 @@ public interface WikiConfiguration {
   String getWikiName();
 
   /**
-   * @return The fixed base URL, if any.  Otherwise the base URL should be derived
-   *         from the request.
-   */
-  String getFixedBaseUrl();
-
-  /**
    * @return The SVN URL for our data store.
    */
   SVNURL getUrl();

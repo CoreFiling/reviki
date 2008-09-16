@@ -56,15 +56,7 @@ public class TestWikiUrlsImpl extends TestCase {
     assertEquals("http://www.example.com/reviki/foo/FindPage", urls.search());
   }
 
-  public void testFixedBaseUrlJustGoesAheadAndUsesIt() {
-    expect(_configuration.getFixedBaseUrl()).andReturn("http://www.example.com/wiki").anyTimes();
-    replay(_configuration);
-    WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);
-    assertEquals("http://www.example.com/wiki/FooPage", urls.page("FooPage"));
-  }
-  
   private WikiUrlsImpl createURLs(final String wikiName) {
-    expect(_configuration.getFixedBaseUrl()).andReturn(null).anyTimes();
     expect(_configuration.getWikiName()).andReturn(wikiName).anyTimes();
     replay(_configuration, _applicationUrls);
     return new WikiUrlsImpl(_applicationUrls, _configuration);

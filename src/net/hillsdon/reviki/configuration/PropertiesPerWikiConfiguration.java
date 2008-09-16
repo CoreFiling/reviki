@@ -57,10 +57,6 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
     return _deploymentConfiguration.isEditable();
   }
   
-  public String getFixedBaseUrl() {
-    return _deploymentConfiguration.getFixedBaseUrl(_wikiName);
-  }
-  
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof PropertiesPerWikiConfiguration) {

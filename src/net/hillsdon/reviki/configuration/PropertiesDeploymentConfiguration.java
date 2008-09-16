@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNException;
@@ -42,7 +41,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   // Properties file keys:
   public static final String KEY_PREFIX_SVN_URL = "svn-url-";
   public static final String KEY_PREFIX_BASE_URL = "base-url-";
-  public static final String KEY_BASE_URL = "base-url";
   
   private final PersistentStringMap _properties;
   private final DataDir _dataDir;
@@ -70,22 +68,6 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     }
   }
   
-  public String getFixedBaseUrl(final String wikiName) {
-    // First wiki specific, then generic, otherwise null.
-    String baseUrl = getTrimToNullProperty(KEY_PREFIX_BASE_URL + wikiName);
-    if (baseUrl == null) {
-      baseUrl = getTrimToNullProperty(KEY_BASE_URL);
-      if (baseUrl != null) {
-        baseUrl += (baseUrl.endsWith("/") ? "" : "/") + wikiName;
-      }
-    }
-    return baseUrl;
-  }
-
-  private String getTrimToNullProperty(final String key) {
-    return StringUtils.trimToNull(_properties.get(key));
-  }
-
   File getSearchIndexDirectory(final String wikiName) {
     return _dataDir.getSearchIndexDirectory(wikiName);
   }
