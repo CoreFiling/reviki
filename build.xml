@@ -11,7 +11,7 @@
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat-url" value="http://mirror.fubra.com/ftp.apache.org/tomcat/tomcat-6/v6.0.16/bin/apache-tomcat-6.0.16.zip"/>
+  <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip"/>
   <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
        The wiki should be called 'test' (with no base URL set).
 
