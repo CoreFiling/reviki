@@ -14,7 +14,7 @@
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="menuItems">
-    <c:if test="${not(pageInfo.locked) or pageInfo.lockedBy == username}">
+    <c:if test="${not pageInfo.locked or pageInfo.lockedBy == username}">
       <li class="menu">
         <form id="editTop" name="editTop" action="" method="post" style="display:inline;">
           <input type="submit" value="Edit"/>
