@@ -50,6 +50,13 @@ public class TestRepositoryBasicSVNOperations extends TestCase {
     assertEquals("AttachmentsTest11969665985340", changeInfo.getPage());
   }
 
+  public void testAttachmentSlashAsRootPath() {
+    ChangeInfo changeInfo = changeInfo("/", "/AttachmentsTest11969665985340-attachments/file.txt");
+    assertEquals(StoreKind.ATTACHMENT, changeInfo.getKind());
+    assertEquals("file.txt", changeInfo.getName());
+    assertEquals("AttachmentsTest11969665985340", changeInfo.getPage());
+  }
+
   public void testPage() {
     ChangeInfo changeInfo = changeInfo("/wiki2", "/wiki2/ThisIsAPage");
     assertEquals("ThisIsAPage", changeInfo.getPage());
