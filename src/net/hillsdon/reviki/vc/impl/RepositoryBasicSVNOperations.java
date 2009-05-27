@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import static java.util.Collections.singletonMap;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +52,6 @@ import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
-
-import static java.util.Collections.singletonMap;
 
 /**
  * The real impl, using an {@link SVNRepository}.
@@ -128,9 +128,13 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   private static final Pattern PAGE_PATH = Pattern.compile("[^/]*");
   private static final Pattern ATTACHMENT_PATH = Pattern.compile("([^/]*?)-attachments/(.*)");
-  static ChangeInfo classifiedChange(final SVNLogEntry entry, final String rootPath, final String path) {
+  static ChangeInfo classifiedChange(final SVNLogEntry entry, String rootPath, final String path) {
     StoreKind kind = StoreKind.OTHER;
-    String name = path.length() > rootPath.length() ? path.substring(rootPath.length() + 1) : path;
+    // Be sure the root path ends with a slash because the 'path' will always have the slash.
+    if (!rootPath.endsWith("/")) {
+      rootPath = rootPath + "/";
+    }
+    String name = path.length() > rootPath.length() ? path.substring(rootPath.length()) : path;
     String page = null;
     Matcher matcher = PAGE_PATH.matcher(name);
     if (matcher.matches() && !name.endsWith("-attachments")) {
