@@ -176,6 +176,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
             // We get this when the page has already been unlocked.
             return null;
           }
+          throw ex;
         }
         return null;
       }
