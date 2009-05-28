@@ -15,6 +15,12 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,13 +64,8 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
-import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -144,7 +145,8 @@ public class DefaultPageImpl implements DefaultPage {
       else {
         InputStream in = file.getInputStream();
         try {
-          storeAttachment(page, attachmentName, baseRevision, file.getName(), in);
+          // IE sends the full file path.
+          storeAttachment(page, attachmentName, baseRevision, FilenameUtils.getName(file.getName()), in);
           return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {
