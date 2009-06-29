@@ -19,9 +19,8 @@ import static net.hillsdon.xml.xpathcontext.Coercion.CONTEXT;
 import static net.hillsdon.xml.xpathcontext.Coercion.NUMBER;
 import static net.hillsdon.xml.xpathcontext.Coercion.STRING;
 
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -40,10 +39,10 @@ import org.xml.sax.InputSource;
 public class TestFeedWriter extends TestCase {
 
   private static final String FEED_URL = "http://www.example.com/dooby/RecentChanges/feed";
+  private static final String POUND_SIGN = "\u00a3";
 
   public void test() throws Exception {
-    StringWriter out = new StringWriter();
-    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
+    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description with special character " + POUND_SIGN, StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
       public String feed() {
         return "this isn't used";
@@ -61,8 +60,9 @@ public class TestFeedWriter extends TestCase {
         return "favicon";
       }
     };
-    new AtomFeedWriter(urls).writeAtom(FEED_URL, changes, new PrintWriter(out));
-    InputSource input = new InputSource(new StringReader(out.toString()));
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    new AtomFeedWriter(urls).writeAtom(FEED_URL, changes, out);
+    InputSource input = new InputSource(new ByteArrayInputStream(out.toByteArray()));
     
     try {
       XPathContext feed = XPathContextFactory.newInstance().newXPathContext(input);
@@ -73,6 +73,7 @@ public class TestFeedWriter extends TestCase {
       assertEquals(1.0, feed.evaluate("count(//atom:entry)", NUMBER));
       XPathContext entry = feed.evaluate("atom:feed/atom:entry", CONTEXT);
       assertEquals("page?revision=123", entry.evaluate("atom:id", STRING));
+      assertEquals("Change description with special character " + POUND_SIGN, entry.evaluate("atom:summary", STRING));
     }
     catch (RuntimeException ex) {
       // Seems to be available in Eclipse, on the command line on my development box, but not elsewhere.

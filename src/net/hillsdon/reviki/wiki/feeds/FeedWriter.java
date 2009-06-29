@@ -15,7 +15,7 @@
  */
 package net.hillsdon.reviki.wiki.feeds;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.util.Collection;
 
 import javax.xml.transform.TransformerConfigurationException;
@@ -32,6 +32,6 @@ import org.xml.sax.SAXException;
  */
 public interface FeedWriter {
   
-  void writeAtom(String feedUrl, Collection<ChangeInfo> changes, PrintWriter out) throws TransformerConfigurationException, SAXException;
+  void writeAtom(String feedUrl, Collection<ChangeInfo> changes, OutputStream out) throws TransformerConfigurationException, SAXException;
 
 }

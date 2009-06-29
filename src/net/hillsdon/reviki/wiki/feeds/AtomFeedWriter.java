@@ -15,7 +15,7 @@
  */
 package net.hillsdon.reviki.wiki.feeds;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -82,7 +82,7 @@ public class AtomFeedWriter implements FeedWriter {
     return dateFormat.format(date);
   }
 
-  public void writeAtom(String feedUrl, final Collection<ChangeInfo> changes, final PrintWriter out) throws TransformerConfigurationException, SAXException {
+  public void writeAtom(String feedUrl, final Collection<ChangeInfo> changes, final OutputStream out) throws TransformerConfigurationException, SAXException {
     StreamResult streamResult = new StreamResult(out);
     SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     

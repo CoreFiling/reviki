@@ -37,8 +37,9 @@ public class FeedView implements View {
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    response.setCharacterEncoding("UTF-8");
     response.setContentType("application/atom+xml");
-    _feedWriter.writeAtom(_feedUrl, _changes, response.getWriter());
+    _feedWriter.writeAtom(_feedUrl, _changes, response.getOutputStream());
   }
   
 }
