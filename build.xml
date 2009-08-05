@@ -16,7 +16,12 @@
        The wiki should be called 'test' (with no base URL set).
 
        An external properties file is used to retrieve the username and password to use.
-       Supply the testwiki.username and testwiki.password properties in build.properties. -->
+       Supply the testwiki.username and testwiki.password properties in build.properties. 
+
+       Note the wiki data will be stored in ./reviki-test-data, not the usual ~/reviki-data
+       directory.
+
+  -->
   <property file="build.properties" />
 
   <path id="classpath">
