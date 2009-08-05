@@ -25,10 +25,15 @@ import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 
 public class TestRepositoryBasicSVNOperations extends TestCase {
 
+  public void testSVNPathUtilIsWeird() throws Exception {
+    assertEquals(/* What no slash? */ "Foo", SVNPathUtil.append("/", "Foo"));
+  }
+  
   public void testDetectMimeTypeResetsInputStream() throws Exception {
     BufferedInputStream stream = new BufferedInputStream(new ByteArrayInputStream(new byte[] {0}));
     String mimeType = RepositoryBasicSVNOperations.detectMimeType(stream);

@@ -88,7 +88,8 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   @SuppressWarnings("unchecked")
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final boolean pathOnly) {
-    final String fullLoggedPath = SVNPathUtil.append(rootPath, loggedPath);
+    final String fullLoggedPathFromAppend = SVNPathUtil.append(rootPath, loggedPath);
+    final String fullLoggedPath = (!fullLoggedPathFromAppend.startsWith("/")) ? "/" + fullLoggedPathFromAppend : fullLoggedPathFromAppend;
     final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
       if (SVNPathUtil.isAncestor(rootPath, changedPath) && (!pathOnly || fullLoggedPath.equals(changedPath))) {
