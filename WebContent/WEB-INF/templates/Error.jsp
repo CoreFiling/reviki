@@ -5,5 +5,6 @@
   <tiles:putAttribute name="heading">An error has occurred</tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p><c:out value="${exception.message}"/></p>
+    <p><a href="javascript:history.go(-1)">Go back</a></p>
   </tiles:putAttribute>
 </tiles:insertTemplate>
