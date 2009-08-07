@@ -97,12 +97,21 @@ public class CreoleRenderer {
     RenderNode[] defaultInline = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
     RenderNode[] inline = concat(customInline, defaultInline);
 
+    // These are used when matching table headings and cells
+    final String notPipeNorDoubleOpenOpt = "([^\\[|]*(\\[(?!\\[))?[^\\[|]*)*";
+    final String pairOfDoubleOpenOpt = "((\\[\\[)(.*?)(\\]\\]))*";
+
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
     RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
-    RenderNode tableHeading = new RegexMatchToTag("[|]+=([^|]*)", "th", 1);
-    RenderNode tableCell = new RegexMatchToTag("[|]+([^|]*)", "td", 1);
+
+    // These assume the link format is similar to [[aaa|bbb]] - they will break
+    // if the link format is changed
+    RenderNode tableHeading = new RegexMatchToTag("[|]+=((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "th", 1);
+    RenderNode tableCell = new RegexMatchToTag("[|]+((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "td", 1);
+
     table.addChildren(tableRow);
     tableRow.addChildren(tableHeading, tableCell);
+    tableHeading.addChildren(concat(inline, noWiki));
     tableCell.addChildren(concat(inline, noWiki));
 
     italic.addChildren(inline); 
