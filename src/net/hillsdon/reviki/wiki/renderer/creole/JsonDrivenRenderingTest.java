@@ -56,7 +56,10 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
       final String input = test.get("input");
       final String actual = render(input);
       validate(caseName, actual);
-      final boolean match = matches(expected, actual);
+      
+      // We ignore the CSS class we add to save cluttering the expectations.
+      String tidiedActual = actual.replaceAll(" " + TagResultNode.CSS_CLASS_ATTR, "");
+      final boolean match = expected.equals(tidiedActual);
       if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);
         continue;
@@ -66,19 +69,13 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
         err.println("Creole case: " + caseName);
         err.println("Input:\n" + input);
         err.println("Expected:\n" + expected);
-        err.println("Actual:\n" + actual);
+        err.println("Actual (tidied):\n" + tidiedActual);
         err.println();
       }
     }
     if (errors > 0) {
       fail("Rendering errors, please see stderr.");
     }
-  }
-
-  private boolean matches(final String expected, String actual) {
-    // We ignore the CSS class we add to save cluttering the expectations.
-    actual = actual.replaceAll(" " + TagResultNode.CSS_CLASS_ATTR, "");
-    return expected.equals(actual);
   }
 
   private void validate(final String caseName, final String actual) {
