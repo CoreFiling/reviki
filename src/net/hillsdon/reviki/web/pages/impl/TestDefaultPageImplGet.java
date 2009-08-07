@@ -82,7 +82,7 @@ public class TestDefaultPageImplGet extends TestCase {
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(_store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
   }
 
   /**

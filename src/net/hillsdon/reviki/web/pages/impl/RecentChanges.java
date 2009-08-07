@@ -15,6 +15,10 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
+import static net.hillsdon.fij.core.Functional.filter;
+import static net.hillsdon.fij.core.Functional.list;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.fij.core.Predicates;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -36,11 +41,6 @@ import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
-
-import static net.hillsdon.fij.core.Functional.filter;
-import static net.hillsdon.fij.core.Functional.list;
-
-import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class RecentChanges extends AbstractSpecialPage {
 
@@ -59,9 +59,11 @@ public class RecentChanges extends AbstractSpecialPage {
   private final PageStore _store;
   private final FeedWriter _feedWriter;
   private final WikiUrls _wikiUrls;
+  private final WikiConfiguration _configuration;
 
-  public RecentChanges(final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter, final WikiUrls wikiUrls) {
+  public RecentChanges(final WikiConfiguration configuration, final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter, final WikiUrls wikiUrls) {
     super(defaultPage);
+    _configuration = configuration;
     _store = store;
     _feedWriter = feedWriter;
     _wikiUrls = wikiUrls;
@@ -73,7 +75,7 @@ public class RecentChanges extends AbstractSpecialPage {
     final List<ChangeInfo> recentChanges = getRecentChanges(getLimit(request), showMinor);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      return new FeedView(_feedWriter, recentChanges, _wikiUrls.feed());
+      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed());
     }
     return new JspView("RecentChanges");
   }

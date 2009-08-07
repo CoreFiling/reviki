@@ -40,6 +40,7 @@ public class TestFeedWriter extends TestCase {
 
   private static final String FEED_URL = "http://www.example.com/dooby/RecentChanges/feed";
   private static final String POUND_SIGN = "\u00a3";
+  private static final String TITLE = "Reviki Feed Title";
 
   public void test() throws Exception {
     List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description with special character " + POUND_SIGN, StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
@@ -61,7 +62,7 @@ public class TestFeedWriter extends TestCase {
       }
     };
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    new AtomFeedWriter(urls).writeAtom(FEED_URL, changes, out);
+    new AtomFeedWriter(urls).writeAtom(TITLE, FEED_URL, changes, out);
     InputSource input = new InputSource(new ByteArrayInputStream(out.toByteArray()));
     
     try {
@@ -70,6 +71,7 @@ public class TestFeedWriter extends TestCase {
       
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:link/@href", STRING));
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:id", STRING));
+      assertEquals(TITLE, feed.evaluate("atom:feed/atom:title", STRING));
       assertEquals(1.0, feed.evaluate("count(//atom:entry)", NUMBER));
       XPathContext entry = feed.evaluate("atom:feed/atom:entry", CONTEXT);
       assertEquals("page?revision=123", entry.evaluate("atom:id", STRING));

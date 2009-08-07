@@ -20,17 +20,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
 public class FeedView implements View {
-  
+
   private final FeedWriter _feedWriter;
   private final List<ChangeInfo> _changes;
   private final String _feedUrl;
+  private final WikiConfiguration _wikiConfiguration;
 
-  public FeedView(final FeedWriter feedWriter, final List<ChangeInfo> changes, final String feedUrl) {
+  public FeedView(final WikiConfiguration wikiConfiguration, final FeedWriter feedWriter, final List<ChangeInfo> changes, final String feedUrl) {
+    _wikiConfiguration = wikiConfiguration;
     _feedWriter = feedWriter;
     _changes = changes;
     _feedUrl = feedUrl;
@@ -39,7 +42,8 @@ public class FeedView implements View {
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/atom+xml");
-    _feedWriter.writeAtom(_feedUrl, _changes, response.getOutputStream());
+    final String title = _wikiConfiguration.getWikiName() + " wiki";
+    _feedWriter.writeAtom(title, _feedUrl, _changes, response.getOutputStream());
   }
-  
+
 }

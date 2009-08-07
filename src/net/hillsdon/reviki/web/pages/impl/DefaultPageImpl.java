@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.text.Strings;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
@@ -101,8 +102,10 @@ public class DefaultPageImpl implements DefaultPage {
   private final DiffGenerator _diffGenerator;
   private final WikiUrls _wikiUrls;
   private final FeedWriter _feedWriter;
+  private final WikiConfiguration _configuration;
   
-  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+    _configuration = configuration;
     _store = store;
     _renderer = renderer;
     _graph = graph;
@@ -260,7 +263,7 @@ public class DefaultPageImpl implements DefaultPage {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
       final String feedUrl = _wikiUrls.page(page.getName()) + "?history&ctype=atom";
-      return new FeedView(_feedWriter, changes, feedUrl);
+      return new FeedView(_configuration, _feedWriter, changes, feedUrl);
     }
     request.setAttribute("changes", changes);
     return new JspView("History");

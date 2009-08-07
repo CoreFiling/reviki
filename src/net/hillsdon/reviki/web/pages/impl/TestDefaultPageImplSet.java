@@ -62,7 +62,7 @@ public class TestDefaultPageImplSet extends TestCase {
     _feedWriter = createMock(FeedWriter.class);
     _store = createMock(CachingPageStore.class);
     _wikiUrls = new ExampleDotComWikiUrls();
-    _page = new DefaultPageImpl(_store, null, null, null, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, null, null, null, _wikiUrls, _feedWriter);
     _request = new MockHttpServletRequest();
     _response = null;
   }
