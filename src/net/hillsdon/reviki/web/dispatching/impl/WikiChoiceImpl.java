@@ -32,6 +32,8 @@ import net.hillsdon.reviki.web.dispatching.WikiChoice;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 
+import org.picocontainer.Startable;
+
 public class WikiChoiceImpl implements WikiChoice {
 
   private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
@@ -43,14 +45,24 @@ public class WikiChoiceImpl implements WikiChoice {
     _configuration = configuration;
     _applicationSession = applicationSession;
     _applicationUrls = applicationUrls;
+
+    _configuration.load();
+    for (String wikiName : _configuration.getWikiNames()) {
+      // These wiki configurations could be broken but we can't really report the
+      // error now so just wait for the user to find them broken.
+      WikiConfiguration perWikiConfiguration = _configuration.getConfiguration(wikiName);
+      installHandler(perWikiConfiguration, createWikiHandler(perWikiConfiguration));
+    }
   }
 
-  public WikiHandler addWiki(final WikiConfiguration configuration) {
-    WikiHandler handler = _applicationSession.createWikiSession(configuration).getWikiHandler();
+  public WikiHandler createWikiHandler(WikiConfiguration configuration) {
+    return _applicationSession.createWikiSession(configuration).getWikiHandler();
+  }
+  
+  public void installHandler(WikiConfiguration configuration, WikiHandler handler) {
     _wikis.put(configuration, handler);
-    return handler;
   }
-
+  
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
@@ -63,10 +75,6 @@ public class WikiChoiceImpl implements WikiChoice {
     RequestHandler wiki = _wikis.get(perWikiConfiguration);
     boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
     if (wiki == null || reconfigure) {
-      // At the moment we lazily install wiki handlers.  Fix this when adding a wiki list?
-      if (perWikiConfiguration.isComplete() && !reconfigure) {
-        return addWiki(perWikiConfiguration);
-      }
       return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration, _applicationUrls);
     }
     return wiki;

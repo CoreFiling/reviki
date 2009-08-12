@@ -15,7 +15,10 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
+
 import java.io.IOException;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,9 +28,11 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
+import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
@@ -37,7 +42,6 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -62,7 +66,7 @@ public class WikiHandlerImpl implements WikiHandler {
   private final ChangeNotificationDispatcher _syncUpdater;
   private final WikiUrls _wikiUrls;
   private final ResourceHandler _resources;
-  private final PageHandler _handler;
+  private final PageHandler _pageHandler;
 
   public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls) {
     _cachingPageStore = cachingPageStore;
@@ -71,24 +75,40 @@ public class WikiHandlerImpl implements WikiHandler {
     _syncUpdater = syncUpdater;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
     _resources = resources;
-    _handler = handler;
+    _pageHandler = handler;
     _wikiUrls = wikiUrls;
   }
 
-  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    try {
-      request.setAttribute(WikiUrls.KEY, _wikiUrls);
-      request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?ctype=raw");
-      request.setAttribute("internalLinker", _internalLinker);
-      
-      _requestLifecycleAwareManager.requestStarted(request);
-      if ("resources".equals(path.peek())) {
-        return _resources.handle(path.consume(), request, response);
+  public View test(HttpServletRequest request, HttpServletResponse response) throws PageStoreInvalidException, Exception {
+    return handleInternal(new ConsumedPath(Collections.<String>emptyList()), request, response, new PageHandler() {
+      public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        _cachingPageStore.assertValid();
+        return null;
       }
-      
-      _syncUpdater.sync();
-      addSideBarEtcToRequest(request);
-      return _handler.handle(path, request, response);
+    });
+  }
+  
+  public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    return handleInternal(path, request, response, new RequestHandler() {
+      public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setAttribute(WikiUrls.KEY, _wikiUrls);
+        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?ctype=raw");
+        request.setAttribute("internalLinker", _internalLinker);
+        if ("resources".equals(path.peek())) {
+          return _resources.handle(path.consume(), request, response);
+        }
+        
+        _syncUpdater.sync();
+        addSideBarEtcToRequest(request);
+        return _pageHandler.handle(path, request, response);
+      }
+    });
+  }
+
+  private View handleInternal(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response, final RequestHandler delegate) throws Exception {
+    try {
+      _requestLifecycleAwareManager.requestStarted(request);
+      return delegate.handle(path, request, response);
     }
     catch (PageStoreAuthenticationException ex) {
       return new RequestAuthenticationView();

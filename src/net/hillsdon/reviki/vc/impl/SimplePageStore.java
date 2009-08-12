@@ -32,6 +32,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 
 /**
  * Partial implementation suitable for tests.
@@ -107,6 +108,9 @@ public class SimplePageStore implements CachingPageStore {
 
   public PageStore getUnderlying() {
     return this;
+  }
+
+  public void assertValid() throws PageStoreInvalidException {
   }
   
 }

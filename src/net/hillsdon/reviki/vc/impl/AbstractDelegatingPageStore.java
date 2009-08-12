@@ -29,6 +29,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 
 
 
@@ -111,6 +112,10 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
   
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
     return getDelegateInternal().rename(from, to, baseRevision, commitMessage);
+  }
+ 
+  public void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException {
+    getDelegateInternal().assertValid();
   }
   
 }

@@ -20,12 +20,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ActiveWikis;
+import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
@@ -56,7 +58,21 @@ public class ConfigureWikiHandler implements RequestHandler {
         _perWikiConfiguration.setUrl(url);
         _perWikiConfiguration.save();
         if (_perWikiConfiguration.isComplete()) {
-          _activeWikis.addWiki(_perWikiConfiguration);
+          WikiHandler handler = _activeWikis.createWikiHandler(_perWikiConfiguration);
+          
+          try {
+            View authenticationView = handler.test(request, response);
+            if (authenticationView != null) {
+              return authenticationView;
+            }
+          }
+          catch (PageStoreInvalidException ex) {
+            request.setAttribute("flash", "SVN location invalid.  Try svn mkdir?");
+            // TODO: Preserve SVN location.
+            return new JspView("Configuration");
+          }
+          
+          _activeWikis.installHandler(_perWikiConfiguration, handler);
         }
         return new RedirectToPageView(new WikiUrlsImpl(_applicationUrls, _perWikiConfiguration), BuiltInPageReferences.PAGE_FRONT_PAGE);
       }

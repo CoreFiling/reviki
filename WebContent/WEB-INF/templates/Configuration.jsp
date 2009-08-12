@@ -6,14 +6,15 @@
   <tiles:putAttribute name="content">
     <p>
       The wiki will store pages at the directory pointed to by the given SVN URL.
-      The URL should not be the root of the repository unless you really want to
-      store the data there.
     </p>
+    <ul>
+      <li>The directory must already exist.</li>
+      <li>The URL should not be the root of the repository unless you really want to store the data there.</li>
+    </ul>
     <p>
       If the location contains existing wiki data it may take some minutes for
       indexing to complete after you submit this form.
     </p>
-    
     <form name="configurationForm" action="" method="post">
       <table>
         <tr>

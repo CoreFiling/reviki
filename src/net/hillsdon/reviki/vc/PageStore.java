@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 
+
 /**
  * A verson control based store of wiki pages with attachments.
  * 
@@ -159,4 +160,10 @@ public interface PageStore {
    */
   void attachment(PageReference ref, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
 
+  /**
+   * @throws PageStoreInvalidException If the underlying data repository is invalid/not present etc.
+   * @throws PageStoreAuthenticationException If we couldn't authenticate (probably a good sign but can't be sure). 
+   */
+  void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException;
+  
 }

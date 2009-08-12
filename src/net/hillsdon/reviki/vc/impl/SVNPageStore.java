@@ -51,6 +51,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.SVNException;
@@ -347,6 +348,22 @@ public class SVNPageStore implements PageStore {
   
   private Map<String, String> createLocksMap(final String path, final String lockToken) {
     return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
+  }
+
+  public void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException {
+    try {
+      if (_operations.checkPath("", -1) == SVNNodeKind.NONE) {
+        throw new PageStoreInvalidException();
+      }
+    }
+    catch (PageStoreAuthenticationException e) {
+      throw e;
+    }
+    catch (PageStoreException e) {
+      // Assume this always means we're broken.  If that's not true then we'll need to push this
+      // into operations and check the different SVNKit failure codes there.
+      throw new PageStoreInvalidException(e);
+    }
   }
   
 }

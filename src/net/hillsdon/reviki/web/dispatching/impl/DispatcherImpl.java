@@ -15,13 +15,14 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestAttributes;
@@ -37,13 +38,9 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static java.lang.String.format;
-
 public class DispatcherImpl implements Dispatcher {
   
   private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
-
-  private final DeploymentConfiguration _configuration;
 
   private final ListWikis _list;
   private final WikiChoiceImpl _choice;
@@ -52,16 +49,13 @@ public class DispatcherImpl implements Dispatcher {
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
   private final RequestCompletedHandler _requestCompletedHandler;
 
-  public DispatcherImpl(DeploymentConfiguration configuration, ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
-    _configuration = configuration;
+  public DispatcherImpl(ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
     _applicationUrls = applicationUrls;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
     _requestCompletedHandler = requestCompletedHandler;
-    
-    _configuration.load();
   }
 
   public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
