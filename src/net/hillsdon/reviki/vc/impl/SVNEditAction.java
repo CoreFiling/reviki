@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.apache.commons.logging.Log;
@@ -85,7 +86,8 @@ public abstract class SVNEditAction implements SVNAction<Long> {
    * @param operations TODO
    * @throws SVNException On failure. 
    * @throws IOException On failure. 
+   * @throws NotFoundException 
    */
-  protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException;
+  protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException, NotFoundException;
   
 }

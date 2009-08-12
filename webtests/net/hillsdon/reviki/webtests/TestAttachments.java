@@ -59,7 +59,7 @@ public class TestAttachments extends WebTestSupport {
 
   public void testUploadNothingGivesError() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
-    HtmlPage page = editWikiPage(name, "", "", true);
+    HtmlPage page = editWikiPage(name, "content", "", true);
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();

@@ -57,8 +57,8 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.internal.util.SVNDate;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
-import org.tmatesoft.svn.core.internal.util.SVNTimeUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
@@ -125,13 +125,13 @@ public class SVNPageStore implements PageStore {
 
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    HashMap<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<String, String>();
     SVNNodeKind kind = _operations.checkPath(ref.getPath(), revision);
     if (SVNNodeKind.FILE.equals(kind)) {
       _operations.getFile(ref.getPath(), revision, properties, baos);
       long actualRevision = SVNProperty.longValue(properties.get(SVNProperty.REVISION));
       long lastChangedRevision = SVNProperty.longValue(properties.get(SVNProperty.COMMITTED_REVISION));
-      Date lastChangedDate = SVNTimeUtil.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
+      Date lastChangedDate = SVNDate.parseDate(properties.get(SVNProperty.COMMITTED_DATE));
       String lastChangedAuthor = properties.get(SVNProperty.LAST_AUTHOR);
       String lockOwner = null;
       String lockToken = null;

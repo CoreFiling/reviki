@@ -46,7 +46,9 @@ import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
@@ -206,13 +208,21 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<Void>() {
+      @SuppressWarnings("unchecked")
       public Void perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
+        final SVNProperties props1 = properties == null ? null : new SVNProperties();
         try {
-          repository.getFile(path, revision, properties, out);
+          repository.getFile(path, revision, props1, out);
+          if(properties != null) {
+            final Map<String, SVNPropertyValue> props2= (Map<String, SVNPropertyValue>)props1.asMap();
+            for(Map.Entry<String, SVNPropertyValue> entry : props2.entrySet()) {
+              properties.put(entry.getKey(), entry.getValue().getString());
+            }
+          }
         }
         catch (SVNException ex) {
           // FIXME: Presumably this code would be different for non-http repositories.
-          if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(ex.getErrorMessage().getErrorCode())) {
+          if (SVNErrorCode.FS_NOT_FOUND.equals(ex.getErrorMessage().getErrorCode())) {
             throw new NotFoundException(ex);
           }
           throw ex;
@@ -264,10 +274,10 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     
     final Map<String, String> autoprops = _autoPropertiesApplier.apply(path);
     for (Map.Entry<String, String> entry : autoprops.entrySet()) {
-      commitEditor.changeFileProperty(path, entry.getKey(), entry.getValue());
+      commitEditor.changeFileProperty(path, entry.getKey(), SVNPropertyValue.create(entry.getValue()));
     }
     if (!autoprops.containsKey(SVNProperty.MIME_TYPE) && autoDetectedMimeType != null) {
-      commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, autoDetectedMimeType);
+      commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, SVNPropertyValue.create(autoDetectedMimeType));
     }
     
     commitEditor.closeFile(path, checksum);
@@ -290,7 +300,15 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   public void delete(ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
-    commitEditor.deleteEntry(path, baseRevision);
+    try {
+      commitEditor.deleteEntry(path, baseRevision);
+    }
+    catch (SVNException ex) {
+      // We just ignore this - older versions of SVNKit didn't explain at all.
+      if (!SVNErrorCode.FS_NOT_FOUND.equals(ex.getErrorMessage().getErrorCode())) {
+        throw ex;
+      }
+    }
   }
 
   public SVNLock getLock(final String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
