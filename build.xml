@@ -168,6 +168,7 @@
     <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functional-tests-failed">
       <jvmarg value="-Dwiki.username=${testwiki.username}" />
       <jvmarg value="-Dwiki.password=${testwiki.password}" />
+      <jvmarg value="-Dwiki.svn=${testwiki.svn}" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>

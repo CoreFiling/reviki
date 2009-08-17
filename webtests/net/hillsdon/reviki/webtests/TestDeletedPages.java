@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.webtests;
 
-import java.io.IOException;
-
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -70,7 +68,7 @@ public class TestDeletedPages extends WebTestSupport {
     assertTrue(originalByRevision.asText().contains(content));
   }
   
-  private NamedPage createThenDeletePage() throws IOException {
+  private NamedPage createThenDeletePage() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
     editWikiPage(name, "Initial content", "", true);
     HtmlPage page = editWikiPage(name, "", "", false);

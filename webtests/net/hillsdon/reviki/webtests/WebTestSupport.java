@@ -17,6 +17,7 @@ package net.hillsdon.reviki.webtests;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
@@ -54,6 +56,14 @@ public abstract class WebTestSupport extends TestCase {
   protected String getUsername() {
     return System.getProperty("wiki.username");
   }
+  
+  protected String getPassword() {
+    return System.getProperty("wiki.password");
+  }
+  
+  protected String getSvnLocation() {
+    return System.getProperty("wiki.svn");
+  }
 
   private String getUrl(final String path) {
     return BASE_URL + "/" + path;
@@ -74,7 +84,11 @@ public abstract class WebTestSupport extends TestCase {
 
   private int _counter = 0;
   protected String uniqueWikiPageName(final String prefix) {
-    return prefix + System.currentTimeMillis() + _counter++;
+    return prefix + uniqueName();
+  }
+  
+  protected String uniqueName() {
+    return "" + System.currentTimeMillis() + _counter++;
   }
 
   /**
@@ -85,8 +99,11 @@ public abstract class WebTestSupport extends TestCase {
    * @return The page after the 'Save' button has been clicked.
    * @throws IOException On failure.
    */
-  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws IOException {
-    HtmlPage page = getWikiPage(name);
+  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
+    return editWikiPage(getWikiPage(name), content, descriptionOfChange, isNew);
+  }
+
+  protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
     URL pageUrl = page.getWebResponse().getUrl();
     if (isNew != null) {
       assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
@@ -96,6 +113,11 @@ public abstract class WebTestSupport extends TestCase {
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
     page = (HtmlPage) editForm.getInputByValue("Save").click();
+    
+    @SuppressWarnings("unchecked")
+    final List<HtmlInput> saveButtons = (List<HtmlInput>) page.getByXPath("//input[@type='submit' and @value='Save']");
+    assertEquals(0, saveButtons.size());
+    
     assertEquals(pageUrl, page.getWebResponse().getUrl());
     return page;
   }
