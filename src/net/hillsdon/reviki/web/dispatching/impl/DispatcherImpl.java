@@ -70,11 +70,10 @@ public class DispatcherImpl implements Dispatcher {
       }
     }
     catch (NotFoundException ex) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      handleException(request, response, ex, "Could not find the file you were looking for.", 404);
     }
     catch (Exception ex) {
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      handleException(request, response, ex);
+      handleException(request, response, ex, null, 500);
     }
     finally {
       _requestCompletedHandler.requestComplete();
@@ -100,7 +99,8 @@ public class DispatcherImpl implements Dispatcher {
     throw new NotFoundException();
   }
 
-  private void handleException(final HttpServletRequest request, final HttpServletResponse response, Exception ex) throws ServletException, IOException {
+  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex, final String customMessage, final int statusCode) throws ServletException, IOException {
+    response.setStatus(statusCode);
     String user = (String) request.getAttribute(RequestAttributes.USERNAME);
     if (user == null) {
       user = "[none]";
@@ -109,6 +109,7 @@ public class DispatcherImpl implements Dispatcher {
     String uri = request.getRequestURI() + (queryString == null ? "" : "?" + queryString);
     LOG.error(format("Forwarding to error page for user '%s' accessing '%s'.", user, uri), ex);
     request.setAttribute("exception", ex);
+    request.setAttribute("customMessage", customMessage);
     request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
   }
   

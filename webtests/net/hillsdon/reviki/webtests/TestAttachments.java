@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -48,13 +47,10 @@ public class TestAttachments extends WebTestSupport {
   }
 
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
-    try {
-      getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
-      fail();
-    }
-    catch (FailingHttpStatusCodeException ex) {
-      assertEquals(404, ex.getStatusCode());
-    }
+    ignoreStatusCodeErrors();
+    final HtmlPage page = getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
+    assertTrue(page.getTitleText().contains("Error"));
+    assertEquals(404, page.getWebResponse().getStatusCode());
   }
 
   public void testUploadNothingGivesError() throws Exception {

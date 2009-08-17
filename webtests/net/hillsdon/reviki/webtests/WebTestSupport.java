@@ -53,6 +53,10 @@ public abstract class WebTestSupport extends TestCase {
     _client.addWebWindowListener(new ValidateOnContentChange());
   }
 
+  protected void ignoreStatusCodeErrors() {
+    _client.setThrowExceptionOnFailingStatusCode(false);
+  }
+  
   protected String getUsername() {
     return System.getProperty("wiki.username");
   }
