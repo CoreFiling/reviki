@@ -12,7 +12,7 @@
 
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
-  <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
+  <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/><c:if test="${showHeadRev}"> - r${pageInfo.revision}</c:if></tiles:putAttribute>
   <tiles:putAttribute name="menuItems">
     <c:if test="${not pageInfo.locked or pageInfo.lockedBy == username}">
       <li class="menu">
@@ -88,7 +88,7 @@
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
 		    <p>
-		      <a href="?diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
+		      <a href="?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
 		    </p>
 		  </c:if>
 		</div>

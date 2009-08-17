@@ -41,6 +41,7 @@ public class TestRecentChanges extends WebTestSupport {
     
     Iterator<HtmlAnchor> links = getRecentChangesLinks();
     HtmlAnchor first = links.next();
+    links.next();
     HtmlAnchor second = links.next();
     assertEquals(first.asText(), createdSecond);
     assertEquals(second.asText(), createdFirst);
@@ -49,6 +50,7 @@ public class TestRecentChanges extends WebTestSupport {
     editWikiPage(createdFirst, "Different content", descriptionOfChange, false);
     links = getRecentChangesLinks();
     first = links.next();
+    links.next();
     second = links.next();
     assertEquals(first.asText(), createdFirst);
     assertEquals(second.asText(), createdSecond);

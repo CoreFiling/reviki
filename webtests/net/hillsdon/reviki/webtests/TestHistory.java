@@ -18,8 +18,10 @@ package net.hillsdon.reviki.webtests;
 import java.util.List;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
 
@@ -32,21 +34,35 @@ public class TestHistory extends WebTestSupport {
     page = editWikiPage(pageName, "Altered content", "s/Initial/Altered", false);
     HtmlPage history = (HtmlPage) page.getAnchorByHref("?history").click();
     List<HtmlTableRow> historyRows = history.getByXPath("//tr[td]");
-    assertEquals(2, historyRows.size());
-    HtmlTableRow altered = historyRows.get(0);
+    assertEquals(3, historyRows.size());
+    HtmlTableRow altered = historyRows.get(1);
     // First column is date/time.
-    assertEquals(pageName, altered.getCell(1).asText());
-    assertEquals(getUsername(), altered.getCell(2).asText());
-    assertEquals("s/Initial/Altered", altered.getCell(3).asText());
-    HtmlTableRow initial = historyRows.get(1);
-    assertEquals(pageName, initial.getCell(1).asText());
-    assertEquals(getUsername(), initial.getCell(2).asText());
-    assertEquals("None", initial.getCell(3).asText());
+    verifyRow(altered, "s/Initial/Altered");
+    HtmlTableRow initial = historyRows.get(2);
+    verifyRow(initial, "None");
 
-    HtmlAnchor diffLink = (HtmlAnchor) altered.getCell(3).getByXPath("a").iterator().next();
-    HtmlPage diff = (HtmlPage) diffLink.click();
+    final List<HtmlSubmitInput> compareButtons = (List<HtmlSubmitInput>) history.getByXPath("//input[@type='submit' and @value='Compare']/.");
+    assertEquals(1, compareButtons.size());
+    HtmlPage diff = (HtmlPage) compareButtons.get(0).click();
     assertEquals("Altered", ((DomNode) diff.getByXPath("//ins").iterator().next()).asText());
     assertEquals("Initial", ((DomNode) diff.getByXPath("//del").iterator().next()).asText());
+    List<HtmlDivision> divs = diff.getByXPath("//div[@id='flash']/.");
+    assertEquals(0, divs.size());
+
+    // Check for the warning when viewing differences backwards
+    final List<HtmlRadioButtonInput> radioButtons = history.getByXPath("//input[@type='radio']/.");
+    assertEquals(4, radioButtons.size());
+    radioButtons.get(0).click();
+    radioButtons.get(3).click();
+    diff = (HtmlPage) compareButtons.get(0).click();
+    divs = diff.getByXPath("//div[@id='flash']/.");
+    assertEquals(1, divs.size());
+
+  }
+
+  private void verifyRow(HtmlTableRow altered, String content) {
+    assertEquals(getUsername(), altered.getCell(2).asText());
+    assertEquals(content, altered.getCell(3).asText());
   }
   
 }

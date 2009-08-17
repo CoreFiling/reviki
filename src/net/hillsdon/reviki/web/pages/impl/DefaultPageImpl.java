@@ -91,7 +91,10 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String ATTR_BACKLINKS_LIMITED = "backlinksLimited";
   public static final String ATTR_RENDERED_CONTENTS = "renderedContents";
   public static final String ATTR_MARKED_UP_DIFF = "markedUpDiff";
-  
+  public static final String ATTR_DIFF_START_REV = "diffStartRev";
+  public static final String ATTR_DIFF_END_REV = "diffEndRev";
+  public static final String ATTR_SHOW_REV = "showHeadRev";
+
   public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
@@ -228,15 +231,21 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    long revison = getRevision(request);
-    Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
+    final long revision = getRevision(request);
+    final Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
 
-    final PageInfo main = _store.get(page, revison);
+    final PageInfo main = _store.get(page, revision);
     request.setAttribute(ATTR_PAGE_INFO, main);
+    request.setAttribute(ATTR_SHOW_REV, revision != -1);
     if (diffRevision != null) {
-      PageInfo base = _store.get(page, diffRevision);
-      request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(base.getContent(), main.getContent()));
+      final PageInfo compare = _store.get(page, diffRevision);
+      request.setAttribute(ATTR_DIFF_END_REV, revisionText(revision));
+      request.setAttribute(ATTR_DIFF_START_REV, revisionText(diffRevision));
+      request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(compare.getContent(), main.getContent()));
+      if (diffRevision > revision && revision != -1) {
+        request.setAttribute("flash", "Note this diff is reversed.");
+      }
       return new JspView("ViewDiff");
     }
     else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
@@ -247,6 +256,10 @@ public class DefaultPageImpl implements DefaultPage {
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }
+  }
+
+  private String revisionText(final long revision) {
+    return revision != -1 ? "r" + revision : "latest";
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
