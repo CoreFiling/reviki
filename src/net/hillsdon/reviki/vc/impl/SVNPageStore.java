@@ -42,8 +42,10 @@ import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.MimeIdentifier;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
@@ -52,8 +54,10 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;
+import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
 
+import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -204,10 +208,21 @@ public class SVNPageStore implements PageStore {
     }
     return _operations.execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
       @Override
-      protected void driveCommitEditor(ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException {
-        commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), baseRevision);
-        set(commitEditor, path, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)));
-        commitEditor.closeDir();
+      protected void driveCommitEditor(ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException, SaveException {
+        try {
+          commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), baseRevision);
+          set(commitEditor, path, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)));
+          commitEditor.closeDir();
+        }
+        catch (SVNException e) {
+          if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(e.getErrorMessage().getErrorCode())) {
+            throw new LostLockException(e);
+          }
+          else if (SVNErrorCode.FS_CONFLICT.equals(e.getErrorMessage().getErrorCode())) {
+            throw new ConflictException(e);
+          }
+          throw e;
+        }
       }
     });
   }

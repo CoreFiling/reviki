@@ -47,6 +47,6 @@ public interface PageInfo extends PageReference  {
   boolean isDeleted();
   
   PageInfo withAlternativeContent(String content);
-
+  PageInfo withoutLockToken();
   
 }

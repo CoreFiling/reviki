@@ -1,2 +1,5 @@
 testwiki.username=someone
 testwiki.password=secret
+testwiki.altusername=someone-else
+testwiki.altpassword=secret
+testwiki.svn="http://localhost/svn/"

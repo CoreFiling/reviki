@@ -36,7 +36,9 @@ import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
+import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
@@ -71,28 +73,47 @@ import org.apache.commons.io.IOUtils;
 public class DefaultPageImpl implements DefaultPage {
 
   public static final String SUBMIT_SAVE = "save";
+
   public static final String SUBMIT_COPY = "copy";
+
   public static final String SUBMIT_RENAME = "rename";
+
   public static final String SUBMIT_UNLOCK = "unlock";
+
   public static final String SUBMIT_PREVIEW = "preview";
 
   public static final String PARAM_TO_PAGE = "toPage";
+
   public static final String PARAM_FROM_PAGE = "fromPage";
+
   public static final String PARAM_CONTENT = "content";
+
   public static final String PARAM_BASE_REVISION = "baseRevision";
+
   public static final String PARAM_LOCK_TOKEN = "lockToken";
+
   public static final String PARAM_COMMIT_MESSAGE = "description";
+
   public static final String PARAM_MINOR_EDIT = "minorEdit";
+
   public static final String PARAM_DIFF_REVISION = "diff";
+
   public static final String PARAM_ATTACHMENT_NAME = "attachmentName";
 
   public static final String ATTR_PAGE_INFO = "pageInfo";
+
   public static final String ATTR_BACKLINKS = "backlinks";
+
   public static final String ATTR_BACKLINKS_LIMITED = "backlinksLimited";
+
   public static final String ATTR_RENDERED_CONTENTS = "renderedContents";
+
   public static final String ATTR_MARKED_UP_DIFF = "markedUpDiff";
+
   public static final String ATTR_DIFF_START_REV = "diffStartRev";
+
   public static final String ATTR_DIFF_END_REV = "diffEndRev";
+
   public static final String ATTR_SHOW_REV = "showHeadRev";
 
   public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
@@ -100,13 +121,19 @@ public class DefaultPageImpl implements DefaultPage {
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
   private final CachingPageStore _store;
+
   private final MarkupRenderer _renderer;
+
   private final WikiGraph _graph;
+
   private final DiffGenerator _diffGenerator;
+
   private final WikiUrls _wikiUrls;
+
   private final FeedWriter _feedWriter;
+
   private final WikiConfiguration _configuration;
-  
+
   public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _configuration = configuration;
     _store = store;
@@ -116,7 +143,7 @@ public class DefaultPageImpl implements DefaultPage {
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
   }
-  
+
   public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
@@ -143,7 +170,7 @@ public class DefaultPageImpl implements DefaultPage {
       if (baseRevision == null) {
         baseRevision = PageInfo.UNCOMMITTED;
       }
-      
+
       if (file == null || file.getSize() == 0) {
         request.setAttribute("flash", ERROR_NO_FILE);
         return attachments(page, path, request, response);
@@ -167,14 +194,15 @@ public class DefaultPageImpl implements DefaultPage {
     }
   }
 
-  @SuppressWarnings("unchecked") // commons-upload...
+  @SuppressWarnings("unchecked")
+  // commons-upload...
   private List<FileItem> getFileItems(HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     List<FileItem> items = upload.parseRequest(request);
     return items;
   }
-  
+
   private void storeAttachment(final PageReference page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
@@ -187,7 +215,6 @@ public class DefaultPageImpl implements DefaultPage {
     _store.attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
   }
 
-
   public View attachment(final PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
     return new View() {
@@ -196,9 +223,11 @@ public class DefaultPageImpl implements DefaultPage {
           public void setContentType(final String contentType) {
             response.setContentType(contentType);
           }
+
           public void setFileName(final String name) {
             response.setHeader("Content-Disposition", "attachment: filename=" + attachmentName);
           }
+
           public OutputStream stream() throws IOException {
             return response.getOutputStream();
           }
@@ -212,15 +241,31 @@ public class DefaultPageImpl implements DefaultPage {
     return new JspView("Attachments");
   }
 
+  private boolean isLockTokenValid(final PageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
+    final String username = (String) request.getAttribute(RequestAttributes.USERNAME);
+    return pageInfo.lockedByUserIfNeeded(username) && (!preview || pageInfo.isNew() || lockTokenMatches(pageInfo, request));
+  }
+
+  private boolean lockTokenMatches(final PageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {
+    return pageInfo.getLockToken().equals(getRequiredString(request, PARAM_LOCK_TOKEN));
+  }
+
   public View editor(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
-    request.setAttribute("pageInfo", pageInfo);
-    if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
-      request.setAttribute("flash", "Could not lock the page.");
-      return new JspView("ViewPage");
+    if (!isLockTokenValid(pageInfo, request, preview)) {
+      if (preview) {
+        return diffEditorView(page, null, request);
+      }
+      else {
+        request.setAttribute("pageInfo", pageInfo);
+        request.setAttribute("flash", "Could not lock the page.");
+        return new JspView("ViewPage");
+      }
     }
     else {
-      if (request.getParameter(SUBMIT_PREVIEW) != null) {
+      request.setAttribute("pageInfo", pageInfo);
+      if (preview) {
         pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
         request.setAttribute("pageInfo", pageInfo);
         ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent());
@@ -290,14 +335,22 @@ public class DefaultPageImpl implements DefaultPage {
     if (!(hasSaveParam ^ hasCopyParam ^ hasRenameParam ^ hasUnlockParam)) {
       throw new InvalidInputException("Exactly one action must be specified.");
     }
-    
+
     if (hasSaveParam) {
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(Strings.CRLF)) {
         content = content + Strings.CRLF;
       }
-      _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
+      try {
+        _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
+      }
+      catch (LostLockException e) {
+        return diffEditorView(page, null, request);
+      }
+      catch (ConflictException e) {
+        return diffEditorView(page, "Page has been updated since you started. Please do not save unless you feel that you can merge the changes.", request);
+      }
     }
     else if (hasCopyParam) {
       final String fromPage = getString(request, PARAM_FROM_PAGE);
@@ -335,11 +388,33 @@ public class DefaultPageImpl implements DefaultPage {
     }
     return new RedirectToPageView(_wikiUrls, page);
   }
-  
+
+  private View diffEditorView(final PageReference page, String customMessage, final HttpServletRequest request) throws PageStoreException {
+    PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    String message;
+    final String content = request.getParameter(PARAM_CONTENT);
+    final String newContent = pageInfo.getContent();
+    pageInfo = pageInfo.withAlternativeContent((String) content);
+    request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(newContent, content));
+    if (pageInfo.isLocked() && !pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
+      message = "Page was locked by " + pageInfo.getLockedBy() + " on " + pageInfo.getLockedSince() + ".";
+      pageInfo = pageInfo.withoutLockToken();
+    }
+    else {
+      message = "Lock was lost!";
+    }
+    if (customMessage != null) {
+      message = customMessage;
+    }
+    request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+    request.setAttribute("flash", message);
+    return new JspView("EditPage");
+  }
+
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
     return getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
   }
-  
+
   String createLinkingCommitMessage(PageReference page, final HttpServletRequest request) {
     boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
     String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
@@ -348,6 +423,5 @@ public class DefaultPageImpl implements DefaultPage {
     }
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName());
   }
-  
 
 }

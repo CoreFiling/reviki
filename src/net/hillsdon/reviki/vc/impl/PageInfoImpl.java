@@ -124,4 +124,17 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     return other;
   }
 
+  public PageInfo withoutLockToken() {
+    return new PageInfoImpl(
+      super.getPath(),
+      _content,
+      _revision,
+      _lastChangedRevision,
+      _lastChangedAuthor,
+      _lastChangedDate,
+      _lockedBy,
+      "",
+      _lockedSince);
+  }
+
 }

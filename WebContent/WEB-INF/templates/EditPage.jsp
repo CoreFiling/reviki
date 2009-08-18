@@ -10,6 +10,12 @@
       ${preview}
       </div>
     </c:if>
+    <c:if test="${not empty markedUpDiff}">
+      <h2>Comparison <a href="#editForm">(skip)</a></h2>
+      <div id="wiki-rendering">
+      ${markedUpDiff}
+      </div>
+    </c:if>
     
     <form id="editForm" name="editForm" action="" method="post">
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>

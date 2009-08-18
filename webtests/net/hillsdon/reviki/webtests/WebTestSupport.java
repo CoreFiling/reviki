@@ -40,31 +40,55 @@ public abstract class WebTestSupport extends TestCase {
   public static final String BASE_URL = "http://localhost:8080/reviki";
   
   private WebClient _client;
+  private WebClient _altclient = null;
+
+  private WebClient setupClient(final String username, final String password) {
+    final WebClient client = new WebClient();
+    DefaultCredentialsProvider credentials = new DefaultCredentialsProvider();
+    credentials.addCredentials(username, password);
+    client.setCredentialsProvider(credentials);
+    client.setRedirectEnabled(true);
+    client.setThrowExceptionOnFailingStatusCode(true);
+    client.setThrowExceptionOnScriptError(true);
+    client.addWebWindowListener(new ValidateOnContentChange());
+    return client;
+  }
 
   @Override
   protected void setUp() throws Exception {
-    _client = new WebClient();
-    DefaultCredentialsProvider credentials = new DefaultCredentialsProvider();
-    credentials.addCredentials(getUsername(), System.getProperty("wiki.password"));
-    _client.setCredentialsProvider(credentials);
-    _client.setRedirectEnabled(true);
-    _client.setThrowExceptionOnFailingStatusCode(true);
-    _client.setThrowExceptionOnScriptError(true);
-    _client.addWebWindowListener(new ValidateOnContentChange());
+    _client = setupClient(getUsername(), getPassword());
   }
 
   protected void ignoreStatusCodeErrors() {
     _client.setThrowExceptionOnFailingStatusCode(false);
   }
-  
+
+  protected void switchUser() {
+    if (_altclient == null) {
+      _altclient = setupClient(getAltUsername(), getAltPassword());
+    }
+    final WebClient temp = _client;
+    _client = _altclient;
+    _altclient = temp;
+
+  }
+
+  protected String getAltUsername() {
+    return System.getProperty("wiki.altusername");
+  }
+
+  protected String getAltPassword() {
+    return System.getProperty("wiki.altpassword");
+  }
+
   protected String getUsername() {
     return System.getProperty("wiki.username");
   }
-  
+
   protected String getPassword() {
     return System.getProperty("wiki.password");
   }
-  
+
   protected String getSvnLocation() {
     return System.getProperty("wiki.svn");
   }
