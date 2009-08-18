@@ -24,7 +24,9 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -71,6 +73,19 @@ public abstract class WebTestSupport extends TestCase {
     _client = _altclient;
     _altclient = temp;
 
+  }
+
+  protected boolean hasErrorMessage(final HtmlPage page) throws Exception {
+    try {
+      return page.getByXPath("id('flash')").size() > 0;
+    }
+    catch (ElementNotFoundException e) {
+      return false;
+    }
+  }
+
+  protected String getErrorMessage(final HtmlPage page) throws Exception {
+    return ((DomText) page.getByXPath("id('flash')/p/text()").iterator().next()).asText().trim();
   }
 
   protected String getAltUsername() {

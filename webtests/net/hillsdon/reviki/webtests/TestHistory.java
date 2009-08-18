@@ -46,8 +46,7 @@ public class TestHistory extends WebTestSupport {
     HtmlPage diff = (HtmlPage) compareButtons.get(0).click();
     assertEquals("Altered", ((DomNode) diff.getByXPath("//ins").iterator().next()).asText());
     assertEquals("Initial", ((DomNode) diff.getByXPath("//del").iterator().next()).asText());
-    List<HtmlDivision> divs = diff.getByXPath("//div[@id='flash']/.");
-    assertEquals(0, divs.size());
+    assertFalse(hasErrorMessage(diff));
 
     // Check for the warning when viewing differences backwards
     final List<HtmlRadioButtonInput> radioButtons = history.getByXPath("//input[@type='radio']/.");
@@ -55,8 +54,7 @@ public class TestHistory extends WebTestSupport {
     radioButtons.get(0).click();
     radioButtons.get(3).click();
     diff = (HtmlPage) compareButtons.get(0).click();
-    divs = diff.getByXPath("//div[@id='flash']/.");
-    assertEquals(1, divs.size());
+    assertTrue(hasErrorMessage(diff));
 
   }
 

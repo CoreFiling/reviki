@@ -59,7 +59,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
-    assertEquals(ERROR_NO_FILE, ((DomNode) attachments.getByXPath("id('flash')").get(0)).asText().trim());
+    assertEquals(ERROR_NO_FILE, getErrorMessage(attachments));
   }
   
   public void testUploadAndDownloadAttachment() throws Exception {

@@ -92,7 +92,7 @@ public class TestConfigSvn extends WebTestSupport {
     // Click Save and hopefully get same page but with flash
     final HtmlPage confPageWithFlash = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
     assertTrue(confPageWithFlash.getTitleText().contains("Config Svn"));
-    assertTrue(confPageWithFlash.getByXPath("id('flash')").size() > 0);
+    assertTrue(hasErrorMessage(confPageWithFlash));
   }
 
   private void abortEditAndFail(final ISVNEditor editor, SVNException originalError) {
