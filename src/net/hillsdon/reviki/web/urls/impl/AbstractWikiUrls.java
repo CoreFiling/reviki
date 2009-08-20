@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.web.urls.impl;
 
 import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
@@ -25,16 +26,20 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
  */
 public abstract class AbstractWikiUrls implements WikiUrls {
 
-  public final String page(final String name) {
-    return pagesRoot() + Escape.url(name);
+  public final String page(final String name, final URLOutputFilter urlOutputFilter) {
+    return page(name, "", urlOutputFilter);
   }
 
-  public final String search() {
-    return page("FindPage");
+  public String page(final String name, final String extraUnescaped, final URLOutputFilter urlOutputFilter) {
+    return urlOutputFilter.filterURL(pagesRoot() + Escape.urlEncodeUTF8(name) + extraUnescaped);
   }
 
-  public final String feed() {
-    return page("RecentChanges") + "?ctype=atom";
+  public final String search(final URLOutputFilter urlOutputFilter) {
+    return page("FindPage", urlOutputFilter);
+  }
+
+  public final String feed(final URLOutputFilter urlOutputFilter) {
+    return page("RecentChanges", "?ctype=atom", urlOutputFilter);
   }
 
   public final String resource(final String path) {

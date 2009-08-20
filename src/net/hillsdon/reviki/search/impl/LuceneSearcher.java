@@ -33,6 +33,7 @@ import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.RenderedPage;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
@@ -122,7 +123,7 @@ public class LuceneSearcher implements SearchEngine {
   }
   
   private Document createWikiPageDocument(final String path, final String content) throws IOException, PageStoreException {
-    RenderedPage renderedPage = _renderedPageFactory.create(path, content);
+    RenderedPage renderedPage = _renderedPageFactory.create(path, content, URLOutputFilter.NULL);
     Document document = new Document();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));

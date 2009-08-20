@@ -24,6 +24,7 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 
@@ -53,7 +54,7 @@ public class RedirectToPageView implements View {
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    response.sendRedirect(_wikiUrls.page(_page.getPath()) + _appended);
+    response.sendRedirect(response.encodeRedirectURL(_wikiUrls.page(_page.getPath(), URLOutputFilter.NULL) + _appended));
   }
 
   public static View create(final PageReference page, final ApplicationUrls applicationUrls, final WikiConfiguration perWikiConfiguration) {

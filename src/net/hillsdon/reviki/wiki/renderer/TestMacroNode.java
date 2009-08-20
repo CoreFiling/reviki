@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import net.hillsdon.fij.accessors.Holder;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import net.hillsdon.reviki.wiki.renderer.macro.ResultFormat;
 
@@ -50,7 +51,7 @@ public class TestMacroNode extends TestCase {
     MacroNode macroNode = new MacroNode(new Holder<List<Macro>>(asList(npes)), false);
     Matcher matcher = Pattern.compile("([a-z]+) ([a-z]+)").matcher("npes remainder");
     matcher.matches();
-    String result = macroNode.handle(new PageReferenceImpl("WhatEver"), matcher, null).toXHTML();
+    String result = macroNode.handle(new PageReferenceImpl("WhatEver"), matcher, null, URLOutputFilter.NULL).toXHTML();
     assertTrue(result.contains("Simulated &amp; escape me please."));
   }
   

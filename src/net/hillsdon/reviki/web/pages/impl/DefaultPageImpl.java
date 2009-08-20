@@ -56,7 +56,9 @@ import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
@@ -268,7 +270,7 @@ public class DefaultPageImpl implements DefaultPage {
       if (preview) {
         pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
         request.setAttribute("pageInfo", pageInfo);
-        ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent());
+        ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(response));
         request.setAttribute("preview", rendered.toXHTML());
       }
       return new JspView("EditPage");
@@ -297,7 +299,7 @@ public class DefaultPageImpl implements DefaultPage {
       return new RawPageView(main);
     }
     else {
-      ResultNode rendered = _renderer.render(main, main.getContent());
+      ResultNode rendered = _renderer.render(main, main.getContent(), new ResponseSessionURLOutputFilter(response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }
@@ -320,7 +322,7 @@ public class DefaultPageImpl implements DefaultPage {
   public View history(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      final String feedUrl = _wikiUrls.page(page.getName()) + "?history&ctype=atom";
+      final String feedUrl = _wikiUrls.page(page.getName(), URLOutputFilter.NULL) + "?history&ctype=atom";
       return new FeedView(_configuration, _feedWriter, changes, feedUrl);
     }
     request.setAttribute("changes", changes);
@@ -421,7 +423,7 @@ public class DefaultPageImpl implements DefaultPage {
     if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName());
+    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName(), URLOutputFilter.NULL);
   }
 
 }

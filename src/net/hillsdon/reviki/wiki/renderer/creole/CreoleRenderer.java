@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
@@ -63,9 +64,10 @@ public class CreoleRenderer {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
-    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
       String escaped = Escape.html(matcher.group(0));
-      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escaped, escaped));
+      String escapedFiltered = Escape.html(urlOutputFilter.filterURL(matcher.group(0)));
+      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escapedFiltered, escaped));
     }
   }
   private static class Heading extends RegexMatchToTag {
@@ -143,8 +145,8 @@ public class CreoleRenderer {
     _root = root;
   }
   
-  public ResultNode render(final PageReference page, final String in) {
-    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null));
+  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) {
+    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null, urlOutputFilter));
   }
   
   @SuppressWarnings("unchecked")

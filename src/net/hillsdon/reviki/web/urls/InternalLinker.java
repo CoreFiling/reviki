@@ -15,13 +15,13 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import static java.lang.String.format;
+import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
-import static java.lang.String.format;
-import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 
 public class InternalLinker {
 
@@ -42,11 +42,11 @@ public class InternalLinker {
     }
   }
   
-  public String url(final String pageName) {
-    return _wikiUrls.page(pageName);
+  public String url(final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(pageName, extra, urlOutputFilter);
   }
   
-  public String link(final String pageName, final String linkText) {
+  public String link(final String pageName, final String linkText, final URLOutputFilter urlOutputFilter) {
     // Special case: only link acronyms with real pages.
     final boolean exists = exists(pageName);
     if (!exists && isAcronym(pageName)) {
@@ -58,7 +58,7 @@ public class InternalLinker {
     return format("<a %sclass='%s' href='%s'>%s</a>",
       otherAttrs,
       cssClass,
-      Escape.html(url(pageName)),
+      Escape.html(url(pageName, "", urlOutputFilter)),
       Escape.html(linkText)
     );
   }

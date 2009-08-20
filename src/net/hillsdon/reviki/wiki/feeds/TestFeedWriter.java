@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.xml.xpathcontext.XPathContext;
 import net.hillsdon.xml.xpathcontext.XPathContextFactory;
@@ -45,20 +46,23 @@ public class TestFeedWriter extends TestCase {
   public void test() throws Exception {
     List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description with special character " + POUND_SIGN, StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
-      public String feed() {
+      public String feed(final URLOutputFilter urlOutputFilter) {
         return "this isn't used";
       }
-      public String page(final String name) {
+      public String page(final String name, final URLOutputFilter urlOutputFilter) {
         return "page";
       }
       public String pagesRoot() {
         return "root";
       }
-      public String search() {
+      public String search(final URLOutputFilter urlOutputFilter) {
         return "search";
       }
       public String resource(String path) {
         return "favicon";
+      }
+      public String page(String name, String extra, URLOutputFilter urlOutputFilter) {
+        return "page";
       }
     };
     ByteArrayOutputStream out = new ByteArrayOutputStream();

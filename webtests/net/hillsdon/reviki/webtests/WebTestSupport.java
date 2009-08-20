@@ -53,6 +53,8 @@ public abstract class WebTestSupport extends TestCase {
     client.setThrowExceptionOnFailingStatusCode(true);
     client.setThrowExceptionOnScriptError(true);
     client.addWebWindowListener(new ValidateOnContentChange());
+    // TODO: run tests without cookies
+    // client.setCookiesEnabled(false);
     return client;
   }
 

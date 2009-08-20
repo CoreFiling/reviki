@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.urls.impl;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -51,16 +52,16 @@ public class TestWikiUrlsImpl extends TestCase {
   public void testNoFixedBaseUrl() {
     WikiUrlsImpl urls = createURLs("foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
-    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed());
-    assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search());
+    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page("Spaced Out", URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed(URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search(URLOutputFilter.NULL));
   }
 
   public void testFixedBaseUrlJustGoesAheadAndUsesIt() {
     expect(_configuration.getFixedBaseUrl()).andReturn("http://www.example.com/wiki").anyTimes();
     replay(_configuration);
     WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);
-    assertEquals("http://www.example.com/wiki/FooPage", urls.page("FooPage"));
+    assertEquals("http://www.example.com/wiki/FooPage", urls.page("FooPage", URLOutputFilter.NULL));
   }
   
   private WikiUrlsImpl createURLs(final String wikiName) {

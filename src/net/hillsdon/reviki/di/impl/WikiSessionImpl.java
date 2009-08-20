@@ -55,6 +55,7 @@ import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
 import net.hillsdon.reviki.web.pages.impl.RecentChanges;
 import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
@@ -104,8 +105,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
     
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
-        return _renderer.render(page, in);
+      public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+        return _renderer.render(page, in, urlOutputFilter);
       }
     });
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));

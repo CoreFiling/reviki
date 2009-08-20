@@ -32,6 +32,7 @@ import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
@@ -50,6 +51,7 @@ import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_B
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.expect;
 
 /**
@@ -150,7 +152,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
   
   private void expectRenderContent() throws Exception  {
-    expect(_renderer.render(eq(THE_PAGE), eq("Content"))).andReturn(new LiteralResultNode("Content")).once();
+    expect(_renderer.render(eq(THE_PAGE), eq("Content"), isA(URLOutputFilter.class))).andReturn(new LiteralResultNode("Content")).once();
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {

@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 
 public class TestCreoleLinkNode extends TestCase {
@@ -33,26 +34,26 @@ public class TestCreoleLinkNode extends TestCase {
   }
   
   public void testInternal() {
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null).toXHTML());
-    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testInterWiki() {
-    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null).toXHTML());
+    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
   
   public void testExternal() {
-    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null).toXHTML());
+    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
     // No text, we use URL.  Useful if we fail to match some links.
-    assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null).toXHTML());
+    assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null, URLOutputFilter.NULL).toXHTML());
     // Backward external link!
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null, URLOutputFilter.NULL).toXHTML());
   }
   
   public void testAttachments() {
     // The class isn't too clever here.
-    assertEquals("<a class='attachment' href='WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null).toXHTML());
-    assertEquals("<a class='attachment' href='ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null).toXHTML());
+    assertEquals("<a class='attachment' href='WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='attachment' href='ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null, URLOutputFilter.NULL).toXHTML());
   }
   
   public void testInterWikiAttachment() {

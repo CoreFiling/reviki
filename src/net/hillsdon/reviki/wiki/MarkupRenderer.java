@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
@@ -33,11 +34,11 @@ public interface MarkupRenderer {
    * Useful for testing.
    */
   MarkupRenderer AS_IS = new MarkupRenderer() {
-    public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
+    public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
       return new LiteralResultNode(in);
     }
   };
   
-  ResultNode render(PageReference page, String in) throws IOException, PageStoreException;
+  ResultNode render(PageReference page, String in, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
     
 }

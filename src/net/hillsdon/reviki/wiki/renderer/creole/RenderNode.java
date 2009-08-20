@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public interface RenderNode {
@@ -45,7 +46,7 @@ public interface RenderNode {
    * @param parent TODO
    * @return Rendered HTML.
    */
-  List<ResultNode> render(PageReference page, String text, RenderNode parent);
+  List<ResultNode> render(PageReference page, String text, RenderNode parent, URLOutputFilter urlOutputFilter);
   
   /**
    * Test for a match in the given text.
@@ -61,6 +62,6 @@ public interface RenderNode {
    * @param parent TODO
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
-  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent);
+  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter);
 
 }

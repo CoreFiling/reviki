@@ -31,12 +31,19 @@ public interface WikiUrls extends ResourceUrls {
    */
   String KEY = WikiUrls.class.getName();
 
+  /**
+   * Note that if the the returned String is going to be used as a link, it must be encoded
+   * with a {@link URLOutputFilter}. 
+   * @return
+   */
   String pagesRoot();
   
-  String search();
+  String search(URLOutputFilter urlOutputFilter);
   
-  String page(String name);
+  String page(String name, String extra, URLOutputFilter urlOutputFilter);
 
-  String feed();
+  String page(String name, URLOutputFilter urlOutputFilter);
+
+  String feed(URLOutputFilter urlOutputFilter);
   
 }

@@ -50,7 +50,7 @@ public class InterWikiLinker {
     if (formatString == null) {
       throw new UnknownWikiException();
     }
-    return String.format(formatString, Escape.url(pageName));
+    return String.format(formatString, Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName)));
   }
   
   /**

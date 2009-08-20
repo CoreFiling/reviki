@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 
 public class Escape {
+  
   /**
    * Avoid encoding an entire link that you wish a browser to use,
    * such as "http://....". Instead, encode only what is required.
@@ -29,7 +30,7 @@ public class Escape {
    * @param content
    * @return
    */
-  public static String encodeUTF8(String content) {
+  public static String urlEncodeUTF8(String content) {
     try {
       return java.net.URLEncoder.encode(content, "UTF-8");
     }

@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.wiki;
 
 import static java.util.Arrays.asList;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import junit.framework.TestCase;
 
 public class TestRenderedPage extends TestCase {
@@ -28,7 +29,7 @@ public class TestRenderedPage extends TestCase {
   }
   
   private RenderedPage create(String content) throws Exception {
-    return _factory.create("FrontPage", content);
+    return _factory.create("FrontPage", content, URLOutputFilter.NULL);
   }
 
   public void testGetPage() throws Exception {

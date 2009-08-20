@@ -24,6 +24,7 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 import net.hillsdon.reviki.wiki.renderer.creole.JsonDrivenRenderingTest;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
@@ -44,7 +45,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
             new ExampleDotComWikiUrls(), 
             new SimplePageStore()), 
             new Holder<List<Macro>>(Collections.<Macro>emptyList()));
-    return renderer.render(new PageReferenceImpl(""), input).toXHTML();
+    return renderer.render(new PageReferenceImpl(""), input, URLOutputFilter.NULL).toXHTML();
   }
   
 }

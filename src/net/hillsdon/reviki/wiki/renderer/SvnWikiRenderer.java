@@ -23,6 +23,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
@@ -56,8 +57,8 @@ public class SvnWikiRenderer implements MarkupRenderer {
         });
   }
   
-  public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
-    return _creole.render(page, in);
+  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return _creole.render(page, in, urlOutputFilter);
   }
 
 }

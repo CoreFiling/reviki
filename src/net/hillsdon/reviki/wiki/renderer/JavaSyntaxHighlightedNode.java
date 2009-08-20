@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
@@ -42,7 +43,7 @@ public class JavaSyntaxHighlightedNode extends AbstractRegexNode {
               : "(?s)\\[<java>\\](.*?)\\[</java>\\]");
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
     String content = matcher.group(1).trim();
     try {
       return new LiteralResultNode(XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA).highlight("", content, "UTF-8", true));

@@ -17,11 +17,13 @@ package net.hillsdon.reviki.web.taglib;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.
@@ -45,9 +47,10 @@ public class WikiLinkTag extends TagSupport {
   public int doStartTag() throws JspException {
     try {
       InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
+      final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
       if (linker != null) {
         JspWriter out = pageContext.getOut();
-        out.write(linker.link(getPage(), getPage()));
+        out.write(linker.link(getPage(), getPage(), new ResponseSessionURLOutputFilter(response)));
       }
     }
     catch (IOException e) {

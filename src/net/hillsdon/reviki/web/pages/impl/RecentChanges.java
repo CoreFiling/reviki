@@ -39,6 +39,7 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
@@ -75,7 +76,7 @@ public class RecentChanges extends AbstractSpecialPage {
     final List<ChangeInfo> recentChanges = getRecentChanges(getLimit(request), showMinor);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed());
+      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed(URLOutputFilter.NULL));
     }
     return new JspView("RecentChanges");
   }

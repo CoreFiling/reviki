@@ -23,6 +23,7 @@ import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 public class ResourceHandlerImpl implements ResourceHandler {
 
@@ -33,7 +34,7 @@ public class ResourceHandlerImpl implements ResourceHandler {
     }
     return new View() {
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        request.getRequestDispatcher("/resources/" + Escape.url(resource)).forward(request, response);
+        request.getRequestDispatcher("/resources/" + Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(resource))).forward(request, response);
       }
     };
   }

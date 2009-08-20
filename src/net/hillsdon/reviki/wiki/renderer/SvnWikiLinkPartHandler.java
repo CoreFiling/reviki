@@ -20,6 +20,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -41,14 +42,14 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _configuration = configuration;
   }
   
-  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link) {
+  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) {
     if (link.isURL()) {
-      return link(page, renderer, "external", link.getRefd(), link.getText());
+      return link(page, renderer, "external", link.getRefd(), link.getText(), urlOutputFilter);
     }
     else {
       if (link.getWiki() != null) {
         try {
-          return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getRefd()), link.getText());
+          return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getRefd()), link.getText(), urlOutputFilter);
         }
         catch (UnknownWikiException e) {
           return link.getText();
@@ -68,17 +69,17 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
           else {
             refd = refd.replaceFirst("/", "/attachments/");
           }
-          return link(page, renderer, "attachment", refd, link.getText());
+          return link(page, renderer, "attachment", refd, link.getText(), urlOutputFilter);
         }
         else {
-          return _internalLinker.link(link.getRefd(), link.getText());
+          return _internalLinker.link(link.getRefd(), link.getText(), urlOutputFilter);
         }
       }
     }
   }
   
-  private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text) {
-    return String.format(_formatString, Escape.html(clazz), Escape.html(url), new CompositeResultNode(renderer.render(page, text, null)).toXHTML());
+  private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text, final URLOutputFilter urlOutputFilter) {
+    return String.format(_formatString, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), new CompositeResultNode(renderer.render(page, text, null, urlOutputFilter)).toXHTML());
   }
 
 }

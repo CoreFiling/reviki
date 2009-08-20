@@ -38,7 +38,9 @@ import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
@@ -92,14 +94,14 @@ public class WikiHandlerImpl implements WikiHandler {
     return handleInternal(path, request, response, new RequestHandler() {
       public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setAttribute(WikiUrls.KEY, _wikiUrls);
-        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath()) + "?ctype=raw");
+        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath(), "", URLOutputFilter.NULL) + "?ctype=raw");
         request.setAttribute("internalLinker", _internalLinker);
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);
         }
         
         _syncUpdater.sync();
-        addSideBarEtcToRequest(request);
+        addSideBarEtcToRequest(request, response);
         return _pageHandler.handle(path, request, response);
       }
     });
@@ -126,11 +128,11 @@ public class WikiHandlerImpl implements WikiHandler {
     }
   }
 
-  private void addSideBarEtcToRequest(final HttpServletRequest request) throws PageStoreException, IOException {
+  private void addSideBarEtcToRequest(final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException {
     for (PageReference ref : COMPLIMENTARY_CONTENT_PAGES) {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
       PageInfo page = _cachingPageStore.get(ref, -1);
-      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent()).toXHTML());
+      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent(), new ResponseSessionURLOutputFilter(response)).toXHTML());
     }
   }
 
