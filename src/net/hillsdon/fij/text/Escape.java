@@ -16,13 +16,22 @@
 package net.hillsdon.fij.text;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+
 
 public class Escape {
-
-  public static String url(final String content) {
+  /**
+   * Avoid encoding an entire link that you wish a browser to use,
+   * such as "http://....". Instead, encode only what is required.
+   * For example:
+   * <ul>
+   * <li>urlEncoder.encodeURL(pagesRoot() + Escape.encodeUTF8(name));</li>
+   * </ul>
+   * @param content
+   * @return
+   */
+  public static String encodeUTF8(String content) {
     try {
-      return URLEncoder.encode(content, "UTF-8");
+      return java.net.URLEncoder.encode(content, "UTF-8");
     }
     catch (UnsupportedEncodingException ex) {
       throw new Error("Java supports UTF-8!", ex);
