@@ -3,14 +3,14 @@
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading">
-    <a href="?">
+    <a href="<c:url value="${page.name}"/>">
       <c:out value="${pageInfo.title}"/>
     </a>
     - from ${diffStartRev} to ${diffEndRev}
   </tiles:putAttribute>
   <tiles:putAttribute name="menuItems">
 	<li class="menu">
-	  <a name="history" href="?history">History</a>
+	  <a name="history" href="<c:url value="${page.name}?history"/>">History</a>
 	</li>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
@@ -19,7 +19,7 @@
     </div>
     <hr/>
     <p>
-      Change from ${diffStartRev} to ${diffEndRev} <a href="?history">[History]</a>
+      Change from ${diffStartRev} to ${diffEndRev} <a href="<c:url value="${page.name}?history"/>">[History]</a>
     </p>
   </tiles:putAttribute>
 </tiles:insertTemplate>

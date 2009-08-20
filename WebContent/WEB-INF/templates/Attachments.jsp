@@ -19,7 +19,7 @@
               </c:if>
            </td>
             <td>
-              <form name="replaceAttachmentUpload" action="" method="post" enctype="multipart/form-data">
+              <form name="replaceAttachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
                 <input type="file" name="file"/>
                 <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>"/>
                 <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"/>
@@ -48,7 +48,7 @@
     </c:otherwise>
     </c:choose>
     <h4>Upload a new attachment</h4>
-    <form name="attachmentUpload" action="" method="post" enctype="multipart/form-data">
+    <form name="attachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
       <table>
         <tr><th style="text-align: right;"><label for="file">File to upload</label></th><td><input id="file" type="file" name="file"/></td></tr>
         <tr><th style="text-align: right;"><label for="attachmentName">Attachment name (optional)</label></th><td><input id="attachmentName" type="text" name="attachmentName"/></td></tr>

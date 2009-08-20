@@ -7,7 +7,7 @@
   <tiles:putAttribute name="heading">Rename <sw:wikiLink page="${page}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>Edit history will be retained.  Links to the page will not be updated.</p>
-    <form name="renameForm" method="post" action="">
+    <form name="renameForm" method="post" action="<c:url value="${page.name}"/>">
       <label for="toPage">New page name </label><input id="toPage" name="toPage" type="text" value=""/>
       <input name="rename" type="submit" value="Rename"/>
     </form>

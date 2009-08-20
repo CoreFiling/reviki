@@ -20,9 +20,12 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 
 /**
  * Communicates a redirect to a wiki page.
@@ -51,6 +54,10 @@ public class RedirectToPageView implements View {
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     response.sendRedirect(_wikiUrls.page(_page.getPath()) + _appended);
+  }
+
+  public static View create(final PageReference page, final ApplicationUrls applicationUrls, final WikiConfiguration perWikiConfiguration) {
+    return new RedirectToPageView(new WikiUrlsImpl(applicationUrls, perWikiConfiguration), page);
   }
   
 }

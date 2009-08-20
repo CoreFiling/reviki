@@ -30,7 +30,6 @@ import net.hillsdon.reviki.web.dispatching.ActiveWikis;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class ConfigureWikiHandler implements RequestHandler {
@@ -74,7 +73,7 @@ public class ConfigureWikiHandler implements RequestHandler {
           
           _activeWikis.installHandler(_perWikiConfiguration, handler);
         }
-        return new RedirectToPageView(new WikiUrlsImpl(_applicationUrls, _perWikiConfiguration), BuiltInPageReferences.PAGE_FRONT_PAGE);
+        return RedirectToPageView.create(BuiltInPageReferences.PAGE_FRONT_PAGE, _applicationUrls, _perWikiConfiguration);
       }
       catch (IllegalArgumentException ex) {
         request.setAttribute("error", ex.getMessage());

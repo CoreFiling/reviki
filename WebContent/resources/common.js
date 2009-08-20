@@ -23,7 +23,7 @@ reviki.configureAutoSuggest = function() {
   var queryInput = $("#query");
   if (queryInput) {
     queryInput.attr["autocomplete"] = "off";
-    queryInput.suggest(reviki.BASE_URL + "FindPage?ctype=txt&limit=20&force", {
+    queryInput.suggest(reviki.SEARCH_URL + "?ctype=txt&limit=20&force", {
       param: "query",
       onSelect: function() {
         $("#searchForm").submit();

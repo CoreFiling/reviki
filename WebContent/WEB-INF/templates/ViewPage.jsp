@@ -16,25 +16,25 @@
   <tiles:putAttribute name="menuItems">
     <c:if test="${not pageInfo.locked or pageInfo.lockedBy == username}">
       <li class="menu">
-        <form id="editTop" name="editTop" action="" method="post" style="display:inline;">
+        <form id="editTop" name="editTop" action="<c:url value="${page.name}"/>" method="post" style="display:inline;">
           <input type="submit" value="Edit"/>
         </form>
       </li>
       <li class="menu">
-        <a href="${page.name}/attachments/">Attachments</a>
+        <a href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
       </li>
       <c:if test="${not pageInfo.new}">
         <li class="menu">
-          <a name="rename" href="?rename">Rename</a>
+          <a name="rename" href="<c:url value="${page.name}?rename"/>">Rename</a>
         </li>
         <li class="menu">
-          <a name="copy" href="?copy">Copy</a>
+          <a name="copy" href="<c:url value="${page.name}?copy"/>">Copy</a>
         </li>
       </c:if>
     </c:if>
     <c:if test="${not empty lastEditAction}">
 	    <li class="menu">
-	      <a name="history" href="?history">History</a>
+	      <a name="history" href="<c:url value="${page.name}?history"/>">History</a>
 	    </li>
     </c:if>
   </tiles:putAttribute>
@@ -45,7 +45,7 @@
     <div class="auxillary">
 	    <c:if test="${pageInfo.new and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
-	    <form id="editContent" name="editContent" action="" method="post">
+	    <form id="editContent" name="editContent" action="<c:url value="${page.name}"/>" method="post">
 	      <input type="submit" value="Edit this new page" />
 	    </form>
 	    </div>
@@ -66,7 +66,7 @@
 	      <c:when test="${pageInfo.locked}">
 	        <c:choose>
 	          <c:when test="${pageInfo.lockedBy == username}">
-	            <form id="editBottom" name="editBottom" action="" method="post">
+	            <form id="editBottom" name="editBottom" action="<c:url value="${page.name}"/>" method="post">
 	              <input type="submit" value="Edit"/>
 	            </form> 
 	            <p id="lockedInfo">You have locked this page.</p>
@@ -75,20 +75,20 @@
 	            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
 	          </c:otherwise>
 	        </c:choose>
-          <form id="unlock" name="unlock" action="" method="post" style="display:inline;">
+          <form id="unlock" name="unlock" action="<c:url value="${page.name}"/>" method="post" style="display:inline;">
             <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
             <input name="unlock" type="submit" value="Unlock"/>
           </form>
 	      </c:when>
 	      <c:otherwise>
-	        <form id="editBottom" name="editBottom" action="" method="post" style="display:inline;">
+	        <form id="editBottom" name="editBottom" action="<c:url value="${page.name}"/>" method="post" style="display:inline;">
 	          <input name="editButton" type="submit" value="Edit"/>
-	        </form><a href="${page.name}/attachments/">Attachments</a>
+	        </form><a href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
 	      </c:otherwise>
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
 		    <p>
-		      <a href="?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="?history">[History]</a>
+		      <a href="<c:url value="${page.name}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="<c:url value="${page.name}?history"/>">[History]</a>
 		    </p>
 		  </c:if>
 		</div>

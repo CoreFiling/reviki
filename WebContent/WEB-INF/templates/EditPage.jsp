@@ -17,7 +17,7 @@
       </div>
     </c:if>
     
-    <form id="editForm" name="editForm" action="" method="post">
+    <form id="editForm" name="editForm" action="<c:url value="${page.name}"/>" method="post">
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>

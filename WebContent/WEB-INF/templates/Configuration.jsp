@@ -15,7 +15,7 @@
       If the location contains existing wiki data it may take some minutes for
       indexing to complete after you submit this form.
     </p>
-    <form name="configurationForm" action="" method="post">
+    <form name="configurationForm" action="<c:url value="ConfigSvnLocation"/>" method="post">
       <table>
         <tr>
           <td><label for="url">SVN URL </label></td>

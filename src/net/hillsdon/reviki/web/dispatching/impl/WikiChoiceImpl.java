@@ -30,9 +30,9 @@ import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiChoice;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
+import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-
-import org.picocontainer.Startable;
+import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class WikiChoiceImpl implements WikiChoice {
 
@@ -72,10 +72,16 @@ public class WikiChoiceImpl implements WikiChoice {
   }
 
   private RequestHandler getWikiHandler(final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
-    RequestHandler wiki = _wikis.get(perWikiConfiguration);
-    boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
-    if (wiki == null || reconfigure) {
+    final RequestHandler wiki = _wikis.get(perWikiConfiguration);
+    if ("ConfigSvnLocation".equals(path.peek())) {
       return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration, _applicationUrls);
+    }
+    else if (wiki == null) {
+      return new RequestHandler() {
+        public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+          return RedirectToPageView.create(BuiltInPageReferences.CONFIG_SVN, _applicationUrls, perWikiConfiguration);
+        }
+      };
     }
     return wiki;
   }

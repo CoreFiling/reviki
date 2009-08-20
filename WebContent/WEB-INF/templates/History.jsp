@@ -7,7 +7,7 @@
   <tiles:putAttribute name="title">History for <c:out value="${page.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading">History for <a href="<c:url value="${page}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <form method="get" action="?">
+    <form method="get" action="<c:url value="${page.name}"/>">
 	    <table class="history">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
