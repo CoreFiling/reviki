@@ -6,16 +6,6 @@
     <uri>http://www.hillsdon.net/ns/reviki/tags</uri>
 
     <tag>
-      <name>wikiLink</name>
-      <tag-class>net.hillsdon.reviki.web.taglib.WikiLinkTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-        <name>page</name>
-        <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
-      </attribute>
-    </tag>
-    <tag>
       <name>wikiUrl</name>
       <tag-class>net.hillsdon.reviki.web.taglib.WikiUrlTag</tag-class>
       <body-content>empty</body-content>
@@ -26,6 +16,31 @@
       </attribute>
       <attribute>
         <name>extra</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>session</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+    </tag>
+    <tag>
+      <name>wikiLink</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.WikiLinkTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+        <name>page</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>extra</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>session</name>
         <required>false</required>
         <rtexprvalue>true</rtexprvalue>
       </attribute>

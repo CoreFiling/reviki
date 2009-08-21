@@ -72,7 +72,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
           return link(page, renderer, "attachment", refd, link.getText(), urlOutputFilter);
         }
         else {
-          return _internalLinker.link(link.getRefd(), link.getText(), urlOutputFilter);
+          return _internalLinker.aHref(link.getRefd(), link.getText(), "", urlOutputFilter);
         }
       }
     }

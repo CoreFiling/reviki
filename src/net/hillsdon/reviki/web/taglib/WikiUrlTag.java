@@ -15,58 +15,21 @@
  */
 package net.hillsdon.reviki.web.taglib;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 /**
- * Uses an {@link InternalLinker} to create links to wiki pages.
+ * Uses an {@link InternalLinker} to create URLs to wiki pages.
  * 
  * @copyright
  * @author mth
  */
-public class WikiUrlTag extends TagSupport {
+public class WikiUrlTag extends AbstractWikiLinkTag {
 
   private static final long serialVersionUID = 1L;
-  private String _page;
-  private String _extra = "";
 
-  public String getPage() {
-    return _page;
-  }
-
-  public void setPage(final String page) {
-    _page = page;
-  }
-
-  public String getExtra() {
-    return _extra;
-  }
-
-  public void setExtra(final String extra) {
-    _extra = extra;
-  }
-
-  public int doStartTag() throws JspException {
-    try {
-      InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
-      final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
-      if (linker != null) {
-        JspWriter out = pageContext.getOut();
-        out.write(Escape.html(linker.url(getPage(), getExtra(), new ResponseSessionURLOutputFilter(response))));
-      }
-    }
-    catch (IOException e) {
-      throw new JspException(e);
-    }
-    return SKIP_BODY;
+  protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
+    return linker.url(getPage(), getExtra(), urlOutputFilter);
   }
   
 }
