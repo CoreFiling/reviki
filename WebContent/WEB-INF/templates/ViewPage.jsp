@@ -21,7 +21,7 @@
         </form>
       </li>
       <li class="menu">
-        <a href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
+        <a name="attachments" href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
       </li>
       <c:if test="${not pageInfo.new}">
         <li class="menu">
@@ -83,12 +83,12 @@
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="<c:url value="${page.name}"/>" method="post" style="display:inline;">
 	          <input name="editButton" type="submit" value="Edit"/>
-	        </form><a href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
+	        </form><a name="attachments" href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
 	      </c:otherwise>
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
 		    <p>
-		      <a href="<c:url value="${page.name}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="<c:url value="${page.name}?history"/>">[History]</a>
+		      <a name="lastChanged" href="<c:url value="${page.name}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="<c:url value="${page.name}?history"/>">[History]</a>
 		    </p>
 		  </c:if>
 		</div>

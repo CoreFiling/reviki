@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jaxen.JaxenException;
+
 import junit.framework.TestCase;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
@@ -54,7 +56,7 @@ public abstract class WebTestSupport extends TestCase {
     client.setThrowExceptionOnScriptError(true);
     client.addWebWindowListener(new ValidateOnContentChange());
     // TODO: run tests without cookies
-    // client.setCookiesEnabled(false);
+    client.setCookiesEnabled(false);
     return client;
   }
 
@@ -163,8 +165,24 @@ public abstract class WebTestSupport extends TestCase {
     final List<HtmlInput> saveButtons = (List<HtmlInput>) page.getByXPath("//input[@type='submit' and @value='Save']");
     assertEquals(0, saveButtons.size());
     
-    assertEquals(pageUrl, page.getWebResponse().getUrl());
+    assertURL(pageUrl, page.getWebResponse().getUrl());
     return page;
+  }
+
+  protected HtmlAnchor getAnchorByHrefContains(final HtmlPage page, final String hrefContains) throws JaxenException {
+    return (HtmlAnchor) page.getByXPath("//a[fn:contains(@href, '" + hrefContains + "')]").iterator().next();
+  }
+
+  protected String removeSessionId(final String url) {
+    return url.replaceFirst("[;][^?]*", "");
+  }
+
+  protected void assertURL(final String expected, final String actual) {
+    assertEquals(removeSessionId(expected.toString()), removeSessionId(actual.toString()));
+  }
+
+  protected void assertURL(final URL expected, final URL actual) {
+    assertURL(expected.toString(), actual.toString());
   }
 
   protected HtmlPage clickEditLink(final HtmlPage page) throws IOException {
@@ -181,7 +199,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   public static HtmlPage clickAttachmentsLink(final HtmlPage page, final String name) throws IOException {
-    HtmlAnchor attachmentsLink = page.getAnchorByHref(name + "/attachments/");
+    HtmlAnchor attachmentsLink = page.getAnchorByName("attachments");
     assertEquals("Attachments", attachmentsLink.asText());
     HtmlPage attachments = (HtmlPage) attachmentsLink.click();
     return attachments;
@@ -204,9 +222,9 @@ public abstract class WebTestSupport extends TestCase {
     return results;
   }
   
-  protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException {
+  protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
     HtmlPage results = search(page, query);
-    results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
+    getAnchorByHrefContains(results, BASE_URL + "/pages/test/" + name);
   }
 
   protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {

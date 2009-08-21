@@ -50,10 +50,10 @@ public class TestRename extends WebTestSupport {
     form.getInputByName("toPage").setValueAttribute(toPageName);
     page = (HtmlPage) form.getInputByName("rename").click();
 
-    assertTrue(page.getWebResponse().getUrl().toURI().getPath().endsWith(toPageName));
+    assertTrue(page.getWebResponse().getUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = clickAttachmentsLink(page, toPageName);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref("file.txt")));
+    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "file.txt")));
     
     assertSearchDoesNotFindPage(page, fromPageName);
     editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);

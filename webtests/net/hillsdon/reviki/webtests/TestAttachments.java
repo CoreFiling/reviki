@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import org.apache.commons.io.IOUtils;
 
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
-import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -65,22 +64,20 @@ public class TestAttachments extends WebTestSupport {
   public void testUploadAndDownloadAttachment() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "Content", "", true);
-
     HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
-
-    assertEquals("File 1.", getAttachmentAtEndOfLink(attachments.getAnchorByHref("file.txt")));
+    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
 
     // A link should have been added to the page.
     page = getWikiPage(name);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
+    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
     
     attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
     form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
     attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
-    assertEquals("File 2.", getAttachmentAtEndOfLink(page.getAnchorByHref(name + "/attachments/file.txt")));
+    assertEquals("File 2.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
-    HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[starts-with(@href, 'file.txt?revision')]").get(0);
+    HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
   }
 

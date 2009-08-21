@@ -24,7 +24,7 @@
       </c:otherwise>
     </c:choose>
     <c:if test="${not empty suggestCreate}">
-      <a href="<sw:wikiUrl page="${suggestCreate}"/>">Create new page <c:out value="${suggestCreate}"/></a>
+      <a name="create" href="<sw:wikiUrl page="${suggestCreate}"/>">Create new page <c:out value="${suggestCreate}"/></a>
     </c:if>
   </tiles:putAttribute>
 </tiles:insertTemplate>

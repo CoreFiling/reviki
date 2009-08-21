@@ -66,12 +66,11 @@ public class WikiChoiceImpl implements WikiChoice {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
-    request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
-    RequestHandler handler = getWikiHandler(configuration, path);
+    RequestHandler handler = getWikiHandler(request, configuration, path);
     return handler.handle(path, request, response);
   }
 
-  private RequestHandler getWikiHandler(final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
+  private RequestHandler getWikiHandler(final HttpServletRequest request, final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
     final RequestHandler wiki = _wikis.get(perWikiConfiguration);
     if ("ConfigSvnLocation".equals(path.peek())) {
       return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration, _applicationUrls);
@@ -83,6 +82,7 @@ public class WikiChoiceImpl implements WikiChoice {
         }
       };
     }
+    request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, true);
     return wiki;
   }
 
