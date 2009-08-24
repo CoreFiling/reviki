@@ -32,6 +32,9 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Notifies the search engine of page changes immediately after they happen.
  * 
@@ -41,6 +44,8 @@ import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
  * @author mth
  */
 public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubscriber {
+
+  private static final Log LOG = LogFactory.getLog(ExternalCommitAwareSearchEngine.class);
 
   private PageStore _store;
   private final SearchEngine _delegate;
@@ -77,15 +82,20 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
       }
     }
     for (PageReference page : minimized) {
-      PageInfo info = _store.get(page, -1);
-      // Note we pass 'upto' as the revision here.  At the moment we get
-      // back the revision of deleted pages as -2 which isn't such a good
-      // thing to set our 'highest indexed revision' to...
-      if (info.isNew()) {
-        _delegate.delete(info.getPath(), upto);
+      try {
+        PageInfo info = _store.get(page, -1);
+        // Note we pass 'upto' as the revision here.  At the moment we get
+        // back the revision of deleted pages as -2 which isn't such a good
+        // thing to set our 'highest indexed revision' to...
+        if (info.isNew()) {
+          _delegate.delete(info.getPath(), upto);
+        }
+        else {
+          _delegate.index(info.getPath(), upto, info.getContent());
+        }
       }
-      else {
-        _delegate.index(info.getPath(), upto, info.getContent());
+      catch (Exception ex) {
+        LOG.error(ex);
       }
     }
   }

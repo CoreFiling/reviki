@@ -56,17 +56,13 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
  
   public synchronized void sync() throws PageStoreAuthenticationException, PageStoreException, IOException {
     long latest = _operations.getLatestRevision();
-    try {
-      if (latest > _lastSynced) {
-        List<ChangeInfo> logs = _operations.log("", -1, false, true, _lastSynced + 1, latest);
-        if (!logs.isEmpty()) {
-          notifyListeners(latest, list(reversed(logs)));
-        }
+    if (latest > _lastSynced) {
+      List<ChangeInfo> logs = _operations.log("", -1, false, true, _lastSynced + 1, latest);
+      if (!logs.isEmpty()) {
+        notifyListeners(latest, list(reversed(logs)));
       }
     }
-    finally {
-      _lastSynced = latest;
-    }
+    _lastSynced = latest;
   }
   
   private void notifyListeners(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
