@@ -55,7 +55,7 @@
 	    <c:if test="${not empty backlinks}">
 	      Referenced on:
 	      <c:forEach var="backlink" items="${backlinks}">
-	        <sw:wikiLink page="${backlink}"/>
+	        <sw:wikiPage page="${backlink}"/>
 	      </c:forEach>
 	      <c:if test="${backlinksLimited}">
 	        <a href="<sw:wikiUrl page="FindPage"/>?query=${pageInfo.name}&amp;force">...</a>

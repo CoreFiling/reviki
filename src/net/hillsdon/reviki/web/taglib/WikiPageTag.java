@@ -24,7 +24,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
  * @copyright
  * @author mth
  */
-public class WikiLinkTag extends AbstractWikiLinkTag {
+public class WikiPageTag extends AbstractWikiLinkTag {
 
   private static final long serialVersionUID = 1L;
 

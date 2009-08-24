@@ -48,9 +48,9 @@
         <c:if test="${not empty menuItems}">
           <li class="menu menu-separator"></li>
         </c:if>
-        <li class="menu"><sw:wikiUrl page="FrontPage"/></li>
-        <li class="menu"><sw:wikiUrl page="RecentChanges"/></li>
-        <li class="menu"><sw:wikiUrl page="AllPages"/></li>
+        <li class="menu"><sw:wikiPage page="FrontPage"/></li>
+        <li class="menu"><sw:wikiPage page="RecentChanges"/></li>
+        <li class="menu"><sw:wikiPage page="AllPages"/></li>
         <li class="menu">
           <form id="searchForm" name="searchForm" style="display: inline; margin-top:0.2em;" action="<sw:wikiUrl page="FindPage"/>" method="get">
             <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>

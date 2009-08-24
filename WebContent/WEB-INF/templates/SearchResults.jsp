@@ -11,7 +11,7 @@
         <ul>
           <c:forEach var="match" items="${results}">
             <li>
-              <sw:wikiLink page="${match.page}"/>
+              <sw:wikiPage page="${match.page}"/>
               <p style="margin-top: 0px">
                 ${match.htmlExtract}
               </p>

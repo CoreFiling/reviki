@@ -34,7 +34,7 @@ public final class WikiWordUtils {
    * @return e.g. "foo/BarHumbug" gives "Bar humbug".
    */
   public static String pathToTitle(final String path) {
-    List<String> parts = splitCamelCase(path.substring(path.lastIndexOf('/') + 1));
+    List<String> parts = splitCamelCase(lastComponentOfPath(path));
     StringBuilder out = new StringBuilder();
     for (int i = 0; i < parts.size(); ++i) {
       String part = parts.get(i);
@@ -46,6 +46,10 @@ public final class WikiWordUtils {
       }
     }
     return out.toString();
+  }
+
+  public static String lastComponentOfPath(final String path) {
+    return path.substring(path.lastIndexOf('/') + 1);
   }
 
   /**

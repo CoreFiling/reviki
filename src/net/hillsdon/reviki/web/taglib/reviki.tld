@@ -26,8 +26,8 @@
       </attribute>
     </tag>
     <tag>
-      <name>wikiLink</name>
-      <tag-class>net.hillsdon.reviki.web.taglib.WikiLinkTag</tag-class>
+      <name>wikiPage</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.WikiPageTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
         <name>page</name>
