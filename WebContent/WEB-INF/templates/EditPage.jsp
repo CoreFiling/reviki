@@ -21,6 +21,7 @@
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
+      <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
       <input style="width:5em;" name="save" type="submit" value="Save"/>

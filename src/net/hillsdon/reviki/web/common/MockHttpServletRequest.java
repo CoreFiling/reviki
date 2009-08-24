@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * Partial implementation for testing.  Only those methods overridden in
  * this class do anything useful.
@@ -33,6 +35,13 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
   private String _requestURI = "";
   private String _requestURL = "";
   private String _contextPath = "";
+  public static final String MOCK_SESSION_ID = "ABC";
+  private HttpSession session = new NullHttpSession() {
+    @Override
+    public String getId() {
+      return MOCK_SESSION_ID;
+    }
+  };
 
   @Override
   public void setAttribute(final String key, final Object value) {
@@ -93,5 +102,30 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
   public void setRequestURI(final String requestURI) {
     _requestURI = requestURI;
   }
-  
+
+  @Override
+  public String getRequestedSessionId() {
+    return MOCK_SESSION_ID;
+  }
+
+  @Override
+  public boolean isRequestedSessionIdFromCookie() {
+    return false;
+  }
+
+  @Override
+  public boolean isRequestedSessionIdValid() {
+    return true;
+  }
+
+  @Override
+  public HttpSession getSession() {
+    return session;
+  }
+
+  @Override
+  public HttpSession getSession(boolean arg0) {
+   return session; 
+  }
+
 }

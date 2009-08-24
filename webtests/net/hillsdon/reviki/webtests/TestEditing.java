@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.webtests;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import org.jaxen.JaxenException;
 
@@ -28,6 +29,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 
 public class TestEditing extends WebTestSupport {
   
+  private static final String FAKE_SESSION_ID = "53ABE0412468E35DE001355A4EE80822";
   private static final String USER1_EDIT_CONTENT = "user1";
   private static final String USER2_EDIT_CONTENT = "user2";
   private static final String ID_EDIT_FORM = "editForm";
@@ -152,4 +154,41 @@ public class TestEditing extends WebTestSupport {
     return pageUser1;
   }
 
+  public void testPreviewInvalidSessionId() throws Exception {
+    testInvalidSessionIdHelper("Preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", false);
+  }
+
+  public void testSaveInvalidSessionId() throws Exception {
+    testInvalidSessionIdHelper("Save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", false);
+  }
+
+  public void testPreviewInvalidSessionIdFakeAppended() throws Exception {
+    testInvalidSessionIdHelper("Preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", true);
+  }
+
+  public void testSaveInvalidSessionIdFakeAppended() throws Exception {
+    testInvalidSessionIdHelper("Save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", true);
+  }
+
+  private void testInvalidSessionIdHelper(final String button, final String name, final String failMsg, final boolean fakeAppendedSessionId) throws IOException, JaxenException {
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    final HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    final HtmlInput sessionId = form.getInputByName("sessionId");
+    sessionId.setValueAttribute(FAKE_SESSION_ID);
+    if (fakeAppendedSessionId) {
+      form.setActionAttribute(name + ";jsessionid=" + FAKE_SESSION_ID);
+    }
+    final HtmlTextArea content = form.getTextAreaByName("content");
+    final String expectedContent = "http://www.example.com";
+    content.setText(expectedContent);
+
+    editPage = (HtmlPage) form.getInputByValue(button).click();
+
+    try {
+      getAnchorByHrefContains(editPage, expectedContent);
+      fail(failMsg);
+    }
+    catch (NoSuchElementException e) {
+    }
+  }
 }

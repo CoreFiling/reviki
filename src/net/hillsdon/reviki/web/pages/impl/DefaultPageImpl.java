@@ -74,6 +74,8 @@ import org.apache.commons.io.IOUtils;
 
 public class DefaultPageImpl implements DefaultPage {
 
+  public static final String ATTR_PREVIEW = "preview";
+
   public static final String SUBMIT_SAVE = "save";
 
   public static final String SUBMIT_COPY = "copy";
@@ -82,7 +84,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final String SUBMIT_UNLOCK = "unlock";
 
-  public static final String SUBMIT_PREVIEW = "preview";
+  public static final String SUBMIT_PREVIEW = ATTR_PREVIEW;
 
   public static final String PARAM_TO_PAGE = "toPage";
 
@@ -101,6 +103,8 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String PARAM_DIFF_REVISION = "diff";
 
   public static final String PARAM_ATTACHMENT_NAME = "attachmentName";
+  
+  public static final String PARAM_SESSION_ID = "sessionId";
 
   public static final String ATTR_PAGE_INFO = "pageInfo";
 
@@ -117,8 +121,12 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String ATTR_DIFF_END_REV = "diffEndRev";
 
   public static final String ATTR_SHOW_REV = "showHeadRev";
+  
+  public static final String ATTR_SESSION_ID = "sessionId";
 
   public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
+  
+  public static final String ERROR_SESSION_EXPIRED = "Your session has expired. Please try again.";
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
@@ -252,29 +260,44 @@ public class DefaultPageImpl implements DefaultPage {
     return pageInfo.getLockToken().equals(getRequiredString(request, PARAM_LOCK_TOKEN));
   }
 
+  private boolean isSessionIdValid(HttpServletRequest request) {
+    final String postedSessionId = request.getParameter(PARAM_SESSION_ID);
+    final String requestedSessionId = request.getRequestedSessionId();
+    return requestedSessionId != null && postedSessionId != null && postedSessionId.equals(requestedSessionId) && request.isRequestedSessionIdValid();
+  }
+
   public View editor(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     if (!isLockTokenValid(pageInfo, request, preview)) {
       if (preview) {
         return diffEditorView(page, null, request);
       }
       else {
-        request.setAttribute("pageInfo", pageInfo);
         request.setAttribute("flash", "Could not lock the page.");
         return new JspView("ViewPage");
       }
     }
     else {
-      request.setAttribute("pageInfo", pageInfo);
+      copySessionIdAsAttribute(request);
       if (preview) {
-        pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
-        request.setAttribute("pageInfo", pageInfo);
-        ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(response));
-        request.setAttribute("preview", rendered.toXHTML());
+        if (!isSessionIdValid(request)) {
+          return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
+        }
+        else {
+          pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
+          request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+          ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(response));
+          request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
+        }
       }
       return new JspView("EditPage");
     }
+  }
+
+  private void copySessionIdAsAttribute(final HttpServletRequest request) {
+    request.setAttribute(ATTR_SESSION_ID, request.getSession().getId());
   }
 
   public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -339,6 +362,10 @@ public class DefaultPageImpl implements DefaultPage {
     }
 
     if (hasSaveParam) {
+      if (!isSessionIdValid(request)) {
+        copySessionIdAsAttribute(request);
+        return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
+      }
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
       String content = getRequiredString(request, PARAM_CONTENT);
       if (!content.endsWith(Strings.CRLF)) {
