@@ -147,5 +147,15 @@ public class TestLuceneSearcher extends TestCase {
   public void testTrimToEmptyStringNoResults() throws Exception {
     assertEquals(Collections.emptySet(), _searcher.search("  ", true));
   }
+
+  public void testFindLowerPath() throws Exception {
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("thename", false));
+  }
+
+  public void testFindPartialLowerPath() throws Exception {
+    _searcher.index(PAGE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("thena", false));
+  }
   
 }

@@ -18,6 +18,7 @@ package net.hillsdon.reviki.search.impl;
 import static net.hillsdon.fij.core.Functional.map;
 import static net.hillsdon.fij.core.Functional.set;
 import static net.hillsdon.fij.text.Strings.join;
+import static net.hillsdon.reviki.text.WikiWordUtils.lastComponentOfPath;
 import static net.hillsdon.reviki.text.WikiWordUtils.pathToTitle;
 
 import java.io.File;
@@ -38,9 +39,9 @@ import net.hillsdon.reviki.wiki.RenderedPage;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.PorterStemFilter;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -79,23 +80,26 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   private static final String FIELD_PATH = "path";
+  private static final String FIELD_PATH_LOWER = "path-lower";
   private static final String FIELD_CONTENT = "content";
   /**
    * We tokenize the wiki word to allow e.g. 'another' to find 'AnotherNewPage'.
    */
-  private static final String FIELD_TITLE = "title";
+  private static final String FIELD_TITLE_TOKENIZED = "title";
   private static final String FIELD_OUTGOING_LINKS = "outgoing-links";
-  
+
   private static final String FIELD_PROPERTY_KEY = "property";
   private static final String FIELD_PROPERTY_VALUE = "property-value";
   private static final String PROPERTY_LAST_INDEXED_REVISION = "last-indexed-revision";
-  
+
+  private static final String[] ALL_SEARCH_FIELDS = new String[] {FIELD_PATH, FIELD_PATH_LOWER, FIELD_TITLE_TOKENIZED, FIELD_CONTENT};
+
   private final File _dir;
   private final RenderedPageFactory _renderedPageFactory;
 
   /**
-   * @param dir The search index lives here.  
-   *            If null is passed the search will behave as a null implemenation.
+   * @param dir The search index lives here.
+   *            If null is passed the search will behave as a null implementation.
    */
   public LuceneSearcher(final File dir, final RenderedPageFactory renderedPageFactory) {
     _dir = dir;
@@ -109,24 +113,36 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   private Analyzer createAnalyzer() {
-    Analyzer text = new StandardAnalyzer() {
+    final Analyzer text = new StandardAnalyzer() {
       public TokenStream tokenStream(final String fieldName, final Reader reader) {
         return new PorterStemFilter(super.tokenStream(fieldName, reader));
       }
     };
-    KeywordAnalyzer id = new KeywordAnalyzer();
-    PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(text);
-    perField.addAnalyzer(FIELD_PATH, id);
-    perField.addAnalyzer(FIELD_PROPERTY_KEY, id);
-    perField.addAnalyzer(FIELD_PROPERTY_VALUE, id);
+    final Analyzer simple = new SimpleAnalyzer();
+    final PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(new Analyzer() {
+      @Override
+      public TokenStream tokenStream(String fieldName, Reader reader) {
+        throw new UnsupportedOperationException("Need to define analyser for: " + fieldName);
+      }
+    });
+    perField.addAnalyzer(FIELD_PATH, simple);
+    perField.addAnalyzer(FIELD_PATH_LOWER, simple);
+    perField.addAnalyzer(FIELD_TITLE_TOKENIZED, simple);
+    perField.addAnalyzer(FIELD_PROPERTY_KEY, simple);
+    perField.addAnalyzer(FIELD_PROPERTY_VALUE, simple);
+    perField.addAnalyzer(FIELD_OUTGOING_LINKS, simple);
+    perField.addAnalyzer(FIELD_CONTENT, text);
     return perField;
   }
   
   private Document createWikiPageDocument(final String path, final String content) throws IOException, PageStoreException {
     RenderedPage renderedPage = _renderedPageFactory.create(path, content, URLOutputFilter.NULL);
     Document document = new Document();
+    final String title = pathToTitle(path);
+    final String pathLower = lastComponentOfPath(path).toLowerCase();
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
-    document.add(new Field(FIELD_TITLE, pathToTitle(path), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_PATH_LOWER, pathLower, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    document.add(new Field(FIELD_TITLE_TOKENIZED, title, Field.Store.YES, Field.Index.TOKENIZED));
     document.add(new Field(FIELD_OUTGOING_LINKS, join(renderedPage.findOutgoingWikiLinks().iterator(), " "), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
@@ -149,7 +165,7 @@ public class LuceneSearcher implements SearchEngine {
       writer.close();
     }
   }
-  
+
   private void replaceDocument(final String keyField, final Document document) throws CorruptIndexException, LockObtainFailedException, IOException {
     IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
     try {
@@ -161,7 +177,7 @@ public class LuceneSearcher implements SearchEngine {
       writer.close();
     }
   }
-  
+
   // Lucene allows multiple non-deleting readers and at most one writer at a time.
   // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
   public synchronized void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
@@ -179,7 +195,7 @@ public class LuceneSearcher implements SearchEngine {
     deleteDocument(FIELD_PATH, path);
     rememberLastIndexedRevision(revision);
   }
-  
+
   public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
     if (_dir == null) {
       return Collections.emptySet();
@@ -225,7 +241,6 @@ public class LuceneSearcher implements SearchEngine {
 
   /**
    * Reusable template that cleans up properly.
-   * 
    * @param <T> Result type.
    * @param operation Operation to perform.
    * @return Result from operation.
@@ -252,7 +267,7 @@ public class LuceneSearcher implements SearchEngine {
       reader.close();
     }
   }
-  
+
   public Set<SearchMatch> search(final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
@@ -261,15 +276,14 @@ public class LuceneSearcher implements SearchEngine {
       public Set<SearchMatch> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
         LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
         // Prefer path, then title then content matches (match equality is on page name)
-        for (String field : new String[] {FIELD_PATH, FIELD_TITLE, FIELD_CONTENT}) {
-          results.addAll(query(reader, analyzer, searcher, field, queryString, provideExtracts));
+        for (String field : ALL_SEARCH_FIELDS) {
+          results.addAll(query(reader, analyzer, searcher, field, FIELD_PATH_LOWER.equals(field) ? queryString + "*" : queryString, provideExtracts));
         }
         return results;
       }
     });
   }
 
-  @SuppressWarnings("unchecked")
   private LinkedHashSet<SearchMatch> query(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final String queryString, final boolean provideExtracts) throws IOException, ParseException {
     QueryParser parser = new QueryParser(field, analyzer);
     parser.setLowercaseExpandedTerms(!FIELD_PATH.equals(field));
@@ -282,7 +296,7 @@ public class LuceneSearcher implements SearchEngine {
     }
     Hits hits = searcher.search(query);
     LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
-    Iterator<Hit> iter = hits.iterator();
+    @SuppressWarnings("unchecked") Iterator<Hit> iter = hits.iterator();
     while (iter.hasNext()) {
       Hit hit = (Hit) iter.next();
       String text = hit.get(field);
@@ -290,7 +304,7 @@ public class LuceneSearcher implements SearchEngine {
       // The text is not stored for all fields, just provide a null extract.
       if (highlighter != null && text != null) {
         TokenStream tokenStream = analyzer.tokenStream(field, new StringReader(text));
-        // Get 3 best fragments and seperate with a "..."
+        // Get 3 best fragments and separate with a "..."
         extract = highlighter.getBestFragments(tokenStream, text, 3, "...");
       }
       results.add(new SearchMatch(hit.get(FIELD_PATH), extract));
@@ -340,5 +354,5 @@ public class LuceneSearcher implements SearchEngine {
   public String escape(final String in) {
     return QueryParser.escape(in);
   }
-  
+
 }
