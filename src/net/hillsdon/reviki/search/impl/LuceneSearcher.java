@@ -39,9 +39,9 @@ import net.hillsdon.reviki.wiki.RenderedPage;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.PorterStemFilter;
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -56,6 +56,7 @@ import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.Hit;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
@@ -118,19 +119,19 @@ public class LuceneSearcher implements SearchEngine {
         return new PorterStemFilter(super.tokenStream(fieldName, reader));
       }
     };
-    final Analyzer simple = new SimpleAnalyzer();
+    final Analyzer id = new KeywordAnalyzer();
     final PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(new Analyzer() {
       @Override
       public TokenStream tokenStream(String fieldName, Reader reader) {
         throw new UnsupportedOperationException("Need to define analyser for: " + fieldName);
       }
     });
-    perField.addAnalyzer(FIELD_PATH, simple);
-    perField.addAnalyzer(FIELD_PATH_LOWER, simple);
-    perField.addAnalyzer(FIELD_TITLE_TOKENIZED, simple);
-    perField.addAnalyzer(FIELD_PROPERTY_KEY, simple);
-    perField.addAnalyzer(FIELD_PROPERTY_VALUE, simple);
-    perField.addAnalyzer(FIELD_OUTGOING_LINKS, simple);
+    perField.addAnalyzer(FIELD_PATH, id);
+    perField.addAnalyzer(FIELD_PATH_LOWER, id);
+    perField.addAnalyzer(FIELD_TITLE_TOKENIZED, text);
+    perField.addAnalyzer(FIELD_PROPERTY_KEY, id);
+    perField.addAnalyzer(FIELD_PROPERTY_VALUE, id);
+    perField.addAnalyzer(FIELD_OUTGOING_LINKS, id);
     perField.addAnalyzer(FIELD_CONTENT, text);
     return perField;
   }
@@ -277,7 +278,13 @@ public class LuceneSearcher implements SearchEngine {
         LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : ALL_SEARCH_FIELDS) {
-          results.addAll(query(reader, analyzer, searcher, field, FIELD_PATH_LOWER.equals(field) ? queryString + "*" : queryString, provideExtracts));
+          if (field.equals(FIELD_PATH_LOWER)) {
+            final Query query = new PrefixQuery(new Term(FIELD_PATH_LOWER, queryString));
+            results.addAll(doQuery(reader, analyzer, searcher, field, provideExtracts, query));
+          }
+          else {
+            results.addAll(query(reader, analyzer, searcher, field, queryString, provideExtracts));
+          }
         }
         return results;
       }
@@ -289,6 +296,10 @@ public class LuceneSearcher implements SearchEngine {
     parser.setLowercaseExpandedTerms(!FIELD_PATH.equals(field));
     parser.setDefaultOperator(Operator.AND);
     Query query = parser.parse(queryString);
+    return doQuery(reader, analyzer, searcher, field, provideExtracts, query);
+  }
+
+  private LinkedHashSet<SearchMatch> doQuery(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final boolean provideExtracts, Query query) throws IOException, CorruptIndexException {
     Highlighter highlighter = null;
     if (provideExtracts) {
       query.rewrite(reader);

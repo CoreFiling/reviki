@@ -39,8 +39,8 @@ import net.hillsdon.reviki.wiki.RenderedPageFactory;
  */
 public class TestLuceneSearcher extends TestCase {
 
-  private static final String PAGE_NAME = "TheName";
-  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_NAME, null)));
+  private static final String PAGE_THE_NAME = "TheName";
+  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_THE_NAME, null)));
   
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -86,23 +86,23 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testRepeatedAddsForSamePathReplace() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
-    _searcher.index(PAGE_NAME, -1, "the something else");
+    _searcher.index(PAGE_THE_NAME, -1, "the something else");
     assertEquals(emptySet(), _searcher.search("content", true));
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
   
   public void testFindsByPath() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME, true));
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true));
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
   
   public void testFindsCaseInsensitivelyByPath() throws Exception {
     try {
-      assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_NAME.toLowerCase(Locale.US), true));
+      assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME.toLowerCase(Locale.US), true));
       throw new Error("Fixed bug!");
     }
     catch (AssertionFailedError bug) {
@@ -110,35 +110,35 @@ public class TestLuceneSearcher extends TestCase {
   }
   
   public void testCaseInsensitiveLowerFindsMixed() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "The Content");
+    _searcher.index(PAGE_THE_NAME, -1, "The Content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
 
   public void testCaseInsensitiveMixedFindsLower() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("Content", true));
   }
 
   // Interestingly these fail while the others pass... when upgrading to Lucene 2.3.0.
   public void testMoreInterestingWords() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "cabbage patch");
+    _searcher.index(PAGE_THE_NAME, -1, "cabbage patch");
     assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("patch", false));
     
-    _searcher.index(PAGE_NAME, -1, "fruit flies");
+    _searcher.index(PAGE_THE_NAME, -1, "fruit flies");
     assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("flies", false));
   }
   
   public void testFindsByTokenizedPath() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
   }
 
   // FIXME: This doesn't actually test anything interesting, just added for the tearDown check.
   public void testIncomingOutgoingLinks() throws Exception {
-    assertEquals(Collections.emptySet(), _searcher.incomingLinks(PAGE_NAME));
-    assertEquals(Collections.emptySet(), _searcher.outgoingLinks(PAGE_NAME));
+    assertEquals(Collections.emptySet(), _searcher.incomingLinks(PAGE_THE_NAME));
+    assertEquals(Collections.emptySet(), _searcher.outgoingLinks(PAGE_THE_NAME));
   }
   
   /**
@@ -149,13 +149,18 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testFindLowerPath() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("thename", false));
   }
 
   public void testFindPartialLowerPath() throws Exception {
-    _searcher.index(PAGE_NAME, -1, "the content");
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("thena", false));
+  }
+
+  public void testFieldBasedQueryWithQuotes() throws Exception {
+    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false));
   }
   
 }
