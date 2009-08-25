@@ -11,7 +11,7 @@
 	    <table class="history">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
-	        <th class="history">Revision</th>
+	        <th class="history">Page</th>
 	        <th class="history">User</th>
 	        <th class="history">Description</th>
 	        <th class="history" colspan="2"><input type="submit" value="Compare" /></th>
@@ -48,7 +48,7 @@
 	                <del>r<c:out value="${change.revision}"/></del>
 	              </c:when>
 	              <c:otherwise>
-	                <a href="<c:url value="${change.name}"/>?revision=${change.revision}">r<c:out value="${change.revision}"/></a>
+	                <a href="<c:url value="${change.name}"/>?revision=${change.revision}"><c:out value="${change.name}" /> r<c:out value="${change.revision}"/></a>
 	              </c:otherwise>
 	            </c:choose>
 	          </td>
