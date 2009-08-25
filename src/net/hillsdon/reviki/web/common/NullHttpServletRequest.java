@@ -36,7 +36,7 @@ import javax.servlet.http.HttpSession;
  * 
  * @author mth
  */
-@SuppressWarnings({"deprecation", "unused", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public abstract class NullHttpServletRequest implements HttpServletRequest {
 
 

@@ -106,7 +106,7 @@ public class TestFunctional extends TestCase {
   }
   
   public void testSetOfOtherSetIsLinkedHashSet() {
-    assertTrue(set(new HashSet<String>()) instanceof LinkedHashSet);
+    assertTrue(set(new HashSet<String>()) instanceof LinkedHashSet<?>);
   }
   
   public void testListOfListIsSame() {

@@ -145,7 +145,7 @@ public class Functional {
   }
 
   public static <T> List<T> list(final Iterable<T> iterable) {
-    if (iterable instanceof List) {
+    if (iterable instanceof List<?>) {
       return (List<T>) iterable;
     }
     List<T> result = new ArrayList<T>();
@@ -164,7 +164,7 @@ public class Functional {
   }
 
   public static <T> Set<T> set(final Iterable<T> iterable) {
-    if (iterable instanceof LinkedHashSet) {
+    if (iterable instanceof LinkedHashSet<?>) {
       return (Set<T>) iterable;
     }
     Set<T> result = new LinkedHashSet<T>();
