@@ -11,14 +11,14 @@
 	    <table class="history">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
-	        <th class="history">Page</th>
+	        <th class="history" style="white-space: nowrap;">Page</th>
 	        <th class="history">User</th>
 	        <th class="history">Description</th>
 	        <th class="history" colspan="2"><input type="submit" value="Compare" /></th>
 	      </tr>
 	      <tr class="history">
 	        <td class="history" style="white-space: nowrap;"></td>
-	        <td class="history"></td>
+	        <td class="history" style="white-space: nowrap;"></td>
 	        <td class="history"></td>
 	        <td class="history"></td>
 	        <td class="history">from</td>
@@ -42,7 +42,7 @@
 	              </c:otherwise>
 	            </c:choose>
 	          </td>
-	          <td class="history">
+	          <td class="history" style="white-space: nowrap;">
 	            <c:choose>
 	              <c:when test="${change.deletion}">
 	                <del>r<c:out value="${change.revision}"/></del>
