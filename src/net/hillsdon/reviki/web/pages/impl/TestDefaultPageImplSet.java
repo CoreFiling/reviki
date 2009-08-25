@@ -144,7 +144,7 @@ public class TestDefaultPageImplSet extends TestCase {
   private void expectDiffView() throws PageStoreException {
     expect(_store.getUnderlying()).andReturn(_storeUnder);
     expect(_storeUnder.tryToLock(CALLED_ON_PAGE)).andReturn(_pageInfo);
-    expect(_diffGenerator.getDiffMarkup(OLD_CONTENT, NEW_CONTENT)).andReturn(DIFF_CONTENT);
+    expect(_diffGenerator.getDiffMarkup(OLD_CONTENT, NEW_CONTENT + Strings.CRLF)).andReturn(DIFF_CONTENT);
   }
 
   public void testSaveDelegatesToPageStoreThenRedirectsToView() throws Exception {

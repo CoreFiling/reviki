@@ -286,7 +286,7 @@ public class DefaultPageImpl implements DefaultPage {
           return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
         }
         else {
-          pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
+          pageInfo = pageInfo.withAlternativeContent(getContent(request));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
           ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(response));
           request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
@@ -367,10 +367,7 @@ public class DefaultPageImpl implements DefaultPage {
         return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
       }
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
-      String content = getRequiredString(request, PARAM_CONTENT);
-      if (!content.endsWith(Strings.CRLF)) {
-        content = content + Strings.CRLF;
-      }
+      String content = getContent(request);
       try {
         _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
       }
@@ -418,10 +415,10 @@ public class DefaultPageImpl implements DefaultPage {
     return new RedirectToPageView(_wikiUrls, page);
   }
 
-  private View diffEditorView(final PageReference page, String customMessage, final HttpServletRequest request) throws PageStoreException {
+  private View diffEditorView(final PageReference page, String customMessage, final HttpServletRequest request) throws PageStoreException, InvalidInputException {
     PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
     String message;
-    final String content = request.getParameter(PARAM_CONTENT);
+    final String content = getContent(request);
     final String newContent = pageInfo.getContent();
     pageInfo = pageInfo.withAlternativeContent((String) content);
     request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(newContent, content));
@@ -438,6 +435,12 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute("flash", message);
     return new JspView("EditPage");
+  }
+
+  private String getContent(final HttpServletRequest request) throws InvalidInputException {
+    String content = getRequiredString(request, PARAM_CONTENT);
+    content = content + Strings.CRLF;
+    return content;
   }
 
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {

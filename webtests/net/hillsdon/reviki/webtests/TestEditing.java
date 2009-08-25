@@ -18,6 +18,8 @@ package net.hillsdon.reviki.webtests;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import net.hillsdon.fij.text.Strings;
+
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -77,7 +79,7 @@ public class TestEditing extends WebTestSupport {
     content = form.getTextAreaByName("content");
     assertEquals(expectedDescription, description.getValueAttribute());
     assertTrue(minorEdit.isChecked());
-    assertEquals(expectedContent, content.getText());
+    assertEquals(expectedContent + getNewlineTexarea(), content.getText());
     // This checks for the rendering...
     assertNotNull(editPage.getAnchorByHref(expectedContent));
   }

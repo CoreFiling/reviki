@@ -25,6 +25,7 @@ import java.util.Iterator;
 public class Strings {
 
   private static final String UTF8_ENCODING = "UTF8";
+  public static final String CRLF = "\r\n";
 
   public static String sCharAt(String s, int index) {
     if (index >= 0 && index < s.length()) {
@@ -78,6 +79,4 @@ public class Strings {
     }
   }
 
-  public static final String CRLF = "\r\n";
-  
 }

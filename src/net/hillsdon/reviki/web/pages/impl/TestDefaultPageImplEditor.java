@@ -12,6 +12,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
+import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -92,7 +93,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID + "AAA");
 
     expectTryToLock();
-    expect(_diffGenerator.getDiffMarkup("content", "malicious content!")).andReturn("difference");
+    expect(_diffGenerator.getDiffMarkup("content", "malicious content!" + Strings.CRLF)).andReturn("difference");
     replay();
 
     final JspView view = (JspView) _page.editor(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
@@ -113,7 +114,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setAttribute(RequestAttributes.USERNAME, USERNAME);
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
-    expect(_renderer.render(eq(THE_PAGE), eq("new content"), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
+    expect(_renderer.render(eq(THE_PAGE), eq("new content" + Strings.CRLF), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
     expect(_resultNode.toXHTML()).andReturn("rendered preview");
     expectTryToLock();
     replay();

@@ -42,7 +42,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public abstract class WebTestSupport extends TestCase {
 
   public static final String BASE_URL = "http://localhost:8080/reviki";
-  
+  public static final String NEWLINE_TEXTAREA = "\n";
   private WebClient _client;
   private WebClient _altclient = null;
 
@@ -69,6 +69,14 @@ public abstract class WebTestSupport extends TestCase {
     _client.setThrowExceptionOnFailingStatusCode(false);
   }
 
+  /**
+   * When retrieved by the webclient, newlines in textareas are just \n.
+   * @return
+   */
+  protected String getNewlineTexarea() {
+    return NEWLINE_TEXTAREA;
+  }
+  
   protected void switchUser() {
     if (_altclient == null) {
       _altclient = setupClient(getAltUsername(), getAltPassword());
