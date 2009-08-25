@@ -362,8 +362,8 @@ public class DefaultPageImpl implements DefaultPage {
     }
 
     if (hasSaveParam) {
+      copySessionIdAsAttribute(request);
       if (!isSessionIdValid(request)) {
-        copySessionIdAsAttribute(request);
         return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
       }
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
