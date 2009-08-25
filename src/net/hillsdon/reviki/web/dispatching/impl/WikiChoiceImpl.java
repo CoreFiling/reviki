@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.ApplicationSession;
+import net.hillsdon.reviki.di.WikiSession;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestHandler;
@@ -34,7 +35,9 @@ import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
-public class WikiChoiceImpl implements WikiChoice {
+import org.picocontainer.Startable;
+
+public class WikiChoiceImpl implements WikiChoice, Startable {
 
   private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
@@ -45,7 +48,9 @@ public class WikiChoiceImpl implements WikiChoice {
     _configuration = configuration;
     _applicationSession = applicationSession;
     _applicationUrls = applicationUrls;
+  }
 
+  public void start() {
     _configuration.load();
     for (String wikiName : _configuration.getWikiNames()) {
       // These wiki configurations could be broken but we can't really report the
@@ -54,9 +59,14 @@ public class WikiChoiceImpl implements WikiChoice {
       installHandler(perWikiConfiguration, createWikiHandler(perWikiConfiguration));
     }
   }
-
+  
+  public void stop() {
+  }
+  
   public WikiHandler createWikiHandler(WikiConfiguration configuration) {
-    return _applicationSession.createWikiSession(configuration).getWikiHandler();
+    WikiSession wikiSession = _applicationSession.createWikiSession(configuration);
+    wikiSession.start();
+    return wikiSession.getWikiHandler();
   }
   
   public void installHandler(WikiConfiguration configuration, WikiHandler handler) {
@@ -87,11 +97,16 @@ public class WikiChoiceImpl implements WikiChoice {
   }
 
   private WikiConfiguration getWikiConfiguration(final ConsumedPath path) throws NotFoundException {
-    String wikiName = path.next();
-    if (wikiName == null) {
+    final String wikiName = path.next();
+    if (!isValidWikiName(wikiName)) {
       throw new NotFoundException();
     }
     return _configuration.getConfiguration(wikiName);
+  }
+
+  boolean isValidWikiName(final String wikiName) {
+    return wikiName != null && wikiName.length() != 0 
+        && Character.isLowerCase(wikiName.charAt(0));
   }
 
 }
