@@ -279,7 +279,7 @@ public class LuceneSearcher implements SearchEngine {
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : ALL_SEARCH_FIELDS) {
           if (field.equals(FIELD_PATH_LOWER)) {
-            final Query query = new PrefixQuery(new Term(FIELD_PATH_LOWER, queryString));
+            final Query query = new PrefixQuery(new Term(FIELD_PATH_LOWER, queryString.toLowerCase()));
             results.addAll(doQuery(reader, analyzer, searcher, field, provideExtracts, query));
           }
           else {

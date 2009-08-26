@@ -27,6 +27,7 @@ import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.io.Lsof;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
@@ -40,7 +41,10 @@ import net.hillsdon.reviki.wiki.RenderedPageFactory;
 public class TestLuceneSearcher extends TestCase {
 
   private static final String PAGE_THE_NAME = "TheName";
+  private static final String PAGE_THE_NAME2 = "TheName2";
+  private static final String PAGE_THE_NAME3 = "TheName3";
   private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_THE_NAME, null)));
+  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(Functional.set(new SearchMatch(PAGE_THE_NAME, null), new SearchMatch(PAGE_THE_NAME2, null), new SearchMatch(PAGE_THE_NAME3, null)));
 
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -153,9 +157,9 @@ public class TestLuceneSearcher extends TestCase {
     assertEquals(JUST_THE_PAGE, _searcher.search("thename", false));
   }
 
-  public void testFindPartialLowerPath() throws Exception {
+  public void testFindPartialLowerPathCaseInsensitive() throws Exception {
     _searcher.index(PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("thena", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("ThenA", false));
   }
 
   public void testFieldBasedQueryWithQuotes() throws Exception {
@@ -163,4 +167,24 @@ public class TestLuceneSearcher extends TestCase {
     assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false));
   }
 
+  public void testAndByDefault() throws Exception {
+    _searcher.index(PAGE_THE_NAME, -1, "some content");
+    _searcher.index(PAGE_THE_NAME2, -1, "some");
+    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("some content", false));
+  }
+
+  public void testOr() throws Exception {
+    _searcher.index(PAGE_THE_NAME, -1, "some content");
+    _searcher.index(PAGE_THE_NAME2, -1, "some");
+    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    assertEquals(ALL_3, _searcher.search("some OR content", false));
+  }
+
+  public void testLowercaseOrIsNotKeyword() throws Exception {
+    _searcher.index(PAGE_THE_NAME, -1, "some content");
+    _searcher.index(PAGE_THE_NAME2, -1, "some");
+    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    assertEquals(JUST_THE_PAGE, _searcher.search("some or content", false));
+  }
 }
