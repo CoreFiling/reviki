@@ -39,7 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DispatcherImpl implements Dispatcher {
-  
+
   private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
   private final ListWikis _list;
@@ -49,7 +49,7 @@ public class DispatcherImpl implements Dispatcher {
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
   private final RequestCompletedHandler _requestCompletedHandler;
 
-  public DispatcherImpl(ListWikis list, WikiChoiceImpl choice, JumpToWikiUrl jumpToWiki, ApplicationUrls applicationUrls, RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
+  public DispatcherImpl(final ListWikis list, final WikiChoiceImpl choice, final JumpToWikiUrl jumpToWiki, final ApplicationUrls applicationUrls, final RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
@@ -58,7 +58,7 @@ public class DispatcherImpl implements Dispatcher {
     _requestCompletedHandler = requestCompletedHandler;
   }
 
-  public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
     ConsumedPath path = new ConsumedPath(request);
@@ -70,10 +70,10 @@ public class DispatcherImpl implements Dispatcher {
       }
     }
     catch (NotFoundException ex) {
-      handleException(request, response, ex, "Could not find the file you were looking for.", 404);
+      handleException(request, response, ex, false, "Could not find the file you were looking for.", 404);
     }
     catch (Exception ex) {
-      handleException(request, response, ex, null, 500);
+      handleException(request, response, ex, true, null, 500);
     }
     finally {
       _requestCompletedHandler.requestComplete();
@@ -99,7 +99,7 @@ public class DispatcherImpl implements Dispatcher {
     throw new NotFoundException();
   }
 
-  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex, final String customMessage, final int statusCode) throws ServletException, IOException {
+  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex, final boolean logTrace, final String customMessage, final int statusCode) throws ServletException, IOException {
     response.setStatus(statusCode);
     String user = (String) request.getAttribute(RequestAttributes.USERNAME);
     if (user == null) {
@@ -107,10 +107,16 @@ public class DispatcherImpl implements Dispatcher {
     }
     String queryString = request.getQueryString();
     String uri = request.getRequestURI() + (queryString == null ? "" : "?" + queryString);
-    LOG.error(format("Forwarding to error page for user '%s' accessing '%s'.", user, uri), ex);
+    String message = format("%s for user '%s' accessing '%s'.", ex.getClass().getSimpleName(), user, uri);
+    if (logTrace) {
+      LOG.error(message, ex);
+    }
+    else {
+      LOG.warn(message, null);
+    }
     request.setAttribute("exception", ex);
     request.setAttribute("customMessage", customMessage);
     request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
   }
-  
+
 }
