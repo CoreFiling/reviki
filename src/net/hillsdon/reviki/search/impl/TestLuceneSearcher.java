@@ -34,21 +34,21 @@ import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
 /**
  * Tests for {@link LuceneSearcher}.
- * 
+ *
  * @author mth
  */
 public class TestLuceneSearcher extends TestCase {
 
   private static final String PAGE_THE_NAME = "TheName";
   private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_THE_NAME, null)));
-  
+
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
     assertTrue(file.delete());
     assertTrue(file.mkdir());
     return file;
   }
-  
+
   private static void recursivelyDelete(final File dir) {
     File[] contents = dir.listFiles();
     for (File f : contents) {
@@ -93,13 +93,13 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
-  
+
   public void testFindsByPath() throws Exception {
     _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true));
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
-  
+
   public void testFindsCaseInsensitivelyByPath() throws Exception {
     try {
       assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME.toLowerCase(Locale.US), true));
@@ -108,7 +108,7 @@ public class TestLuceneSearcher extends TestCase {
     catch (AssertionFailedError bug) {
     }
   }
-  
+
   public void testCaseInsensitiveLowerFindsMixed() throws Exception {
     _searcher.index(PAGE_THE_NAME, -1, "The Content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
@@ -124,12 +124,12 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(PAGE_THE_NAME, -1, "cabbage patch");
     assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("patch", false));
-    
+
     _searcher.index(PAGE_THE_NAME, -1, "fruit flies");
     assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("flies", false));
   }
-  
+
   public void testFindsByTokenizedPath() throws Exception {
     _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
@@ -140,7 +140,7 @@ public class TestLuceneSearcher extends TestCase {
     assertEquals(Collections.emptySet(), _searcher.incomingLinks(PAGE_THE_NAME));
     assertEquals(Collections.emptySet(), _searcher.outgoingLinks(PAGE_THE_NAME));
   }
-  
+
   /**
    * It isn't a valid query but its daft to choke on it.
    */
@@ -162,5 +162,5 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false));
   }
-  
+
 }

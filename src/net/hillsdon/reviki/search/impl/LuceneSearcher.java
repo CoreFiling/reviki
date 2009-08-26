@@ -68,7 +68,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 /**
  * Uses lucene to provide search capabilities.
- * 
+ *
  * @author mth
  */
 public class LuceneSearcher implements SearchEngine {
@@ -122,7 +122,7 @@ public class LuceneSearcher implements SearchEngine {
     final Analyzer id = new KeywordAnalyzer();
     final PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(new Analyzer() {
       @Override
-      public TokenStream tokenStream(String fieldName, Reader reader) {
+      public TokenStream tokenStream(final String fieldName, final Reader reader) {
         throw new UnsupportedOperationException("Need to define analyser for: " + fieldName);
       }
     });
@@ -135,7 +135,7 @@ public class LuceneSearcher implements SearchEngine {
     perField.addAnalyzer(FIELD_CONTENT, text);
     return perField;
   }
-  
+
   private Document createWikiPageDocument(final String path, final String content) throws IOException, PageStoreException {
     RenderedPage renderedPage = _renderedPageFactory.create(path, content, URLOutputFilter.NULL);
     Document document = new Document();
@@ -299,7 +299,7 @@ public class LuceneSearcher implements SearchEngine {
     return doQuery(reader, analyzer, searcher, field, provideExtracts, query);
   }
 
-  private LinkedHashSet<SearchMatch> doQuery(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final boolean provideExtracts, Query query) throws IOException, CorruptIndexException {
+  private LinkedHashSet<SearchMatch> doQuery(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final boolean provideExtracts, final Query query) throws IOException, CorruptIndexException {
     Highlighter highlighter = null;
     if (provideExtracts) {
       query.rewrite(reader);
@@ -309,7 +309,7 @@ public class LuceneSearcher implements SearchEngine {
     LinkedHashSet<SearchMatch> results = new LinkedHashSet<SearchMatch>();
     @SuppressWarnings("unchecked") Iterator<Hit> iter = hits.iterator();
     while (iter.hasNext()) {
-      Hit hit = (Hit) iter.next();
+      Hit hit = iter.next();
       String text = hit.get(field);
       String extract = null;
       // The text is not stored for all fields, just provide a null extract.
