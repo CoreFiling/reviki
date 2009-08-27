@@ -19,18 +19,18 @@ import java.io.UnsupportedEncodingException;
 
 
 public class Escape {
-  
+
   /**
    * Avoid encoding an entire link that you wish a browser to use,
    * such as "http://....". Instead, encode only what is required.
    * For example:
    * <ul>
-   * <li>urlEncoder.encodeURL(pagesRoot() + Escape.encodeUTF8(name));</li>
+   * <li>pagesRoot() + Escape.urlEncodeUTF8(name));</li>
    * </ul>
    * @param content
    * @return
    */
-  public static String urlEncodeUTF8(String content) {
+  public static String urlEncodeUTF8(final String content) {
     try {
       return java.net.URLEncoder.encode(content, "UTF-8");
     }
@@ -41,7 +41,7 @@ public class Escape {
 
   /**
    * HTML escaping routine.  This is a bit extreme for element content.
-   * 
+   *
    * @param content
    *          the unescaped content.
    * @return the escaped output.
