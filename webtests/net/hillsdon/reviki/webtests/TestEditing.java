@@ -28,12 +28,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 
 public class TestEditing extends WebTestSupport {
-  
+
   private static final String FAKE_SESSION_ID = "53ABE0412468E35DE001355A4EE80822";
   private static final String USER1_EDIT_CONTENT = "user1";
   private static final String USER2_EDIT_CONTENT = "user2";
   private static final String ID_EDIT_FORM = "editForm";
-  
+
 
   public void testEditPageIncrementsRevision() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
@@ -47,13 +47,13 @@ public class TestEditing extends WebTestSupport {
     String name = uniqueWikiPageName("EditPageTest");
     editThenCancel(name);
   }
-  
+
   public void testCancelEditExistingPage() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
     editWikiPage(name, "Whatever", "", true);
     editThenCancel(name);
   }
-  
+
   public void testPreview() throws Exception {
     String name = uniqueWikiPageName("PreviewPageTest");
     HtmlPage editPage = clickEditLink(getWikiPage(name));
@@ -67,7 +67,7 @@ public class TestEditing extends WebTestSupport {
     HtmlTextArea content = form.getTextAreaByName("content");
     String expectedContent = "http://www.example.com";
     content.setText(expectedContent);
-    
+
     // Now if we preview we should get the previewed text rendered, and in
     // the edit area.  The other options should be preserved too.
     editPage = (HtmlPage) form.getInputByValue("Preview").click();
@@ -95,12 +95,7 @@ public class TestEditing extends WebTestSupport {
     }
     catch (ElementNotFoundException ignore) {
     }
-    try {
-      viewPage.getByXPath("id('lockedInfo')");
-      fail("Should not be present.");
-    }
-    catch (ElementNotFoundException ignore) {
-    }
+    assertEquals("Should not be present.", 0,viewPage.getByXPath("id('lockedInfo')").size());
   }
 
   public void testLoseLockSave() throws Exception {

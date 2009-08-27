@@ -34,7 +34,7 @@ public class TestHistory extends WebTestSupport {
     HtmlPage page = editWikiPage(pageName, "Initial content", "", true);
     page = editWikiPage(pageName, "Altered content", "s/Initial/Altered", false);
     HtmlPage history = (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
-    List<HtmlTableRow> historyRows = history.getByXPath("//tr[td]");
+    List<HtmlTableRow> historyRows = (List<HtmlTableRow>) history.getByXPath("//tr[td]");
     assertEquals(3, historyRows.size());
     HtmlTableRow altered = historyRows.get(1);
     // First column is date/time.
@@ -47,23 +47,23 @@ public class TestHistory extends WebTestSupport {
     HtmlPage diff = (HtmlPage) compareButtons.get(0).click();
     assertEquals("Altered", ((DomNode) diff.getByXPath("//ins").iterator().next()).asText());
     assertEquals("Initial", ((DomNode) diff.getByXPath("//del").iterator().next()).asText());
-    List<HtmlDivision> divs = diff.getByXPath("//div[@id='flash']/.");
+    List<HtmlDivision> divs = (List<HtmlDivision>) diff.getByXPath("//div[@id='flash']/.");
     assertEquals(0, divs.size());
 
     // Check for the warning when viewing differences backwards
-    final List<HtmlRadioButtonInput> radioButtons = history.getByXPath("//input[@type='radio']/.");
+    final List<HtmlRadioButtonInput> radioButtons = (List<HtmlRadioButtonInput>) history.getByXPath("//input[@type='radio']/.");
     assertEquals(4, radioButtons.size());
     radioButtons.get(0).click();
     radioButtons.get(3).click();
     diff = (HtmlPage) compareButtons.get(0).click();
-    divs = diff.getByXPath("//div[@id='flash']/.");
+    divs = (List<HtmlDivision>) diff.getByXPath("//div[@id='flash']/.");
     assertEquals(1, divs.size());
 
   }
 
-  private void verifyRow(HtmlTableRow altered, String content) {
+  private void verifyRow(final HtmlTableRow altered, final String content) {
     assertEquals(getUsername(), altered.getCell(2).asText());
     assertEquals(content, altered.getCell(3).asText());
   }
-  
+
 }

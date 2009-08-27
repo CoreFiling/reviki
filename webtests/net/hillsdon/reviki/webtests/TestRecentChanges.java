@@ -26,7 +26,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class TestRecentChanges extends WebTestSupport {
-  
+
   /**
    * Create two new pages.
    * Ensure they appear at the top of RecentChanges with the second page first.
@@ -38,14 +38,14 @@ public class TestRecentChanges extends WebTestSupport {
     editWikiPage(createdFirst, "Content", "", true);
     String createdSecond = uniqueWikiPageName("RecentChangesTestSecond");
     editWikiPage(createdSecond, "Content", "", true);
-    
+
     Iterator<HtmlAnchor> links = getRecentChangesLinks();
     HtmlAnchor first = links.next();
     links.next();
     HtmlAnchor second = links.next();
     assertEquals(first.asText(), createdSecond);
     assertEquals(second.asText(), createdFirst);
-    
+
     String descriptionOfChange = format("Bump %s up to top.", createdFirst);
     editWikiPage(createdFirst, "Different content", descriptionOfChange, false);
     links = getRecentChangesLinks();
@@ -54,7 +54,7 @@ public class TestRecentChanges extends WebTestSupport {
     second = links.next();
     assertEquals(first.asText(), createdFirst);
     assertEquals(second.asText(), createdSecond);
-    
+
     HtmlPage recentChanges = getWikiPage("RecentChanges");
     assertTrue(recentChanges.asText().contains(descriptionOfChange));
   }
@@ -62,8 +62,8 @@ public class TestRecentChanges extends WebTestSupport {
   @SuppressWarnings("unchecked")
   private Iterator<HtmlAnchor> getRecentChangesLinks() throws IOException, JaxenException {
     HtmlPage recentChanges = getWikiPage("RecentChanges");
-    Iterator<HtmlAnchor> links = recentChanges.getByXPath("//tr/td[position() = 2]/a").iterator();
+    Iterator<HtmlAnchor> links = (Iterator<HtmlAnchor>) recentChanges.getByXPath("//tr/td[position() = 2]/a").iterator();
     return links;
   }
-  
+
 }

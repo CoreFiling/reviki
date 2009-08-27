@@ -27,6 +27,7 @@
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.dimensions.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.bgiframe.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.suggest.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.hotkeys-0.7.9.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
   <script type="text/javascript">
     reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>"

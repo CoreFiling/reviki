@@ -31,7 +31,7 @@ public class TestSearch extends WebTestSupport {
     @SuppressWarnings("unused")
     XmlPage xml = (XmlPage) results.getWebClient().getPage(results.getFullyQualifiedUrl(link.getHrefAttribute()));
   }
-  
+
   public void testSearchOffersToCreateWikiPageThatDoesntExistWhenWeSearchForAWikiWord() throws Exception {
     String name = uniqueWikiPageName("ThisDoesNotExist");
     HtmlPage results = search(getWikiPage("FrontPage"), name);
@@ -39,7 +39,7 @@ public class TestSearch extends WebTestSupport {
     assertURL(BASE_URL + "/pages/test/" + name, results.getAnchorByName("create").getHrefAttribute());
     //results.getAnchorByHref(BASE_URL + "/pages/test/" + name);
   }
-  
+
   /**
    * Search by WikiWord and Wiki Word.
    */
@@ -50,7 +50,7 @@ public class TestSearch extends WebTestSupport {
     assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name));
     HtmlPage searchResult = search(page, name);
     // Goes directly to the page.
-    assertEquals(page.getWebResponse().getUrl(), searchResult.getWebResponse().getUrl());
+    assertEquals(page.getWebResponse().getRequestUrl(), searchResult.getWebResponse().getRequestUrl());
   }
 
 }

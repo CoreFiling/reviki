@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jaxen.JaxenException;
-
 import junit.framework.TestCase;
+
+import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -36,7 +36,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
  * Superclass for writing HtmlUnit tests for the wiki.
- * 
+ *
  * @author mth
  */
 public abstract class WebTestSupport extends TestCase {
@@ -55,8 +55,7 @@ public abstract class WebTestSupport extends TestCase {
     client.setThrowExceptionOnFailingStatusCode(true);
     client.setThrowExceptionOnScriptError(true);
     client.addWebWindowListener(new ValidateOnContentChange());
-    // TODO: run tests without cookies
-    client.setCookiesEnabled(false);
+    client.getCookieManager().setCookiesEnabled(false);
     return client;
   }
 
@@ -76,7 +75,7 @@ public abstract class WebTestSupport extends TestCase {
   protected String getNewlineTexarea() {
     return NEWLINE_TEXTAREA;
   }
-  
+
   protected void switchUser() {
     if (_altclient == null) {
       _altclient = setupClient(getAltUsername(), getAltPassword());
@@ -85,6 +84,14 @@ public abstract class WebTestSupport extends TestCase {
     _client = _altclient;
     _altclient = temp;
 
+  }
+
+  protected WebClient getClient() {
+    return _client;
+  }
+
+  protected boolean isEditPage(final HtmlPage page) {
+    return page.getByXPath("input[@name='save']").size() == 1;
   }
 
   protected boolean hasErrorMessage(final HtmlPage page) throws Exception {
@@ -127,7 +134,7 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage getWebPage(final String path) throws IOException {
     return (HtmlPage) _client.getPage(getUrl(path));
   }
-  
+
   /**
    * @param name Name of page.
    * @return That page in the 'test' wiki.
@@ -141,7 +148,7 @@ public abstract class WebTestSupport extends TestCase {
   protected String uniqueWikiPageName(final String prefix) {
     return prefix + uniqueName();
   }
-  
+
   protected String uniqueName() {
     return "" + System.currentTimeMillis() + _counter++;
   }
@@ -159,7 +166,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
-    URL pageUrl = page.getWebResponse().getUrl();
+    URL pageUrl = page.getWebResponse().getRequestUrl();
     if (isNew != null) {
       assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
     }
@@ -168,17 +175,17 @@ public abstract class WebTestSupport extends TestCase {
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
     page = (HtmlPage) editForm.getInputByValue("Save").click();
-    
+
     @SuppressWarnings("unchecked")
     final List<HtmlInput> saveButtons = (List<HtmlInput>) page.getByXPath("//input[@type='submit' and @value='Save']");
     assertEquals(0, saveButtons.size());
-    
-    assertURL(pageUrl, page.getWebResponse().getUrl());
+
+    assertURL(pageUrl, page.getWebResponse().getRequestUrl());
     return page;
   }
 
   protected HtmlAnchor getAnchorByHrefContains(final HtmlPage page, final String hrefContains) throws JaxenException {
-    return (HtmlAnchor) page.getByXPath("//a[fn:contains(@href, '" + hrefContains + "')]").iterator().next();
+    return (HtmlAnchor) page.getByXPath("//a[contains(@href, '" + hrefContains + "')]").iterator().next();
   }
 
   protected String removeSessionId(final String url) {
@@ -196,9 +203,9 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage clickEditLink(final HtmlPage page) throws IOException {
     return (HtmlPage) page.getAnchorByName("editTopSubmitLink").click();
   }
-  
+
   private static final Pattern RE_REVISION = Pattern.compile("r[0-9]+");
-  
+
   protected long getRevisionNumberFromTitle(final HtmlPage page) {
     Matcher matcher = RE_REVISION.matcher(page.getTitleText());
     assertTrue(matcher.find());
@@ -220,25 +227,25 @@ public abstract class WebTestSupport extends TestCase {
     form.getInputByName("attachmentName").setValueAttribute("file");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
     return attachments;
-    
+
   }
-  
+
   protected HtmlPage search(final HtmlPage page, final String query) throws IOException {
     HtmlForm searchForm = page.getFormByName("searchForm");
     searchForm.getInputByName("query").setValueAttribute(query);
     HtmlPage results = (HtmlPage) searchForm.getInputByValue("Go").click();
     return results;
   }
-  
+
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
     HtmlPage results = search(page, query);
     getAnchorByHrefContains(results, BASE_URL + "/pages/test/" + name);
   }
 
-  protected void assertSearchDoesNotFindPage(HtmlPage start, String pageName) throws IOException {
+  protected void assertSearchDoesNotFindPage(final HtmlPage start, final String pageName) throws IOException {
     assertTrue(search(start, pageName).asText().contains("No results found"));
   }
-  
+
   protected HtmlPage getWikiList() throws IOException {
     return getWebPage("list");
   }

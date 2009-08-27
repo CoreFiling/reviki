@@ -24,11 +24,11 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
  * Tests rename.
- * 
+ *
  * @author mth
  */
 public class TestRename extends WebTestSupport {
-  
+
   public void testRenameLinkNotAvailableForNonExistantPages() throws Exception {
     HtmlPage page = getWikiPage(uniqueWikiPageName("RenameLinkTest"));
     try {
@@ -38,23 +38,23 @@ public class TestRename extends WebTestSupport {
     catch (ElementNotFoundException expected) {
     }
   }
-  
+
   public void testRenameRenamesBothPageAndMovesAttachments() throws Exception {
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     String toPageName = uniqueWikiPageName("RenameTestTo");
     HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "Whatever", true);
     uploadAttachment(TestAttachments.ATTACHMENT_UPLOAD_FILE_1, fromPageName);
-    
+
     page = (HtmlPage) page.getAnchorByName("rename").click();
     HtmlForm form = page.getFormByName("renameForm");
     form.getInputByName("toPage").setValueAttribute(toPageName);
     page = (HtmlPage) form.getInputByName("rename").click();
 
-    assertTrue(page.getWebResponse().getUrl().toURI().getPath().contains(toPageName));
+    assertTrue(page.getWebResponse().getRequestUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = clickAttachmentsLink(page, toPageName);
     assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "file.txt")));
-    
+
     assertSearchDoesNotFindPage(page, fromPageName);
     editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);
   }

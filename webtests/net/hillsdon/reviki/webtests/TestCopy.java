@@ -22,11 +22,11 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
  * Tests copy.
- * 
+ *
  * @author mth
  */
 public class TestCopy extends WebTestSupport {
-  
+
   public void testCopyLinkNotAvailableForNonExistantPages() throws Exception {
     HtmlPage page = getWikiPage(uniqueWikiPageName("CopyLinkTest"));
     try {
@@ -36,7 +36,7 @@ public class TestCopy extends WebTestSupport {
     catch (ElementNotFoundException expected) {
     }
   }
-  
+
   public void testCopy() throws Exception {
     String fromPageName = uniqueWikiPageName("CopyTestFrom");
     String toPageName = uniqueWikiPageName("CopyTestTo");
@@ -46,10 +46,10 @@ public class TestCopy extends WebTestSupport {
     HtmlForm form = page.getFormByName("copyForm");
     form.getInputByName("toPage").setValueAttribute(toPageName);
     page = (HtmlPage) form.getInputByName("copy").click();
-    assertTrue(page.getWebResponse().getUrl().toURI().getPath().contains(toPageName));
+    assertTrue(page.getWebResponse().getRequestUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = getWikiPage(fromPageName);
     assertTrue(page.asText().contains("Catchy tunes"));
   }
-  
+
 }

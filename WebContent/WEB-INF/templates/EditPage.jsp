@@ -24,9 +24,9 @@
       <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
-      <input style="width:5em;" name="save" type="submit" value="Save"/>
-      <input style="width:5em;" name="unlock" type="submit" value="Cancel"/>
-      <input style="width:5em;" name="preview" type="submit" value="Preview"/>
+      <input style="width:5em;" name="save" type="submit" value="Save" id="save"/>
+      <input style="width:5em;" name="unlock" type="submit" value="Cancel" id="cancel"/>
+      <input style="width:5em;" name="preview" type="submit" value="Preview" id="preview"/>
       <br />
       <label for="minorEdit">Minor edit?</label>
       <input type="checkbox" id="minorEdit" name="minorEdit" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if> />
