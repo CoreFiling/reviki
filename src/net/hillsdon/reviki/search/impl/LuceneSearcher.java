@@ -131,7 +131,7 @@ public class LuceneSearcher implements SearchEngine {
     perField.addAnalyzer(FIELD_TITLE_TOKENIZED, text);
     perField.addAnalyzer(FIELD_PROPERTY_KEY, id);
     perField.addAnalyzer(FIELD_PROPERTY_VALUE, id);
-    perField.addAnalyzer(FIELD_OUTGOING_LINKS, id);
+    perField.addAnalyzer(FIELD_OUTGOING_LINKS, text);
     perField.addAnalyzer(FIELD_CONTENT, text);
     return perField;
   }
