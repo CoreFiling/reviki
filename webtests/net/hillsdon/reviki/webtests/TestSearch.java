@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
 
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
@@ -53,4 +54,11 @@ public class TestSearch extends WebTestSupport {
     assertEquals(page.getWebResponse().getRequestUrl(), searchResult.getWebResponse().getRequestUrl());
   }
 
+  public void testPageWithSpacesShowsInBacklinks() throws Exception {
+    final String refers = uniqueWikiPageName("SearchSpaces BacklinkTesta");
+    final String referred = uniqueWikiPageName("SearchSpaces BacklinkTestb");
+    editWikiPage(refers, referred, "", true);
+    final HtmlPage page = getWikiPage(referred);
+    getAnchorByHrefContains(page, Escape.urlEncodeUTF8(refers));
+  }
 }

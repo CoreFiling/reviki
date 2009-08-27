@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
@@ -204,7 +205,8 @@ public class LuceneSearcher implements SearchEngine {
     try {
       return doReadOperation(new ReadOperation<Set<String>>() {
         public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
-          Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, escape(page), false), SearchMatch.TO_PAGE_NAME));
+          final String pageEscaped = escape(Escape.urlEncodeUTF8(page));
+          Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false), SearchMatch.TO_PAGE_NAME));
           results.remove(page);
           return results;
         }

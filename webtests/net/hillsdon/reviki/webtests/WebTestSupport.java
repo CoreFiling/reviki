@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
+import net.hillsdon.fij.text.Escape;
 
 import org.jaxen.JaxenException;
 
@@ -141,7 +142,7 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On error.
    */
   protected HtmlPage getWikiPage(final String name) throws IOException {
-    return getWebPage("pages/test/" + name);
+    return getWebPage("pages/test/" + Escape.urlEncodeUTF8(name));
   }
 
   private int _counter = 0;
