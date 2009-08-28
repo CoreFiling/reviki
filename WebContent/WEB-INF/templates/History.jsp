@@ -7,14 +7,14 @@
   <tiles:putAttribute name="title">History for <c:out value="${page.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading">History for <a href="<c:url value="${page}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <form method="get" action="<c:url value="${page.name}"/>">
+    <form method="get" name="compareForm" action="<c:url value="${page.name}"/>">
 	    <table class="history">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
 	        <th class="history" style="white-space: nowrap;">Page</th>
 	        <th class="history">User</th>
 	        <th class="history">Description</th>
-	        <th class="history" colspan="2"><input type="submit" value="Compare" /></th>
+	        <th class="history" colspan="2"><input type="submit" value="Compare" name="compare" /></th>
 	      </tr>
 	      <tr class="history">
 	        <td class="history" style="white-space: nowrap;"></td>
@@ -61,20 +61,20 @@
 	          <td class="history">
 	          	<c:choose>
 	          	  <c:when test="${status.index == 1 || status.index == 0 && fn:length(changes) == 1}">
-	          	    <input type="radio" name="diff" value="${change.revision}" checked="checked"/>
+	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}" checked="checked"/>
 	          	  </c:when>
 	          	  <c:otherwise>
-	          	    <input type="radio" name="diff" value="${change.revision}"/>
+	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}"/>
 	          	  </c:otherwise>
 	          	</c:choose>
 	          </td>
 	          <td class="history">
 	          <c:choose>
 	            <c:when test="${status.index == 0}">
-	              <input type="radio" name="revision" value="${change.revision}" checked="checked"/>
+	              <input type="radio" name="revision" value="${change.name}.${change.revision}" checked="checked"/>
 	            </c:when>
 	          	<c:otherwise>
-	          	  <input type="radio" name="revision" value="${change.revision}"/>
+	          	  <input type="radio" name="revision" value="${change.name}.${change.revision}"/>
 	          	</c:otherwise>
 	          </c:choose>
 	          </td>

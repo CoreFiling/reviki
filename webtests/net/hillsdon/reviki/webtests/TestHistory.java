@@ -18,13 +18,15 @@ package net.hillsdon.reviki.webtests;
 import java.util.List;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
-
 
 public class TestHistory extends WebTestSupport {
 
@@ -59,6 +61,37 @@ public class TestHistory extends WebTestSupport {
     divs = (List<HtmlDivision>) diff.getByXPath("//div[@id='flash']/.");
     assertEquals(1, divs.size());
 
+  }
+
+  public void testCompare() throws Exception {
+    final String page1 = uniqueWikiPageName("HistoryCompare1.999@'.999Test");
+    final String page2 = uniqueWikiPageName("HistoryCompare2.999@'.999Test");
+    editWikiPage(page1, "1", "", true);
+    editWikiPage(page1, "2", "", false);
+    editWikiPage(page1, "3", "", false);
+    HtmlPage page = renamePage(page1, page2);
+    editWikiPage(page2, "4", "", false);
+    page = (HtmlPage) page.getAnchorByName("history").click();
+    HtmlForm form = page.getFormByName("compareForm");
+    List<HtmlInput> fromList = form.getInputsByName("diff");
+    List<HtmlInput> toList = form.getInputsByName("revision");
+    final int last = fromList.size() - 1;
+    assertEquals(last, toList.size() - 1);
+    // The second newest revision is checked for "from"
+    assertTrue(fromList.get(1).isChecked());
+    // The newest revision is checked for "to"
+    assertTrue(toList.get(0).isChecked());
+    // Choose the oldest for "from"
+    fromList.get(last).click();
+    toList.get(0).click();
+    HtmlPage diffPage = (HtmlPage) ((HtmlSubmitInput) form.getInputByName("compare")).click();
+    final HtmlDivision diffRendering = (HtmlDivision) diffPage.getByXPath("id('wiki-rendering')").get(0);
+    assertEquals("1", ((DomText) diffRendering.getByXPath("del/text()").get(0)).asText().trim());
+    assertEquals("4", ((DomText) diffRendering.getByXPath("ins/text()").get(0)).asText().trim());
+    // Choose "from" and "to" to be the oldest revisions so we can check title
+    toList.get(last).click();
+    diffPage = (HtmlPage) ((HtmlSubmitInput) form.getInputByName("compare")).click();
+    diffPage.getTitleText().contains(page2);
   }
 
   private void verifyRow(final HtmlTableRow altered, final String content) {

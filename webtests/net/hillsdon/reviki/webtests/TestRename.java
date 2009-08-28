@@ -18,7 +18,6 @@ package net.hillsdon.reviki.webtests;
 import static net.hillsdon.reviki.webtests.TestAttachments.getAttachmentAtEndOfLink;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 
@@ -45,10 +44,7 @@ public class TestRename extends WebTestSupport {
     HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "Whatever", true);
     uploadAttachment(TestAttachments.ATTACHMENT_UPLOAD_FILE_1, fromPageName);
 
-    page = (HtmlPage) page.getAnchorByName("rename").click();
-    HtmlForm form = page.getFormByName("renameForm");
-    form.getInputByName("toPage").setValueAttribute(toPageName);
-    page = (HtmlPage) form.getInputByName("rename").click();
+    page = renamePage(fromPageName, toPageName);
 
     assertTrue(page.getWebResponse().getRequestUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));

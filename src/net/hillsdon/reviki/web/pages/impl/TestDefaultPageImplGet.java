@@ -15,6 +15,18 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
+import static net.hillsdon.fij.core.Functional.set;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -26,11 +38,11 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageRevisionReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
+import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
-import net.hillsdon.reviki.web.common.RequestParameterReaders;
-import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -41,34 +53,21 @@ import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 
 import org.easymock.EasyMock;
 
-import static net.hillsdon.fij.core.Functional.set;
-
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.expect;
-
 /**
  * Tests for {@link GetRegularPageImpl}.
- * 
+ *
  * @author mth
  */
 public class TestDefaultPageImplGet extends TestCase {
 
   private static final PageReference THE_PAGE = new PageReferenceImpl("ThePage");
-  
+
   private CachingPageStore _store;
   private MarkupRenderer _renderer;
   private WikiGraph _graph;
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
-  private DefaultPage _page;
+  private DefaultPageImpl _page;
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
 
@@ -118,7 +117,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   public void testProvideRevisionAndDiffViewsDiffBetweenTheRevisions() throws Exception {
-    _request.setParameter(RequestParameterReaders.PARAM_REVISION, "6");
+    _request.setParameter(DefaultPageImpl.PARAM_REVISION, "6");
     _request.setParameter(PARAM_DIFF_REVISION, "4");
     expectGetIncomingLinks();
     String sixContent = "Content at revision six.";
@@ -134,7 +133,41 @@ public class TestDefaultPageImplGet extends TestCase {
     assertEquals(theDiff, _request.getAttribute(ATTR_MARKED_UP_DIFF));
     verify();
   }
-  
+
+  public void testProvideDiffAcrossRenamedPages() throws Exception {
+    final PageReference page1 = new PageReferenceImpl("Pa.1?@ge1");
+    final PageReference page2 = new PageReferenceImpl("Pa--.1?@geaa2");
+    _request.setParameter(DefaultPageImpl.PARAM_REVISION, page1.getPath() + ".6");
+    _request.setParameter(PARAM_DIFF_REVISION, page2.getPath() + ".4");
+    expectGetIncomingLinks();
+    String sixContent = "Content at revision six.";
+    String fourContent = "Content at revision four.";
+    expectGetContent(page1, 6, sixContent);
+    expectGetContent(page2, 4, fourContent);
+    String theDiff = "It's changed!";
+    expect(_diffGenerator.getDiffMarkup(fourContent, sixContent)).andReturn(theDiff);
+    // We don't render anything.
+    replay();
+    JspView view = (JspView) _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
+    assertEquals("ViewDiff", view.getName());
+    assertEquals(theDiff, _request.getAttribute(ATTR_MARKED_UP_DIFF));
+    verify();
+  }
+
+  public void testGetPageRevisionReference() throws Exception {
+    PageReference defaultPage = new PageReferenceImpl("default");
+    assertEquals(new PageRevisionReference(defaultPage, -1), _page.getPageRevisionReference(defaultPage, null, "revision"));
+    assertEquals(new PageRevisionReference(defaultPage, 1), _page.getPageRevisionReference(defaultPage, "1", "revision"));
+    assertEquals(new PageRevisionReference(new PageReferenceImpl("foo"), 1), _page.getPageRevisionReference(defaultPage, "foo.1", "revision"));
+
+    try {
+      assertEquals(new PageRevisionReference(new PageReferenceImpl("foo"), 1), _page.getPageRevisionReference(defaultPage, "foo", "revision"));
+      fail();
+    }
+    catch (InvalidInputException expected) {
+    }
+  }
+
   private String[] getCountIncomingLinks(final int count) {
     String[] incomingLinks = new String[count];
     for (int i = 0; i < incomingLinks.length; ++i) {
@@ -142,7 +175,7 @@ public class TestDefaultPageImplGet extends TestCase {
     }
     return incomingLinks;
   }
-  
+
   private void verify() {
     EasyMock.verify(_store, _renderer, _graph, _diffGenerator);
   }
@@ -150,7 +183,7 @@ public class TestDefaultPageImplGet extends TestCase {
   private void replay() {
     EasyMock.replay(_store, _renderer, _graph, _diffGenerator);
   }
-  
+
   private void expectRenderContent() throws Exception  {
     expect(_renderer.render(eq(THE_PAGE), eq("Content"), isA(URLOutputFilter.class))).andReturn(new LiteralResultNode("Content")).once();
   }
@@ -162,11 +195,15 @@ public class TestDefaultPageImplGet extends TestCase {
   private PageInfo expectGetContent() throws Exception  {
     return expectGetContent(-1, "Content");
   }
-  
+
   private PageInfo expectGetContent(final int revision, final String content) throws Exception  {
-    PageInfo pageInfo = new PageInfoImpl(THE_PAGE.getPath(), content, revision, revision, "", new Date(), "", "", null);
-    expect(_store.get(THE_PAGE, revision)).andReturn(pageInfo).once();
+    return expectGetContent(THE_PAGE, revision, content);
+  }
+
+  private PageInfo expectGetContent(final PageReference page, final int revision, final String content) throws Exception {
+    PageInfo pageInfo = new PageInfoImpl(page.getPath(), content, revision, revision, "", new Date(), "", "", null);
+    expect(_store.get(page, revision)).andReturn(pageInfo).once();
     return pageInfo;
   }
-  
+
 }

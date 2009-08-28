@@ -17,7 +17,6 @@ package net.hillsdon.reviki.web.pages.impl;
 
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
@@ -45,6 +44,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageRevisionReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
@@ -102,6 +102,8 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final String PARAM_DIFF_REVISION = "diff";
 
+  public static final String PARAM_REVISION = "revision";
+
   public static final String PARAM_ATTACHMENT_NAME = "attachmentName";
 
   public static final String PARAM_SESSION_ID = "sessionId";
@@ -119,6 +121,11 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String ATTR_DIFF_START_REV = "diffStartRev";
 
   public static final String ATTR_DIFF_END_REV = "diffEndRev";
+
+  /**
+   * Because the diff view may be looking at renamed pages.
+   */
+  public static final String ATTR_DIFF_TITLE = "diffTitle";
 
   public static final String ATTR_SHOW_REV = "showHeadRev";
 
@@ -301,19 +308,19 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    final long revision = getRevision(request);
-    final Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
+    final String revisionParam = request.getParameter(PARAM_REVISION);
+    final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
-
-    final PageInfo main = _store.get(page, revision);
+    final PageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
     request.setAttribute(ATTR_PAGE_INFO, main);
-    request.setAttribute(ATTR_SHOW_REV, revision != -1);
-    if (diffRevision != null) {
-      final PageInfo compare = _store.get(page, diffRevision);
-      request.setAttribute(ATTR_DIFF_END_REV, revisionText(revision));
-      request.setAttribute(ATTR_DIFF_START_REV, revisionText(diffRevision));
+    request.setAttribute(ATTR_SHOW_REV, revisionParam != null);
+    if (diffParam != null) {
+      request.setAttribute(ATTR_DIFF_TITLE, page.getPath());
+      final PageInfo compare = pageInfoFromRevisionParam(page, diffParam, PARAM_DIFF_REVISION);
+      request.setAttribute(ATTR_DIFF_END_REV, revisionText(main.getRevision()));
+      request.setAttribute(ATTR_DIFF_START_REV, revisionText(compare.getRevision()));
       request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(compare.getContent(), main.getContent()));
-      if (diffRevision > revision && revision != -1) {
+      if (compare.getRevision() > main.getRevision() && main.getRevision() > -1) {
         request.setAttribute("flash", "Note this diff is reversed.");
       }
       return new JspView("ViewDiff");
@@ -329,7 +336,18 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   private String revisionText(final long revision) {
-    return revision != -1 ? "r" + revision : "latest";
+    if (revision == -1) {
+      return "latest";
+    }
+    else if (revision == -2) {
+      return "uncommitted";
+    }
+    else if (revision == -3) {
+      return "deleted";
+    }
+    else {
+      return "r" + revision;
+    }
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
@@ -454,6 +472,40 @@ public class DefaultPageImpl implements DefaultPage {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName(), URLOutputFilter.NULL);
+  }
+
+  private PageInfo pageInfoFromRevisionParam(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException, PageStoreException {
+    final PageRevisionReference reference = getPageRevisionReference(defaultPage, revisionText, paramName);
+    return _store.get(reference.getPage(), reference.getRevision());
+  }
+
+  /**
+   * Gets the PageInfo from a diff or rev parameter. I.e. "1234" or "PageName.1234"
+   * @param defaultPage The page (used when the parameter does not override the page).
+   * @param revisionText The parameter value.
+   * @param paramName The name of the parameter for error messages.
+   * @return The PageInfo.
+   * @throws InvalidInputException When the parameter value is not of the correct form.
+   * @throws PageStoreException
+   */
+  PageRevisionReference getPageRevisionReference(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException {
+    if (revisionText == null) {
+      return new PageRevisionReference(defaultPage, -1);
+    }
+
+    final int dotIndex = revisionText.lastIndexOf('.');
+    if (dotIndex != -1) {
+      final Long revision = getLong(revisionText.substring(dotIndex + 1), paramName);
+      final String pageName = revisionText.substring(0, dotIndex);
+      final PageReference pageReference = pageName.length() > 0 ? new PageReferenceImpl(pageName) : defaultPage;
+      return new PageRevisionReference(pageReference, revision);
+    }
+    return new PageRevisionReference(defaultPage, getLong(revisionText, paramName));
+  }
+
+  private static long getRevision(final HttpServletRequest request) throws InvalidInputException {
+    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
+    return givenRevision == null ? -1 : givenRevision;
   }
 
 }

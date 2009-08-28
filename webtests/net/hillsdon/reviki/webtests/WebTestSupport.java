@@ -34,6 +34,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 
 /**
  * Superclass for writing HtmlUnit tests for the wiki.
@@ -152,6 +153,18 @@ public abstract class WebTestSupport extends TestCase {
 
   protected String uniqueName() {
     return "" + System.currentTimeMillis() + _counter++;
+  }
+
+  protected HtmlPage renamePage(final String pageFrom, final String pageTo) throws IOException {
+    HtmlPage page = getWikiPage(pageFrom);
+    HtmlAnchor renameAnchor = page.getAnchorByName("rename");
+    page = (HtmlPage) renameAnchor.click();
+    final HtmlForm form = page.getFormByName("renameForm");
+    final HtmlInput input = form.getInputByName("toPage");
+    input.setValueAttribute(pageTo);
+    page = (HtmlPage) ((HtmlSubmitInput) form.getInputByName("rename")).click();
+    assertEquals(1, page.getByXPath("id('wiki-rendering')").size());
+    return page;
   }
 
   /**
