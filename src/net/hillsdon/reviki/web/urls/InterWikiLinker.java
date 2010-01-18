@@ -32,7 +32,7 @@ public class InterWikiLinker {
 
   /**
    * @param wikiName Wiki name.  Will overwrite any previous entry with the same wiki name.
-   * @param formatString Absolute URI template with one %s which will be replaced by the page name when creating links.
+   * @param formatString Absolute URI template generally with one or more %s tokens which will be replaced by the page name when creating links.
    */
   public void addWiki(final String wikiName, final String formatString) {
     _links.put(wikiName, formatString);
@@ -50,7 +50,7 @@ public class InterWikiLinker {
     if (formatString == null) {
       throw new UnknownWikiException();
     }
-    return String.format(formatString, Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName)));
+    return formatString.replace("%s", Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName)));
   }
   
   /**
