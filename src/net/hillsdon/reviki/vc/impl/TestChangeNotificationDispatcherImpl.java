@@ -55,7 +55,7 @@ public class TestChangeNotificationDispatcherImpl extends TestCase {
     expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L).anyTimes();
     expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L).anyTimes();
     expect(_operations.getLatestRevision()).andReturn(5L).once();
-    expect(_operations.log("", -1, false, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
+    expect(_operations.log("", -1, LogEntryFilter.ALL, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
     _syncedUptoThreeSubscriber.handleChanges(5, asList(REVISION_FOUR_CHANGE, REVISION_FIVE_CHANGE));
     expectLastCall();
     _syncedUptoFourSubscriber.handleChanges(5, asList(REVISION_FIVE_CHANGE));

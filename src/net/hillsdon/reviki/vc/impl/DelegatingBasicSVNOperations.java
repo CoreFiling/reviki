@@ -96,8 +96,8 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().lock(ref, revision);
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, boolean pathOnly, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().log(path, limit, pathOnly, stopOnCopy, startRevision, endRevision);
+  public List<ChangeInfo> log(final String path, final long limit, LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
+    return getDelegate().log(path, limit, logEntryFilter, stopOnCopy, startRevision, endRevision);
   }
 
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreAuthenticationException, PageStoreException {

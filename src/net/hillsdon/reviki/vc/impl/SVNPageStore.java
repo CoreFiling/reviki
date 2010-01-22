@@ -96,7 +96,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
-    return _operations.log("", limit, false, true, 0, -1);
+    return _operations.log("", limit, LogEntryFilter.ALL, true, 0, -1);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
@@ -105,7 +105,7 @@ public class SVNPageStore implements PageStore {
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
     // We follow all the previous locations.
     String path = ref.getPath();
-    while (path != null && changes.addAll(_operations.log(path, -1, true, true, 0, lastRevision))) {
+    while (path != null && changes.addAll(_operations.log(path, -1, LogEntryFilter.PATH_ONLY, true, 0, lastRevision))) {
       if (!changes.isEmpty()) {
         ChangeInfo last = changes.get(changes.size() - 1);
         path = last.getCopiedFrom();
@@ -292,7 +292,7 @@ public class SVNPageStore implements PageStore {
     final String attachmentPath = attachmentPath(ref);
     Collection<ChangeInfo> changed = Collections.emptyList();
     if (_operations.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-      changed = _operations.log(attachmentPath, -1, false, false, 0, -1);
+      changed = _operations.log(attachmentPath, -1, LogEntryFilter.ALL, false, 0, -1);
     }
     Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     for (ChangeInfo change : changed) {
@@ -325,7 +325,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    List<ChangeInfo> log = _operations.log("", -1, false, true, start, end);
+    List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.ALL, true, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {

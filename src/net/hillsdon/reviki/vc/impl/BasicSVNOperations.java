@@ -50,7 +50,7 @@ public interface BasicSVNOperations {
   /**
    * Returns the most recent changes first.
    */
-  List<ChangeInfo> log(String path, long limit, boolean pathOnly, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
+  List<ChangeInfo> log(String path, long limit, LogEntryFilter logEntryFilter, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 
   String getRoot() throws PageStoreAuthenticationException, PageStoreException;
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;

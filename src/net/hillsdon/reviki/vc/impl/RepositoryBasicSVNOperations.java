@@ -72,7 +72,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     _autoPropertiesApplier = autoPropertiesApplier;
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, final boolean pathOnly, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
+  public List<ChangeInfo> log(final String path, final long limit, final LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         final String rootPath = getRoot();
@@ -80,7 +80,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
         // Start and end reversed to get newest changes first.
         _repository.log(new String[] {path}, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
           public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-            entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry, pathOnly));
+            entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry, logEntryFilter));
           }
         });
         return entries;
@@ -89,12 +89,12 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
   
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final boolean pathOnly) {
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final LogEntryFilter logEntryFilter) {
     final String fullLoggedPathFromAppend = SVNPathUtil.append(rootPath, loggedPath);
     final String fullLoggedPath = (!fullLoggedPathFromAppend.startsWith("/")) ? "/" + fullLoggedPathFromAppend : fullLoggedPathFromAppend;
     final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (SVNPathUtil.isAncestor(rootPath, changedPath) && (!pathOnly || fullLoggedPath.equals(changedPath))) {
+      if (SVNPathUtil.isAncestor(rootPath, changedPath) && matchesLogEntryFilter(logEntryFilter, fullLoggedPath, changedPath)) {
         ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
         // something useful with 'other' changes.
@@ -104,6 +104,10 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       }
     }
     return results;
+  }
+
+  private boolean matchesLogEntryFilter(final LogEntryFilter logEntryFilter,final String fullLoggedPath, String changedPath){
+    return logEntryFilter.accept(fullLoggedPath, changedPath);
   }
 
   public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
