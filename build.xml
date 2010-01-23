@@ -138,6 +138,8 @@
       <regexpmapper handledirsep="true" from="apache-tomcat-.*?/(.*)" to="\1"/>
     </copy>
     <delete dir="${tomcat}-unziphelper"/>
+    <!-- Full of JSPs that the Eclipse validation objects to. -->
+    <delete dir="${tomcat}/webapps/examples"/>
 
     <!-- Would be really useful to munge the port numbers to something unusual here,
          8080 will often conflict with something else.  Perhaps some XSLT? -->
