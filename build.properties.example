@@ -4,4 +4,4 @@ wiki.username=user1
 wiki.password=password1
 wiki.altusername=user2
 wiki.altpassword=password2
-wiki.svn="http://localhost/svn/"
+wiki.svn=http\://localhost/svn/

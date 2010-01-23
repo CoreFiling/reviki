@@ -14,13 +14,12 @@
   <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip"/>
   <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
        The wiki should be called 'test' (with no base URL set).
-
-       An external properties file is used to retrieve the username and password to use.
-       Supply the wiki.username and wiki.password properties in build.properties. 
-
+       
        Note the wiki data will be stored in ./reviki-test-data, not the usual ~/reviki-data
        directory.
 
+       An external properties file is used to retrieve the username and password to use.
+       Supply the wiki.username and wiki.password properties in build.properties. 
   -->
   <property file="build.properties" />
 
@@ -139,7 +138,8 @@
     </copy>
     <delete dir="${tomcat}-unziphelper"/>
     <!-- Full of JSPs that the Eclipse validation objects to. -->
-    <delete dir="${tomcat}/webapps/examples"/>
+    <delete dir="${tomcat}/webapps"/>
+    <mkdir dir="${tomcat}/webapps"/>
 
     <!-- Would be really useful to munge the port numbers to something unusual here,
          8080 will often conflict with something else.  Perhaps some XSLT? -->
