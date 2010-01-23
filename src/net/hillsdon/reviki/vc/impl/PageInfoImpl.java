@@ -103,7 +103,12 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   public boolean lockedByUserIfNeeded(final String user) {
-    return isNew() || user.equals(getLockedBy());
+    return isNew() || isLockedByUser(user);
+  }
+
+  private boolean isLockedByUser(final String user) {
+    final String lockedBy = getLockedBy();
+    return lockedBy != null && lockedBy.equals(user);
   }
   
   public long getLastChangedRevision() {

@@ -16,7 +16,7 @@
        The wiki should be called 'test' (with no base URL set).
 
        An external properties file is used to retrieve the username and password to use.
-       Supply the testwiki.username and testwiki.password properties in build.properties. 
+       Supply the wiki.username and wiki.password properties in build.properties. 
 
        Note the wiki data will be stored in ./reviki-test-data, not the usual ~/reviki-data
        directory.
@@ -166,11 +166,12 @@
   <target name="functional-tests" depends="deploy, functional-tests-compile">
     <antcall target="start-tomcat" />
     <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functional-tests-failed">
-      <jvmarg value="-Dwiki.username=${testwiki.username}" />
-      <jvmarg value="-Dwiki.password=${testwiki.password}" />
-      <jvmarg value="-Dwiki.altusername=${testwiki.altusername}" />
-      <jvmarg value="-Dwiki.altpassword=${testwiki.altpassword}" />
-      <jvmarg value="-Dwiki.svn=${testwiki.svn}" />
+      <jvmarg value="-Dwiki.url=${wiki.url}" />
+      <jvmarg value="-Dwiki.username=${wiki.username}" />
+      <jvmarg value="-Dwiki.password=${wiki.password}" />
+      <jvmarg value="-Dwiki.altusername=${wiki.altusername}" />
+      <jvmarg value="-Dwiki.altpassword=${wiki.altpassword}" />
+      <jvmarg value="-Dwiki.svn=${wiki.svn}" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>

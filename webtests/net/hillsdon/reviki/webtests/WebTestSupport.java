@@ -43,8 +43,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
  */
 public abstract class WebTestSupport extends TestCase {
 
-  public static final String BASE_URL = "http://localhost:8980/reviki";
+  public static final String BASE_URL = System.getProperty("wiki.url", "http://localhost:8980/reviki");
+  
   public static final String NEWLINE_TEXTAREA = "\n";
+  
   private WebClient _client;
   private WebClient _altclient = null;
 
@@ -68,14 +70,6 @@ public abstract class WebTestSupport extends TestCase {
 
   protected void ignoreStatusCodeErrors() {
     _client.setThrowExceptionOnFailingStatusCode(false);
-  }
-
-  /**
-   * When retrieved by the webclient, newlines in textareas are just \n.
-   * @return
-   */
-  protected String getNewlineTexarea() {
-    return NEWLINE_TEXTAREA;
   }
 
   protected void switchUser() {

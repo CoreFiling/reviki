@@ -77,7 +77,7 @@ public class TestEditing extends WebTestSupport {
     content = form.getTextAreaByName("content");
     assertEquals(expectedDescription, description.getValueAttribute());
     assertTrue(minorEdit.isChecked());
-    assertEquals(expectedContent + getNewlineTexarea(), content.getText());
+    assertEquals(expectedContent + NEWLINE_TEXTAREA, content.getText());
     // This checks for the rendering...
     assertNotNull(editPage.getAnchorByHref(expectedContent));
   }
