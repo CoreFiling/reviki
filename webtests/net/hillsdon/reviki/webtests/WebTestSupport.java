@@ -79,7 +79,6 @@ public abstract class WebTestSupport extends TestCase {
     final WebClient temp = _client;
     _client = _altclient;
     _altclient = temp;
-
   }
 
   protected WebClient getClient() {
