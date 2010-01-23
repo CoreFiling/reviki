@@ -40,7 +40,7 @@ public interface PageInfo extends PageReference  {
   String getLockedBy();
   String getLockToken();
   boolean isLocked();
-  boolean lockedByUserIfNeeded(String user);
+  boolean isNewOrLockedByUser(String user);
   Date getLockedSince();
   
   boolean isNew();

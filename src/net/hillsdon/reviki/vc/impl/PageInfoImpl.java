@@ -102,7 +102,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     return _revision == DELETED;
   }
 
-  public boolean lockedByUserIfNeeded(final String user) {
+  public boolean isNewOrLockedByUser(final String user) {
     return isNew() || isLockedByUser(user);
   }
 

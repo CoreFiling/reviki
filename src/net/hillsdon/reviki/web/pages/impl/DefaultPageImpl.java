@@ -260,7 +260,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   private boolean isLockTokenValid(final PageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
     final String username = (String) request.getAttribute(RequestAttributes.USERNAME);
-    return pageInfo.lockedByUserIfNeeded(username) && (!preview || pageInfo.isNew() || lockTokenMatches(pageInfo, request));
+    return pageInfo.isNewOrLockedByUser(username) && (!preview || pageInfo.isNew() || lockTokenMatches(pageInfo, request));
   }
 
   private boolean lockTokenMatches(final PageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {
@@ -440,7 +440,7 @@ public class DefaultPageImpl implements DefaultPage {
     final String newContent = pageInfo.getContent();
     pageInfo = pageInfo.withAlternativeContent(content);
     request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(newContent, content));
-    if (pageInfo.isLocked() && !pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
+    if (pageInfo.isLocked() && !pageInfo.isNewOrLockedByUser((String) request.getAttribute(RequestAttributes.USERNAME))) {
       message = "Page was locked by " + pageInfo.getLockedBy() + " on " + pageInfo.getLockedSince() + ".";
       pageInfo = pageInfo.withoutLockToken();
     }
