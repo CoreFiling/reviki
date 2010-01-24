@@ -28,6 +28,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -104,6 +105,10 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().unlock(ref, lockToken);
   }
 
+  public List<SVNDirEntry> ls(String path) throws PageStoreException {
+    return getDelegate().ls(path);
+  }
+  
   protected abstract BasicSVNOperations getDelegate();
 
 }

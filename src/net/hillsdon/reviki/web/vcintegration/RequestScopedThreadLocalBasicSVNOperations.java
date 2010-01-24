@@ -44,7 +44,6 @@ public final class RequestScopedThreadLocalBasicSVNOperations extends Delegating
   public void destroy() {
     _requestLocal.destroy();
   }
-  
   @Override
   protected BasicSVNOperations getDelegate() {
     return _requestLocal.get();

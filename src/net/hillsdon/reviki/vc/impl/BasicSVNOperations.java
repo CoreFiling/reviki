@@ -28,6 +28,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -95,4 +96,6 @@ public interface BasicSVNOperations {
   void lock(PageReference ref, long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException;
   SVNLock getLock(String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
+  List<SVNDirEntry> ls(String path) throws NotFoundException, PageStoreException;
+  
 }

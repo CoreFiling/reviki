@@ -42,6 +42,7 @@ import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
@@ -57,6 +58,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
 
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
@@ -96,7 +98,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
-    return _operations.log("", limit, LogEntryFilter.ALL, true, 0, -1);
+    return _operations.log("", limit, LogEntryFilter.DESCENDANTS, true, 0, -1);
   }
 
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
@@ -290,21 +292,30 @@ public class SVNPageStore implements PageStore {
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
     final String attachmentPath = attachmentPath(ref);
-    Collection<ChangeInfo> changed = Collections.emptyList();
+    final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     if (_operations.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
-      changed = _operations.log(attachmentPath, -1, LogEntryFilter.ALL, false, 0, -1);
-    }
-    Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
-    for (ChangeInfo change : changed) {
-      if (change.getKind() == StoreKind.ATTACHMENT) {
-        AttachmentHistory history = results.get(change.getName());
-        if (history == null) {
-          history = new AttachmentHistory();
-          results.put(change.getName(), history);
+      final Collection<ChangeInfo> changed = _operations.log(attachmentPath, -1, LogEntryFilter.DESCENDANTS, false, 0, -1);
+      for (ChangeInfo change : changed) {
+        if (change.getKind() == StoreKind.ATTACHMENT) {
+          AttachmentHistory history = results.get(change.getName());
+          if (history == null) {
+            history = new AttachmentHistory();
+            results.put(change.getName(), history);
+          }
+          history.getVersions().add(change);
         }
-        history.getVersions().add(change);
+      }
+      // We need to log and ls - consider the case of copying an attachment *directory*.
+      for (SVNDirEntry attachment : _operations.ls(attachmentPath)) {
+        if (!results.containsKey(attachment.getName())) {
+          AttachmentHistory history = new AttachmentHistory();
+          ChangeInfo change = new ChangeInfo(ref.getName(), attachment.getName(), attachment.getAuthor(), attachment.getDate(), attachment.getRevision(), attachment.getCommitMessage(), StoreKind.ATTACHMENT, ChangeType.ADDED, null, -1);
+          history.getVersions().add(change);
+          results.put(attachment.getName(), history);
+        }
       }
     }
+    
     return results.values();
   }
   
@@ -325,7 +336,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.ALL, true, start, end);
+    List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {

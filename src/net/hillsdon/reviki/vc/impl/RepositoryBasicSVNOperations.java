@@ -21,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,7 @@ import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
@@ -93,8 +95,9 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     final String fullLoggedPathFromAppend = SVNPathUtil.append(rootPath, loggedPath);
     final String fullLoggedPath = (!fullLoggedPathFromAppend.startsWith("/")) ? "/" + fullLoggedPathFromAppend : fullLoggedPathFromAppend;
     final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
-    for (String changedPath : (Iterable<String>) entry.getChangedPaths().keySet()) {
-      if (SVNPathUtil.isAncestor(rootPath, changedPath) && matchesLogEntryFilter(logEntryFilter, fullLoggedPath, changedPath)) {
+    for (Map.Entry<String, SVNLogEntryPath> pathEntry : (Iterable<Map.Entry<String, SVNLogEntryPath>>) entry.getChangedPaths().entrySet()) {
+      final String changedPath = pathEntry.getKey();
+      if (logEntryFilter.accept(fullLoggedPath, pathEntry.getValue())) {
         ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
         // something useful with 'other' changes.
@@ -104,10 +107,6 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       }
     }
     return results;
-  }
-
-  private boolean matchesLogEntryFilter(final LogEntryFilter logEntryFilter,final String fullLoggedPath, String changedPath){
-    return logEntryFilter.accept(fullLoggedPath, changedPath);
   }
 
   public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
@@ -337,6 +336,16 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.deleteEntry(fromPath, baseRevision);
     commitEditor.addDir(toPath, fromPath, baseRevision);
     commitEditor.closeDir();
+  }
+
+  public List<SVNDirEntry> ls(final String path) throws PageStoreException {
+    return execute(new SVNAction<List<SVNDirEntry>>() {
+      public List<SVNDirEntry> perform(BasicSVNOperations operations, SVNRepository repository) throws SVNException, PageStoreException, IOException {
+        List<SVNDirEntry> list = new ArrayList<SVNDirEntry>();
+        repository.getDir(path, -1, null, list);
+        return list;
+      }
+    });
   }
   
 }
