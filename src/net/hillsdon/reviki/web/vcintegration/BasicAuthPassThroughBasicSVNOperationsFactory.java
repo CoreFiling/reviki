@@ -118,7 +118,8 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
     DAVRepositoryFactory.setup();
     SVNRepository repository = createRepository();
     UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));
-    // To get proxy support for testing/debug see SVNWCUtil.createDefaultAuthenticationManager()
+    // To get proxy support for testing/debug:
+    // repository.setAuthenticationManager(SVNWCUtil.createDefaultAuthenticationManager());
     repository.setAuthenticationManager(new BasicAuthenticationManager(credentials.getUsername(), credentials.getPassword()));
     request.setAttribute(RequestAttributes.USERNAME, credentials.getUsername());
     return new RepositoryBasicSVNOperations(repository, _autoPropertiesApplier);
