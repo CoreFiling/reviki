@@ -20,7 +20,7 @@
        directory.
 
        An external properties file is used to retrieve the username and password to use.
-       Supply the wiki.username and wiki.password properties in build.properties. 
+       See the file "build.properties.example".
   -->
   <property file="build.properties" />
 
@@ -166,8 +166,7 @@
     <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
-  <target name="functional-tests" depends="deploy, functional-tests-compile">
-    <antcall target="start-tomcat" />
+  <target name="functional-tests-junit" depends="functional-tests-compile">
     <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functional-tests-failed">
       <jvmarg value="-Dwiki.url=${wiki.url}" />
       <jvmarg value="-Dwiki.username=${wiki.username}" />
@@ -188,7 +187,18 @@
         </fileset>
       </batchtest>
     </junit>
-    <antcall target="stop-tomcat" />
+  </target>
+
+  <target name="functional-tests" depends="deploy">
+    <antcall>
+      <target name="start-tomcat" />
+      <target name="functional-tests-junit"/>
+      <target name="stop-tomcat" />
+      <target name="fail-iff-functional-tests-failed"/>
+    </antcall>
+  </target>
+
+  <target name="fail-iff-functional-tests-failed">
     <fail if="functional-tests-failed" />
   </target>
 
