@@ -17,8 +17,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 
 /**
- * @author pjt
+ * Tests for setting up new wikis.
  *
+ * @author pjt
  */
 public class TestConfigSvn extends WebTestSupport {
 
