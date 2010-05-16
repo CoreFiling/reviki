@@ -196,7 +196,8 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected String removeSessionId(final String url) {
-    return url.replaceFirst("[;][^?]*", "");
+    // The first caters for Tomcat, the second Jetty.
+    return url.replaceFirst("[;][^?]*", "").replaceFirst("%3B[^?]*", "");
   }
 
   protected void assertURL(final String expected, final String actual) {
