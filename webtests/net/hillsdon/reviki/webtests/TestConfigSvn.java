@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 
 /**
  * @author pjt
- * 
+ *
  */
 public class TestConfigSvn extends WebTestSupport {
 
@@ -46,7 +46,7 @@ public class TestConfigSvn extends WebTestSupport {
     }
   }
 
-  private void createOurDirectory(ISVNEditor editor) {
+  private void createOurDirectory(final ISVNEditor editor) {
     try {
       editor.openRoot(-1);
       editor.addDir(DIRECTORY, null, 0);
@@ -71,7 +71,7 @@ public class TestConfigSvn extends WebTestSupport {
     final HtmlPage confSvnPage = getWebPage("pages/" + wikiName);
     // Enter svn url + DIRECTORY
     final HtmlInput input = (HtmlInput) confSvnPage.getByXPath("//input[@name='url']").iterator().next();
-    input.setValueAttribute(System.getProperty("wiki.svn") + DIRECTORY);
+    input.setValueAttribute(getSvnLocation() + DIRECTORY);
     // Click Save and hopefully get FrontPage
     HtmlPage frontPage = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
     assertTrue(frontPage.getTitleText().contains("Front Page"));
@@ -88,14 +88,14 @@ public class TestConfigSvn extends WebTestSupport {
     final HtmlPage confSvnPage = getWebPage("pages/" + wikiName);
     // Enter svn url + DIRECTORY
     final HtmlInput input = (HtmlInput) confSvnPage.getByXPath("//input[@name='url']").iterator().next();
-    input.setValueAttribute(System.getProperty("wiki.svn") + DIRECTORY);
+    input.setValueAttribute(getSvnLocation() + DIRECTORY);
     // Click Save and hopefully get same page but with flash
     final HtmlPage confPageWithFlash = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
     assertTrue(confPageWithFlash.getTitleText().contains("Config Svn"));
     assertTrue(hasErrorMessage(confPageWithFlash));
   }
 
-  private void abortEditAndFail(final ISVNEditor editor, SVNException originalError) {
+  private void abortEditAndFail(final ISVNEditor editor, final SVNException originalError) {
     try {
       editor.abortEdit();
     }

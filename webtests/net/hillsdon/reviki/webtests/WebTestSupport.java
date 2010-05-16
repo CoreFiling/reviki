@@ -44,9 +44,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 public abstract class WebTestSupport extends TestCase {
 
   public static final String BASE_URL = System.getProperty("wiki.url", "http://localhost:8980/reviki");
-  
+
   public static final String NEWLINE_TEXTAREA = "\n";
-  
+
   private WebClient _client;
   private WebClient _altclient = null;
 
