@@ -32,10 +32,6 @@ public class ConsumedPath {
   private ListIterator<String> _iterator;
   private List<String> _list;
 
-  public ConsumedPath(final HttpServletRequest request) {
-    this(request.getRequestURI(), request.getContextPath());
-  }
-
   public ConsumedPath(final String requestURI, final String contextPath) {
     this(createPartList(requestURI, contextPath));
   }
@@ -95,6 +91,11 @@ public class ConsumedPath {
   public ConsumedPath consume() {
     next();
     return this;
+  }
+  
+  @Override
+  public String toString() {
+    return _list.toString();
   }
   
 }

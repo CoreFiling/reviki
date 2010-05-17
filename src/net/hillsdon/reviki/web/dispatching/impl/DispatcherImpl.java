@@ -61,7 +61,14 @@ public class DispatcherImpl implements Dispatcher {
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
-    ConsumedPath path = new ConsumedPath(request);
+    
+    // Avoid getRequestURL as that contains jsessionid (at least on Jetty).
+    final String contextPath = request.getContextPath();
+    final String servletPath = request.getServletPath();
+    final String pathInfo = request.getPathInfo();
+    final String reconstructedRequestURI = contextPath + servletPath + (pathInfo == null ? "" : pathInfo);
+    ConsumedPath path = new ConsumedPath(reconstructedRequestURI, contextPath);
+    
     try {
       _requestLifecycleAwareManager.requestStarted(request);
       View view = handle(path, request, response);
