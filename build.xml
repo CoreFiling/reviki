@@ -41,7 +41,7 @@
      <exec outputproperty="revision" executable="svnversion"/>
   </target>
 
-  <target name="clean">
+  <target name="clean" description="Clean-up build artifacts">
     <delete dir="${build-classes}" />
     <delete dir="${build-web}" />
     <delete dir="${build-webtests}" />
@@ -95,7 +95,7 @@
     </jar>
   </target>
 
-  <target name="unit-tests" depends="compile">
+  <target name="unit-tests" depends="compile" description="Run the unit tests">
     <junit printsummary="yes" haltonfailure="yes">
       <formatter type="plain" usefile="false"/>
       <classpath>
@@ -111,7 +111,7 @@
     </junit>
   </target>
 
-  <target name="war" depends="compile">
+  <target name="war" depends="compile" description="Build the WAR file">
     <war warfile="${war}"
          webxml="${build-web}/WEB-INF/web.xml">
        <classes dir="${build-classes}">
@@ -147,13 +147,13 @@
     <chmod dir="${tomcat}/bin" includes="**/*.sh" perm="u+x" />
   </target>
 
-  <target name="deploy" depends="war, prepare-tomcat">
+  <target name="deploy" depends="war, prepare-tomcat" description="Build and deploy the WAR to tomcat, ready to be started">
     <property name="deploy-dir" value="${tomcat}/conf/Catalina/localhost"/>
     <mkdir dir="${deploy-dir}"/>
     <copy file="context.xml" tofile="${deploy-dir}/reviki.xml"/>
   </target>
 
-  <target name="start-tomcat">
+  <target name="start-tomcat" description="Start tomcat at localhost:8080">
     <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
     <exec executable="${tomcat}/bin/startup.sh"/>
     <waitfor maxwait="15" maxwaitunit="second" checkevery="500" timeoutproperty="start-tomcat-failed">
@@ -162,7 +162,7 @@
     <fail if="start-tomcat-failed" />
   </target>
 
-  <target name="stop-tomcat">
+  <target name="stop-tomcat" description="Stop tomcat launched by start-tomcat">
     <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
@@ -189,7 +189,7 @@
     </junit>
   </target>
 
-  <target name="functional-tests" depends="deploy">
+  <target name="functional-tests" depends="deploy" description="Run the functional tests against a tomcat started/stopped by ant">
     <antcall>
       <target name="start-tomcat" />
       <target name="functional-tests-junit"/>
