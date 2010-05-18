@@ -77,6 +77,14 @@ public class TestRepositoryBasicSVNOperations extends TestCase {
   private ChangeInfo changeInfo(String rootPath, final String path) {
     return RepositoryBasicSVNOperations.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), rootPath, path);
   }
-  
+
+  public void testPathMunging() throws Exception {
+    assertEquals("", RepositoryBasicSVNOperations.fixFullLoggedPath(""));
+    assertEquals("", RepositoryBasicSVNOperations.fixFullLoggedPath("/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("/test/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("/test"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("test/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("test"));
+  }
   
 }

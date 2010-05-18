@@ -93,7 +93,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   @SuppressWarnings("unchecked")
   private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final LogEntryFilter logEntryFilter) {
     final String fullLoggedPathFromAppend = SVNPathUtil.append(rootPath, loggedPath);
-    final String fullLoggedPath = (!fullLoggedPathFromAppend.startsWith("/")) ? "/" + fullLoggedPathFromAppend : fullLoggedPathFromAppend;
+    final String fullLoggedPath = fixFullLoggedPath(fullLoggedPathFromAppend);
     final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (Map.Entry<String, SVNLogEntryPath> pathEntry : (Iterable<Map.Entry<String, SVNLogEntryPath>>) entry.getChangedPaths().entrySet()) {
       final String changedPath = pathEntry.getKey();
@@ -107,6 +107,21 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       }
     }
     return results;
+  }
+
+  static String fixFullLoggedPath(String fullLoggedPathFromAppend) {
+    boolean hasTrailing = fullLoggedPathFromAppend.endsWith("/");
+    boolean hasLeading = fullLoggedPathFromAppend.startsWith("/");
+    
+    // Always remove trailing "/"
+    if (hasTrailing) {
+      fullLoggedPathFromAppend = fullLoggedPathFromAppend.substring(0, fullLoggedPathFromAppend.length()-1);
+    }
+    // Ensure leading "/" unless empty string 
+    if (!hasLeading && !"".equals(fullLoggedPathFromAppend)) {
+      fullLoggedPathFromAppend = "/" + fullLoggedPathFromAppend;
+    }
+    return fullLoggedPathFromAppend;
   }
 
   public String getRoot() throws PageStoreAuthenticationException, PageStoreException {
