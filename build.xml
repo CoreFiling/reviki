@@ -202,7 +202,7 @@
     <fail if="functional-tests-failed" />
   </target>
 
-  <target name="all-tests" depends="unit-tests, functional-tests"/>
+  <target name="all-tests" depends="unit-tests, functional-tests" description="Run all the tests (starts/stops tomcat)"/>
 
 </project>
 
