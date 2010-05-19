@@ -82,7 +82,7 @@
     </javac>
   </target>
 
-  <target name="taglib-jar" depends="compile" description="Rebuilt the JSP taglib JAR file">
+  <target name="taglib-jar" depends="compile" description="Rebuild the JSP taglib JAR file">
     <mkdir dir="${build-classes}/META-INF"/>
     <move file="${build-classes}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-classes}/META-INF/reviki.tld"/>
     <jar destfile="WebContent/WEB-INF/lib/reviki-tlds.jar" >
