@@ -200,6 +200,13 @@
     </antcall>
   </target>
 
+  <target name="functional-tests-external" description="Run the functional tests against a tomcat outside of ant's control">
+    <antcall>
+      <target name="functional-tests-junit"/>
+      <target name="fail-iff-functional-tests-failed"/>
+    </antcall>
+  </target>
+
   <target name="fail-iff-functional-tests-failed">
     <fail if="functional-tests-failed" />
   </target>
