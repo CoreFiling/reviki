@@ -295,7 +295,7 @@ public class DefaultPageImpl implements DefaultPage {
         else {
           pageInfo = pageInfo.withAlternativeContent(getContent(request));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(response));
+          ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(request, response));
           request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
         }
       }
@@ -329,7 +329,7 @@ public class DefaultPageImpl implements DefaultPage {
       return new RawPageView(main);
     }
     else {
-      ResultNode rendered = _renderer.render(main, main.getContent(), new ResponseSessionURLOutputFilter(response));
+      ResultNode rendered = _renderer.render(main, main.getContent(), new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }

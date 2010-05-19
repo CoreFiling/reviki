@@ -17,6 +17,7 @@ package net.hillsdon.reviki.web.taglib;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -69,7 +70,7 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
       final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
       if (linker != null) {
         JspWriter out = pageContext.getOut();
-        URLOutputFilter urlOutputFilter = isSession() ? new ResponseSessionURLOutputFilter(response) : URLOutputFilter.NULL;
+        URLOutputFilter urlOutputFilter = isSession() ? new ResponseSessionURLOutputFilter((HttpServletRequest) pageContext.getRequest(), response) : URLOutputFilter.NULL;
         out.write(doOutput(linker, urlOutputFilter));
       }
     }

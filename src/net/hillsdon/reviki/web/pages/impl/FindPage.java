@@ -71,7 +71,7 @@ public class FindPage extends AbstractSpecialPage {
       return new View() {
         public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
           response.setContentType("application/opensearchdescription+xml");
-          String searchURL = _wikiUrls.search(new ResponseSessionURLOutputFilter(response));
+          String searchURL = _wikiUrls.search(new ResponseSessionURLOutputFilter(request, response));
           String faviconURL = _wikiUrls.resource("favicon.ico");
           response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(faviconURL), Escape.html(searchURL)));
         }

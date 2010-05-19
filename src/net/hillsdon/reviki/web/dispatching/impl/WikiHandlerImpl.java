@@ -132,7 +132,7 @@ public class WikiHandlerImpl implements WikiHandler {
     for (PageReference ref : COMPLIMENTARY_CONTENT_PAGES) {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
       PageInfo page = _cachingPageStore.get(ref, -1);
-      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent(), new ResponseSessionURLOutputFilter(response)).toXHTML());
+      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent(), new ResponseSessionURLOutputFilter(request, response)).toXHTML());
     }
   }
 
