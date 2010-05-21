@@ -16,7 +16,6 @@
 package net.hillsdon.reviki.wiki.macros;
 
 import static java.util.Collections.sort;
-import static net.hillsdon.fij.text.Strings.join;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,12 +25,21 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import net.hillsdon.reviki.wiki.renderer.macro.ResultFormat;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+
 public abstract class AbstractListOfPagesMacro implements Macro {
 
   public final String handle(final PageReference page, final String remainder) throws Exception {
     List<String> pages = new ArrayList<String>(getPages(remainder));
     sort(pages);
-    return join(pages.iterator(), "  * ", "\n", "");
+
+    return Joiner.on("\n").join(Iterables.transform(pages, new Function<String, String>() {
+      public String apply(final String page) {
+        return "  * " + page;
+      }
+    }));
   }
 
   public final ResultFormat getResultFormat() {
