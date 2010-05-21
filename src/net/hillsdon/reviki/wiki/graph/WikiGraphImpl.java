@@ -25,8 +25,9 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 
-import static net.hillsdon.fij.core.Functional.list;
-import static net.hillsdon.fij.core.Functional.map;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public class WikiGraphImpl implements WikiGraph {
 
@@ -37,17 +38,15 @@ public class WikiGraphImpl implements WikiGraph {
     _pageStore = pageStore;
     _searchEngine = searchEngine;
   }
-  
+
   public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
     Set<String> incoming = _searchEngine.incomingLinks(page);
-    retainOnlyExistingPages(incoming);
-    return incoming;
+    return onlyExistingPages(incoming);
   }
 
   public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
     Set<String> outgoing = _searchEngine.outgoingLinks(page);
-    retainOnlyExistingPages(outgoing);
-    return outgoing;
+    return onlyExistingPages(outgoing);
   }
 
   public Set<String> isolatedPages() throws IOException, PageStoreException {
@@ -64,12 +63,13 @@ public class WikiGraphImpl implements WikiGraph {
   /**
    * The search index will only update its record of outgoing links
    * when pages are edited so we compensate by filtering.
-   * 
+   *
    * @param pages Incoming.
    * @throws PageStoreException If we can't get the page list.
    */
-  private void retainOnlyExistingPages(final Set<String> pages) throws PageStoreException {
-    pages.retainAll(list(map(_pageStore.list(), PageReference.TO_NAME)));
+  private Set<String> onlyExistingPages(final Set<String> pages) throws PageStoreException {
+    Set<String> allExisting = ImmutableSet.copyOf(Iterables.transform(_pageStore.list(), PageReference.TO_NAME));
+    return Sets.intersection(pages, allExisting);
   }
 
 }

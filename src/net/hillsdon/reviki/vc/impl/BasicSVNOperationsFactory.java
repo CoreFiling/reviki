@@ -17,7 +17,7 @@ package net.hillsdon.reviki.vc.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.fij.core.Transform;
+import com.google.common.base.Function;
 
-public interface BasicSVNOperationsFactory extends Transform<HttpServletRequest, BasicSVNOperations> {
+public interface BasicSVNOperationsFactory extends Function<HttpServletRequest, BasicSVNOperations> {
 }

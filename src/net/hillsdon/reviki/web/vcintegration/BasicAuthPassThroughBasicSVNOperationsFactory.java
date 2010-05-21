@@ -37,7 +37,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 /**
  * Creates a page store that will authenticate with credentials provided in
  * the given request's 'Authorization' header (for basic auth only).
- *   
+ *
  * @author mth
  */
 public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOperationsFactory {
@@ -114,7 +114,7 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
     return new UsernamePassword(username, password);
   }
 
-  public BasicSVNOperations transform(final HttpServletRequest request) {
+  public BasicSVNOperations apply(final HttpServletRequest request) {
     DAVRepositoryFactory.setup();
     SVNRepository repository = createRepository();
     UsernamePassword credentials = getBasicAuthCredentials(request.getHeader("Authorization"));

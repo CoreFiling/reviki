@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.wiki.graph;
 
-import static net.hillsdon.fij.core.Functional.set;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
@@ -26,11 +25,13 @@ import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 import org.easymock.EasyMock;
 
+import com.google.common.collect.ImmutableSet;
+
 public class TestWikiGraphImpl extends TestCase {
 
   private CachingPageStore _store;
   private SearchEngine _mockedSearchEngine;
-  
+
   private WikiGraph _graph;
 
   @Override
@@ -40,17 +41,17 @@ public class TestWikiGraphImpl extends TestCase {
     _mockedSearchEngine = EasyMock.createMock(SearchEngine.class);
     _graph = new WikiGraphImpl(_store, _mockedSearchEngine);
   }
-  
+
   public void testRemovesNonExistantPagesFromOutgoingLinks() throws Exception {
-    expect(_mockedSearchEngine.outgoingLinks("RootPage")).andReturn(set("FooPage", "BarPage"));
+    expect(_mockedSearchEngine.outgoingLinks("RootPage")).andReturn(ImmutableSet.of("FooPage", "BarPage"));
     replay(_mockedSearchEngine);
-    assertEquals(set("FooPage"), _graph.outgoingLinks("RootPage"));
+    assertEquals(ImmutableSet.of("FooPage"), _graph.outgoingLinks("RootPage"));
   }
-  
+
   public void testRemovesNonExistantPagesFromIncomingLinks() throws Exception {
-    expect(_mockedSearchEngine.incomingLinks("RootPage")).andReturn(set("FooPage", "BarPage"));
+    expect(_mockedSearchEngine.incomingLinks("RootPage")).andReturn(ImmutableSet.of("FooPage", "BarPage"));
     replay(_mockedSearchEngine);
-    assertEquals(set("FooPage"), _graph.incomingLinks("RootPage"));
+    assertEquals(ImmutableSet.of("FooPage"), _graph.incomingLinks("RootPage"));
   }
 
 }

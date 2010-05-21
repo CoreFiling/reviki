@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
-import static net.hillsdon.fij.core.Functional.set;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_BACKLINKS_LIMITED;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_MARKED_UP_DIFF;
@@ -52,6 +51,8 @@ import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 
 import org.easymock.EasyMock;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Tests for {@link GetRegularPageImpl}.
@@ -189,7 +190,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {
-    expect(_graph.incomingLinks(THE_PAGE.getPath())).andReturn(set(returnedPages)).once();
+    expect(_graph.incomingLinks(THE_PAGE.getPath())).andReturn(ImmutableSet.copyOf(returnedPages)).once();
   }
 
   private PageInfo expectGetContent() throws Exception  {

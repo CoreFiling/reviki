@@ -15,9 +15,6 @@
  */
 package net.hillsdon.reviki.search.impl;
 
-import static net.hillsdon.fij.core.Functional.map;
-import static net.hillsdon.fij.core.Functional.set;
-import static net.hillsdon.fij.text.Strings.join;
 import static net.hillsdon.reviki.text.WikiWordUtils.lastComponentOfPath;
 import static net.hillsdon.reviki.text.WikiWordUtils.pathToTitle;
 
@@ -66,6 +63,11 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.LockObtainFailedException;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 /**
  * Uses lucene to provide search capabilities.
@@ -116,6 +118,7 @@ public class LuceneSearcher implements SearchEngine {
 
   private Analyzer createAnalyzer() {
     final Analyzer text = new StandardAnalyzer() {
+      @Override
       public TokenStream tokenStream(final String fieldName, final Reader reader) {
         return new PorterStemFilter(super.tokenStream(fieldName, reader));
       }
@@ -145,7 +148,7 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_PATH_LOWER, pathLower, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE_TOKENIZED, title, Field.Store.YES, Field.Index.TOKENIZED));
-    document.add(new Field(FIELD_OUTGOING_LINKS, join(renderedPage.findOutgoingWikiLinks().iterator(), " "), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_OUTGOING_LINKS, Joiner.on(" ").join(renderedPage.findOutgoingWikiLinks()), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
     return document;
@@ -206,7 +209,7 @@ public class LuceneSearcher implements SearchEngine {
       return doReadOperation(new ReadOperation<Set<String>>() {
         public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
           final String pageEscaped = escape(Escape.urlEncodeUTF8(page));
-          Set<String> results = set(map(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false), SearchMatch.TO_PAGE_NAME));
+          Set<String> results = Sets.newLinkedHashSet(Iterables.transform(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false), SearchMatch.TO_PAGE_NAME));
           results.remove(page);
           return results;
         }
@@ -229,7 +232,7 @@ public class LuceneSearcher implements SearchEngine {
           if (iterator.hasNext()) {
             Hit hit = (Hit) iterator.next();
             String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
-            Set<String> results = set(outgoingLinks.split("\\s"));
+            Set<String> results = ImmutableSet.copyOf(outgoingLinks.split("\\s"));
             results.remove(page);
             return results;
           }

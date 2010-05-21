@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.wiki.plugin;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import net.hillsdon.fij.core.IterableUtils;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.NotFoundException;
@@ -38,17 +39,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.picocontainer.DefaultPicoContainer;
 
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
+import com.google.common.collect.Iterables;
 
 /**
  * An aggregate of all the current plugins.
- * 
+ *
  * @author mth
  */
 public class PluginsImpl implements Plugins {
 
   private static final Log LOG = LogFactory.getLog(PluginsImpl.class);
-  
+
   /**
    * A plugin at a revision.
    */
@@ -60,18 +61,18 @@ public class PluginsImpl implements Plugins {
       _revision = revision;
     }
   }
-  
+
   private final DefaultPicoContainer _context;
   private final ConcurrentMap<String, PluginAtRevision> _active = new ConcurrentHashMap<String, PluginAtRevision>();
   private final PageStore _store;
-  
+
   /**
    */
   public PluginsImpl(final PageStore store) {
     _store = store;
     _context = new DefaultPicoContainer();
   }
-  
+
   public <T> List<T> getImplementations(final Class<T> clazz) {
     List<T> implementations = new ArrayList<T>();
     for (PluginAtRevision plugin : _active.values()) {
@@ -82,7 +83,7 @@ public class PluginsImpl implements Plugins {
 
   public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
     // We want to do the most recent first to prevent repeated work.
-    for (ChangeInfo change : IterableUtils.reversed(chronological)) {
+    for (ChangeInfo change : Iterables.reverse(chronological)) {
       if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(CONFIG_PLUGINS.getPath())) {
         PluginAtRevision plugin = _active.get(change.getName());
         if (plugin == null || plugin._revision < change.getRevision()) {
@@ -129,5 +130,5 @@ public class PluginsImpl implements Plugins {
   public long getHighestSyncedRevision() throws IOException {
     return 0;
   }
-  
+
 }

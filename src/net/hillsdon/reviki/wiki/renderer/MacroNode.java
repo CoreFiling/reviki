@@ -18,7 +18,6 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -33,18 +32,20 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Supplier;
+
 /**
  * Macro
- * 
+ *
  * @author mth
  */
 public class MacroNode extends AbstractRegexNode {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
-  
-  private final Accessor<List<Macro>> _macros;
 
-  public MacroNode(final Accessor<List<Macro>> macros, final boolean block) {
+  private final Supplier<List<Macro>> _macros;
+
+  public MacroNode(final Supplier<List<Macro>> macros, final boolean block) {
     super(block ? "(?s)(?:^|\\n)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>(^|\\n)"
                 : "(?s)<<([-\\p{Digit}\\p{L}]+?):(.+?)>>");
     _macros = macros;
@@ -68,7 +69,7 @@ public class MacroNode extends AbstractRegexNode {
     if (macro == null) {
       return new LiteralResultNode("<pre>" + Escape.html(matcher.group()) + "</pre>");
     }
-    
+
     try {
       String content = macro.handle(page, matcher.group(2));
       switch (macro.getResultFormat()) {

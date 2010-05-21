@@ -34,10 +34,6 @@ public class Strings {
     return "";
   }
   
-  public static String join(final Iterator<?> iter, final String between) {
-    return join(iter, null, null, between);
-  }
-  
   public static String join(final Iterator<?> iter, final String before, final String after, final String between) {
     StringBuilder sb = new StringBuilder();
     boolean first = true;

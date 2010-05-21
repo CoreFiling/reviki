@@ -27,11 +27,12 @@ import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import net.hillsdon.fij.core.Functional;
 import net.hillsdon.fij.io.Lsof;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Tests for {@link LuceneSearcher}.
@@ -44,7 +45,7 @@ public class TestLuceneSearcher extends TestCase {
   private static final String PAGE_THE_NAME2 = "TheName2";
   private static final String PAGE_THE_NAME3 = "TheName3";
   private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_THE_NAME, null)));
-  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(Functional.set(new SearchMatch(PAGE_THE_NAME, null), new SearchMatch(PAGE_THE_NAME2, null), new SearchMatch(PAGE_THE_NAME3, null)));
+  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(PAGE_THE_NAME, null), new SearchMatch(PAGE_THE_NAME2, null), new SearchMatch(PAGE_THE_NAME3, null)));
 
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
