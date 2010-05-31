@@ -21,3 +21,5 @@ First formal release.  Changes noted are since r1022.
 
 * Fix attachment pages that were showing irrelevant files for commits that
   touched more than one file [dbug 6299].
+
+* Ensure HTTP connections to the SVN server are closed after each request.
