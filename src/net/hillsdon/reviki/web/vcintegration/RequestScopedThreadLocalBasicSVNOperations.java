@@ -24,29 +24,33 @@ import net.hillsdon.reviki.vc.impl.DelegatingBasicSVNOperations;
 /**
  * Allow us to pass a BasicSVNOperations implementation into various objects but
  *  a) use authentication from the current request
- *  b) work with the thread-safety limitations of 
+ *  b) work with the thread-safety limitations of
  *     {@link org.tmatesoft.svn.core.io.SVNRepository}.
- * 
+ *
  * @author mth
  */
 public final class RequestScopedThreadLocalBasicSVNOperations extends DelegatingBasicSVNOperations implements RequestLifecycleAware {
 
   private final RequestLocal<BasicSVNOperations> _requestLocal;
-  
+
   public RequestScopedThreadLocalBasicSVNOperations(final BasicSVNOperationsFactory factory) {
     _requestLocal = new RequestLocal<BasicSVNOperations>(factory);
   }
-  
+
   public void create(final HttpServletRequest request) {
     _requestLocal.create(request);
   }
-  
+
   public void destroy() {
+    BasicSVNOperations value = _requestLocal.get();
+    if (value != null) {
+      value.dispose();
+    }
     _requestLocal.destroy();
   }
   @Override
   protected BasicSVNOperations getDelegate() {
     return _requestLocal.get();
   }
-  
+
 }

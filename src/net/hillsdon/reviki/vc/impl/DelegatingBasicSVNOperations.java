@@ -36,7 +36,7 @@ import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
  * Delegates to {@link #getDelegate()}.
- * 
+ *
  * @author mth
  */
 public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations {
@@ -45,31 +45,31 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     return getDelegate().checkPath(path, revision);
   }
 
-  public void copy(ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
+  public void copy(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {
     getDelegate().copy(commitEditor, fromPath, fromRevision, toPath);
   }
 
-  public void create(ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
+  public void create(final ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
     getDelegate().create(commitEditor, path, content);
   }
 
-  public void delete(ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
+  public void delete(final ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
     getDelegate().delete(commitEditor, path, baseRevision);
   }
 
-  public void edit(ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
+  public void edit(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
     getDelegate().edit(commitEditor, path, baseRevision, content);
   }
 
-  public void createDirectory(ISVNEditor commitEditor, final String dir) throws SVNException {
+  public void createDirectory(final ISVNEditor commitEditor, final String dir) throws SVNException {
     getDelegate().createDirectory(commitEditor, dir);
   }
-  
-  public void moveDir(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException {
+
+  public void moveDir(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
     getDelegate().moveDir(commitEditor, fromPath, baseRevision, toPath);
   }
-  
-  public void moveFile(ISVNEditor commitEditor, String fromPath, long baseRevision, String toPath) throws SVNException {
+
+  public void moveFile(final ISVNEditor commitEditor, final String fromPath, final long baseRevision, final String toPath) throws SVNException {
     getDelegate().moveFile(commitEditor, fromPath, baseRevision, toPath);
   }
 
@@ -97,7 +97,7 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().lock(ref, revision);
   }
 
-  public List<ChangeInfo> log(final String path, final long limit, LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
+  public List<ChangeInfo> log(final String path, final long limit, final LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return getDelegate().log(path, limit, logEntryFilter, stopOnCopy, startRevision, endRevision);
   }
 
@@ -105,10 +105,14 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().unlock(ref, lockToken);
   }
 
-  public List<SVNDirEntry> ls(String path) throws PageStoreException {
+  public List<SVNDirEntry> ls(final String path) throws PageStoreException {
     return getDelegate().ls(path);
   }
-  
+
+  public void dispose() {
+    getDelegate().dispose();
+  }
+
   protected abstract BasicSVNOperations getDelegate();
 
 }

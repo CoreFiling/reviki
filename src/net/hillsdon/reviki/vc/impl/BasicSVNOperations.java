@@ -37,13 +37,13 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
  * The low-level SVN operations in terms of our classes where useful.
- * 
+ *
  * This interface insulates the {@link SVNPageStore} from the {@link SVNRepository}
  * to enable testing of the logic in the page store.
- * 
+ *
  * In order to combine multiple operations {@link #execute(SVNAction)} has now
  * been exposed so it may make sense to change the layering here.
- * 
+ *
  * @author mth
  */
 public interface BasicSVNOperations {
@@ -78,7 +78,7 @@ public interface BasicSVNOperations {
    * Caller must closeDir afterwards.
    */
   void createDirectory(ISVNEditor commitEditor, String dir) throws SVNException;
-  
+
   /**
    * Currently does open/closeDir.
    */
@@ -97,5 +97,7 @@ public interface BasicSVNOperations {
   SVNLock getLock(String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
   List<SVNDirEntry> ls(String path) throws NotFoundException, PageStoreException;
-  
+
+  void dispose();
+
 }
