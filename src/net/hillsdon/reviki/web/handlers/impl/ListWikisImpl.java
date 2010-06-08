@@ -71,7 +71,7 @@ public class ListWikisImpl implements ListWikis {
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
     final List<WikiDescriptor> descriptors = new ArrayList<WikiDescriptor>();
     for (String name : _configuration.getWikiNames()) {
-      String frontPage = _applicationUrls.get(name).page(BuiltInPageReferences.PAGE_FRONT_PAGE.getPath(), new ResponseSessionURLOutputFilter(request, response));
+      String frontPage = _applicationUrls.get(name).page(null, BuiltInPageReferences.PAGE_FRONT_PAGE.getPath(), new ResponseSessionURLOutputFilter(request, response));
       descriptors.add(new WikiDescriptor(name, frontPage));
     }
     request.setAttribute("descriptors", descriptors);

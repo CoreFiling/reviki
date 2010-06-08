@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.di.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,19 +104,22 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
+    
+    File primarySearchDir = configuration.getSearchIndexDirectory();
+    File[] otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, in, urlOutputFilter);
       }
     });
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
 
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
-    Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
+    Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);

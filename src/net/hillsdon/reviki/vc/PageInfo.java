@@ -27,6 +27,8 @@ public interface PageInfo extends PageReference  {
   // Magic revisions.  Prefer isFoo() methods.
   long UNCOMMITTED = -2;
   long DELETED = -3;
+  
+  String getWiki();
 
   String getContent();
   

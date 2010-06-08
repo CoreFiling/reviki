@@ -32,12 +32,30 @@ public class SearchMatch {
     }
   };
 
+  private final boolean _sameWiki;
+  private final String _wiki;
   private final String _page;
   private final String _htmlExtract;
 
-  public SearchMatch(final String page, final String htmlExtract) {
+  public SearchMatch(final boolean sameWiki, final String wiki, final String page, final String htmlExtract) {
+    _sameWiki = sameWiki;
+    _wiki = wiki;
     _page = page;
     _htmlExtract = htmlExtract;
+  }
+  
+  /**
+   * @return true iff the wiki for the match is the same as the wiki from which the search was performed.
+   */
+  public boolean isSameWiki() {
+    return _sameWiki;
+  }
+  
+  /**
+   * @return The wiki of the page that matched.
+   */
+  public String getWiki() {
+    return _wiki;
   }
 
   /**

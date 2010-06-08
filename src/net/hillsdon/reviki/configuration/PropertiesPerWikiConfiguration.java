@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.configuration;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.tmatesoft.svn.core.SVNURL;
 
@@ -31,6 +32,18 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
   
   public File getSearchIndexDirectory() {
     return _deploymentConfiguration.getSearchIndexDirectory(_wikiName);
+  }
+  
+  public File[] getOtherSearchIndexDirectories() {
+    Collection<String> wikiNames = _deploymentConfiguration.getWikiNames();
+    File[] otherIndexDirs = new File[wikiNames.size()-1];
+    int i = 0;
+    for (String wikiName: wikiNames) {
+      if (!wikiName.equals(_wikiName)) {
+        otherIndexDirs[i++] = _deploymentConfiguration.getSearchIndexDirectory(wikiName);
+      }
+    }
+    return otherIndexDirs;
   }
 
   public void setUrl(final String location) {
@@ -59,6 +72,10 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
   
   public String getFixedBaseUrl() {
     return _deploymentConfiguration.getFixedBaseUrl(_wikiName);
+  }
+  
+  public String getFixedBaseUrl(String wikiName) {
+    return _deploymentConfiguration.getFixedBaseUrl(wikiName);
   }
   
   @Override

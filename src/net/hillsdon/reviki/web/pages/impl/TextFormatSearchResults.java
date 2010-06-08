@@ -42,7 +42,17 @@ public class TextFormatSearchResults implements View {
     response.setContentType("text/plain");
     PrintWriter writer = response.getWriter();
     for (SearchMatch matcher : _results) {
-      writer.println(matcher.getPage());
+      String spanClass;
+      String spanText;
+      if (matcher.isSameWiki()) {
+        spanClass = "";
+        spanText = matcher.getPage();
+      }
+      else {
+        spanClass = "same-wiki";
+        spanText = String.format("[%s] %s", matcher.getWiki(), matcher.getPage());
+      }
+      writer.printf("<span class=\"%s\">%s</span>\n", spanClass, spanText);
     }
   }
   

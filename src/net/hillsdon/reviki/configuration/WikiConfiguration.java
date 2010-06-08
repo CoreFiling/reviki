@@ -36,6 +36,11 @@ public interface WikiConfiguration {
    *         from the request.
    */
   String getFixedBaseUrl();
+  
+  /**
+   * @return The fixed base URL, if any, for the named wiki.
+   */
+  String getFixedBaseUrl(String wikiName);
 
   /**
    * @return The SVN URL for our data store.
@@ -52,6 +57,12 @@ public interface WikiConfiguration {
    * @return The directory to store the search engine index in or null if not possible.
    */
   File getSearchIndexDirectory();
+  
+  /**
+   * @return An array of directories to the other wikis use to store the search engine indices in.
+   */
+  File[] getOtherSearchIndexDirectories();
+
 
   /**
    * @return true if the configuration is OK.

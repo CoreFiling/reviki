@@ -117,5 +117,8 @@ public abstract class AbstractDelegatingPageStore implements PageStore {
   public void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException {
     getDelegateInternal().assertValid();
   }
-  
+
+  public String getWiki() throws PageStoreException {
+    return getDelegateInternal().getWiki();
+  }
 }

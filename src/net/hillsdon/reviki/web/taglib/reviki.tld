@@ -30,6 +30,11 @@
       <tag-class>net.hillsdon.reviki.web.taglib.WikiPageTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
+        <name>wiki</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
         <name>page</name>
         <required>true</required>
         <rtexprvalue>true</rtexprvalue>

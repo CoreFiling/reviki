@@ -29,7 +29,7 @@ public class WikiPageTag extends AbstractWikiLinkTag {
   private static final long serialVersionUID = 1L;
 
   protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
-    return linker.aHref(getPage(), getPage(), getExtra(), urlOutputFilter);
+    return linker.aHref(getWiki(), getPage(), getPage(), getExtra(), urlOutputFilter);
   }
   
 }

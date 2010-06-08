@@ -35,15 +35,19 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
   }
   
   public String pagesRoot() {
-    String fixedBaseUrl = _configuration.getFixedBaseUrl();
+    return pagesRoot(null);
+  }
+  
+  public String pagesRoot(String wikiName) {
+    String fixedBaseUrl = _configuration.getFixedBaseUrl(wikiName);
     if (fixedBaseUrl != null) {
      if (!fixedBaseUrl.endsWith("/")) {
        fixedBaseUrl += "/";
      }
-     return fixedBaseUrl; 
+     return fixedBaseUrl;
     }
-    
-    final String givenWikiName = _configuration.getWikiName();
+
+    final String givenWikiName = wikiName == null ? _configuration.getWikiName() : wikiName;
     String relative = "/pages/";
     if (givenWikiName != null) {
       relative += Escape.urlEncodeUTF8(givenWikiName) + "/";

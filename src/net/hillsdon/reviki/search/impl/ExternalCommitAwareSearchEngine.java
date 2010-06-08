@@ -61,8 +61,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     _store = store;
   }
   
-  public void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
-    _delegate.index(path, revision, content);
+  public void index(final String wiki, final String path, final long revision, final String content) throws IOException, PageStoreException {
+    _delegate.index(wiki, path, revision, content);
   }
 
   public Set<SearchMatch> search(final String query, final boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
@@ -88,10 +88,10 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
         // back the revision of deleted pages as -2 which isn't such a good
         // thing to set our 'highest indexed revision' to...
         if (info.isNew()) {
-          _delegate.delete(info.getPath(), upto);
+          _delegate.delete(info.getWiki(), info.getPath(), upto);
         }
         else {
-          _delegate.index(info.getPath(), upto, info.getContent());
+          _delegate.index(info.getWiki(), info.getPath(), upto, info.getContent());
         }
       }
       catch (Exception ex) {
@@ -104,8 +104,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.getHighestIndexedRevision();
   }
 
-  public void delete(final String path, final long revision) throws IOException {
-    _delegate.delete(path, revision);
+  public void delete(final String wiki, final String path, final long revision) throws IOException {
+    _delegate.delete(wiki, path, revision);
   }
 
   public String escape(final String in) {

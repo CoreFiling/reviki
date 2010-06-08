@@ -38,11 +38,13 @@ public interface WikiUrls extends ResourceUrls {
    */
   String pagesRoot();
   
+  String pagesRoot(String wikiName);
+  
   String search(URLOutputFilter urlOutputFilter);
   
-  String page(String name, String extra, URLOutputFilter urlOutputFilter);
+  String page(String wikiName, String pageName, String extra, URLOutputFilter urlOutputFilter);
 
-  String page(String name, URLOutputFilter urlOutputFilter);
+  String page(String wikiName, String pageName, URLOutputFilter urlOutputFilter);
 
   String feed(URLOutputFilter urlOutputFilter);
   

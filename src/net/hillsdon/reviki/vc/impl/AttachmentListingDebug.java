@@ -15,7 +15,7 @@ public class AttachmentListingDebug {
     SVNRepository repository = SVNRepositoryFactory.create(SVNURL.parseURIDecoded("http://svn.dsl.local/svn/web/wiki/dsl"));
     repository.setAuthenticationManager(SVNWCUtil.createDefaultAuthenticationManager());
     RepositoryBasicSVNOperations operations = new RepositoryBasicSVNOperations(repository, null);
-    SVNPageStore store = new SVNPageStore(new InMemoryDeletedRevisionTracker(), operations, null, null);
+    SVNPageStore store = new SVNPageStore("wiki", new InMemoryDeletedRevisionTracker(), operations, null, null);
     for (AttachmentHistory attachment : store.attachments(new PageReferenceImpl("Printing"))) {
       System.err.println(attachment.getName());
     }

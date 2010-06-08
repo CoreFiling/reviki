@@ -63,7 +63,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _response = null;
     _store = createMock(CachingPageStore.class);
     _pageStore = createMock(PageStore.class);
-    _pageInfo = new PageInfoImpl("ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
+    _pageInfo = new PageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);

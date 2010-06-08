@@ -36,6 +36,11 @@ import java.util.Set;
 public interface PageStore {
   
   /**
+   * @return The name of the wiki for which this PageStore stores pages.
+   */
+  String getWiki() throws PageStoreException;
+  
+  /**
    * @return The latest (highest) revision number.
    */
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;

@@ -202,7 +202,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   private PageInfo expectGetContent(final PageReference page, final int revision, final String content) throws Exception {
-    PageInfo pageInfo = new PageInfoImpl(page.getPath(), content, revision, revision, "", new Date(), "", "", null);
+    PageInfo pageInfo = new PageInfoImpl("wiki", page.getPath(), content, revision, revision, "", new Date(), "", "", null);
     expect(_store.get(page, revision)).andReturn(pageInfo).once();
     return pageInfo;
   }

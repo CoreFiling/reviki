@@ -43,10 +43,19 @@ public class InternalLinker {
   }
   
   public String url(final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
-    return _wikiUrls.page(pageName, extra, urlOutputFilter);
+    return _wikiUrls.page(null, pageName, extra, urlOutputFilter);
+  }
+  
+  public String url(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(wikiName, pageName, extra, urlOutputFilter);
   }
   
   public String aHref(final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
+    String x = aHref(null, pageName, linkText, extra, urlOutputFilter);
+    return x;
+  }
+  
+  public String aHref(final String wikiName, final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
     // Special case: only link acronyms with real pages.
     final boolean exists = exists(pageName);
     if (!exists && isAcronym(pageName)) {
@@ -58,7 +67,7 @@ public class InternalLinker {
     return format("<a %sclass='%s' href='%s'>%s</a>",
       otherAttrs,
       cssClass,
-      Escape.html(url(pageName, extra, urlOutputFilter)),
+      Escape.html(url(wikiName, pageName, extra, urlOutputFilter)),
       Escape.html(linkText)
     );
   }

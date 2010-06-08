@@ -83,16 +83,19 @@ public class SVNPageStore implements PageStore {
     }
   };
 
+  private final String _wiki;
   private final BasicSVNOperations _operations;
   private final DeletedRevisionTracker _tracker;
   private final MimeIdentifier _mimeIdentifier;
   private final AutoPropertiesApplier _autoPropertiesApplier;
 
+
   /**
    * Note the repository URL can be deep, it need not refer to the root of the
    * repository itself. We put pages in the root of what we're given.
    */
-  public SVNPageStore(final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+  public SVNPageStore(final String wiki, final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+    _wiki = wiki;
     _tracker = tracker;
     _operations = operations;
     _autoPropertiesApplier = autoPropertiesApplier;
@@ -157,7 +160,7 @@ public class SVNPageStore implements PageStore {
       catch (NotFoundException ex) {
         // It was a file at 'revision' but is now deleted so we can't get the lock information.
       }
-      return new PageInfoImpl(ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken, lockedSince);
+      return new PageInfoImpl(_wiki, ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken, lockedSince);
     }
     else if (SVNNodeKind.NONE.equals(kind)) {
       long pseudoRevision = PageInfo.UNCOMMITTED;
@@ -171,7 +174,7 @@ public class SVNPageStore implements PageStore {
         lastChangedAuthor = deletingChange.getUser();
         lastChangedDate = deletingChange.getDate();
       }
-      return new PageInfoImpl(ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
+      return new PageInfoImpl(_wiki, ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
     }
     else {
       throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
@@ -395,6 +398,10 @@ public class SVNPageStore implements PageStore {
       // into operations and check the different SVNKit failure codes there.
       throw new PageStoreInvalidException(e);
     }
+  }
+
+  public String getWiki() throws PageStoreException {
+    return _wiki;
   }
 
 }

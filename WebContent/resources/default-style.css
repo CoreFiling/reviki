@@ -173,3 +173,25 @@ table.history, td.history, th.history {
 	border:1px dashed grey;
 	border-collapse:collapse;
 }
+
+/* Search */
+h2.results-wiki {
+	font-weight: bold;
+	border-bottom: 1px solid #aaa;
+	color: #222;
+	width: 50%;
+}
+
+.same-wiki {
+	background: #f8f8f8;
+	margin: 0;
+	width: 100%;
+}
+
+.same-wiki:hover {
+	background: #f0f088;
+}
+
+.ac_results li {
+	padding: 0 !important;
+}

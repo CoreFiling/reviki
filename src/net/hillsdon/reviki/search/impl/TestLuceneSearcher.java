@@ -41,11 +41,13 @@ import com.google.common.collect.ImmutableSet;
  */
 public class TestLuceneSearcher extends TestCase {
 
+  private static final String WIKI_NAME = "wiki";
+  private static final String WIKI_NAME2 = "wiki2";
   private static final String PAGE_THE_NAME = "TheName";
   private static final String PAGE_THE_NAME2 = "TheName2";
   private static final String PAGE_THE_NAME3 = "TheName3";
-  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(PAGE_THE_NAME, null)));
-  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(PAGE_THE_NAME, null), new SearchMatch(PAGE_THE_NAME2, null), new SearchMatch(PAGE_THE_NAME3, null)));
+  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null)));
+  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null)));
 
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -68,39 +70,48 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   private File _dir;
+  private File _dir2;
   private LuceneSearcher _searcher;
+  private LuceneSearcher _searcher2;
 
   @Override
   protected void setUp() throws Exception {
     _dir = createTempDir();
-    _searcher = new LuceneSearcher(_dir, new RenderedPageFactory(MarkupRenderer.AS_IS));
+    _dir2 = createTempDir();
+    _searcher = new LuceneSearcher(WIKI_NAME, _dir, new File[]{_dir2}, new RenderedPageFactory(MarkupRenderer.AS_IS));
+    _searcher2 = new LuceneSearcher(WIKI_NAME2, _dir2, new File[]{_dir}, new RenderedPageFactory(MarkupRenderer.AS_IS));
   }
 
   @Override
   protected void tearDown() throws Exception {
-    // Nothing in _dir should be open.  Note this only works on Linux-like
+    cleanupTempDir(_dir);
+    cleanupTempDir(_dir2);
+  }
+  
+  protected void cleanupTempDir(File tmpDir) {
+    // Nothing in tmpDir should be open.  Note this only works on Linux-like
     // machines at the moment (silently passing on others).
     for (File file : Lsof.lsof()) {
-      final String dir = _dir.getAbsolutePath() + File.separator;
+      final String dir = tmpDir.getAbsolutePath() + File.separator;
       final String filePath = file.getAbsolutePath();
       if (filePath.startsWith(dir)) {
         fail(file.toString() + " should be closed!");
       }
     }
-    recursivelyDelete(_dir);
+    recursivelyDelete(tmpDir);
   }
 
   public void testRepeatedAddsForSamePathReplace() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
-    _searcher.index(PAGE_THE_NAME, -1, "the something else");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the something else");
     assertEquals(emptySet(), _searcher.search("content", true));
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
 
   public void testFindsByPath() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true));
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
   }
@@ -115,28 +126,28 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testCaseInsensitiveLowerFindsMixed() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "The Content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "The Content");
     assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
   }
 
   public void testCaseInsensitiveMixedFindsLower() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("Content", true));
   }
 
   // Interestingly these fail while the others pass... when upgrading to Lucene 2.3.0.
   public void testMoreInterestingWords() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "cabbage patch");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "cabbage patch");
     assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("patch", false));
 
-    _searcher.index(PAGE_THE_NAME, -1, "fruit flies");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "fruit flies");
     assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false));
     assertEquals(JUST_THE_PAGE, _searcher.search("flies", false));
   }
 
   public void testFindsByTokenizedPath() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
   }
 
@@ -154,38 +165,54 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testFindLowerPath() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("thename", false));
   }
 
   public void testFindPartialLowerPathCaseInsensitive() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("ThenA", false));
   }
 
   public void testFieldBasedQueryWithQuotes() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false));
   }
 
   public void testAndByDefault() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "some content");
-    _searcher.index(PAGE_THE_NAME2, -1, "some");
-    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
     assertEquals(JUST_THE_PAGE, _searcher.search("some content", false));
   }
 
   public void testOr() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "some content");
-    _searcher.index(PAGE_THE_NAME2, -1, "some");
-    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
     assertEquals(ALL_3, _searcher.search("some OR content", false));
   }
 
   public void testLowercaseOrIsNotKeyword() throws Exception {
-    _searcher.index(PAGE_THE_NAME, -1, "some content");
-    _searcher.index(PAGE_THE_NAME2, -1, "some");
-    _searcher.index(PAGE_THE_NAME3, -1, "content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
     assertEquals(JUST_THE_PAGE, _searcher.search("some or content", false));
+  }
+  
+  public void testMultiWiki() throws Exception {
+    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
+    _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
+    assertEquals(expected, _searcher.search("some or content", false));
+    assertEquals(expected, _searcher2.search("some or content", false));
+  }
+  
+  public void testMultiWikiOrder() throws Exception {
+    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
+    _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
+    assertEquals(WIKI_NAME, _searcher.search("some or content", false).iterator().next().getWiki());
+    assertEquals(WIKI_NAME2, _searcher2.search("some or content", false).iterator().next().getWiki());
   }
 }

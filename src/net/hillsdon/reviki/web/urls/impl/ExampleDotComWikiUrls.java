@@ -20,5 +20,11 @@ public class ExampleDotComWikiUrls extends AbstractWikiUrls {
   public String pagesRoot() {
     return "http://www.example.com/reviki/pages/test-wiki/";
   }
-
+  
+  public String pagesRoot(String wikiName) {
+    if (wikiName==null) {
+      return pagesRoot();
+    }
+    return null;
+  }
 }

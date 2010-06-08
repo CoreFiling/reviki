@@ -29,13 +29,15 @@ import com.google.common.base.Supplier;
 
 public class PerRequestPageStoreFactory implements Supplier<PageStore> {
 
+  private final String _wiki;
   private final SearchEngine _indexer;
   private final DeletedRevisionTracker _tracker;
   private final BasicSVNOperations _operations;
   private final AutoPropertiesApplier _autoPropertiesApplier;
   private final MimeIdentifier _mimeIdentifier;
 
-  public PerRequestPageStoreFactory(final SearchEngine indexer, final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+  public PerRequestPageStoreFactory(final String wiki, final SearchEngine indexer, final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+    _wiki = wiki;
     _indexer = indexer;
     _tracker = tracker;
     _operations = operations;
@@ -44,7 +46,7 @@ public class PerRequestPageStoreFactory implements Supplier<PageStore> {
   }
 
   public PageStore get() {
-    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_tracker, _operations, _autoPropertiesApplier, _mimeIdentifier))));
+    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_wiki, _tracker, _operations, _autoPropertiesApplier, _mimeIdentifier))));
   }
 
 }

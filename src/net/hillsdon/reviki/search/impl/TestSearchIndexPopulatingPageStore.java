@@ -48,7 +48,8 @@ public class TestSearchIndexPopulatingPageStore extends TestCase {
     final long newRevision = 15;
   
     expect(_mockedDelegate.set(ref, lockToken, baseRevision, content, commitMessage)).andReturn(newRevision );
-    _mockedSearchEngine.index(ref.getPath(), newRevision, content);
+    _mockedSearchEngine.index("wiki", ref.getPath(), newRevision, content);
+    expect(_mockedDelegate.getWiki()).andReturn("wiki");
     replay(_mockedDelegate, _mockedSearchEngine);
     _populatingPageStore.set(ref, lockToken, baseRevision, content, commitMessage);
     verify(_mockedDelegate, _mockedSearchEngine);

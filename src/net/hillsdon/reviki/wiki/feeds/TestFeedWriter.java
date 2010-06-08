@@ -49,11 +49,14 @@ public class TestFeedWriter extends TestCase {
       public String feed(final URLOutputFilter urlOutputFilter) {
         return "this isn't used";
       }
-      public String page(final String name, final URLOutputFilter urlOutputFilter) {
+      public String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
         return "page";
       }
       public String pagesRoot() {
         return "root";
+      }
+      public String pagesRoot(String wikiName) {
+        return null;
       }
       public String search(final URLOutputFilter urlOutputFilter) {
         return "search";
@@ -61,7 +64,7 @@ public class TestFeedWriter extends TestCase {
       public String resource(String path) {
         return "favicon";
       }
-      public String page(String name, String extra, URLOutputFilter urlOutputFilter) {
+      public String page(String wikiName, String pageName, String extra, URLOutputFilter urlOutputFilter) {
         return "page";
       }
     };

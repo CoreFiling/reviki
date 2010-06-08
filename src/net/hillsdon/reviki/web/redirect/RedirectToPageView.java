@@ -54,7 +54,7 @@ public class RedirectToPageView implements View {
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    response.sendRedirect(response.encodeRedirectURL(_wikiUrls.page(_page.getPath(), URLOutputFilter.NULL) + _appended));
+    response.sendRedirect(response.encodeRedirectURL(_wikiUrls.page(null, _page.getPath(), URLOutputFilter.NULL) + _appended));
   }
 
   public static View create(final PageReference page, final ApplicationUrls applicationUrls, final WikiConfiguration perWikiConfiguration) {

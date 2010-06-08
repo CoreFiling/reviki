@@ -36,6 +36,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 public abstract class AbstractWikiLinkTag extends TagSupport {
 
   private static final long serialVersionUID = 1L;
+  private String _wiki;
   private String _page;
   private String _extra = "";
   private boolean _session = true;
@@ -46,6 +47,14 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
 
   public void setPage(final String page) {
     _page = page;
+  }
+  
+  public String getWiki() {
+    return _wiki;
+  }
+  
+  public void setWiki(final String wiki) {
+    _wiki = wiki;
   }
 
   public String getExtra() {
