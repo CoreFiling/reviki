@@ -1,12 +1,15 @@
 Reviki
 
                               Version History
-0.1.0 (2010-06-05)
+0.1.0 (2010-06-11)
 ------------------
 
 First formal release.  Changes noted are since r1022.
 
 * Now supported on Jetty.
+
+* Cross-wiki search.  Note this requires all wikis to have been indexed, which
+  is still done on first access.
 
 * Keyboard shortcuts for edit, save and cancel, with prompt to confirm cancel.
 
