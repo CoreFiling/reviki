@@ -55,9 +55,16 @@ public class InternalLinker {
     return x;
   }
   
+  /**
+   * Generate a hyperlink.
+   * @param wikiName If not-null it will generate a foreign-wiki link (which will always be deemed to exist)
+   * @param pageName The name of the page on wikiName
+   * @param linkText The text to display
+   * @return The html
+   */
   public String aHref(final String wikiName, final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
-    // Special case: only link acronyms with real pages.
-    final boolean exists = exists(pageName);
+    // Special case: only link acronyms with real pages or on foreign wikis.
+    final boolean exists = wikiName!=null || exists(pageName);
     if (!exists && isAcronym(pageName)) {
       return Escape.html(pageName);
     }
