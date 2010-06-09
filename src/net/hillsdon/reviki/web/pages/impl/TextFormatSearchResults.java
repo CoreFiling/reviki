@@ -45,14 +45,13 @@ public class TextFormatSearchResults implements View {
       String spanClass;
       String spanText;
       if (matcher.isSameWiki()) {
-        spanClass = "";
-        spanText = matcher.getPage();
+        writer.println(matcher.getPage());
       }
       else {
-        spanClass = "same-wiki";
-        spanText = String.format("[%s] %s", matcher.getWiki(), matcher.getPage());
+        //TODO: Can't currently find a clean way to pass wiki name / foreign flag to jquery suggest.
+        //Unlike autocomplete, it doesn't have an easy way to provide a parser for items.
+        writer.println(matcher.getPage());
       }
-      writer.printf("<span class=\"%s\">%s</span>\n", spanClass, spanText);
     }
   }
   
