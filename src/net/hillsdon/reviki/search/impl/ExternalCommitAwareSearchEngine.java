@@ -65,8 +65,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     _delegate.index(wiki, path, revision, content);
   }
 
-  public Set<SearchMatch> search(final String query, final boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
-    return _delegate.search(query, provideExtracts);
+  public Set<SearchMatch> search(final String query, final boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException {
+    return _delegate.search(query, provideExtracts, singleWiki);
   }
 
   public long getHighestSyncedRevision() throws IOException {

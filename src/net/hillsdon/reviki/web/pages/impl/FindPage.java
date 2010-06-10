@@ -91,7 +91,7 @@ public class FindPage extends AbstractSpecialPage {
       return new RedirectToPageView(_wikiUrls, queryPage);
     }
     
-    final Set<SearchMatch> results = _searchEngine.search(query, true);
+    final Set<SearchMatch> results = _searchEngine.search(query, true, pageExists);
     Long limit = getLong(request.getParameter("limit"), "limit");
     if (limit != null) {
       results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));

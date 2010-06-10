@@ -369,7 +369,7 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
 
-  public Set<SearchMatch> search(final String queryString, final boolean provideExtracts) throws IOException, QuerySyntaxException {
+  public Set<SearchMatch> search(final String queryString, final boolean provideExtracts, final boolean singleWiki) throws IOException, QuerySyntaxException {
     if (_dir == null || queryString == null || queryString.trim().length() == 0) {
       return Collections.emptySet();
     }
@@ -388,7 +388,7 @@ public class LuceneSearcher implements SearchEngine {
         }
         return orderResults(results);
       }
-    }, true);
+    }, !singleWiki);
   }
   
   private Set<SearchMatch> orderResults(Set<SearchMatch> results) {

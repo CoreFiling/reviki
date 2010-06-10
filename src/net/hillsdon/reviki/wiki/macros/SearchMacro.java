@@ -37,7 +37,7 @@ public class SearchMacro extends AbstractListOfPagesMacro {
 
   @Override
   protected Collection<String> getPages(final String remainder) throws Exception {
-    return ImmutableList.copyOf(Iterables.transform(_searchEngine.search(remainder, false), SearchMatch.TO_PAGE_NAME));
+    return ImmutableList.copyOf(Iterables.transform(_searchEngine.search(remainder, false, true), SearchMatch.TO_PAGE_NAME));
   }
 
 }

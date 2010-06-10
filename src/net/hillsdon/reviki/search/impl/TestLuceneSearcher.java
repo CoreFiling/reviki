@@ -103,22 +103,22 @@ public class TestLuceneSearcher extends TestCase {
 
   public void testRepeatedAddsForSamePathReplace() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true, false));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the something else");
-    assertEquals(emptySet(), _searcher.search("content", true));
+    assertEquals(emptySet(), _searcher.search("content", true, false));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true, false));
   }
 
   public void testFindsByPath() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true));
-    assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true, false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false, false));
   }
 
   public void testFindsCaseInsensitivelyByPath() throws Exception {
     try {
-      assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME.toLowerCase(Locale.US), true));
+      assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME.toLowerCase(Locale.US), true, false));
       throw new Error("Fixed bug!");
     }
     catch (AssertionFailedError bug) {
@@ -127,28 +127,28 @@ public class TestLuceneSearcher extends TestCase {
 
   public void testCaseInsensitiveLowerFindsMixed() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "The Content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("content", true));
+    assertEquals(JUST_THE_PAGE, _searcher.search("content", true, false));
   }
 
   public void testCaseInsensitiveMixedFindsLower() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("Content", true));
+    assertEquals(JUST_THE_PAGE, _searcher.search("Content", true, false));
   }
 
   // Interestingly these fail while the others pass... when upgrading to Lucene 2.3.0.
   public void testMoreInterestingWords() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "cabbage patch");
-    assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false));
-    assertEquals(JUST_THE_PAGE, _searcher.search("patch", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("cabbage", false, false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("patch", false, false));
 
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "fruit flies");
-    assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false));
-    assertEquals(JUST_THE_PAGE, _searcher.search("flies", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("fruit", false, false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("flies", false, false));
   }
 
   public void testFindsByTokenizedPath() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("name", true));
+    assertEquals(JUST_THE_PAGE, _searcher.search("name", true, false));
   }
 
   // FIXME: This doesn't actually test anything interesting, just added for the tearDown check.
@@ -161,58 +161,58 @@ public class TestLuceneSearcher extends TestCase {
    * It isn't a valid query but its daft to choke on it.
    */
   public void testTrimToEmptyStringNoResults() throws Exception {
-    assertEquals(Collections.emptySet(), _searcher.search("  ", true));
+    assertEquals(Collections.emptySet(), _searcher.search("  ", true, false));
   }
 
   public void testFindLowerPath() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("thename", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("thename", false, false));
   }
 
   public void testFindPartialLowerPathCaseInsensitive() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("ThenA", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("ThenA", false, false));
   }
 
   public void testFieldBasedQueryWithQuotes() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("path:\"TheName\"", false, false));
   }
 
   public void testAndByDefault() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("some content", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("some content", false, false));
   }
 
   public void testOr() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
-    assertEquals(ALL_3, _searcher.search("some OR content", false));
+    assertEquals(ALL_3, _searcher.search("some OR content", false, false));
   }
 
   public void testLowercaseOrIsNotKeyword() throws Exception {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
-    assertEquals(JUST_THE_PAGE, _searcher.search("some or content", false));
+    assertEquals(JUST_THE_PAGE, _searcher.search("some or content", false, false));
   }
   
   public void testMultiWiki() throws Exception {
     Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
-    assertEquals(expected, _searcher.search("some or content", false));
-    assertEquals(expected, _searcher2.search("some or content", false));
+    assertEquals(expected, _searcher.search("some or content", false, false));
+    assertEquals(expected, _searcher2.search("some or content", false, false));
   }
   
   public void testMultiWikiOrder() throws Exception {
     Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
-    assertEquals(WIKI_NAME, _searcher.search("some or content", false).iterator().next().getWiki());
-    assertEquals(WIKI_NAME2, _searcher2.search("some or content", false).iterator().next().getWiki());
+    assertEquals(WIKI_NAME, _searcher.search("some or content", false, false).iterator().next().getWiki());
+    assertEquals(WIKI_NAME2, _searcher2.search("some or content", false, false).iterator().next().getWiki());
   }
 }

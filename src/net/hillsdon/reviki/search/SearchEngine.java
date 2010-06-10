@@ -32,12 +32,13 @@ public interface SearchEngine {
    * 
    * @param query Query.
    * @param provideExtracts true if extracts from the matching text should be provided in the returned matches (slower). 
+   * @param singleWiki true if the search should be restricted to the current wiki.
    * @return Matches for the query, in rank order.
    * @throws IOException On error reading the search index. 
    * @throws QuerySyntaxException If the query is too broken to use. 
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  Set<SearchMatch> search(String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException;
+  Set<SearchMatch> search(String query, boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException;
 
   /**
    * @param page A page.
