@@ -37,7 +37,7 @@ public abstract class AbstractListOfPagesMacro implements Macro {
 
     return Joiner.on("\n").join(Iterables.transform(pages, new Function<String, String>() {
       public String apply(final String page) {
-        return "  * " + page;
+        return "  * [[" + page + "]]";
       }
     }));
   }

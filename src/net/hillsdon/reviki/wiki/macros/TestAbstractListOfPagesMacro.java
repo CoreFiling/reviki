@@ -14,11 +14,11 @@ public class TestAbstractListOfPagesMacro extends TestCase {
       }
       @Override
       protected Collection<String> getPages(final String remainder) throws Exception {
-        return Arrays.asList("bar", "blort");
+        return Arrays.asList("foo bar", "ABC");
       }
     };
     String result = macro.handle(null, null);
-    assertEquals("  * bar\n  * blort", result);
+    assertEquals("  * [[ABC]]\n  * [[foo bar]]", result);
   }
 
 }
