@@ -172,12 +172,20 @@ public abstract class WebTestSupport extends TestCase {
     return editWikiPage(getWikiPage(name), content, descriptionOfChange, isNew);
   }
 
+  private void assertMatches(final String re, final String text) {
+    assertTrue(text, text.matches(re));
+  }
+
   protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
     URL pageUrl = page.getWebResponse().getRequestUrl();
+    final String newSign = isNew != null && isNew ? " - New" : "";
     if (isNew != null) {
-      assertTrue(!isNew ^ page.getTitleText().endsWith(" - New"));
+      assertMatches("test - [A-Z].*?" + newSign, page.getTitleText());
     }
     page = clickEditLink(page);
+    if (isNew != null) {
+      assertMatches("test - [*][A-Z].*?" + newSign, page.getTitleText());
+    }
     HtmlForm editForm = page.getFormByName("editForm");
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
