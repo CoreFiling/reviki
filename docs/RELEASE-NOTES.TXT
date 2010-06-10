@@ -14,7 +14,7 @@ First formal release.  Changes noted are since r1022.
 * Keyboard shortcuts for edit, save and cancel, with prompt to confirm cancel.
 
 * Fix for incoming/outgoing links calculation for pages with spaces in their
-  names [dbug 7650].  To fully benefit from this improvement, search index
+  names [dbug 5821].  To fully benefit from this improvement, search index
   folders should be deleted from the reviki-data directory.
 
 * Fix compare feature to work across page renames [dbug 5813].
