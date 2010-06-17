@@ -23,12 +23,15 @@ import net.hillsdon.fij.text.Escape;
 
 /**
  * Can create links to external wikis given a wiki name and page name.
- * 
+ *
  * @author mth
  */
 public class InterWikiLinker {
 
-  private Map<String, String> _links = new LinkedHashMap<String, String>();
+  private final Map<String, String> _links = new LinkedHashMap<String, String>();
+
+  public InterWikiLinker() {
+  }
 
   /**
    * @param wikiName Wiki name.  Will overwrite any previous entry with the same wiki name.
@@ -52,13 +55,13 @@ public class InterWikiLinker {
     }
     return formatString.replace("%s", Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName)));
   }
-  
+
   /**
    * Exposed for testing.
-   * @return Unmodifiable map from wiki name for format string as provided in {@link #addWiki(String, String)}. 
+   * @return Unmodifiable map from wiki name for format string as provided in {@link #addWiki(String, String)}.
    */
   public Map<String, String> getWikiToFormatStringMap() {
     return Collections.unmodifiableMap(_links);
   }
-  
+
 }

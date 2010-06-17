@@ -28,7 +28,7 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 
 /**
  * Configuration derived from ConfigXXX pages in the wiki.
- * 
+ *
  * @author mth
  */
 public class PageStoreConfiguration implements Configuration {
@@ -38,12 +38,12 @@ public class PageStoreConfiguration implements Configuration {
   public PageStoreConfiguration(final PageStore store) {
     _store = store;
   }
-  
+
   /**
    * @return An interwiki linker populated according to ConfigInterWikiLinks
    *         which should be lines of the form:
    *         c2 http://c2.com/cgi/wiki?%s
-   *         where %s is a placeholder for the page name. 
+   *         where %s is a placeholder for the page name.
    */
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {
     PageInfo page = _store.get(new PageReferenceImpl("ConfigInterWikiLinks"), -1);

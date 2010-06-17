@@ -23,7 +23,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
  * Determines base URL from the request.
- * 
+ *
  * @author mth
  */
 public class ApplicationUrlsImpl implements ApplicationUrls {
@@ -41,14 +41,14 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
   public ApplicationUrlsImpl(final HttpServletRequest request, final DeploymentConfiguration deploymentConfiguration) {
     this(getBaseUrl(request), deploymentConfiguration);
   }
-  
+
   public ApplicationUrlsImpl(final String base, final DeploymentConfiguration deploymentConfiguration) {
     _base = base;
     _deploymentConfiguration = deploymentConfiguration;
   }
 
   public WikiUrls get(final String name) {
-    return get(name, name);
+    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name));
   }
 
   public String list() {
@@ -59,11 +59,8 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
     return _base + relative;
   }
 
-  public WikiUrls get(String name, String givenWikiName) {
-    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name));
-  }
 
-  public String resource(String path) {
+  public String resource(final String path) {
     return url("/resources/" + path);
   }
 

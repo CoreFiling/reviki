@@ -46,10 +46,6 @@ public class RequestScopedApplicationUrls extends AbstractRequestLifecycleAware<
     return get().url(relative);
   }
 
-  public WikiUrls get(final String name, final String givenWikiName) {
-    return get().get(name, givenWikiName);
-  }
-
   public String resource(final String path) {
     return get().resource(path);
   }
