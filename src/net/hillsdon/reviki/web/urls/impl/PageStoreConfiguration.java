@@ -23,8 +23,10 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
+import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
  * Configuration derived from ConfigXXX pages in the wiki.
@@ -34,9 +36,11 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 public class PageStoreConfiguration implements Configuration {
 
   private final PageStore _store;
+  private final ApplicationUrls _applicationUrls;
 
-  public PageStoreConfiguration(final PageStore store) {
+  public PageStoreConfiguration(final PageStore store, final ApplicationUrls applicationUrls) {
     _store = store;
+    _applicationUrls = applicationUrls;
   }
 
   /**
@@ -46,12 +50,23 @@ public class PageStoreConfiguration implements Configuration {
    *         where %s is a placeholder for the page name.
    */
   public InterWikiLinker getInterWikiLinker() throws PageStoreException {
+    final InterWikiLinker linker = new InterWikiLinker();
+    addSameDeploymentInterWikiLinks(linker);
+    addSpecifiedInterWikiLinks(linker);
+    return linker;
+  }
+
+  private void addSameDeploymentInterWikiLinks(final InterWikiLinker linker) {
+    for (WikiUrls urls : _applicationUrls.getAvailableWikiUrls()) {
+      linker.addWiki(urls.getWikiName(), urls.interWikiTemplate());
+    }
+  }
+
+  private void addSpecifiedInterWikiLinks(final InterWikiLinker linker) throws PageStoreException {
     PageInfo page = _store.get(new PageReferenceImpl("ConfigInterWikiLinks"), -1);
-    InterWikiLinker linker = new InterWikiLinker();
     if (!page.isNew()) {
       parseLinkEntries(linker, page.getContent());
     }
-    return linker;
   }
 
   private void parseLinkEntries(final InterWikiLinker linker, final String data) {

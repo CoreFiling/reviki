@@ -15,11 +15,18 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 /**
  * Determines base URL from the request.
@@ -62,6 +69,14 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
 
   public String resource(final String path) {
     return url("/resources/" + path);
+  }
+
+  public Set<WikiUrls> getAvailableWikiUrls() {
+    return Sets.newLinkedHashSet(Iterables.transform(_deploymentConfiguration.getWikis(), new Function<WikiConfiguration, WikiUrls>() {
+      public WikiUrls apply(final WikiConfiguration wiki) {
+        return get(wiki.getWikiName());
+      }
+    }));
   }
 
 }

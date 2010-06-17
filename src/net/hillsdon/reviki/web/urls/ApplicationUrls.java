@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import java.util.Set;
+
 
 public interface ApplicationUrls extends ResourceUrls {
 
@@ -43,5 +45,10 @@ public interface ApplicationUrls extends ResourceUrls {
    * @return The relevant URLs.
    */
   WikiUrls get(String name);
+
+  /**
+   * @return The various available {@link WikiUrls}.
+   */
+  Set<WikiUrls> getAvailableWikiUrls();
 
 }

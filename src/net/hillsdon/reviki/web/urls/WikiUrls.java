@@ -15,13 +15,15 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import net.hillsdon.reviki.configuration.WikiConfiguration;
+
 /**
  * Wikis are rather tied up with the web.  At the moment we assume the public URL
  * is the servlet container URL which is probably dubious if apache is fronting
  * tomcat etc.  Probably need a configurable base URL.
- * 
+ *
  * These methods return fully qualified URLs.
- * 
+ *
  * @author mth
  */
 public interface WikiUrls extends ResourceUrls {
@@ -33,19 +35,25 @@ public interface WikiUrls extends ResourceUrls {
 
   /**
    * Note that if the the returned String is going to be used as a link, it must be encoded
-   * with a {@link URLOutputFilter}. 
+   * with a {@link URLOutputFilter}.
    * @return
    */
   String pagesRoot();
-  
+
   String pagesRoot(String wikiName);
-  
+
   String search(URLOutputFilter urlOutputFilter);
-  
+
   String page(String wikiName, String pageName, String extra, URLOutputFilter urlOutputFilter);
 
   String page(String wikiName, String pageName, URLOutputFilter urlOutputFilter);
 
   String feed(URLOutputFilter urlOutputFilter);
-  
+
+  String interWikiTemplate();
+
+  WikiConfiguration getWiki();
+
+  String getWikiName();
+
 }

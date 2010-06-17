@@ -21,25 +21,29 @@ import net.hillsdon.reviki.web.urls.ApplicationUrls;
 
 /**
  * Wiki URLs with a base URL determined by the ApplicationUrls.
- * 
+ *
  * @author mth
  */
 public class WikiUrlsImpl extends AbstractWikiUrls {
 
   private final ApplicationUrls _applicationUrls;
-  private final WikiConfiguration _configuration;
+  private final WikiConfiguration _wiki;
 
-  public WikiUrlsImpl(final ApplicationUrls applicationUrls, final WikiConfiguration configuration) {
+  public WikiUrlsImpl(final ApplicationUrls applicationUrls, final WikiConfiguration wiki) {
     _applicationUrls = applicationUrls;
-    _configuration = configuration;
+    _wiki = wiki;
   }
-  
+
+  public WikiConfiguration getWiki() {
+    return _wiki;
+  }
+
   public String pagesRoot() {
     return pagesRoot(null);
   }
-  
-  public String pagesRoot(String wikiName) {
-    String fixedBaseUrl = _configuration.getFixedBaseUrl(wikiName);
+
+  public String pagesRoot(final String wikiName) {
+    String fixedBaseUrl = _wiki.getFixedBaseUrl(wikiName);
     if (fixedBaseUrl != null) {
      if (!fixedBaseUrl.endsWith("/")) {
        fixedBaseUrl += "/";
@@ -47,7 +51,7 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
      return fixedBaseUrl;
     }
 
-    final String givenWikiName = wikiName == null ? _configuration.getWikiName() : wikiName;
+    final String givenWikiName = wikiName == null ? _wiki.getWikiName() : wikiName;
     String relative = "/pages/";
     if (givenWikiName != null) {
       relative += Escape.urlEncodeUTF8(givenWikiName) + "/";

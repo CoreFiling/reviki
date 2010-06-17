@@ -21,7 +21,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
  * Common super-class without base URL knowledge.
- * 
+ *
  * @author mth
  */
 public abstract class AbstractWikiUrls implements WikiUrls {
@@ -33,7 +33,11 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   public String page(final String wikiName, final String pageName, final String extraUnescaped, final URLOutputFilter urlOutputFilter) {
     return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.urlEncodeUTF8(pageName) + extraUnescaped);
   }
-  
+
+  public String interWikiTemplate() {
+    return pagesRoot(getWiki().getWikiName()) + "%s";
+  }
+
   public final String search(final URLOutputFilter urlOutputFilter) {
     return search(null, urlOutputFilter);
   }
@@ -41,7 +45,7 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   public final String search(final String wikiName, final URLOutputFilter urlOutputFilter) {
     return page(wikiName, "FindPage", urlOutputFilter);
   }
-  
+
   public final String feed(final URLOutputFilter urlOutputFilter) {
     return feed(null, urlOutputFilter);
   }
@@ -49,13 +53,17 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   public final String feed(final String wikiName, final URLOutputFilter urlOutputFilter) {
     return page(wikiName, "RecentChanges", "?ctype=atom", urlOutputFilter);
   }
-  
+
   public final String resource(final String path) {
     return resource(null, path);
   }
 
   public final String resource(final String wikiName, final String path) {
     return pagesRoot(wikiName) + "resources/" + path;
+  }
+
+  public String getWikiName() {
+    return getWiki().getWikiName();
   }
 
 }

@@ -30,9 +30,6 @@ public class InterWikiLinker {
 
   private final Map<String, String> _links = new LinkedHashMap<String, String>();
 
-  public InterWikiLinker() {
-  }
-
   /**
    * @param wikiName Wiki name.  Will overwrite any previous entry with the same wiki name.
    * @param formatString Absolute URI template generally with one or more %s tokens which will be replaced by the page name when creating links.

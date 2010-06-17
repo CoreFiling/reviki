@@ -15,16 +15,23 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import net.hillsdon.reviki.configuration.WikiConfiguration;
+
 public class ExampleDotComWikiUrls extends AbstractWikiUrls {
 
   public String pagesRoot() {
     return "http://www.example.com/reviki/pages/test-wiki/";
   }
-  
-  public String pagesRoot(String wikiName) {
+
+  public String pagesRoot(final String wikiName) {
     if (wikiName==null) {
       return pagesRoot();
     }
     return null;
   }
+
+  public WikiConfiguration getWiki() {
+    throw new UnsupportedOperationException();
+  }
+
 }

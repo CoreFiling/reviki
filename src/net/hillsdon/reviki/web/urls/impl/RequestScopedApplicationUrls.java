@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
@@ -48,6 +50,10 @@ public class RequestScopedApplicationUrls extends AbstractRequestLifecycleAware<
 
   public String resource(final String path) {
     return get().resource(path);
+  }
+
+  public Set<WikiUrls> getAvailableWikiUrls() {
+    return get().getAvailableWikiUrls();
   }
 
 }

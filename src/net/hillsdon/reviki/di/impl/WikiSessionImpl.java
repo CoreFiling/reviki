@@ -53,6 +53,7 @@ import net.hillsdon.reviki.web.pages.impl.OrphanedPages;
 import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
 import net.hillsdon.reviki.web.pages.impl.RecentChanges;
 import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -104,6 +105,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
+    final ApplicationUrls applicationUrls = getParentContainer().getComponent(ApplicationUrls.class);
 
     File primarySearchDir = configuration.getSearchIndexDirectory();
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
@@ -128,7 +130,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class), cachingPageStore);
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore), internalLinker, new Supplier<List<Macro>>() {
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
         List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
         macros.addAll(_plugins.getImplementations(Macro.class));

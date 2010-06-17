@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
@@ -55,27 +56,36 @@ public class TestFeedWriter extends TestCase {
       public String pagesRoot() {
         return "root";
       }
-      public String pagesRoot(String wikiName) {
+      public String pagesRoot(final String wikiName) {
         return null;
       }
       public String search(final URLOutputFilter urlOutputFilter) {
         return "search";
       }
-      public String resource(String path) {
+      public String resource(final String path) {
         return "favicon";
       }
-      public String page(String wikiName, String pageName, String extra, URLOutputFilter urlOutputFilter) {
+      public String page(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
         return "page";
+      }
+      public WikiConfiguration getWiki() {
+        throw new UnsupportedOperationException();
+      }
+      public String interWikiTemplate() {
+        throw new UnsupportedOperationException();
+      }
+      public String getWikiName() {
+        return "foo";
       }
     };
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     new AtomFeedWriter(urls).writeAtom(TITLE, FEED_URL, changes, out);
     InputSource input = new InputSource(new ByteArrayInputStream(out.toByteArray()));
-    
+
     try {
       XPathContext feed = XPathContextFactory.newInstance().newXPathContext(input);
       feed.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
-      
+
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:link/@href", STRING));
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:id", STRING));
       assertEquals(TITLE, feed.evaluate("atom:feed/atom:title", STRING));
