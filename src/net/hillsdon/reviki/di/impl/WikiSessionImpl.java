@@ -104,9 +104,9 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
-    
+
     File primarySearchDir = configuration.getSearchIndexDirectory();
-    File[] otherSearchDirs = configuration.getOtherSearchIndexDirectories();
+    List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {

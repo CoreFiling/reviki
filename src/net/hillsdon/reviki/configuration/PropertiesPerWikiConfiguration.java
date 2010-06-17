@@ -16,9 +16,13 @@
 package net.hillsdon.reviki.configuration;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.List;
 
 import org.tmatesoft.svn.core.SVNURL;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 class PropertiesPerWikiConfiguration implements WikiConfiguration {
 
@@ -29,27 +33,20 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
     _deploymentConfiguration = deploymentConfiguration;
     _wikiName = wikiName;
   }
-  
+
   public File getSearchIndexDirectory() {
     return _deploymentConfiguration.getSearchIndexDirectory(_wikiName);
   }
-  
-  public File[] getOtherSearchIndexDirectories() {
-    Collection<String> wikiNames = _deploymentConfiguration.getWikiNames();
-    File[] otherIndexDirs = new File[wikiNames.size()-1];
-    int i = 0;
-    for (String wikiName: wikiNames) {
-      if (!wikiName.equals(_wikiName)) {
-        otherIndexDirs[i++] = _deploymentConfiguration.getSearchIndexDirectory(wikiName);
-      }
-    }
-    return otherIndexDirs;
+
+  public List<File> getOtherSearchIndexDirectories() {
+    Iterable<WikiConfiguration> otherWikis = Iterables.filter(_deploymentConfiguration.getWikis(), Predicates.not(Predicates.<WikiConfiguration>equalTo(this)));
+    return Lists.newArrayList(Iterables.transform(otherWikis, WikiConfiguration.TO_SEARCH_INDEX_DIR));
   }
 
   public void setUrl(final String location) {
     _deploymentConfiguration.setUrl(_wikiName, location);
   }
-  
+
   public SVNURL getUrl() {
     return _deploymentConfiguration.getUrl(_wikiName);
   }
@@ -69,15 +66,15 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
   public boolean isEditable() {
     return _deploymentConfiguration.isEditable();
   }
-  
+
   public String getFixedBaseUrl() {
     return _deploymentConfiguration.getFixedBaseUrl(_wikiName);
   }
-  
-  public String getFixedBaseUrl(String wikiName) {
+
+  public String getFixedBaseUrl(final String wikiName) {
     return _deploymentConfiguration.getFixedBaseUrl(wikiName);
   }
-  
+
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof PropertiesPerWikiConfiguration) {
@@ -86,7 +83,7 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
     }
     return false;
   }
-  
+
   @Override
   public int hashCode() {
     return _deploymentConfiguration.getClass().hashCode() ^ (_wikiName == null ? 0 : _wikiName.hashCode());

@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
@@ -37,7 +38,7 @@ public class ListWikisImpl implements ListWikis {
 
   /**
    * Used by the UI to render the list of wikis.
-   * 
+   *
    * @author mth
    */
   public static class WikiDescriptor {
@@ -49,17 +50,17 @@ public class ListWikisImpl implements ListWikis {
       _name = name;
       _frontPage = frontPage;
     }
-    
+
     public String getName() {
       return _name;
     }
-    
+
     public String getFrontPageUrl() {
       return _frontPage;
     }
-    
+
   }
-  
+
   private final ApplicationUrls _applicationUrls;
   private final DeploymentConfiguration _configuration;
 
@@ -67,11 +68,12 @@ public class ListWikisImpl implements ListWikis {
     _configuration = configuration;
     _applicationUrls = applicationUrls;
   }
-  
+
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException {
     final List<WikiDescriptor> descriptors = new ArrayList<WikiDescriptor>();
-    for (String name : _configuration.getWikiNames()) {
-      String frontPage = _applicationUrls.get(name).page(null, BuiltInPageReferences.PAGE_FRONT_PAGE.getPath(), new ResponseSessionURLOutputFilter(request, response));
+    for (WikiConfiguration wiki : _configuration.getWikis()) {
+      final String name = wiki.getWikiName();
+      final String frontPage = _applicationUrls.get(name).page(null, BuiltInPageReferences.PAGE_FRONT_PAGE.getPath(), new ResponseSessionURLOutputFilter(request, response));
       descriptors.add(new WikiDescriptor(name, frontPage));
     }
     request.setAttribute("descriptors", descriptors);

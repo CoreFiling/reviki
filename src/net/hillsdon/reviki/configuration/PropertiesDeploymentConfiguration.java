@@ -17,9 +17,6 @@ package net.hillsdon.reviki.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 /**
  * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
@@ -105,15 +105,15 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     return getUrl(wikiName) != null;
   }
 
-  public Collection<String> getWikiNames() {
-    List<String> names = new ArrayList<String>();
+  public List<WikiConfiguration> getWikis() {
+    List<WikiConfiguration> wikis = Lists.newArrayList();
     for (String key : _properties.keySet()) {
       if (key.startsWith(KEY_PREFIX_SVN_URL)) {
-        names.add(key.substring(KEY_PREFIX_SVN_URL.length(), key.length()));
+        String name = key.substring(KEY_PREFIX_SVN_URL.length(), key.length());
+        wikis.add(getConfiguration(name));
       }
     }
-    Collections.sort(names);
-    return names;
+    return Ordering.natural().onResultOf(WikiConfiguration.TO_NAME).sortedCopy(wikis);
   }
 
 

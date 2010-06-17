@@ -13,7 +13,7 @@
         </li>
       </c:forEach>
     </ul>
-    <c:if test="${empty configuration.wikiNames}">
+    <c:if test="${empty configuration.wikis}">
     <p>
     There are no wikis configured yet.
     </p>

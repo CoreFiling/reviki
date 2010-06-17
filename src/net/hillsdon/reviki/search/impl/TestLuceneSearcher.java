@@ -21,6 +21,7 @@ import static java.util.Collections.unmodifiableSet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
@@ -78,8 +79,8 @@ public class TestLuceneSearcher extends TestCase {
   protected void setUp() throws Exception {
     _dir = createTempDir();
     _dir2 = createTempDir();
-    _searcher = new LuceneSearcher(WIKI_NAME, _dir, new File[]{_dir2}, new RenderedPageFactory(MarkupRenderer.AS_IS));
-    _searcher2 = new LuceneSearcher(WIKI_NAME2, _dir2, new File[]{_dir}, new RenderedPageFactory(MarkupRenderer.AS_IS));
+    _searcher = new LuceneSearcher(WIKI_NAME, _dir, Arrays.asList(_dir2), new RenderedPageFactory(MarkupRenderer.AS_IS));
+    _searcher2 = new LuceneSearcher(WIKI_NAME2, _dir2, Arrays.asList(_dir), new RenderedPageFactory(MarkupRenderer.AS_IS));
   }
 
   @Override
@@ -87,8 +88,8 @@ public class TestLuceneSearcher extends TestCase {
     cleanupTempDir(_dir);
     cleanupTempDir(_dir2);
   }
-  
-  protected void cleanupTempDir(File tmpDir) {
+
+  protected void cleanupTempDir(final File tmpDir) {
     // Nothing in tmpDir should be open.  Note this only works on Linux-like
     // machines at the moment (silently passing on others).
     for (File file : Lsof.lsof()) {
@@ -199,7 +200,7 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
     assertEquals(JUST_THE_PAGE, _searcher.search("some or content", false, false));
   }
-  
+
   public void testMultiWiki() throws Exception {
     Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
@@ -207,9 +208,8 @@ public class TestLuceneSearcher extends TestCase {
     assertEquals(expected, _searcher.search("some or content", false, false));
     assertEquals(expected, _searcher2.search("some or content", false, false));
   }
-  
+
   public void testMultiWikiOrder() throws Exception {
-    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
     assertEquals(WIKI_NAME, _searcher.search("some or content", false, false).iterator().next().getWiki());

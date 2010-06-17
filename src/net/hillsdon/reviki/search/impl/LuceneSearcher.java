@@ -24,14 +24,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.search.QuerySyntaxException;
@@ -63,7 +61,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -110,9 +107,9 @@ public class LuceneSearcher implements SearchEngine {
 
   private final String _wikiName;
   private final File _dir;
-  private final File[] _otherDirs;
+  private final List<File> _otherDirs;
   private final RenderedPageFactory _renderedPageFactory;
-  
+
   public static String uidFor(final String wiki, final String path) {
     return (wiki==null ? "" : wiki) + "::" + (path==null ? "" : path);
   }
@@ -121,10 +118,10 @@ public class LuceneSearcher implements SearchEngine {
    * @param dir The search index lives here.
    *            If null is passed the search will behave as a null implementation.
    */
-  public LuceneSearcher(final String wikiName, final File dir, final File[] otherDirs, final RenderedPageFactory renderedPageFactory) {
+  public LuceneSearcher(final String wikiName, final File dir, final List<File> otherSearchDirs, final RenderedPageFactory renderedPageFactory) {
     _wikiName = wikiName;
     _dir = dir;
-    _otherDirs = otherDirs;
+    _otherDirs = otherSearchDirs;
     _renderedPageFactory = renderedPageFactory;
   }
 
@@ -182,15 +179,11 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_PROPERTY_VALUE, value, Field.Store.YES, Field.Index.UN_TOKENIZED));
     return document;
   }
-  
+
   private void deleteWikiDocument(final String wiki, final String path) throws IOException {
     deleteDocument(FIELD_UID, uidFor(wiki, path));
   }
-  
-  private void deletePropertyDocument(final String key) throws IOException {
-    deleteDocument(FIELD_PROPERTY_KEY, key);
-  }
-  
+
   private void deleteDocument(final String keyField, final String value) throws IOException {
     IndexWriter writer = new IndexWriter(_dir, createAnalyzer());
     try {
@@ -204,7 +197,7 @@ public class LuceneSearcher implements SearchEngine {
   private void replaceProperty(final Document propertyDocument) throws CorruptIndexException, LockObtainFailedException, IOException {
     replaceDocument(FIELD_PROPERTY_KEY, propertyDocument);
   }
-  
+
   private void replaceWikiDocument(final Document wikiDocument) throws CorruptIndexException, LockObtainFailedException, IOException {
     replaceDocument(FIELD_UID, wikiDocument);
   }
@@ -292,12 +285,12 @@ public class LuceneSearcher implements SearchEngine {
    * @throws IOException On index read error,
    * @throws QuerySyntaxException If we can't parse a query.
    */
-  private <T> T doReadOperation(final ReadOperation<T> operation, boolean allIndices) throws IOException, QuerySyntaxException {
+  private <T> T doReadOperation(final ReadOperation<T> operation, final boolean allIndices) throws IOException, QuerySyntaxException {
     createIndexIfNecessary();
-    
+
     List<Searcher> searchers = new ArrayList<Searcher>();
     List<IndexReader> readers = new ArrayList<IndexReader>();
-    
+
     /* First add our reader/searcher. If this fails, it's an error but clean up. */
     IndexReader reader = IndexReader.open(_dir);
     Searcher searcher = null;
@@ -311,7 +304,7 @@ public class LuceneSearcher implements SearchEngine {
         reader.close();
       }
     }
-      
+
     if (allIndices) {
       for (File dir: _otherDirs) {
         searcher = null;
@@ -323,9 +316,8 @@ public class LuceneSearcher implements SearchEngine {
           readers.add(reader);
         }
         catch (Exception e) {
-          /* The index may not exist, but other wikis' indices aren't that important anyway, so
-           * just don't search them.
-           */
+          // The index may not exist, but other wikis' indices aren't that important anyway, so
+          // just don't search them.
           if (searcher!=null) {
             searcher.close();
           }
@@ -335,7 +327,7 @@ public class LuceneSearcher implements SearchEngine {
         }
       }
     }
-    
+
     try {
       /* Don't bother using a multi searcher if we only have one */
       if (searchers.size()>1) {
@@ -346,7 +338,7 @@ public class LuceneSearcher implements SearchEngine {
       else {
         searcher = searchers.get(0);
       }
-      
+
       try {
         Analyzer analyzer = createAnalyzer();
         return operation.execute(readers.get(0), searcher, analyzer);
@@ -390,8 +382,8 @@ public class LuceneSearcher implements SearchEngine {
       }
     }, !singleWiki);
   }
-  
-  private Set<SearchMatch> orderResults(Set<SearchMatch> results) {
+
+  private Set<SearchMatch> orderResults(final Set<SearchMatch> results) {
     /* Split single set of results into per-wiki sets, maintaining order (within each set) */
     Map<String, Set<SearchMatch>> byWiki = new LinkedHashMap<String, Set<SearchMatch>>();
     for(SearchMatch match: results) {
@@ -401,16 +393,16 @@ public class LuceneSearcher implements SearchEngine {
       }
       matchesForWiki.add(match);
     }
-    
+
     Set<SearchMatch> sortedSet = new LinkedHashSet<SearchMatch>();
-    
+
     /* Find the set for this wiki, and force it to be first */
     Set<SearchMatch> sameWikiMatches = byWiki.get(_wikiName);
     if (sameWikiMatches!=null) {
       sortedSet.addAll(sameWikiMatches);
       byWiki.remove(_wikiName);
     }
-    
+
     /* Flatten remaining per-wiki sets into single set, maintaining order */
     for (Set<SearchMatch> matches: byWiki.values()) {
       sortedSet.addAll(matches);

@@ -52,27 +52,26 @@ public class WikiChoiceImpl implements WikiChoice, Startable {
 
   public void start() {
     _configuration.load();
-    for (String wikiName : _configuration.getWikiNames()) {
+    for (WikiConfiguration wiki : _configuration.getWikis()) {
       // These wiki configurations could be broken but we can't really report the
       // error now so just wait for the user to find them broken.
-      WikiConfiguration perWikiConfiguration = _configuration.getConfiguration(wikiName);
-      installHandler(perWikiConfiguration, createWikiHandler(perWikiConfiguration));
+      installHandler(wiki, createWikiHandler(wiki));
     }
   }
-  
+
   public void stop() {
   }
-  
-  public WikiHandler createWikiHandler(WikiConfiguration configuration) {
+
+  public WikiHandler createWikiHandler(final WikiConfiguration configuration) {
     WikiSession wikiSession = _applicationSession.createWikiSession(configuration);
     wikiSession.start();
     return wikiSession.getWikiHandler();
   }
-  
-  public void installHandler(WikiConfiguration configuration, WikiHandler handler) {
+
+  public void installHandler(final WikiConfiguration configuration, final WikiHandler handler) {
     _wikis.put(configuration, handler);
   }
-  
+
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
@@ -87,7 +86,7 @@ public class WikiChoiceImpl implements WikiChoice, Startable {
     }
     else if (wiki == null) {
       return new RequestHandler() {
-        public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
           return RedirectToPageView.create(BuiltInPageReferences.CONFIG_SVN, _applicationUrls, perWikiConfiguration);
         }
       };
@@ -105,7 +104,7 @@ public class WikiChoiceImpl implements WikiChoice, Startable {
   }
 
   boolean isValidWikiName(final String wikiName) {
-    return wikiName != null && wikiName.length() != 0 
+    return wikiName != null && wikiName.length() != 0
         && Character.isLowerCase(wikiName.charAt(0));
   }
 
