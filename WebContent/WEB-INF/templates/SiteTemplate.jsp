@@ -73,7 +73,7 @@
   </div>
   <div id="footer" class="auxillary">
   ${renderedFooter}
-    <p id="build-details">Built from r$BuildRevision$.</p>
+    <p id="build-details">Version $Version$.</p>
   </div>
   <tiles:insertAttribute name="body-level" ignore="true" />
 </body>

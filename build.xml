@@ -2,6 +2,7 @@
   <description>
     reviki build - see http://reviki.org for more information
   </description>
+  <property name="version" value="0.1.0" />   
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
@@ -41,6 +42,7 @@
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
      <exec outputproperty="revision" executable="svnversion"/>
+  	 <property name="build-details" value="${version} r${revision}" />
   </target>
 
   <target name="clean" description="Clean-up build artifacts">
@@ -63,7 +65,7 @@
         <include name="*/**"/>
       </fileset>
     </copy>
-    <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$BuildRevision$" value="${revision}"/>
+    <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$Version$" value="${build-details}"/>
     <copy todir="${build-classes}">
       <fileset dir="${source}">
         <include name="**/*.json"/>
@@ -126,6 +128,8 @@
        </fileset>
        <webinf dir="${build-web}/WEB-INF" includes="**" excludes="web.xml" />
     </war>
+  	<!-- Output version information file for the build system. -->
+  	<echo message="${version}" file="product.version"/>
   </target>
 
   <target name="prepare-tomcat">
@@ -212,6 +216,18 @@
   </target>
 
   <target name="all-tests" depends="unit-tests, functional-tests" description="Run all the tests (starts/stops tomcat)"/>
+
+  <target name="release" depends="war">
+    <property name="release-dirname" value="reviki-${version}-r${revision}"/>
+    <zip file="${release-dirname}.zip">
+      <zipfileset prefix="${release-dirname}" dir=".">
+        <include name="${war}"/>
+      </zipfileset>
+      <zipfileset prefix="${release-dirname}" dir="docs">
+        <include name="*.TXT"/>
+      </zipfileset>
+    </zip>
+  </target>
 
 </project>
 

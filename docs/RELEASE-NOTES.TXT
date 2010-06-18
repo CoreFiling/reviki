@@ -26,3 +26,5 @@ First formal release.  Changes noted are since r1022.
   touched more than one file [dbug 6299].
 
 * Ensure HTTP connections to the SVN server are closed after each request.
+
+* Automatic inter-wiki links for other wikis on the same instance.
