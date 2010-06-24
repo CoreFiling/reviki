@@ -51,7 +51,8 @@ public class TestWikiUrlsImpl extends TestCase {
         return "http://www.example.com/reviki" + relative;
       }
     }).anyTimes();
-    expect(_configuration.getFixedBaseUrl(null)).andReturn(null).anyTimes();
+    expect(_configuration.getWikiName()).andReturn("foo");
+    expect(_configuration.getFixedBaseUrl((String) EasyMock.anyObject())).andReturn(null).anyTimes();
     WikiUrlsImpl urls = createURLs("foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
     assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page(null, "Spaced Out", URLOutputFilter.NULL));
@@ -60,6 +61,7 @@ public class TestWikiUrlsImpl extends TestCase {
   }
 
   public void testFixedBaseUrlJustGoesAheadAndUsesIt() {
+    expect(_configuration.getWikiName()).andReturn(null);
     expect(_configuration.getFixedBaseUrl(null)).andReturn("http://www.example.com/wiki").anyTimes();
     replay(_configuration);
     WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);

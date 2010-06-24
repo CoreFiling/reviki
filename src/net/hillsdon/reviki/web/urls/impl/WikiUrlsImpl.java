@@ -43,7 +43,9 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
   }
 
   public String pagesRoot(final String wikiName) {
-    String fixedBaseUrl = _wiki.getFixedBaseUrl(wikiName);
+    final String givenWikiName = wikiName == null ? _wiki.getWikiName() : wikiName;
+    
+    String fixedBaseUrl = _wiki.getFixedBaseUrl(givenWikiName);
     if (fixedBaseUrl != null) {
      if (!fixedBaseUrl.endsWith("/")) {
        fixedBaseUrl += "/";
@@ -51,7 +53,6 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
      return fixedBaseUrl;
     }
 
-    final String givenWikiName = wikiName == null ? _wiki.getWikiName() : wikiName;
     String relative = "/pages/";
     if (givenWikiName != null) {
       relative += Escape.urlEncodeUTF8(givenWikiName) + "/";
