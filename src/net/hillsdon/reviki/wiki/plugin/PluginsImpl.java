@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
-import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.StoreKind;
@@ -50,20 +49,8 @@ public class PluginsImpl implements Plugins {
 
   private static final Log LOG = LogFactory.getLog(PluginsImpl.class);
 
-  /**
-   * A plugin at a revision.
-   */
-  private static class PluginAtRevision {
-    private final Plugin _plugin;
-    private final long _revision;
-    public PluginAtRevision(final Plugin plugin, final long revision) {
-      _plugin = plugin;
-      _revision = revision;
-    }
-  }
-
   private final DefaultPicoContainer _context;
-  private final ConcurrentMap<String, PluginAtRevision> _active = new ConcurrentHashMap<String, PluginAtRevision>();
+  private final ConcurrentMap<String, PluginAtRevision> _plugin = new ConcurrentHashMap<String, PluginAtRevision>();
   private final PageStore _store;
 
   /**
@@ -75,51 +62,66 @@ public class PluginsImpl implements Plugins {
 
   public <T> List<T> getImplementations(final Class<T> clazz) {
     List<T> implementations = new ArrayList<T>();
-    for (PluginAtRevision plugin : _active.values()) {
-      implementations.addAll(plugin._plugin.getImplementations(clazz));
+    for (PluginAtRevision plugin : _plugin.values()) {
+      implementations.addAll(plugin.getImplementations(clazz));
     }
     return implementations;
   }
 
-  public void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
+  public void handleChanges(final long upto, final List<ChangeInfo> chronological) {
     // We want to do the most recent first to prevent repeated work.
-    for (ChangeInfo change : Iterables.reverse(chronological)) {
-      if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(CONFIG_PLUGINS.getPath())) {
-        PluginAtRevision plugin = _active.get(change.getName());
-        if (plugin == null || plugin._revision < change.getRevision()) {
-          updatePlugin(change.getName(), change.getRevision());
+    try {
+      for (ChangeInfo change : Iterables.reverse(chronological)) {
+        if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(CONFIG_PLUGINS.getPath())) {
+          PluginAtRevision plugin = _plugin.get(change.getName());
+          if (plugin == null || plugin.getRevision() < change.getRevision()) {
+            updatePlugin(change);
+          }
         }
       }
     }
+    catch (Exception ex) {
+      // If we propagate this then issues with plugins can disable a wiki.
+      // Ideally we'd report this on ConfigPlugins only.
+      LOG.error("Error encountered updating plugins", ex);
+    }
   }
 
-  private void updatePlugin(final String name, final long revision) throws NotFoundException, PageStoreException, IOException {
-    LOG.info("Updating " + name + " to revision " + revision);
-    final File jar = File.createTempFile("cached-", name);
-    jar.deleteOnExit();
-    final OutputStream stream = new FileOutputStream(jar);
-    try {
-      _store.attachment(CONFIG_PLUGINS, name, revision, new ContentTypedSink() {
-        public void setContentType(final String contentType) {
-        }
-        public void setFileName(final String attachment) {
-        }
-        public OutputStream stream() throws IOException {
-          return stream;
-        }
-      });
+  private void updatePlugin(final ChangeInfo change) throws PageStoreException, IOException {
+    final String name = change.getName();
+    final long revision = change.getRevision();
+    if (false || change.isDeletion()) {
+      LOG.info("Removing " + name + " due to revision " + revision);
+      _plugin.put(name, new PluginAtRevision(null, revision));
     }
-    finally {
-      IOUtils.closeQuietly(stream);
-    }
-    URL url = jar.toURI().toURL();
-    try {
-      _active.put(name, new PluginAtRevision(new Plugin(name, url, _context), revision));
-    }
-    catch (InvalidPluginException ex) {
-      // Some way to indicate the error to the user would be nice...
-      _active.remove(name);
-      LOG.error("Invalid plugin uploaded.", ex);
+    else {
+      LOG.info("Updating " + name + " to revision " + revision);
+      final File jar = File.createTempFile("cached-", name);
+      jar.deleteOnExit();
+      final OutputStream stream = new FileOutputStream(jar);
+      try {
+        _store.attachment(CONFIG_PLUGINS, name, revision, new ContentTypedSink() {
+          public void setContentType(final String contentType) {
+          }
+          public void setFileName(final String attachment) {
+          }
+          public OutputStream stream() throws IOException {
+            return stream;
+          }
+        });
+      }
+      finally {
+        IOUtils.closeQuietly(stream);
+      }
+      URL url = jar.toURI().toURL();
+      try {
+        _plugin.put(name, new PluginAtRevision(new Plugin(name, url, _context), revision));
+      }
+      catch (InvalidPluginException ex) {
+        // Some way to indicate the error to the user would be nice...
+        _plugin.remove(name);
+        LOG.error("Invalid plugin uploaded.", ex);
+      }
     }
   }
 
