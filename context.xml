@@ -2,7 +2,7 @@
      may be used as a template for production deployments
     (though if you're happy with the default settings you
      can just use auto-deploy). -->
-<Context docBase="../../reviki.war">
+<Context docBase="../../release/reviki.war">
   <Parameter name="javax.servlet.jsp.jstl.fmt.timeZone" value="Europe/London" />
   <Parameter name="reviki-data-dir" value="reviki-test-data" />
 </Context>

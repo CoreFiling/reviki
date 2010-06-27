@@ -8,7 +8,9 @@
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
   <property name="reports" value="reports" />   
-  <property name="war" value="${ant.project.name}.war" />   
+  <property name="release" value="release" />   
+  <property name="jar" value="${build-web}/WEB-INF/lib/reviki.jar"/>
+  <property name="war" value="${release}/${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
   <property name="source-webtests" value="webtests" />   
@@ -41,6 +43,7 @@
      <mkdir dir="${build-web}" />
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
+     <mkdir dir="${release}" />
      <exec outputproperty="revision" executable="svnversion"/>
   	 <property name="build-details" value="${version} r${revision}" />
   </target>
@@ -50,6 +53,7 @@
     <delete dir="${build-web}" />
     <delete dir="${build-webtests}" />
     <delete dir="${reports}" />
+    <delete dir="${release}" />
     <delete file="${war}"/>
     <delete dir="${tomcat}" />
     <!-- We leave the tomcat zip as it is a large download. -->
@@ -78,7 +82,7 @@
   </target>
 
   <target name="jar" depends="compile">
-    <jar destfile="${build-web}/WEB-INF/lib/reviki.jar">
+    <jar destfile="${jar}">
       <fileset dir="${build-classes}">
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
@@ -134,7 +138,7 @@
        <webinf dir="${build-web}/WEB-INF" includes="**" excludes="web.xml" />
     </war>
   	<!-- Output version information file for the build system. -->
-  	<echo message="${version}" file="product.version"/>
+  	<echo message="${version}" file="${release}/product.version"/>
   </target>
 
   <target name="prepare-tomcat">
@@ -224,7 +228,7 @@
 
   <target name="release" depends="war">
     <property name="release-dirname" value="reviki-${version}-r${revision}"/>
-    <zip file="${release-dirname}.zip">
+    <zip file="${release}/${release-dirname}.zip">
       <zipfileset prefix="${release-dirname}" dir=".">
         <include name="${war}"/>
       </zipfileset>
@@ -232,6 +236,8 @@
         <include name="*.TXT"/>
       </zipfileset>
     </zip>
+    <!-- Take a copy of the reviki JAR for building plugins against. -->
+    <copy file="${jar}" todir="${release}"/>
   </target>
 
 </project>
