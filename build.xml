@@ -77,6 +77,15 @@
     </copy>
   </target>
 
+  <target name="jar" depends="compile">
+    <jar destfile="${build-web}/WEB-INF/lib/reviki.jar">
+      <fileset dir="${build-classes}">
+         <include name="**/*.class"/>
+         <include name="${prepopulated-pages}"/>
+      </fileset>
+    </jar>
+  </target>
+
   <target name="functional-tests-compile" depends="compile">
     <javac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
       <classpath>
@@ -115,13 +124,9 @@
     </junit>
   </target>
 
-  <target name="war" depends="compile" description="Build the WAR file">
+  <target name="war" depends="jar" description="Build the WAR file">
     <war warfile="${war}"
          webxml="${build-web}/WEB-INF/web.xml">
-       <classes dir="${build-classes}">
-         <include name="**/*.class"/>
-         <include name="${prepopulated-pages}"/>
-       </classes>
        <fileset dir="${build-web}">
          <include name="**/*"/>
          <exclude name="WEB-INF/**/*"/>
