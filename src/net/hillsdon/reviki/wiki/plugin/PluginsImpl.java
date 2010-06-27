@@ -90,7 +90,7 @@ public class PluginsImpl implements Plugins {
   private void updatePlugin(final ChangeInfo change) throws PageStoreException, IOException {
     final String name = change.getName();
     final long revision = change.getRevision();
-    if (false || change.isDeletion()) {
+    if (change.isDeletion()) {
       LOG.info("Removing " + name + " due to revision " + revision);
       _plugin.put(name, new PluginAtRevision(null, revision));
     }
