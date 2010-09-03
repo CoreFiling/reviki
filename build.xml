@@ -10,6 +10,7 @@
   <property name="reports" value="reports" />   
   <property name="release" value="release" />   
   <property name="jar" value="${build-web}/WEB-INF/lib/reviki.jar"/>
+  <property name="testJar" value="ant-build/reviki-test.jar"/>
   <property name="war" value="${release}/${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
@@ -86,6 +87,14 @@
       <fileset dir="${build-classes}">
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="test-jar" depends="functional-tests-compile">
+    <jar destfile="${testJar}">
+      <fileset dir="${build-webtests}">
+        <include name="**/*.class"/>
       </fileset>
     </jar>
   </target>
@@ -226,7 +235,7 @@
 
   <target name="all-tests" depends="unit-tests, functional-tests" description="Run all the tests (starts/stops tomcat)"/>
 
-  <target name="release" depends="war">
+  <target name="release" depends="war, test-jar">
     <property name="release-dirname" value="reviki-${version}-r${revision}"/>
     <zip file="${release}/${release-dirname}.zip">
       <zipfileset prefix="${release-dirname}" dir=".">
@@ -236,8 +245,9 @@
         <include name="*.TXT"/>
       </zipfileset>
     </zip>
-    <!-- Take a copy of the reviki JAR for building plugins against. -->
+    <!-- Take a copy of the reviki JARs for building plugins against. -->
     <copy file="${jar}" todir="${release}"/>
+    <copy file="${testJar}" todir="${release}"/>
   </target>
 
 </project>
