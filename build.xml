@@ -122,7 +122,7 @@
   </target>
 
   <target name="unit-tests" depends="compile" description="Run the unit tests">
-    <junit printsummary="yes" haltonfailure="yes">
+    <junit printsummary="yes" fork="true" forkmode="once" haltonfailure="yes">
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
