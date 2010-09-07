@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.search;
 
+import java.util.Map;
+
 import com.google.common.base.Function;
 
 /**
@@ -24,7 +26,7 @@ import com.google.common.base.Function;
  *
  * @author mth
  */
-public class SearchMatch {
+public class SearchMatch implements Comparable<SearchMatch> {
 
   public static final Function<SearchMatch, String> TO_PAGE_NAME = new Function<SearchMatch, String>() {
     public String apply(final SearchMatch in) {
@@ -36,12 +38,14 @@ public class SearchMatch {
   private final String _wiki;
   private final String _page;
   private final String _htmlExtract;
+  private final Map<String, String> _pageProperties;
 
-  public SearchMatch(final boolean sameWiki, final String wiki, final String page, final String htmlExtract) {
+  public SearchMatch(final boolean sameWiki, final String wiki, final String page, final String htmlExtract, final Map<String, String> pageProperties) {
     _sameWiki = sameWiki;
     _wiki = wiki;
     _page = page;
     _htmlExtract = htmlExtract;
+    _pageProperties = pageProperties;
   }
   
   /**
@@ -73,6 +77,10 @@ public class SearchMatch {
     return _htmlExtract;
   }
 
+  public Map<String, String> getPageProperties() {
+    return _pageProperties;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof SearchMatch) {
@@ -86,4 +94,7 @@ public class SearchMatch {
     return _page.hashCode();
   }
 
+  public int compareTo(final SearchMatch searchMatch) {
+    return _page.compareTo(searchMatch._page);
+  }
 }

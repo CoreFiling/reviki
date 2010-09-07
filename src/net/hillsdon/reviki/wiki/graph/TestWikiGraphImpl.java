@@ -19,15 +19,23 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
 import org.easymock.EasyMock;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public class TestWikiGraphImpl extends TestCase {
+  public static final Function<String, SearchMatch> FROM_PAGE_NAME = new Function<String, SearchMatch>() {
+    public SearchMatch apply(final String in) {
+      return new SearchMatch(true, null, in, null, null);
+    }
+  };
 
   private CachingPageStore _store;
   private SearchEngine _mockedSearchEngine;
@@ -43,15 +51,15 @@ public class TestWikiGraphImpl extends TestCase {
   }
 
   public void testRemovesNonExistantPagesFromOutgoingLinks() throws Exception {
-    expect(_mockedSearchEngine.outgoingLinks("RootPage")).andReturn(ImmutableSet.of("FooPage", "BarPage"));
+    expect(_mockedSearchEngine.outgoingLinks("RootPage")).andReturn(ImmutableSet.copyOf(Iterables.transform(ImmutableSet.of("FooPage", "BarPage"), FROM_PAGE_NAME)));
     replay(_mockedSearchEngine);
-    assertEquals(ImmutableSet.of("FooPage"), _graph.outgoingLinks("RootPage"));
+    assertEquals(ImmutableSet.of(FROM_PAGE_NAME.apply("FooPage")), _graph.outgoingLinks("RootPage"));
   }
 
   public void testRemovesNonExistantPagesFromIncomingLinks() throws Exception {
-    expect(_mockedSearchEngine.incomingLinks("RootPage")).andReturn(ImmutableSet.of("FooPage", "BarPage"));
+    expect(_mockedSearchEngine.incomingLinks("RootPage")).andReturn(ImmutableSet.copyOf(Iterables.transform(ImmutableSet.of("FooPage", "BarPage"), FROM_PAGE_NAME)));
     replay(_mockedSearchEngine);
-    assertEquals(ImmutableSet.of("FooPage"), _graph.incomingLinks("RootPage"));
+    assertEquals(ImmutableSet.of(FROM_PAGE_NAME.apply("FooPage")), _graph.incomingLinks("RootPage"));
   }
 
 }

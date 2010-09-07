@@ -23,7 +23,6 @@ import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
@@ -71,6 +71,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -351,7 +354,7 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
-    List<String> pageNames = new ArrayList<String>(_graph.incomingLinks(page.getPath()));
+    List<String> pageNames = Lists.newArrayList(Iterables.transform(_graph.incomingLinks(page.getPath()), SearchMatch.TO_PAGE_NAME));
     Collections.sort(pageNames);
     if (pageNames.size() > MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY) {
       pageNames = pageNames.subList(0, MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY);

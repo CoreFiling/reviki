@@ -16,16 +16,18 @@
 package net.hillsdon.reviki.wiki.macros;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 public class SearchMacro extends AbstractListOfPagesMacro {
 
   private final SearchEngine _searchEngine;
+  private static final String SEARCH_ARG_NAME = "search";
 
   public SearchMacro(final SearchEngine searchEngine) {
     _searchEngine = searchEngine;
@@ -36,8 +38,24 @@ public class SearchMacro extends AbstractListOfPagesMacro {
   }
 
   @Override
-  protected Collection<String> getPages(final String remainder) throws Exception {
-    return ImmutableList.copyOf(Iterables.transform(_searchEngine.search(remainder, false, true), SearchMatch.TO_PAGE_NAME));
+  protected Collection<String> getAllowedArgs() {
+    return Collections.singleton(SEARCH_ARG_NAME) ;
   }
 
+
+  @Override
+  protected Collection<SearchMatch> getPages(final String remainder) throws Exception {
+    String query;
+    Map<String, String> args;
+    try {
+      args = getArgParser().parse(remainder);
+      query = args.get(SEARCH_ARG_NAME);
+    }
+    catch (final MacroArgumentParser.ParseException e) {
+      //if this isn't valid arguments, assume it is the query itself.
+      query = remainder;
+    }
+
+    return ImmutableList.copyOf(_searchEngine.search(query, false, true));
+  }
 }

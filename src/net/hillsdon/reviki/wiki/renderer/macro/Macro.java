@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.wiki.renderer.macro;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 
 /**
  * A very simple macro interface.
@@ -30,6 +31,6 @@ public interface Macro {
 
   ResultFormat getResultFormat();
   
-  String handle(PageReference page, String remainder) throws Exception;
+  String handle(PageReference page, String remainder, PageRenderContext context) throws Exception;
   
 }

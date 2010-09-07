@@ -18,6 +18,7 @@ package net.hillsdon.reviki.wiki.graph;
 import java.io.IOException;
 import java.util.Set;
 
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
@@ -39,13 +40,13 @@ public interface WikiGraph {
    * @throws IOException On error reading an index.
    * @throws PageStoreException On error reading wiki data.
    */
-  Set<String> incomingLinks(String page) throws IOException, PageStoreException;
+  Set<SearchMatch> incomingLinks(String page) throws IOException, PageStoreException;
   
   /**
    * @return Outgoing links for the page (excluding the page itself).
    * @throws IOException On error reading an index.
    * @throws PageStoreException On error reading wiki data.
    */
-  Set<String> outgoingLinks(String page) throws IOException, PageStoreException;
+  Set<SearchMatch> outgoingLinks(String page) throws IOException, PageStoreException;
 
 }

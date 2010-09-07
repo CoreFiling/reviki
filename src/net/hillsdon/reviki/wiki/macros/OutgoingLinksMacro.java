@@ -17,7 +17,9 @@ package net.hillsdon.reviki.wiki.macros;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 
@@ -34,7 +36,11 @@ public class OutgoingLinksMacro extends AbstractListOfPagesMacro {
   }
 
   @Override
-  protected Collection<String> getPages(final String remainder) throws IOException, PageStoreException {
+  protected Collection<String> getAllowedArgs() {
+    return Collections.emptyList();
+  }
+  @Override
+  protected Collection<SearchMatch> getPages(final String remainder) throws IOException, PageStoreException {
     return _wikiGraph.incomingLinks(remainder);
   }
 

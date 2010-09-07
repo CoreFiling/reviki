@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.reviki.wiki.renderer.creole.HtmlEscapeResultNode;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
@@ -55,7 +56,7 @@ public class MacroNode extends AbstractRegexNode {
     return matcher.group(1).trim();
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, final RenderNode parent, final URLOutputFilter urlOutputFilter) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, final RenderNode parent, final URLOutputFilter urlOutputFilter, final PageRenderContext context) {
     // We need to move to a push system for updating macros to avoid this.
     final String macroName = getMacroName(matcher);
     Macro macro = null;
@@ -67,25 +68,25 @@ public class MacroNode extends AbstractRegexNode {
       }
     }
     if (macro == null) {
-      return new LiteralResultNode("<pre>" + Escape.html(matcher.group()) + "</pre>");
+      return new LiteralResultNode("<pre>" + Escape.html(matcher.group()) + "</pre>", context);
     }
 
     try {
-      String content = macro.handle(page, matcher.group(2));
+      String content = macro.handle(page, matcher.group(2), context);
       switch (macro.getResultFormat()) {
         case XHTML:
-          return new LiteralResultNode(content);
+          return new LiteralResultNode(content, context);
         case WIKI:
           // Use the parent as renderer if possible as that has the appropriate child nodes.
           RenderNode renderer = parent != null ? parent : this;
-          return new CompositeResultNode(renderer.render(page, content, this, urlOutputFilter));
+          return new CompositeResultNode(renderer.render(page, content, context, urlOutputFilter), context);
         default:
-          return new HtmlEscapeResultNode(content);
+          return new HtmlEscapeResultNode(content, context);
       }
     }
     catch (Exception e) {
       LOG.error("Error handling macro on: " + page.getPath(), e);
-      return new LiteralResultNode(String.format("<p>Error evaluating macro '%s': %s</p>", Escape.html(macro.getName()), Escape.html(e.getMessage())));
+      return new LiteralResultNode(String.format("<p>Error evaluating macro '%s': %s</p>", Escape.html(macro.getName()), Escape.html(e.getMessage())), context);
     }
   }
 

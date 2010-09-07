@@ -35,7 +35,7 @@ public interface MarkupRenderer {
    */
   MarkupRenderer AS_IS = new MarkupRenderer() {
     public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-      return new LiteralResultNode(in);
+      return new LiteralResultNode(in, null);
     }
   };
   

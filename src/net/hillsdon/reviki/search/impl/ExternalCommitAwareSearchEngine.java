@@ -112,11 +112,11 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.escape(in);
   }
 
-  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
+  public Set<SearchMatch> incomingLinks(final String page) throws IOException, PageStoreException {
     return _delegate.incomingLinks(page);
   }
 
-  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
+  public Set<SearchMatch> outgoingLinks(final String page) throws IOException, PageStoreException {
     return _delegate.outgoingLinks(page);
   }
   

@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.wiki.renderer.result;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -30,12 +32,12 @@ public class TagResultNode extends CompositeResultNode {
   
   private final String _tag;
 
-  public TagResultNode(final String tag) {
-    this(tag, Collections.<ResultNode>emptyList());
+  public TagResultNode(final String tag, PageRenderContext context) {
+    this(tag, Collections.<ResultNode>emptyList(), context);
   }
 
-  public TagResultNode(final String tag, final List<ResultNode> children) {
-    super(children);
+  public TagResultNode(final String tag, final List<ResultNode> children, PageRenderContext context) {
+    super(children, context);
     _tag = tag;
   }
   

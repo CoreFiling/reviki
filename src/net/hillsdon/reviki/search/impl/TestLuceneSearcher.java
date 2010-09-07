@@ -47,8 +47,8 @@ public class TestLuceneSearcher extends TestCase {
   private static final String PAGE_THE_NAME = "TheName";
   private static final String PAGE_THE_NAME2 = "TheName2";
   private static final String PAGE_THE_NAME3 = "TheName3";
-  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null)));
-  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null)));
+  private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null, null)));
+  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null, null)));
 
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -202,7 +202,7 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testMultiWiki() throws Exception {
-    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
+    final Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null, null)));
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher2.index(WIKI_NAME2, PAGE_THE_NAME2, -1, "some other content");
     assertEquals(expected, _searcher.search("some or content", false, false));

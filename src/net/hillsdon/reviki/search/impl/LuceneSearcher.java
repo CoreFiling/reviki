@@ -71,7 +71,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
@@ -102,6 +101,8 @@ public class LuceneSearcher implements SearchEngine {
   private static final String FIELD_PROPERTY_KEY = "property";
   private static final String FIELD_PROPERTY_VALUE = "property-value";
   private static final String PROPERTY_LAST_INDEXED_REVISION = "last-indexed-revision";
+
+  private static final String FIELD_PAGE_PROPS_PREFIX = "pageProp_";
 
   private static final String[] ALL_SEARCH_FIELDS = new String[] {FIELD_PATH, FIELD_PATH_LOWER, FIELD_TITLE_TOKENIZED, FIELD_CONTENT};
 
@@ -139,12 +140,7 @@ public class LuceneSearcher implements SearchEngine {
       }
     };
     final Analyzer id = new KeywordAnalyzer();
-    final PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(new Analyzer() {
-      @Override
-      public TokenStream tokenStream(final String fieldName, final Reader reader) {
-        throw new UnsupportedOperationException("Need to define analyser for: " + fieldName);
-      }
-    });
+    final PerFieldAnalyzerWrapper perField = new PerFieldAnalyzerWrapper(id);
     perField.addAnalyzer(FIELD_UID, id);
     perField.addAnalyzer(FIELD_WIKI, id);
     perField.addAnalyzer(FIELD_PATH, id);
@@ -170,6 +166,13 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_OUTGOING_LINKS, Joiner.on(" ").join(renderedPage.findOutgoingWikiLinks()), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
+
+    //store all the key-value document properties we found by whatever means.
+    final Map<String, String> props = renderedPage.getPageProperties();
+    for (final Map.Entry<String, String> prop : props.entrySet()) {
+      document.add(new Field(FIELD_PAGE_PROPS_PREFIX + prop.getKey(), prop.getValue(), Field.Store.YES, Field.Index.TOKENIZED));
+    }
+
     return document;
   }
 
@@ -232,16 +235,16 @@ public class LuceneSearcher implements SearchEngine {
     rememberLastIndexedRevision(revision);
   }
 
-  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
+  public Set<SearchMatch> incomingLinks(final String page) throws IOException, PageStoreException {
     if (_dir == null) {
       return Collections.emptySet();
     }
     try {
-      return doReadOperation(new ReadOperation<Set<String>>() {
-        public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
+      return doReadOperation(new ReadOperation<Set<SearchMatch>>() {
+        public Set<SearchMatch> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
           final String pageEscaped = escape(Escape.urlEncodeUTF8(page));
-          Set<String> results = Sets.newLinkedHashSet(Iterables.transform(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false), SearchMatch.TO_PAGE_NAME));
-          results.remove(page);
+          Set<SearchMatch> results = Sets.newLinkedHashSet(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false));
+          results.remove(new SearchMatch(true, null, page, null, null)); //NB. nothing except the page affects equality so we can use null for them.
           return results;
         }
       }, false);
@@ -251,21 +254,32 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
 
-  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
+  public Set<SearchMatch> outgoingLinks(final String page) throws IOException, PageStoreException {
     if (_dir == null) {
       return Collections.emptySet();
     }
     try {
-      return doReadOperation(new ReadOperation<Set<String>>() {
-        public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
+      return doReadOperation(new ReadOperation<Set<SearchMatch>>() {
+        public Set<SearchMatch> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
           Hits hits = searcher.search(new TermQuery(new Term(FIELD_PATH, page)));
           Iterator<?> iterator = hits.iterator();
           if (iterator.hasNext()) {
             Hit hit = (Hit) iterator.next();
             String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
-            Set<String> results = ImmutableSet.copyOf(outgoingLinks.split("\\s"));
-            results.remove(page);
-            return results;
+            Set<String> resultPageNames = ImmutableSet.copyOf(outgoingLinks.split("\\s"));
+            resultPageNames.remove(page);
+            try {
+              //NB. We don't request an extract for this.
+              return pageNamesToSearchMatchs(resultPageNames);
+            }
+            catch (QuerySyntaxException e) {
+              if (e.getCause() instanceof ParseException) {
+                throw (ParseException) e.getCause();
+              }
+              else {
+                throw new ParseException(e.getMessage());
+              }
+            }
           }
           return Collections.emptySet();
         }
@@ -274,6 +288,37 @@ public class LuceneSearcher implements SearchEngine {
     catch (QuerySyntaxException ex) {
       throw new NoQueryPerformedException(ex);
     }
+  }
+
+  /**
+   * Take a set of page names and create the SearchMatches for those pages. If the page doesn't exist, a SearchMatch is created for the page with no extract or page properties.
+   * This creates matches for the current wiki only.
+   * @param pageNames
+   * @return
+   */
+  private Set<SearchMatch> pageNamesToSearchMatchs(final Set<String> pageNames) throws IOException, QuerySyntaxException {
+    return pageNamesToSearchMatchs(pageNames, null, null);
+  }
+
+  private Set<SearchMatch> pageNamesToSearchMatchs(final Set<String> pageNames, final Highlighter highlighter, final String extractField) throws IOException, QuerySyntaxException {
+    return doReadOperation(new ReadOperation<Set<SearchMatch>>() {
+      public Set<SearchMatch> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
+        Set<SearchMatch> retval = new LinkedHashSet<SearchMatch>();
+
+        for (final String pageName : pageNames) {
+          Hits hits = searcher.search(new TermQuery(new Term(FIELD_UID, uidFor(_wikiName, pageName))));
+          
+          Iterator<?> iterator = hits.iterator();
+          if (iterator.hasNext()) {
+            Hit hit = (Hit) iterator.next();
+            
+            retval.add(searchMatchFromHit(hit, highlighter, analyzer, extractField));
+          }
+        }
+        
+        return retval;
+      }
+    }, false);
   }
 
   /**
@@ -429,17 +474,48 @@ public class LuceneSearcher implements SearchEngine {
     @SuppressWarnings("unchecked") Iterator<Hit> iter = hits.iterator();
     while (iter.hasNext()) {
       Hit hit = iter.next();
-      String text = hit.get(field);
-      String extract = null;
+      results.add(searchMatchFromHit(hit, highlighter, analyzer, field));
+    }
+    return results;
+  }
+
+  private SearchMatch searchMatchFromHit(final Hit hit) throws CorruptIndexException, IOException {
+    return searchMatchFromHit(hit, null, null, null);
+  }
+  
+  /**
+   * Construct a Search match from a hit.
+   * @param hit the source hit
+   * @param highlighter the highlighter used to highlight the extract. Can be null for no extract.
+   * @param analyzer the analyser used for the extract. Can be null if highlighter is null.
+   * @param extractField the field to use for the extract. Can be null if highlighter is null.
+   */
+  private SearchMatch searchMatchFromHit(final Hit hit, final Highlighter highlighter, final Analyzer analyzer, final String extractField) throws CorruptIndexException, IOException {
+    String extract = null;
+    
+    if (highlighter != null) {
+      String text = hit.get(extractField);
       // The text is not stored for all fields, just provide a null extract.
-      if (highlighter != null && text != null) {
-        TokenStream tokenStream = analyzer.tokenStream(field, new StringReader(text));
+      if (text != null) {
+        TokenStream tokenStream = analyzer.tokenStream(extractField, new StringReader(text));
         // Get 3 best fragments and separate with a "..."
         extract = highlighter.getBestFragments(tokenStream, text, 3, "...");
       }
-      results.add(new SearchMatch(_wikiName.equals(hit.get(FIELD_WIKI)), hit.get(FIELD_WIKI), hit.get(FIELD_PATH), extract));
     }
-    return results;
+    
+    return new SearchMatch(_wikiName.equals(hit.get(FIELD_WIKI)), hit.get(FIELD_WIKI), hit.get(FIELD_PATH), extract, getPageProperties(hit.getDocument()));
+  }
+
+  private Map<String, String> getPageProperties(final Document document) {
+    @SuppressWarnings("unchecked")
+    final List<Field> fields = document.getFields();
+    final Map<String, String> pageProps = new LinkedHashMap<String, String>();
+    for (final Field field : fields) {
+      if (field.name().startsWith(FIELD_PAGE_PROPS_PREFIX)) {
+        pageProps.put(field.name().substring(FIELD_PAGE_PROPS_PREFIX.length()), field.stringValue());
+      }
+    }
+    return pageProps;
   }
 
   public long getHighestIndexedRevision() throws IOException {

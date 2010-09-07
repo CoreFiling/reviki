@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.wiki.renderer.result;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -22,9 +24,11 @@ import java.util.List;
 public class CompositeResultNode implements ResultNode {
   
   private final List<ResultNode> _children;
+  private PageRenderContext _context;
 
-  public CompositeResultNode(final List<ResultNode> children) {
+  public CompositeResultNode(final List<ResultNode> children, PageRenderContext context) {
     _children = children;
+    _context = context;
   }
 
   public String toXHTML() {
@@ -39,4 +43,7 @@ public class CompositeResultNode implements ResultNode {
     return Collections.unmodifiableList(_children);
   }
 
+  public PageRenderContext getContext() {
+    return _context;
+  }
 }

@@ -44,8 +44,8 @@ public class TestMisc extends WebTestSupport {
     String perWikiCss = BASE_URL + "/pages/test/ConfigCss?ctype=raw";
     assertTrue(getWikiList().asXml().contains(defaultCss));
     String whatever = getWikiPage("WhatEver").asXml();
-    assertTrue(whatever.contains(perWikiCss));
-    assertFalse(whatever.contains(defaultCss));
+    assertTrue("Couldn't find perWiki css in wiki page", whatever.contains(perWikiCss));
+    assertFalse("Found default css in wiki page", whatever.contains(defaultCss));
   }
   
   public void testConfigSvnLocationShowsFormToEditSvnLocation() throws Exception {

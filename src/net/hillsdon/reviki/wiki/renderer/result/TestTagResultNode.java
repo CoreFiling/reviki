@@ -7,12 +7,12 @@ import junit.framework.TestCase;
 public class TestTagResultNode extends TestCase {
 
   public void testAddsCssClassNoChildren() {
-    TagResultNode hr = new TagResultNode("hr");
+    TagResultNode hr = new TagResultNode("hr", null);
     assertEquals("<hr class='wiki-content' />", hr.toXHTML());
   }
   
   public void testAddsCssClassWithChildren() {
-    TagResultNode hr = new TagResultNode("div", Arrays.<ResultNode>asList(new LiteralResultNode("Child")));
+    TagResultNode hr = new TagResultNode("div", Arrays.<ResultNode>asList(new LiteralResultNode("Child", null)), null);
     assertEquals("<div class='wiki-content'>Child</div>", hr.toXHTML());
   }
   

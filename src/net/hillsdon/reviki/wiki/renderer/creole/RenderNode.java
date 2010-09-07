@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public interface RenderNode {
@@ -35,7 +36,7 @@ public interface RenderNode {
    *              giving a priority to earlier rules in case of equal match
    *              indices.
    *              
-   * @return this, for conviniene.
+   * @return this, for convenience.
    */
   RenderNode addChildren(RenderNode... nodes);
 
@@ -43,10 +44,9 @@ public interface RenderNode {
    * Render starting from this node.
    * @param page TODO
    * @param text Input text.
-   * @param parent TODO
    * @return Rendered HTML.
    */
-  List<ResultNode> render(PageReference page, String text, RenderNode parent, URLOutputFilter urlOutputFilter);
+  List<ResultNode> render(PageReference page, String text, PageRenderContext context, URLOutputFilter urlOutputFilter);
   
   /**
    * Test for a match in the given text.
@@ -60,8 +60,9 @@ public interface RenderNode {
    * @param page TODO
    * @param matcher A matcher that found a match using our find method and we were deemed the best.
    * @param parent TODO
+   * @param context
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
    */
-  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter);
+  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter, PageRenderContext context);
 
 }

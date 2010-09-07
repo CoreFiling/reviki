@@ -20,14 +20,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.hillsdon.reviki.search.SearchEngine;
+import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 public class WikiGraphImpl implements WikiGraph {
 
@@ -39,13 +40,13 @@ public class WikiGraphImpl implements WikiGraph {
     _searchEngine = searchEngine;
   }
 
-  public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
-    Set<String> incoming = _searchEngine.incomingLinks(page);
+  public Set<SearchMatch> incomingLinks(final String page) throws IOException, PageStoreException {
+    Set<SearchMatch> incoming = _searchEngine.incomingLinks(page);
     return onlyExistingPages(incoming);
   }
 
-  public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
-    Set<String> outgoing = _searchEngine.outgoingLinks(page);
+  public Set<SearchMatch> outgoingLinks(final String page) throws IOException, PageStoreException {
+    Set<SearchMatch> outgoing = _searchEngine.outgoingLinks(page);
     return onlyExistingPages(outgoing);
   }
 
@@ -67,9 +68,14 @@ public class WikiGraphImpl implements WikiGraph {
    * @param pages Incoming.
    * @throws PageStoreException If we can't get the page list.
    */
-  private Set<String> onlyExistingPages(final Set<String> pages) throws PageStoreException {
-    Set<String> allExisting = ImmutableSet.copyOf(Iterables.transform(_pageStore.list(), PageReference.TO_NAME));
-    return Sets.intersection(pages, allExisting);
+  private Set<SearchMatch> onlyExistingPages(final Set<SearchMatch> pages) throws PageStoreException {
+    final Set<String> allExisting = ImmutableSet.copyOf(Iterables.transform(_pageStore.list(), PageReference.TO_NAME));
+    return ImmutableSet.copyOf(Iterables.filter(pages, new Predicate<SearchMatch>() {
+
+      public boolean apply(final SearchMatch searchMatch) {
+        return allExisting.contains(searchMatch.getPage());
+      }
+    }));
   }
 
 }

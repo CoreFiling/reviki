@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
@@ -33,8 +34,8 @@ public class LinkNode extends AbstractRegexNode {
     _handler = handler;
   }
 
-  public final ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
-    return new LiteralResultNode(_handler.handle(page, this, _parser.split(matcher), urlOutputFilter));
+  public final ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter, PageRenderContext context) {
+    return new LiteralResultNode(_handler.handle(page, this, _parser.split(matcher), urlOutputFilter, context), context);
   }
 
 }

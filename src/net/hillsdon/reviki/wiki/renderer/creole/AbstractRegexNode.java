@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public abstract class AbstractRegexNode implements RenderNode {
@@ -49,7 +50,7 @@ public abstract class AbstractRegexNode implements RenderNode {
     return this;
   }
 
-  public List<ResultNode> render(final PageReference page, /* mutable */ String text, final RenderNode parent, final URLOutputFilter urlOutputFilter) {
+  public List<ResultNode> render(final PageReference page, /* mutable */ String text, final PageRenderContext context, final URLOutputFilter urlOutputFilter) {
     final List<ResultNode> result = new ArrayList<ResultNode>();
     while (text != null && text.length() > 0) {
       RenderNode earliestRule = null;
@@ -68,24 +69,24 @@ public abstract class AbstractRegexNode implements RenderNode {
       if (earliestRule != null) {
         String beforeMatch = text.substring(0, earliestMatch.start());
         String afterMatch = text.substring(earliestMatch.end());
-        fallback(page, result, beforeMatch, urlOutputFilter);
-        result.add(earliestRule.handle(page, earliestMatch, this, urlOutputFilter));
+        fallback(page, result, beforeMatch, context, urlOutputFilter);
+        result.add(earliestRule.handle(page, earliestMatch, this, urlOutputFilter, context));
         text = afterMatch;
       }
       else {
-        fallback(page, result, text, urlOutputFilter);
+        fallback(page, result, text, context, urlOutputFilter);
         text = "";
       }
     }
     return result;
   }
 
-  private void fallback(final PageReference page, final List<ResultNode> result, final String text, final URLOutputFilter urlOutputFilter) {
+  private void fallback(final PageReference page, final List<ResultNode> result, final String text, final PageRenderContext context, final URLOutputFilter urlOutputFilter) {
     if (_fallback != null) {
-      result.addAll(_fallback.render(page, text, this, urlOutputFilter));
+      result.addAll(_fallback.render(page, text, context, urlOutputFilter));
     }
     else {
-      result.add(new HtmlEscapeResultNode(text));
+      result.add(new HtmlEscapeResultNode(text, context));
     }
   }
 

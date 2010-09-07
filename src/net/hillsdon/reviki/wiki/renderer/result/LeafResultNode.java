@@ -15,14 +15,24 @@
  */
 package net.hillsdon.reviki.wiki.renderer.result;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
+
 import java.util.Collections;
 import java.util.List;
 
 
 public abstract class LeafResultNode implements ResultNode {
+  private PageRenderContext _context;
+
+  protected LeafResultNode(PageRenderContext context) {
+    _context = context;
+  }
 
   public final List<ResultNode> getChildren() {
     return Collections.emptyList();
   }
-  
+
+  public PageRenderContext getContext() {
+    return _context;
+  }
 }

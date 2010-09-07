@@ -15,13 +15,15 @@
  */
 package net.hillsdon.reviki.wiki.renderer.result;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 
 
 public class LiteralResultNode extends LeafResultNode {
 
   private final String _xhtml;
 
-  public LiteralResultNode(final String xhtml) {
+  public LiteralResultNode(final String xhtml, PageRenderContext context) {
+    super(context);
     _xhtml = xhtml;
   }
 

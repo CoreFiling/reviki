@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.wiki.renderer.result;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
+
 import java.util.List;
 
 /**
@@ -32,5 +34,7 @@ public interface ResultNode {
   List<ResultNode> getChildren();
   
   String toXHTML();
+
+  PageRenderContext getContext();
 
 }

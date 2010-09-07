@@ -73,6 +73,7 @@ import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.graph.WikiGraphImpl;
 import net.hillsdon.reviki.wiki.macros.IncomingLinksMacro;
+import net.hillsdon.reviki.wiki.macros.KeyedValue;
 import net.hillsdon.reviki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.reviki.wiki.macros.SearchMacro;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
@@ -132,7 +133,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
-        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new KeyedValue()));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }

@@ -22,6 +22,7 @@ import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
@@ -42,14 +43,14 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _configuration = configuration;
   }
   
-  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) {
+  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter, final PageRenderContext context) {
     if (link.isURL()) {
-      return link(page, renderer, "external", link.getRefd(), link.getText(), urlOutputFilter);
+      return link(page, renderer, "external", link.getRefd(), link.getText(), urlOutputFilter, context);
     }
     else {
       if (link.getWiki() != null) {
         try {
-          return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getRefd()), link.getText(), urlOutputFilter);
+          return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getRefd()), link.getText(), urlOutputFilter, context);
         }
         catch (UnknownWikiException e) {
           return link.getText();
@@ -69,7 +70,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
           else {
             refd = refd.replaceFirst("/", "/attachments/");
           }
-          return link(page, renderer, "attachment", refd, link.getText(), urlOutputFilter);
+          return link(page, renderer, "attachment", refd, link.getText(), urlOutputFilter, context);
         }
         else {
           return _internalLinker.aHref(link.getRefd(), link.getText(), "", urlOutputFilter);
@@ -78,8 +79,8 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     }
   }
   
-  private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text, final URLOutputFilter urlOutputFilter) {
-    return String.format(_formatString, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), new CompositeResultNode(renderer.render(page, text, null, urlOutputFilter)).toXHTML());
+  private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text, final URLOutputFilter urlOutputFilter, final PageRenderContext context) {
+    return String.format(_formatString, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), new CompositeResultNode(renderer.render(page, text, context, urlOutputFilter), context).toXHTML());
   }
 
 }

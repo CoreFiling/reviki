@@ -17,9 +17,10 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 
 public interface LinkPartsHandler {
 
-  String handle(PageReference page, RenderNode renderer, LinkParts parts, URLOutputFilter urlOutputFilter);
+  String handle(PageReference page, RenderNode renderer, LinkParts parts, URLOutputFilter urlOutputFilter, PageRenderContext context);
   
 }

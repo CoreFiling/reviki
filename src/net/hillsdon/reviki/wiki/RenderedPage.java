@@ -18,9 +18,12 @@ package net.hillsdon.reviki.wiki;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.hillsdon.reviki.wiki.renderer.context.PageRenderContext;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 import org.cyberneko.html.parsers.SAXParser;
@@ -35,11 +38,13 @@ public class RenderedPage {
   private static final Pattern RE_EXIST_PAGE_CLASS = Pattern.compile("(^|\\s)existing-page($|\\s)");
   
   private final String _pageName;
-  private final String _rendered; 
+  private final String _rendered;
+  private PageRenderContext _context;
 
   public RenderedPage(final String pageName, final ResultNode resultNode) {
     _pageName = pageName;
     _rendered = resultNode.toXHTML();
+    _context = resultNode.getContext();
   }
 
   public String getPage() {
@@ -92,4 +97,10 @@ public class RenderedPage {
     return RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find();
   }
 
+  public Map<String, String> getPageProperties() {
+    if (_context == null) {
+      return Collections.emptyMap();
+    }
+    return _context.getPageProperties();
+  }
 }
