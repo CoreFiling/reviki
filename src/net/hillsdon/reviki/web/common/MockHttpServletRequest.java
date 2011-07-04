@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -42,6 +43,7 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
       return MOCK_SESSION_ID;
     }
   };
+  private Map<String, RequestDispatcher> _requestDispatchers = new LinkedHashMap<String, RequestDispatcher>();
 
   @Override
   public void setAttribute(final String key, final Object value) {
@@ -83,6 +85,15 @@ public final class MockHttpServletRequest extends NullHttpServletRequest {
       return entries.get(0);
     }
     return null;
+  }
+  
+  @Override
+  public RequestDispatcher getRequestDispatcher(String arg0) {
+    return _requestDispatchers.get(arg0);
+  }
+  
+  public void setRequestDispatcher(String arg0, RequestDispatcher requestDispatcher) {
+    _requestDispatchers.put(arg0, requestDispatcher);
   }
 
   @Override

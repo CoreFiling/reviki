@@ -28,13 +28,24 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 public class ResourceHandlerImpl implements ResourceHandler {
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    final String resource = path.next();
-    if (resource == null || path.hasNext()) {
+    StringBuilder sb = new StringBuilder();
+    
+    while (path.hasNext()) {
+      if (sb.length()>0) {
+        sb.append("/");
+      }
+      sb.append(Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(path.next())));
+    }
+    
+    if (sb.length()==0) {
       throw new NotFoundException();
     }
+    
+    final String resource = sb.toString();
+    
     return new View() {
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        request.getRequestDispatcher("/resources/" + Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(resource))).forward(request, response);
+        request.getRequestDispatcher("/resources/" + resource).forward(request, response);
       }
     };
   }
