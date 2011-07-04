@@ -197,7 +197,7 @@ h2.results-wiki {
 }
 
 #tabs {
-  margin-bottom: 2em;
+  margin: 0 2em 2em 0;
   border: none;
   position: inherit;
 }
@@ -214,10 +214,7 @@ h2.results-wiki {
 
 #tab-header {
   display: inline-block;
-  background: none;
   border-width: 0 0 1px 0;
-  -moz-border-radius-bottomright: 0px;
-  -moz-border-radius-bottomleft: 0px;
 }
 
 #tab-header li a {
