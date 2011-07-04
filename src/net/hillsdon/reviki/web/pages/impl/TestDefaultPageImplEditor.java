@@ -54,7 +54,7 @@ public class TestDefaultPageImplEditor extends TestCase {
 
   private FeedWriter _feedWriter;
   private PageInfoImpl _pageInfo;
-  
+    
   private static final String USERNAME = "user";
 
   @Override
@@ -116,10 +116,13 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
     expect(_renderer.render(eq(THE_PAGE), eq("new content" + Strings.CRLF), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
     expect(_resultNode.toXHTML()).andReturn("rendered preview");
+    expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();
     replay();
     _page.editor(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
     final String preview = (String) _request.getAttribute(DefaultPageImpl.ATTR_PREVIEW);
     assertEquals("rendered preview", preview);
+    final String diff = (String) _request.getAttribute(DefaultPageImpl.ATTR_MARKED_UP_DIFF);
+    assertEquals("rendered diff", diff);
   }
 }

@@ -293,10 +293,13 @@ public class DefaultPageImpl implements DefaultPage {
           return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
         }
         else {
-          pageInfo = pageInfo.withAlternativeContent(getContent(request));
+          final String oldContent = pageInfo.getContent();
+          final String newContent = getContent(request);
+          pageInfo = pageInfo.withAlternativeContent(newContent);
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent(), new ResponseSessionURLOutputFilter(request, response));
+          ResultNode rendered = _renderer.render(pageInfo, newContent, new ResponseSessionURLOutputFilter(request, response));
           request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
+          request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
       return new JspView("EditPage");

@@ -4,20 +4,37 @@
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <c:if test="${not empty preview}">
-      <h2>Preview <a href="#editForm">(skip)</a></h2>
-      <div id="wiki-rendering">
-      ${preview}
+    <c:if test="${not empty preview or not empty markedUpDiff}">
+      <script type='text/javascript'>
+	    $(document).ready(function() {
+		  $("#tabs").tabs();
+		});
+      </script>
+
+      <div id="tabs">
+        <ul id="tab-header">
+          <c:if test="${not empty preview}">
+            <li><a href="#preview-area">Preview</a></li>
+          </c:if>
+          <c:if test="${not empty markedUpDiff}">
+            <li><a href="#diff-area">Diff</a></li>
+          </c:if>
+        </ul>
+
+        <c:if test="${not empty preview}">
+          <div id="preview-area" class="tab-content">
+            <div id="wiki-rendering">${preview}</div>
+          </div>
+        </c:if>
+        <c:if test="${not empty markedUpDiff}">
+          <div id="diff-area" class="tab-content">
+            <div id="wiki-rendering">${markedUpDiff}</div>
+          </div>
+        </c:if>
       </div>
     </c:if>
-    <c:if test="${not empty markedUpDiff}">
-      <h2>Comparison <a href="#editForm">(skip)</a></h2>
-      <div id="wiki-rendering">
-      ${markedUpDiff}
-      </div>
-    </c:if>
-    
-    <form id="editForm" name="editForm" action="<c:url value="${page.name}"/>" method="post">
+
+    <form id="editForm" name="editForm" action="<c:url value="${page.name}"/>" style="clear:left" method="post">
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
