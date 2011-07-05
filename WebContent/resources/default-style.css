@@ -74,10 +74,10 @@ hr {
 span.diff {
 }
 ins.diff {
-	background:#E6FFE6;
+	background: #aaffaa;
 }
 del.diff {
-	background:#FFE6E6;
+	background: #ffaaaa;
 }
 
 /* JHighlighter styles */
