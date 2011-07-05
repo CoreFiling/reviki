@@ -15,13 +15,13 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import static java.lang.String.format;
+import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
-import static java.lang.String.format;
-import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
 
 public class InternalLinker {
 
@@ -42,13 +42,29 @@ public class InternalLinker {
     }
   }
   
-  public String url(final String pageName) {
-    return _wikiUrls.page(pageName);
+  public String url(final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(null, pageName, extra, urlOutputFilter);
   }
   
-  public String link(final String pageName, final String linkText) {
-    // Special case: only link acronyms with real pages.
-    final boolean exists = exists(pageName);
+  public String url(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(wikiName, pageName, extra, urlOutputFilter);
+  }
+  
+  public String aHref(final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
+    String x = aHref(null, pageName, linkText, extra, urlOutputFilter);
+    return x;
+  }
+  
+  /**
+   * Generate a hyperlink.
+   * @param wikiName If not-null it will generate a foreign-wiki link (which will always be deemed to exist)
+   * @param pageName The name of the page on wikiName
+   * @param linkText The text to display
+   * @return The html
+   */
+  public String aHref(final String wikiName, final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
+    // Special case: only link acronyms with real pages or on foreign wikis.
+    final boolean exists = wikiName!=null || exists(pageName);
     if (!exists && isAcronym(pageName)) {
       return Escape.html(pageName);
     }
@@ -58,7 +74,7 @@ public class InternalLinker {
     return format("<a %sclass='%s' href='%s'>%s</a>",
       otherAttrs,
       cssClass,
-      Escape.html(url(pageName)),
+      Escape.html(url(wikiName, pageName, extra, urlOutputFilter)),
       Escape.html(linkText)
     );
   }

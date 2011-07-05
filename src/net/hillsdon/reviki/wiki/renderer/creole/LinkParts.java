@@ -24,7 +24,7 @@ public class LinkParts {
   public LinkParts(final String text, final String wiki, final String refd) {
     _text = text;
     _wiki = wiki;
-    _refd = refd;
+    _refd = refd == null ? "" : refd;
   }
   public String getText() {
     return _text;

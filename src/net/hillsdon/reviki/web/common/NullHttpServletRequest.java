@@ -40,7 +40,7 @@ import javax.servlet.http.HttpSession;
 public abstract class NullHttpServletRequest implements HttpServletRequest {
 
 
-  public String getParameter(final String arg0) {
+  public String getParameter(String arg0) {
     return null;
   }
 
@@ -52,7 +52,7 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
-  public String[] getParameterValues(final String arg0) {
+  public String[] getParameterValues(String arg0) {
     return null;
   }
   
@@ -68,11 +68,11 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
-  public long getDateHeader(final String arg0) {
+  public long getDateHeader(String arg0) {
     return 0;
   }
 
-  public String getHeader(final String arg0) {
+  public String getHeader(String arg0) {
     return null;
   }
 
@@ -80,11 +80,11 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
-  public Enumeration getHeaders(final String arg0) {
+  public Enumeration getHeaders(String arg0) {
     return null;
   }
 
-  public int getIntHeader(final String arg0) {
+  public int getIntHeader(String arg0) {
     return 0;
   }
 
@@ -128,7 +128,7 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
-  public HttpSession getSession(final boolean arg0) {
+  public HttpSession getSession(boolean arg0) {
     return null;
   }
 
@@ -152,11 +152,11 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return false;
   }
 
-  public boolean isUserInRole(final String arg0) {
+  public boolean isUserInRole(String arg0) {
     return false;
   }
 
-  public Object getAttribute(final String arg0) {
+  public Object getAttribute(String arg0) {
     return null;
   }
 
@@ -208,7 +208,7 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
-  public String getRealPath(final String arg0) {
+  public String getRealPath(String arg0) {
     return null;
   }
 
@@ -224,7 +224,7 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return 0;
   }
 
-  public RequestDispatcher getRequestDispatcher(final String arg0) {
+  public RequestDispatcher getRequestDispatcher(String arg0) {
     return null;
   }
 
@@ -244,13 +244,13 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return false;
   }
 
-  public void removeAttribute(final String arg0) {
+  public void removeAttribute(String arg0) {
   }
 
-  public void setAttribute(final String arg0, final Object arg1) {
+  public void setAttribute(String arg0, Object arg1) {
   }
 
-  public void setCharacterEncoding(final String arg0) throws UnsupportedEncodingException {
+  public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException {
   }
 
 }

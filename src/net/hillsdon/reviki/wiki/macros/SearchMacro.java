@@ -15,13 +15,13 @@
  */
 package net.hillsdon.reviki.wiki.macros;
 
-import static net.hillsdon.fij.core.Functional.list;
-import static net.hillsdon.fij.core.Functional.map;
-
 import java.util.Collection;
 
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 public class SearchMacro extends AbstractListOfPagesMacro {
 
@@ -30,14 +30,14 @@ public class SearchMacro extends AbstractListOfPagesMacro {
   public SearchMacro(final SearchEngine searchEngine) {
     _searchEngine = searchEngine;
   }
-  
+
   public String getName() {
     return "search";
   }
 
   @Override
   protected Collection<String> getPages(final String remainder) throws Exception {
-    return list(map(_searchEngine.search(remainder, false), SearchMatch.TO_PAGE_NAME));
+    return ImmutableList.copyOf(Iterables.transform(_searchEngine.search(remainder, false, true), SearchMatch.TO_PAGE_NAME));
   }
 
 }

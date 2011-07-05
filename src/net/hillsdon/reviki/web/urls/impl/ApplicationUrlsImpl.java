@@ -15,34 +15,47 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
-import net.hillsdon.reviki.web.dispatching.impl.BaseUrlFilter;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
 /**
  * Determines base URL from the request.
- * 
+ *
  * @author mth
  */
 public class ApplicationUrlsImpl implements ApplicationUrls {
+
+  private static String getBaseUrl(final HttpServletRequest request) {
+    String requestURL = request.getRequestURL().toString();
+    String path = request.getRequestURI().substring(request.getContextPath().length());
+    String base = requestURL.substring(0, requestURL.length() - path.length());
+    return base;
+  }
 
   private final String _base;
   private final DeploymentConfiguration _deploymentConfiguration;
 
   public ApplicationUrlsImpl(final HttpServletRequest request, final DeploymentConfiguration deploymentConfiguration) {
-    this((String) request.getAttribute(BaseUrlFilter.ATTR_BASE_URL), deploymentConfiguration);
+    this(getBaseUrl(request), deploymentConfiguration);
   }
-  
+
   public ApplicationUrlsImpl(final String base, final DeploymentConfiguration deploymentConfiguration) {
     _base = base;
     _deploymentConfiguration = deploymentConfiguration;
   }
 
   public WikiUrls get(final String name) {
-    return get(name, name);
+    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name));
   }
 
   public String list() {
@@ -53,12 +66,17 @@ public class ApplicationUrlsImpl implements ApplicationUrls {
     return _base + relative;
   }
 
-  public WikiUrls get(final String name, final String givenWikiName) {
-    return new WikiUrlsImpl(this, _deploymentConfiguration.getConfiguration(name));
-  }
 
   public String resource(final String path) {
     return url("/resources/" + path);
+  }
+
+  public Set<WikiUrls> getAvailableWikiUrls() {
+    return Sets.newLinkedHashSet(Iterables.transform(_deploymentConfiguration.getWikis(), new Function<WikiConfiguration, WikiUrls>() {
+      public WikiUrls apply(final WikiConfiguration wiki) {
+        return get(wiki.getWikiName());
+      }
+    }));
   }
 
 }

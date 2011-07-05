@@ -5,26 +5,16 @@ import java.util.List;
 
 public class RequestCompletedHandlerImpl implements RequestCompletedHandler {
 
-  private final ThreadLocal<List<RequestLifecycleAwareManager>> _list = new ThreadLocal<List<RequestLifecycleAwareManager>>();
-  
-  public void register(final RequestLifecycleAwareManager manager) {
-    ensureList().add(manager);
-  }
+  private final List<RequestLifecycleAwareManager> _list = new ArrayList<RequestLifecycleAwareManager>();
 
-  private List<RequestLifecycleAwareManager> ensureList() {
-    List<RequestLifecycleAwareManager> list = _list.get();
-    if (list == null) {
-      list = new ArrayList<RequestLifecycleAwareManager>();
-      _list.set(list);
-    }
-    return list;
+  public void register(final RequestLifecycleAwareManager manager) {
+    _list.add(manager);
   }
 
   public void requestComplete() {
-    for (RequestLifecycleAwareManager manager : ensureList()) {
+    for (RequestLifecycleAwareManager manager : _list) {
       manager.requestComplete();
     }
-    _list.set(null);
   }
 
 }

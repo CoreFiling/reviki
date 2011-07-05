@@ -9,7 +9,7 @@
     <p>The following pages are not referenced from any other page.</p>
     <ul>
       <c:forEach var="path" items="${pageList}">
-        <li><sw:wikiLink page="${path}"/></li>
+        <li><sw:wikiPage page="${path}"/></li>
       </c:forEach>
     </ul>
   </tiles:putAttribute>

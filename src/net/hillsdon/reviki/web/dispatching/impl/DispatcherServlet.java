@@ -46,11 +46,13 @@ public class DispatcherServlet extends HttpServlet {
     // putting the impl class name in the web.xml so this is a reasonable
     // temporary step to get back to zero cycles.
     try {
-      _dispatcher = new PicoBuilder().build()
+      final ApplicationSession applicationSession = new PicoBuilder().build()
         .addComponent(Class.forName("net.hillsdon.reviki.di.impl.ApplicationSessionImpl"))
         .addComponent(config)
         .addComponent(config.getServletContext())
-        .getComponent(ApplicationSession.class).getDispatcher();
+        .getComponent(ApplicationSession.class);
+      applicationSession.start();
+      _dispatcher = applicationSession.getDispatcher();
     }
     catch (ClassNotFoundException e) {
       throw new ServletException("Root session class not found", e);
@@ -59,6 +61,7 @@ public class DispatcherServlet extends HttpServlet {
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    request.getSession();
     _dispatcher.handle(request, response);
   }
 

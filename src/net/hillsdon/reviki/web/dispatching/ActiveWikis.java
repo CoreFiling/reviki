@@ -19,6 +19,14 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 public interface ActiveWikis {
 
-  WikiHandler addWiki(WikiConfiguration configuration);
+  /**
+   * Creates a new, untested wiki handler but does not install it.
+   */
+  WikiHandler createWikiHandler(WikiConfiguration configuration);
+
+  /**
+   * Use the given handler for the configuration until replaced.
+   */
+  void installHandler(WikiConfiguration configuration, WikiHandler handler);
 
 }

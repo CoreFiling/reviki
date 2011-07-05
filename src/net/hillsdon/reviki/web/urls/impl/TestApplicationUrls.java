@@ -18,7 +18,6 @@ package net.hillsdon.reviki.web.urls.impl;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
-import net.hillsdon.reviki.web.dispatching.impl.BaseUrlFilter;
 
 /**
  * Test for {@link WikiUrlsImpl}.
@@ -34,7 +33,9 @@ public class TestApplicationUrls extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _request = new MockHttpServletRequest();
-    _request.setAttribute(BaseUrlFilter.ATTR_BASE_URL, "http://www.example.com/reviki"); 
+    _request.setContextPath("/reviki");
+    _request.setRequestURL("http://www.example.com/reviki/some/page");
+    _request.setRequestURI("/reviki/some/page");
     _urls = new ApplicationUrlsImpl(_request, _deploymentConfiguration);
   }
 

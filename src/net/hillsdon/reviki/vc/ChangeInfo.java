@@ -52,7 +52,7 @@ public class ChangeInfo {
     _changeType = changeType;
     _copiedFrom = copiedFrom;
     _copiedFromRevision = copiedFromRevision;
-    _commitMessage = commitMessage.trim();
+    _commitMessage = commitMessage == null ? null : commitMessage.trim();
   }
   
   public ChangeType getChangeType() {

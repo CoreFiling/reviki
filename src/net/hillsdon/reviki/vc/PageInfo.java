@@ -27,6 +27,8 @@ public interface PageInfo extends PageReference  {
   // Magic revisions.  Prefer isFoo() methods.
   long UNCOMMITTED = -2;
   long DELETED = -3;
+  
+  String getWiki();
 
   String getContent();
   
@@ -40,13 +42,13 @@ public interface PageInfo extends PageReference  {
   String getLockedBy();
   String getLockToken();
   boolean isLocked();
-  boolean lockedByUserIfNeeded(String user);
+  boolean isNewOrLockedByUser(String user);
   Date getLockedSince();
   
   boolean isNew();
   boolean isDeleted();
   
   PageInfo withAlternativeContent(String content);
-
+  PageInfo withoutLockToken();
   
 }

@@ -1,22 +1,33 @@
 <project name="reviki" default="war" basedir=".">
-
+  <description>
+    reviki build - see http://reviki.org for more information
+  </description>
+  <property name="version" value="0.1.1" />   
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
   <property name="reports" value="reports" />   
-  <property name="war" value="${ant.project.name}.war" />   
+  <property name="release" value="release" />   
+  <property name="jar" value="${build-web}/WEB-INF/lib/reviki.jar"/>
+  <property name="testJar" value="ant-build/reviki-test.jar"/>
+  <property name="war" value="${release}/${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat-url" value="http://mirror.fubra.com/ftp.apache.org/tomcat/tomcat-6/v6.0.16/bin/apache-tomcat-6.0.16.zip"/>
+  <property name="tomcat.version" value="6.0.29"/>
+  <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
   <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
        The wiki should be called 'test' (with no base URL set).
+       
+       Note the wiki data will be stored in ./reviki-test-data, not the usual ~/reviki-data
+       directory.
 
        An external properties file is used to retrieve the username and password to use.
-       Supply the testwiki.username and testwiki.password properties in build.properties. -->
+       See the file "build.properties.example".
+  -->
   <property file="build.properties" />
 
   <path id="classpath">
@@ -33,14 +44,17 @@
      <mkdir dir="${build-web}" />
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
+     <mkdir dir="${release}" />
      <exec outputproperty="revision" executable="svnversion"/>
+  	 <property name="build-details" value="${version} r${revision}" />
   </target>
 
-  <target name="clean">
+  <target name="clean" description="Clean-up build artifacts">
     <delete dir="${build-classes}" />
     <delete dir="${build-web}" />
     <delete dir="${build-webtests}" />
     <delete dir="${reports}" />
+    <delete dir="${release}" />
     <delete file="${war}"/>
     <delete dir="${tomcat}" />
     <!-- We leave the tomcat zip as it is a large download. -->
@@ -56,7 +70,7 @@
         <include name="*/**"/>
       </fileset>
     </copy>
-    <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$BuildRevision$" value="${revision}"/>
+    <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$Version$" value="${build-details}"/>
     <copy todir="${build-classes}">
       <fileset dir="${source}">
         <include name="**/*.json"/>
@@ -68,6 +82,23 @@
     </copy>
   </target>
 
+  <target name="jar" depends="compile">
+    <jar destfile="${jar}">
+      <fileset dir="${build-classes}">
+         <include name="**/*.class"/>
+         <include name="${prepopulated-pages}"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="test-jar" depends="functional-tests-compile">
+    <jar destfile="${testJar}">
+      <fileset dir="${build-webtests}">
+        <include name="**/*.class"/>
+      </fileset>
+    </jar>
+  </target>
+
   <target name="functional-tests-compile" depends="compile">
     <javac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
       <classpath>
@@ -77,7 +108,7 @@
     </javac>
   </target>
 
-  <target name="taglib-jar" depends="compile">
+  <target name="taglib-jar" depends="compile" description="Rebuild the JSP taglib JAR file">
     <mkdir dir="${build-classes}/META-INF"/>
     <move file="${build-classes}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-classes}/META-INF/reviki.tld"/>
     <jar destfile="WebContent/WEB-INF/lib/reviki-tlds.jar" >
@@ -90,8 +121,8 @@
     </jar>
   </target>
 
-  <target name="unit-tests" depends="compile">
-    <junit printsummary="yes" haltonfailure="yes">
+  <target name="unit-tests" depends="compile" description="Run the unit tests">
+    <junit printsummary="yes" fork="true" forkmode="once" haltonfailure="yes">
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
@@ -106,19 +137,17 @@
     </junit>
   </target>
 
-  <target name="war" depends="compile">
+  <target name="war" depends="jar" description="Build the WAR file">
     <war warfile="${war}"
          webxml="${build-web}/WEB-INF/web.xml">
-       <classes dir="${build-classes}">
-         <include name="**/*.class"/>
-         <include name="${prepopulated-pages}"/>
-       </classes>
        <fileset dir="${build-web}">
          <include name="**/*"/>
          <exclude name="WEB-INF/**/*"/>
        </fileset>
        <webinf dir="${build-web}/WEB-INF" includes="**" excludes="web.xml" />
     </war>
+  	<!-- Output version information file for the build system. -->
+  	<echo message="${version}" file="${release}/product.version"/>
   </target>
 
   <target name="prepare-tomcat">
@@ -133,19 +162,22 @@
       <regexpmapper handledirsep="true" from="apache-tomcat-.*?/(.*)" to="\1"/>
     </copy>
     <delete dir="${tomcat}-unziphelper"/>
+    <!-- Full of JSPs that the Eclipse validation objects to. -->
+    <delete dir="${tomcat}/webapps"/>
+    <mkdir dir="${tomcat}/webapps"/>
 
     <!-- Would be really useful to munge the port numbers to something unusual here,
          8080 will often conflict with something else.  Perhaps some XSLT? -->
     <chmod dir="${tomcat}/bin" includes="**/*.sh" perm="u+x" />
   </target>
 
-  <target name="deploy" depends="war, prepare-tomcat">
+  <target name="deploy" depends="war, prepare-tomcat" description="Build and deploy the WAR to tomcat, ready to be started">
     <property name="deploy-dir" value="${tomcat}/conf/Catalina/localhost"/>
     <mkdir dir="${deploy-dir}"/>
     <copy file="context.xml" tofile="${deploy-dir}/reviki.xml"/>
   </target>
 
-  <target name="start-tomcat">
+  <target name="start-tomcat" description="Start tomcat at localhost:8080">
     <!-- XXX: Is there a platform independent way to start/stop tomcat? -->
     <exec executable="${tomcat}/bin/startup.sh"/>
     <waitfor maxwait="15" maxwaitunit="second" checkevery="500" timeoutproperty="start-tomcat-failed">
@@ -154,15 +186,18 @@
     <fail if="start-tomcat-failed" />
   </target>
 
-  <target name="stop-tomcat">
+  <target name="stop-tomcat" description="Stop tomcat launched by start-tomcat">
     <exec executable="${tomcat}/bin/shutdown.sh"/>
   </target>
 
-  <target name="functional-tests" depends="deploy, functional-tests-compile">
-    <antcall target="start-tomcat" />
+  <target name="functional-tests-junit" depends="functional-tests-compile">
     <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="functional-tests-failed">
-      <jvmarg value="-Dwiki.username=${testwiki.username}" />
-      <jvmarg value="-Dwiki.password=${testwiki.password}" />
+      <jvmarg value="-Dwiki.url=${wiki.url}" />
+      <jvmarg value="-Dwiki.username=${wiki.username}" />
+      <jvmarg value="-Dwiki.password=${wiki.password}" />
+      <jvmarg value="-Dwiki.altusername=${wiki.altusername}" />
+      <jvmarg value="-Dwiki.altpassword=${wiki.altpassword}" />
+      <jvmarg value="-Dwiki.svn=${wiki.svn}" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
@@ -176,11 +211,44 @@
         </fileset>
       </batchtest>
     </junit>
-    <antcall target="stop-tomcat" />
+  </target>
+
+  <target name="functional-tests" depends="deploy" description="Run the functional tests against a tomcat started/stopped by ant">
+    <antcall>
+      <target name="start-tomcat" />
+      <target name="functional-tests-junit"/>
+      <target name="stop-tomcat" />
+      <target name="fail-iff-functional-tests-failed"/>
+    </antcall>
+  </target>
+
+  <target name="functional-tests-external" description="Run the functional tests against a tomcat outside of ant's control">
+    <antcall>
+      <target name="functional-tests-junit"/>
+      <target name="fail-iff-functional-tests-failed"/>
+    </antcall>
+  </target>
+
+  <target name="fail-iff-functional-tests-failed">
     <fail if="functional-tests-failed" />
   </target>
 
-  <target name="all-tests" depends="unit-tests, functional-tests"/>
+  <target name="all-tests" depends="unit-tests, functional-tests" description="Run all the tests (starts/stops tomcat)"/>
+
+  <target name="release" depends="war, test-jar">
+    <property name="release-dirname" value="reviki-${version}-r${revision}"/>
+    <zip file="${release}/${release-dirname}.zip">
+      <zipfileset prefix="${release-dirname}" dir=".">
+        <include name="${war}"/>
+      </zipfileset>
+      <zipfileset prefix="${release-dirname}" dir="docs">
+        <include name="*.TXT"/>
+      </zipfileset>
+    </zip>
+    <!-- Take a copy of the reviki JARs for building plugins against. -->
+    <copy file="${jar}" todir="${release}"/>
+    <copy file="${testJar}" todir="${release}"/>
+  </target>
 
 </project>
 

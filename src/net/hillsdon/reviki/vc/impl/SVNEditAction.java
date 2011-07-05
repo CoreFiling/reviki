@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.apache.commons.logging.Log;
@@ -51,25 +52,36 @@ public abstract class SVNEditAction implements SVNAction<Long> {
   
   public Long perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException, IOException {
     ISVNEditor commitEditor = null;
+    boolean success = false;
     try {
       commitEditor = repository.getCommitEditor(_commitMessage, _locks, false, null);
       commitEditor.openRoot(-1);
       driveCommitEditor(commitEditor, operations);
       commitEditor.closeDir();
-      return commitEditor.closeEdit().getNewRevision();
+      final long newRevision = commitEditor.closeEdit().getNewRevision();
+      success = true;
+      return newRevision;
     }
     catch (SVNException ex) {
       // We try clean-up as advised but re-throw the original error for handling.
-      if (commitEditor != null) {
-        try {
-          commitEditor.abortEdit();
-        }
-        catch (SVNException abortError) {
-          LOG.warn("Failed to abort after failed transaction.", abortError);
-        }
-      }
       checkForInterveningCommit(ex);
       throw ex;
+    }
+    finally {
+      if (!success) {
+        cleanup(commitEditor);
+      }
+    }
+  }
+
+  private void cleanup(final ISVNEditor commitEditor) {
+    if (commitEditor != null) {
+      try {
+        commitEditor.abortEdit();
+      }
+      catch (SVNException abortError) {
+        LOG.warn("Failed to abort after failed transaction.", abortError);
+      }
     }
   }
 
@@ -85,7 +97,9 @@ public abstract class SVNEditAction implements SVNAction<Long> {
    * @param operations TODO
    * @throws SVNException On failure. 
    * @throws IOException On failure. 
+   * @throws NotFoundException On failure.
+   * @throws PageStoreException On failure.
    */
-  protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException;
+  protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException, NotFoundException, PageStoreException;
   
 }

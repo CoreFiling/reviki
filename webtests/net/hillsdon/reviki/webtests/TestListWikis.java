@@ -30,7 +30,7 @@ public class TestListWikis extends WebTestSupport {
     for (Object o : list.getByXPath("id('wikiList')/li")) {
       HtmlListItem li = (HtmlListItem) o;
       String href = ((HtmlAnchor) li.getByXPath("a").get(0)).getHrefAttribute();
-      testWikiFound |= href.contains("test/FrontPage");
+      testWikiFound |= href.contains("pages/test/FrontPage");
     }
     assertTrue(testWikiFound);
   }

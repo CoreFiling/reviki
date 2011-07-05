@@ -15,13 +15,14 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestAttributes;
@@ -29,6 +30,7 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 import net.hillsdon.reviki.web.handlers.JumpToWikiUrl;
 import net.hillsdon.reviki.web.handlers.ListWikis;
+import net.hillsdon.reviki.web.redirect.RedirectView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.RequestCompletedHandler;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
@@ -36,13 +38,9 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static java.lang.String.format;
-
 public class DispatcherImpl implements Dispatcher {
-  
-  private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
-  private final DeploymentConfiguration _configuration;
+  private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
   private final ListWikis _list;
   private final WikiChoiceImpl _choice;
@@ -51,22 +49,26 @@ public class DispatcherImpl implements Dispatcher {
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
   private final RequestCompletedHandler _requestCompletedHandler;
 
-  public DispatcherImpl(final DeploymentConfiguration configuration, final ListWikis list, final WikiChoiceImpl choice, final JumpToWikiUrl jumpToWiki, final ApplicationUrls applicationUrls, final RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
-    _configuration = configuration;
+  public DispatcherImpl(final ListWikis list, final WikiChoiceImpl choice, final JumpToWikiUrl jumpToWiki, final ApplicationUrls applicationUrls, final RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {
     _list = list;
     _choice = choice;
     _jumpToWiki = jumpToWiki;
     _applicationUrls = applicationUrls;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;
     _requestCompletedHandler = requestCompletedHandler;
-    
-    _configuration.load();
   }
 
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
-    ConsumedPath path = new ConsumedPath(request);
+    
+    // Avoid getRequestURL as that contains jsessionid (at least on Jetty).
+    final String contextPath = request.getContextPath();
+    final String servletPath = request.getServletPath();
+    final String pathInfo = request.getPathInfo();
+    final String reconstructedRequestURI = contextPath + servletPath + (pathInfo == null ? "" : pathInfo);
+    ConsumedPath path = new ConsumedPath(reconstructedRequestURI, contextPath);
+    
     try {
       _requestLifecycleAwareManager.requestStarted(request);
       View view = handle(path, request, response);
@@ -75,41 +77,53 @@ public class DispatcherImpl implements Dispatcher {
       }
     }
     catch (NotFoundException ex) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      handleException(request, response, ex, false, "Could not find the file you were looking for.", 404);
     }
     catch (Exception ex) {
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      handleException(request, response, ex);
+      handleException(request, response, ex, true, null, 500);
     }
     finally {
       _requestCompletedHandler.requestComplete();
     }
   }
 
-  private View handle(ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    // Skip the 'dispatcher' path we're bound to and process the rest.
-    path = path.consume();
-    
-    // These special URLs don't really fit...
-    if ("jump".equals(path.peek())) {
-      return _jumpToWiki.handle(path.consume(), request, response);
+  // This should be moved out of here...
+  private View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    final String initial = path.next();
+    // An internal hack (see index.jsp) to allow us to handle "/".
+    if ("root".equals(initial)) {
+      return new RedirectView(_applicationUrls.list());
     }
-    else if ("list".equals(path.peek())) {
-      return _list.handle(path.consume(), request, response);
+    else if ("pages".equals(initial)) {
+      return _choice.handle(path, request, response);
     }
-    return _choice.handle(path, request, response);
+    else if ("jump".equals(initial)) {
+      return _jumpToWiki.handle(path, request, response);
+    }
+    else if ("list".equals(initial)) {
+      return _list.handle(path, request, response);
+    }
+    throw new NotFoundException();
   }
 
-  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex) throws ServletException, IOException {
+  private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Exception ex, final boolean logTrace, final String customMessage, final int statusCode) throws ServletException, IOException {
+    response.setStatus(statusCode);
     String user = (String) request.getAttribute(RequestAttributes.USERNAME);
     if (user == null) {
       user = "[none]";
     }
     String queryString = request.getQueryString();
     String uri = request.getRequestURI() + (queryString == null ? "" : "?" + queryString);
-    LOG.error(format("Forwarding to error page for user '%s' accessing '%s'.", user, uri), ex);
+    String message = format("%s for user '%s' accessing '%s'.", ex.getClass().getSimpleName(), user, uri);
+    if (logTrace) {
+      LOG.error(message, ex);
+    }
+    else {
+      LOG.warn(message, null);
+    }
     request.setAttribute("exception", ex);
+    request.setAttribute("customMessage", customMessage);
     request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
   }
-  
+
 }

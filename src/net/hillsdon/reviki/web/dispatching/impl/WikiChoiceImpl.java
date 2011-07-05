@@ -24,15 +24,20 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.ApplicationSession;
+import net.hillsdon.reviki.di.WikiSession;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiChoice;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
+import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
-public class WikiChoiceImpl implements WikiChoice {
+import org.picocontainer.Startable;
+
+public class WikiChoiceImpl implements WikiChoice, Startable {
 
   private final Map<WikiConfiguration, RequestHandler> _wikis = new ConcurrentHashMap<WikiConfiguration, RequestHandler>();
   private final DeploymentConfiguration _configuration;
@@ -45,30 +50,48 @@ public class WikiChoiceImpl implements WikiChoice {
     _applicationUrls = applicationUrls;
   }
 
-  public WikiHandler addWiki(final WikiConfiguration configuration) {
-    WikiHandler handler = _applicationSession.createWikiSession(configuration).getWikiHandler();
+  public void start() {
+    _configuration.load();
+    for (WikiConfiguration wiki : _configuration.getWikis()) {
+      // These wiki configurations could be broken but we can't really report the
+      // error now so just wait for the user to find them broken.
+      installHandler(wiki, createWikiHandler(wiki));
+    }
+  }
+
+  public void stop() {
+  }
+
+  public WikiHandler createWikiHandler(final WikiConfiguration configuration) {
+    WikiSession wikiSession = _applicationSession.createWikiSession(configuration);
+    wikiSession.start();
+    return wikiSession.getWikiHandler();
+  }
+
+  public void installHandler(final WikiConfiguration configuration, final WikiHandler handler) {
     _wikis.put(configuration, handler);
-    return handler;
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     WikiConfiguration configuration = getWikiConfiguration(path);
     request.setAttribute("wikiName", configuration.getWikiName());
-    request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, configuration.isComplete());
-    RequestHandler handler = getWikiHandler(configuration, path);
+    RequestHandler handler = getWikiHandler(request, configuration, path);
     return handler.handle(path, request, response);
   }
 
-  private RequestHandler getWikiHandler(final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
-    RequestHandler wiki = _wikis.get(perWikiConfiguration);
-    boolean reconfigure = "ConfigSvnLocation".equals(path.peek());
-    if (wiki == null || reconfigure) {
-      // At the moment we lazily install wiki handlers.  Fix this when adding a wiki list?
-      if (perWikiConfiguration.isComplete() && !reconfigure) {
-        return addWiki(perWikiConfiguration);
-      }
+  private RequestHandler getWikiHandler(final HttpServletRequest request, final WikiConfiguration perWikiConfiguration, final ConsumedPath path) throws NotFoundException {
+    final RequestHandler wiki = _wikis.get(perWikiConfiguration);
+    if ("ConfigSvnLocation".equals(path.peek())) {
       return new ConfigureWikiHandler(_configuration, this, perWikiConfiguration, _applicationUrls);
     }
+    else if (wiki == null) {
+      return new RequestHandler() {
+        public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+          return RedirectToPageView.create(BuiltInPageReferences.CONFIG_SVN, _applicationUrls, perWikiConfiguration);
+        }
+      };
+    }
+    request.setAttribute(WikiHandlerImpl.ATTRIBUTE_WIKI_IS_VALID, true);
     return wiki;
   }
 
@@ -81,7 +104,7 @@ public class WikiChoiceImpl implements WikiChoice {
   }
 
   boolean isValidWikiName(final String wikiName) {
-    return wikiName != null && wikiName.length() != 0 
+    return wikiName != null && wikiName.length() != 0
         && Character.isLowerCase(wikiName.charAt(0));
   }
 

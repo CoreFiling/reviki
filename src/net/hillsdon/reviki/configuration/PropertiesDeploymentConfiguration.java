@@ -17,31 +17,34 @@ package net.hillsdon.reviki.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
+
 /**
  * Wherein we go to mad lengths to store the SVN URL and search index somewhere.
- * 
+ *
  * Additional run-time configuration options are stored in SVN rather than
  * on the file-system so that they benefit from versioning and backup.
- * 
+ *
  * @author mth
  */
 public class PropertiesDeploymentConfiguration implements DeploymentConfiguration {
 
   private static final Log LOG = LogFactory.getLog(PropertiesDeploymentConfiguration.class);
-  
+
   // Properties file keys:
   public static final String KEY_PREFIX_SVN_URL = "svn-url-";
   public static final String KEY_PREFIX_BASE_URL = "base-url-";
-  
+  public static final String KEY_BASE_URL = "base-url";
+
   private final PersistentStringMap _properties;
   private final DataDir _dataDir;
 
@@ -53,7 +56,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   public WikiConfiguration getConfiguration(final String wikiName) {
     return new PropertiesPerWikiConfiguration(this, wikiName);
   }
-  
+
   public SVNURL getUrl(final String wikiName) {
     String url = _properties.get(KEY_PREFIX_SVN_URL + wikiName);
     if (url == null) {
@@ -67,11 +70,27 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       return null;
     }
   }
-  
+
+  public String getFixedBaseUrl(final String wikiName) {
+    // First wiki specific, then generic, otherwise null.
+    String baseUrl = getTrimToNullProperty(KEY_PREFIX_BASE_URL + wikiName);
+    if (baseUrl == null) {
+      baseUrl = getTrimToNullProperty(KEY_BASE_URL);
+      if (baseUrl != null) {
+        baseUrl += (baseUrl.endsWith("/") ? "" : "/") + wikiName;
+      }
+    }
+    return baseUrl;
+  }
+
+  private String getTrimToNullProperty(final String key) {
+    return StringUtils.trimToNull(_properties.get(key));
+  }
+
   File getSearchIndexDirectory(final String wikiName) {
     return _dataDir.getSearchIndexDirectory(wikiName);
   }
-  
+
   void setUrl(final String wikiName, final String url) throws IllegalArgumentException {
     try {
       SVNURL svnUrl = SVNURL.parseURIDecoded(url);
@@ -85,18 +104,19 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   boolean isComplete(final String wikiName) {
     return getUrl(wikiName) != null;
   }
-  
-  public Collection<String> getWikiNames() {
-    List<String> names = new ArrayList<String>();
+
+  public List<WikiConfiguration> getWikis() {
+    List<WikiConfiguration> wikis = Lists.newArrayList();
     for (String key : _properties.keySet()) {
       if (key.startsWith(KEY_PREFIX_SVN_URL)) {
-        names.add(key.substring(KEY_PREFIX_SVN_URL.length(), key.length()));
+        String name = key.substring(KEY_PREFIX_SVN_URL.length(), key.length());
+        wikis.add(getConfiguration(name));
       }
     }
-    return names;
+    return Ordering.natural().onResultOf(WikiConfiguration.TO_NAME).sortedCopy(wikis);
   }
 
-  
+
   public synchronized void load() {
     try {
       _properties.load();
@@ -114,7 +134,7 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       LOG.error("Failed to save properties.", ex);
     }
   }
-  
+
   public boolean isEditable() {
     return _properties.isPersistable();
   }

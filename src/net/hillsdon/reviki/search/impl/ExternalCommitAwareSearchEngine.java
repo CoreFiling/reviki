@@ -32,6 +32,9 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Notifies the search engine of page changes immediately after they happen.
  * 
@@ -41,6 +44,8 @@ import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
  * @author mth
  */
 public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubscriber {
+
+  private static final Log LOG = LogFactory.getLog(ExternalCommitAwareSearchEngine.class);
 
   private PageStore _store;
   private final SearchEngine _delegate;
@@ -56,12 +61,12 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     _store = store;
   }
   
-  public void index(final String path, final long revision, final String content) throws IOException, PageStoreException {
-    _delegate.index(path, revision, content);
+  public void index(final String wiki, final String path, final long revision, final String content) throws IOException, PageStoreException {
+    _delegate.index(wiki, path, revision, content);
   }
 
-  public Set<SearchMatch> search(final String query, final boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException {
-    return _delegate.search(query, provideExtracts);
+  public Set<SearchMatch> search(final String query, final boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException {
+    return _delegate.search(query, provideExtracts, singleWiki);
   }
 
   public long getHighestSyncedRevision() throws IOException {
@@ -77,15 +82,20 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
       }
     }
     for (PageReference page : minimized) {
-      PageInfo info = _store.get(page, -1);
-      // Note we pass 'upto' as the revision here.  At the moment we get
-      // back the revision of deleted pages as -2 which isn't such a good
-      // thing to set our 'highest indexed revision' to...
-      if (info.isNew()) {
-        _delegate.delete(info.getPath(), upto);
+      try {
+        PageInfo info = _store.get(page, -1);
+        // Note we pass 'upto' as the revision here.  At the moment we get
+        // back the revision of deleted pages as -2 which isn't such a good
+        // thing to set our 'highest indexed revision' to...
+        if (info.isNew()) {
+          _delegate.delete(info.getWiki(), info.getPath(), upto);
+        }
+        else {
+          _delegate.index(info.getWiki(), info.getPath(), upto, info.getContent());
+        }
       }
-      else {
-        _delegate.index(info.getPath(), upto, info.getContent());
+      catch (Exception ex) {
+        LOG.error(ex);
       }
     }
   }
@@ -94,8 +104,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.getHighestIndexedRevision();
   }
 
-  public void delete(final String path, final long revision) throws IOException {
-    _delegate.delete(path, revision);
+  public void delete(final String wiki, final String path, final long revision) throws IOException {
+    _delegate.delete(wiki, path, revision);
   }
 
   public String escape(final String in) {

@@ -17,14 +17,12 @@ package net.hillsdon.reviki.web.common;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 /**
  * Utility methods for getting data out of requests.
- * 
+ *
  * @author mth
  */
 public final class RequestParameterReaders {
-
 
   public static String getRequiredString(final HttpServletRequest request, final String parameter) throws InvalidInputException {
     String value = request.getParameter(parameter);
@@ -38,10 +36,11 @@ public final class RequestParameterReaders {
     String value = request.getParameter(parameter);
     return value == null ? null : value.trim();
   }
-  
+
   public static Long getLong(final HttpServletRequest request, final String parameter) throws InvalidInputException {
     return getLong(request.getParameter(parameter), parameter);
   }
+
   public static Long getLong(final String value, final String parameter) throws InvalidInputException {
     if (value == null) {
       return null;
@@ -54,14 +53,7 @@ public final class RequestParameterReaders {
     }
   }
 
-  public static final String PARAM_REVISION = "revision";
-  
   private RequestParameterReaders() {
-  }
-
-  public static long getRevision(final HttpServletRequest request) throws InvalidInputException {
-    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
-    return givenRevision == null ? -1 : givenRevision;
   }
 
 }

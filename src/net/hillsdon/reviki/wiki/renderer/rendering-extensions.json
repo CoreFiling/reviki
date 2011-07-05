@@ -13,6 +13,93 @@
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
     "output": "<p>Hello <tt>//there//</tt>.</p>"
+  },
+  {
+    "name":   "Unnamed URL",
+    "input":  "[[http://example.com/examplepage]]",
+    "output": "<p><a class='external' href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
+  },
+  {
+    "name":   "Named URL",
+    "input":  "[[http://example.com/examplepage|Example Page]]",
+    "output": "<p><a class='external' href='http://example.com/examplepage'>Example Page</a></p>"
+  },
+  {
+    "name":   "Unnamed link",
+    "input":  "[[MyPage]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/MyPage'>MyPage</a></p>"
+  },
+  {
+    "name":   "Named link",
+    "input":  "[[MyPage|My page]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/MyPage'>My page</a></p>"
+  },
+  {
+    "name":   "Named link in a table header with text either side",
+    "input":  "|=aa[[link|name]]bb|",
+    "output": "<table><tr><th>aa<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>bb</th></tr></table>"
+  },
+  {
+    "name":   "Named link in a table header with text (including '[' and ']') either side",
+    "input":  "|=aa[bb]cc[[link|name]]dd[ee]ff|",
+    "output": "<table><tr><th>aa[bb]cc<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>dd[ee]ff</th></tr></table>"
+  },
+  {
+    "name":   "Named link in a table header with several '[' and ']' either side",
+    "input":  "|=[]][[link|name]][]][|",
+    "output": "<table><tr><th>[]]<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>[]][</th></tr></table>"
+  },
+  {
+    "name":   "Named link in a table header",
+    "input":  "|=[[link|name]]|",
+    "output": "<table><tr><th><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a></th></tr></table>"
+  },
+  {
+    "name":   "Several named links in a table header",
+    "input":  "|=[[link1|name1]][[link2|name2]]|",
+    "output": "<table><tr><th><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link1'>name1</a><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link2'>name2</a></th></tr></table>"
+  },
+  {
+    "name":   "Named link in a table cell with text either side",
+    "input":  "|aa[[link|name]]bb|",
+    "output": "<table><tr><td>aa<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>bb</td></tr></table>"
+  },
+  {
+    "name":   "Named link in a table cell with text (including '[' and ']') either side",
+    "input":  "|aa[bb]cc[[link|name]]dd[ee]ff|",
+    "output": "<table><tr><td>aa[bb]cc<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>dd[ee]ff</td></tr></table>"
+  },
+  {
+    "name":   "Named link in a table cell with several '[' and ']' either side",
+    "input":  "|[]][[link|name]][]][|",
+    "output": "<table><tr><td>[]]<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a>[]][</td></tr></table>"
+  },
+  {
+    "name":   "Named link in a table cell",
+    "input":  "|[[link|name]]|",
+    "output": "<table><tr><td><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>name</a></td></tr></table>"
+  },
+  {
+    "name":   "Several named links in a table cell",
+    "input":  "|[[link1|name1]][[link2|name2]]|",
+    "output": "<table><tr><td><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link1'>name1</a><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link2'>name2</a></td></tr></table>"
+  },
+  {
+    "bug":    "unimplemented",
+    "name":   "Nowiki in a table header",
+    "input":  "|={{{|[[|]]}}}|",
+    "output": "<table><tr><th><pre>|[[|]]</pre></th></tr></table>"
+  },
+  {
+    "bug":    "unimplemented",
+    "name":   "Nowiki in a table cell",
+    "input":  "|{{{|[[|]]}}}|",
+    "output": "<table><tr><td><pre>|[[|]]</pre></td></tr></table>"
+  },
+  {
+    "name":   "Blank named link",
+    "input":  "[[|]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/'></a></p>"
   }
 ]
 

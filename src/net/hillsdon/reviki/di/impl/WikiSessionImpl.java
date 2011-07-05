@@ -15,13 +15,12 @@
  */
 package net.hillsdon.reviki.di.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.hillsdon.fij.accessors.Accessor;
-import net.hillsdon.fij.core.Factory;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.WikiSession;
 import net.hillsdon.reviki.search.impl.ExternalCommitAwareSearchEngine;
@@ -37,7 +36,9 @@ import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.FixedMimeIdentifier;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
+import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
+import net.hillsdon.reviki.web.dispatching.impl.ResourceHandlerImpl;
 import net.hillsdon.reviki.web.dispatching.impl.WikiHandlerImpl;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.handlers.impl.PageHandlerImpl;
@@ -52,7 +53,9 @@ import net.hillsdon.reviki.web.pages.impl.OrphanedPages;
 import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
 import net.hillsdon.reviki.web.pages.impl.RecentChanges;
 import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
@@ -79,6 +82,8 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 import org.picocontainer.MutablePicoContainer;
 
+import com.google.common.base.Supplier;
+
 public class WikiSessionImpl extends AbstractSession implements WikiSession {
 
   private SvnWikiRenderer _renderer;
@@ -96,23 +101,27 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
 
   public void configure(final MutablePicoContainer container) {
     container.addComponent(WikiUrls.class, WikiUrlsImpl.class);
-    
+
     // This is cheating!
     // Some of this is a bit circular.  It needs fixing before we can use the di container.
     final WikiConfiguration configuration = container.getComponent(WikiConfiguration.class);
-    
+    final ApplicationUrls applicationUrls = getParentContainer().getComponent(ApplicationUrls.class);
+
+    File primarySearchDir = configuration.getSearchIndexDirectory();
+    List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
+
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
-        return _renderer.render(page, in);
+      public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+        return _renderer.render(page, in, urlOutputFilter);
       }
     });
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getSearchIndexDirectory(), renderedPageFactory));
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
-    
+
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
-    Factory<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(_searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
+    Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);
@@ -121,20 +130,20 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class), cachingPageStore);
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore), internalLinker, new Accessor<List<Macro>>() {
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
         List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }
     });
-    
+
     container.addComponent(tracker);
     container.addComponent(operations);
     container.addComponent(PageStore.class, pageStore);
     container.addComponent(CachingPageStore.class, cachingPageStore);
     container.addComponent(RequestLifecycleAwareManager.class, RequestLifecycleAwareManagerImpl.class);
-    
+
     container.addComponent(wikiGraph);
     container.addComponent(internalLinker);
     container.addComponent(renderedPageFactory);
@@ -143,14 +152,14 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_searchEngine);
     container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
     container.addComponent(FeedWriter.class, AtomFeedWriter.class);
-    
+
     // Special pages
     container.addComponent(SpecialPages.class, SpecialPagesImpl.class);
     container.addComponent(FindPage.class);
     container.addComponent(OrphanedPages.class);
     container.addComponent(AllPages.class);
     container.addComponent(RecentChanges.class);
-    
+
     // Page handling
     container.addComponent(DefaultPageImpl.class, DefaultPageImpl.class);
     container.addComponent(PageSource.class, PageSourceImpl.class);
@@ -160,11 +169,12 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     _plugins.addPluginAccessibleComponent(pageStore);
     _plugins.addPluginAccessibleComponent(wikiGraph);
     _plugins.addPluginAccessibleComponent(_searchEngine);
-    
+
     container.addComponent(ChangeNotificationDispatcherImpl.class);
 
     container.addComponent(WikiSession.class, this);
     container.addComponent(WikiHandlerImpl.class, WikiHandlerImpl.class);
+    container.addComponent(ResourceHandler.class, ResourceHandlerImpl.class);
   }
 
 }

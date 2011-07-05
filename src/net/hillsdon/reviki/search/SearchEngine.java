@@ -32,12 +32,13 @@ public interface SearchEngine {
    * 
    * @param query Query.
    * @param provideExtracts true if extracts from the matching text should be provided in the returned matches (slower). 
+   * @param singleWiki true if the search should be restricted to the current wiki.
    * @return Matches for the query, in rank order.
    * @throws IOException On error reading the search index. 
    * @throws QuerySyntaxException If the query is too broken to use. 
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  Set<SearchMatch> search(String query, boolean provideExtracts) throws IOException, QuerySyntaxException, PageStoreException;
+  Set<SearchMatch> search(String query, boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException;
 
   /**
    * @param page A page.
@@ -64,7 +65,7 @@ public interface SearchEngine {
    * @throws IOException On error writing to the search index. 
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  void index(String path, long revision, String content) throws IOException, PageStoreException;
+  void index(String wiki, String path, long revision, String content) throws IOException, PageStoreException;
 
   /**
    * @return The highest revision number indexed (as passed to index).
@@ -73,11 +74,12 @@ public interface SearchEngine {
   long getHighestIndexedRevision() throws IOException;
 
   /**
+   * @param wiki Wiki name.
    * @param path Page.
    * @param revision Revision at which we noticed its passing.
    * @throws IOException 
    */
-  void delete(String path, long revision) throws IOException;
+  void delete(String wiki, String path, long revision) throws IOException;
 
   /**
    * @param in A string.

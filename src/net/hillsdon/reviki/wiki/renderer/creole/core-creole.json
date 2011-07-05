@@ -136,30 +136,6 @@
   },
   {
     "bug":    "unimplemented",
-    "name":   "Unnamed URL",
-    "input":  "[[http://example.com/examplepage]]",
-    "output": "<p><a href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
-  },
-  {
-    "bug":    "unimplemented",
-    "name":   "Named URL",
-    "input":  "[[http://example.com/examplepage|Example Page]]",
-    "output": "<p><a href='http://example.com/examplepage'>Example Page</a></p>"
-  },
-  {
-    "bug":    "unimplemented",
-    "name":   "Unnamed link",
-    "input":  "[[MyPage]]",
-    "output": "<p><a href='MyPage'>MyPage</a></p>"
-  },
-  {
-    "bug":    "unimplemented",
-    "name":   "Named link",
-    "input":  "[[MyPage|My page]]",
-    "output": "<p><a href='MyPage'>My page</a></p>"
-  },
-  {
-    "bug":    "unimplemented",
     "name":   "Image",
     "input":  "{{image.gif|my image}}",
     "output": "<p><img src='image.gif' alt='my image'/></p>"

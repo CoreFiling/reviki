@@ -1,0 +1,35 @@
+Reviki
+
+                              Version History
+0.1.1 (2010-06-24)
+------------------
+
+* Fix support for reviki base-url property that was broken in 0.1.0.
+
+0.1.0 (2010-06-11)
+------------------
+
+First formal release.  Changes noted are since r1022.
+
+* Now supported on Jetty.
+
+* Cross-wiki search.  Note this requires all wikis to have been indexed, which
+  is still done on first access.
+
+* Keyboard shortcuts for edit, save and cancel, with prompt to confirm cancel.
+
+* Fix for incoming/outgoing links calculation for pages with spaces in their
+  names [dbug 5821].  To fully benefit from this improvement, search index
+  folders should be deleted from the reviki-data directory.
+
+* Fix compare feature to work across page renames [dbug 5813].
+
+* CSS changes to improve table formatting.  Note this requires custom ConfigCss
+  pages to be deleted [dbug 5978].
+
+* Fix attachment pages that were showing irrelevant files for commits that
+  touched more than one file [dbug 6299].
+
+* Ensure HTTP connections to the SVN server are closed after each request.
+
+* Automatic inter-wiki links for other wikis on the same instance.

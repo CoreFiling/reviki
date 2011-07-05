@@ -15,6 +15,20 @@
      </fileset>
   </path>    
 
+  <target name="empty">
+    <delete dir="empty/build"/>
+    <mkdir dir="empty/build"/>
+    <javac srcdir="empty/src"
+           destdir="empty/build">
+      <classpath refid="classpath" />
+    </javac>
+    <jar destfile="empty/empty.jar" >
+      <fileset dir="empty/build">
+        <include name="**/*"/>
+      </fileset>
+    </jar>
+  </target>
+
   <target name="hello-world">
     <delete dir="hello-world/build"/>
     <mkdir dir="hello-world/build"/>

@@ -15,14 +15,9 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
-import static net.hillsdon.fij.core.Functional.filter;
-import static net.hillsdon.fij.core.Functional.list;
-import static net.hillsdon.fij.core.IterableUtils.reversed;
-
 import java.io.IOException;
 import java.util.List;
 
-import net.hillsdon.fij.core.Predicate;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
@@ -32,15 +27,19 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+
 /**
  * Tracks the SVN log and dispatches ChangeInfo lists to subscribers.
- * 
+ *
  * @author mth
  */
 public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispatcher {
 
   private static final Log LOG = LogFactory.getLog(ChangeNotificationDispatcherImpl.class);
-  
+
   private final BasicSVNOperations _operations;
   private final ChangeSubscriber[] _subscribers;
 
@@ -53,27 +52,23 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
       _lastSynced = Math.min(_lastSynced, subscriber.getHighestSyncedRevision());
     }
   }
- 
+
   public synchronized void sync() throws PageStoreAuthenticationException, PageStoreException, IOException {
     long latest = _operations.getLatestRevision();
-    try {
-      if (latest > _lastSynced) {
-        List<ChangeInfo> logs = _operations.log("", -1, false, true, _lastSynced + 1, latest);
-        if (!logs.isEmpty()) {
-          notifyListeners(latest, list(reversed(logs)));
-        }
+    if (latest > _lastSynced) {
+      List<ChangeInfo> logs = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, _lastSynced + 1, latest);
+      if (!logs.isEmpty()) {
+        notifyListeners(latest, ImmutableList.copyOf(Iterables.reverse(logs)));
       }
     }
-    finally {
-      _lastSynced = latest;
-    }
+    _lastSynced = latest;
   }
-  
+
   private void notifyListeners(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
     for (ChangeSubscriber subscriber : _subscribers) {
       final long subscriberHighestSynced = subscriber.getHighestSyncedRevision();
-      List<ChangeInfo> relevant = list(filter(chronological, new Predicate<ChangeInfo>() {
-        public Boolean transform(final ChangeInfo in) {
+      List<ChangeInfo> relevant = ImmutableList.copyOf(Iterables.filter(chronological, new Predicate<ChangeInfo>() {
+        public boolean apply(final ChangeInfo in) {
           return in.getRevision() > subscriberHighestSynced;
         }
       }));
@@ -88,5 +83,5 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
   long getLastSynced() {
     return _lastSynced;
   }
-  
+
 }

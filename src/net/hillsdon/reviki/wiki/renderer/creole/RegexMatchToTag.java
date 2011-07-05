@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.TagResultNode;
 
@@ -42,7 +43,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     _replaceString = replaceString;
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
     if (_contentGroup == null) {
       return new TagResultNode(_tag);
     }
@@ -50,7 +51,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     if (_replaceRe != null) {
       text = _replaceRe.matcher(text).replaceAll(_replaceString);
     }
-    return new TagResultNode(_tag, render(page, text, this));
+    return new TagResultNode(_tag, render(page, text, this, urlOutputFilter));
   }
   
   @Override

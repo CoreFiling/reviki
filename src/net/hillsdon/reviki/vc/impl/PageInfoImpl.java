@@ -29,6 +29,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   public static final long UNCOMMITTED = -2;
   public static final long DELETED = -3;
 
+  private String _wiki;
   private String _content;
   private final long _revision;
   private final long _lastChangedRevision;
@@ -39,8 +40,9 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   private final String _lockToken;
   private final Date _lockedSince;
   
-  public PageInfoImpl(final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
+  public PageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
     super(path);
+    _wiki = wiki;
     _content = content;
     _revision = revision;
     _lastChangedRevision = lastChangedRevision;
@@ -53,6 +55,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
 
   public PageInfoImpl(final PageInfo pageInfo) {
     super(pageInfo.getPath());
+    _wiki = pageInfo.getWiki();
     _content = pageInfo.getContent();
     _revision = pageInfo.getRevision();
     _lastChangedRevision = pageInfo.getLastChangedRevision();
@@ -61,6 +64,10 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     _lockedBy = pageInfo.getLockedBy();
     _lockToken = pageInfo.getLockToken();
     _lockedSince = pageInfo.getLockedSince();
+  }
+
+  public String getWiki() {
+    return _wiki;
   }
 
   public String getContent() {
@@ -102,8 +109,13 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     return _revision == DELETED;
   }
 
-  public boolean lockedByUserIfNeeded(final String user) {
-    return isNew() || user.equals(getLockedBy());
+  public boolean isNewOrLockedByUser(final String user) {
+    return isNew() || isLockedByUser(user);
+  }
+
+  private boolean isLockedByUser(final String user) {
+    final String lockedBy = getLockedBy();
+    return lockedBy != null && lockedBy.equals(user);
   }
   
   public long getLastChangedRevision() {
@@ -122,6 +134,20 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     PageInfoImpl other = new PageInfoImpl(this);
     other._content = content;
     return other;
+  }
+
+  public PageInfo withoutLockToken() {
+    return new PageInfoImpl(
+      _wiki,
+      super.getPath(),
+      _content,
+      _revision,
+      _lastChangedRevision,
+      _lastChangedAuthor,
+      _lastChangedDate,
+      _lockedBy,
+      "",
+      _lockedSince);
   }
 
 }

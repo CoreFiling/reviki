@@ -18,11 +18,11 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.List;
 
-import net.hillsdon.fij.accessors.Accessor;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
@@ -30,13 +30,15 @@ import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
+import com.google.common.base.Supplier;
+
 public class SvnWikiRenderer implements MarkupRenderer {
 
   private final Configuration _configuration;
   private final InternalLinker _internalLinker;
   private final CreoleRenderer _creole;
-  
-  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker,  final Accessor<List<Macro>> macros) {
+
+  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker,  final Supplier<List<Macro>> macros) {
     _configuration = configuration;
     _internalLinker = internalLinker;
     final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, _internalLinker, _configuration);
@@ -55,9 +57,9 @@ public class SvnWikiRenderer implements MarkupRenderer {
             new MacroNode(macros, false),
         });
   }
-  
-  public ResultNode render(final PageReference page, final String in) throws IOException, PageStoreException {
-    return _creole.render(page, in);
+
+  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return _creole.render(page, in, urlOutputFilter);
   }
 
 }

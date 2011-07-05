@@ -42,7 +42,16 @@ public class TextFormatSearchResults implements View {
     response.setContentType("text/plain");
     PrintWriter writer = response.getWriter();
     for (SearchMatch matcher : _results) {
-      writer.println(matcher.getPage());
+      String spanClass;
+      String spanText;
+      if (matcher.isSameWiki()) {
+        writer.println(matcher.getPage());
+      }
+      else {
+        //TODO: Can't currently find a clean way to pass wiki name / foreign flag to jquery suggest.
+        //Unlike autocomplete, it doesn't have an easy way to provide a parser for items.
+        writer.println(matcher.getPage());
+      }
     }
   }
   

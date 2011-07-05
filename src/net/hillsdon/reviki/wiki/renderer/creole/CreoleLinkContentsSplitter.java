@@ -29,7 +29,7 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
   }
 
   LinkParts split(final String in) {
-    String link = StringUtils.trimToNull(StringUtils.substringBefore(in, "|"));
+    String link = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
     String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
     if (text == null) {
       text = link;

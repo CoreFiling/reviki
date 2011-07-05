@@ -4,6 +4,14 @@
   <tiles:putAttribute name="title">Error</tiles:putAttribute>
   <tiles:putAttribute name="heading">An error has occurred</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <p><c:out value="${exception.message}"/></p>
+  <c:if test="${not empty customMessage}">
+  <p>
+    <c:out value="${customMessage}"/>
+  </p>
+  </c:if>
+  <p>
+    <c:out value="${exception.message}"/>
+  </p>
+  <p><a href="javascript:history.go(-1)">Go back</a></p>
   </tiles:putAttribute>
 </tiles:insertTemplate>

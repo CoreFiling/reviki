@@ -17,43 +17,44 @@ package net.hillsdon.reviki.web.vcintegration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.fij.core.Factory;
-import net.hillsdon.fij.core.Transform;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.impl.AbstractDelegatingPageStore;
+
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 
 /**
  * Allow us to pass a PageStore into various objects but
  *  a) use authentication from the current request
- *  b) work with the thread-safety limitations of 
+ *  b) work with the thread-safety limitations of
  *     {@link org.tmatesoft.svn.core.io.SVNRepository}.
- * 
+ *
  * @author mth
  */
 public final class RequestScopedPageStore extends AbstractDelegatingPageStore implements RequestLifecycleAware {
 
   private final RequestLocal<PageStore> _requestLocal;
-  
-  public RequestScopedPageStore(final Factory<PageStore> factory) {
-    _requestLocal = new RequestLocal<PageStore>(new Transform<HttpServletRequest, PageStore>() {
-      public PageStore transform(final HttpServletRequest in) {
+
+  public RequestScopedPageStore(final Supplier<PageStore> factory) {
+    _requestLocal = new RequestLocal<PageStore>(new Function<HttpServletRequest, PageStore>() {
+      public PageStore apply(final HttpServletRequest in) {
         // We don't care about the request.
-        return factory.newInstance();
+        return factory.get();
       }
     });
   }
-  
+
   public void create(final HttpServletRequest request) {
     _requestLocal.create(request);
   }
-  
+
   public void destroy() {
     _requestLocal.destroy();
   }
-  
+
   @Override
   protected PageStore getDelegate() {
     return _requestLocal.get();
   }
-  
+
 }

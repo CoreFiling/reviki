@@ -15,24 +15,27 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.fij.core.Transform;
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.vcintegration.AbstractRequestLifecycleAware;
 
+import com.google.common.base.Function;
+
 public class RequestScopedApplicationUrls extends AbstractRequestLifecycleAware<ApplicationUrls> implements ApplicationUrls {
 
   public RequestScopedApplicationUrls(final DeploymentConfiguration deploymentConfiguration) {
-    super(new Transform<HttpServletRequest, ApplicationUrls>() {
-      public ApplicationUrls transform(final HttpServletRequest in) {
+    super(new Function<HttpServletRequest, ApplicationUrls>() {
+      public ApplicationUrls apply(final HttpServletRequest in) {
         return new ApplicationUrlsImpl(in, deploymentConfiguration);
       }
     });
   }
-  
+
   public WikiUrls get(final String name) {
     return get().get(name);
   }
@@ -45,12 +48,12 @@ public class RequestScopedApplicationUrls extends AbstractRequestLifecycleAware<
     return get().url(relative);
   }
 
-  public WikiUrls get(String name, String givenWikiName) {
-    return get().get(name, givenWikiName);
-  }
-
-  public String resource(String path) {
+  public String resource(final String path) {
     return get().resource(path);
   }
-  
+
+  public Set<WikiUrls> getAvailableWikiUrls() {
+    return get().getAvailableWikiUrls();
+  }
+
 }

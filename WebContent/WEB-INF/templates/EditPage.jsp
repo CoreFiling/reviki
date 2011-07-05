@@ -1,25 +1,49 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
-  <tiles:putAttribute name="title"><c:out value="reviki - ${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
+  <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <c:if test="${not empty preview}">
-      <h2>Preview <a href="#editForm">(skip)</a></h2>
-      <div id="wiki-rendering">
-      ${preview}
+    <c:if test="${not empty preview or not empty markedUpDiff}">
+      <script type='text/javascript'>
+	    $(document).ready(function() {
+		  $("#tabs").tabs();
+		});
+      </script>
+
+      <div id="tabs">
+        <ul id="tab-header">
+          <c:if test="${not empty preview}">
+            <li><a href="#preview-area">Preview</a></li>
+          </c:if>
+          <c:if test="${not empty markedUpDiff}">
+            <li><a href="#diff-area">Diff</a></li>
+          </c:if>
+        </ul>
+
+        <c:if test="${not empty preview}">
+          <div id="preview-area" class="tab-content">
+            <div id="wiki-rendering">${preview}</div>
+          </div>
+        </c:if>
+        <c:if test="${not empty markedUpDiff}">
+          <div id="diff-area" class="tab-content">
+            <div id="wiki-rendering">${markedUpDiff}</div>
+          </div>
+        </c:if>
       </div>
     </c:if>
-    
-    <form id="editForm" name="editForm" action="" method="post">
+
+    <form id="editForm" name="editForm" action="<c:url value="${page.name}"/>" style="clear:left" method="post">
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
+      <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
-      <input style="width:5em;" name="save" type="submit" value="Save"/>
-      <input style="width:5em;" name="unlock" type="submit" value="Cancel"/>
-      <input style="width:5em;" name="preview" type="submit" value="Preview"/>
+      <input style="width:5em;" name="save" type="submit" value="Save" id="save"/>
+      <input style="width:5em;" name="unlock" type="submit" value="Cancel" id="cancel"/>
+      <input style="width:5em;" name="preview" type="submit" value="Preview" id="preview"/>
       <br />
       <label for="minorEdit">Minor edit?</label>
       <input type="checkbox" id="minorEdit" name="minorEdit" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if> />

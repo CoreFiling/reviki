@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
@@ -63,9 +64,10 @@ public class CreoleRenderer {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
-    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent) {
+    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
       String escaped = Escape.html(matcher.group(0));
-      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escaped, escaped));
+      String escapedFiltered = Escape.html(urlOutputFilter.filterURL(matcher.group(0)));
+      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escapedFiltered, escaped));
     }
   }
   private static class Heading extends RegexMatchToTag {
@@ -97,12 +99,21 @@ public class CreoleRenderer {
     RenderNode[] defaultInline = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
     RenderNode[] inline = concat(customInline, defaultInline);
 
+    // These are used when matching table headings and cells
+    final String notPipeNorDoubleOpenOpt = "([^\\[|]*(\\[(?!\\[))?[^\\[|]*)*";
+    final String pairOfDoubleOpenOpt = "((\\[\\[)(.*?)(\\]\\]))*";
+
     RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
     RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
-    RenderNode tableHeading = new RegexMatchToTag("[|]+=([^|]*)", "th", 1);
-    RenderNode tableCell = new RegexMatchToTag("[|]+([^|]*)", "td", 1);
+
+    // These assume the link format is similar to [[aaa|bbb]] - they will break
+    // if the link format is changed
+    RenderNode tableHeading = new RegexMatchToTag("[|]+=((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "th", 1);
+    RenderNode tableCell = new RegexMatchToTag("[|]+((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "td", 1);
+
     table.addChildren(tableRow);
     tableRow.addChildren(tableHeading, tableCell);
+    tableHeading.addChildren(concat(inline, noWiki));
     tableCell.addChildren(concat(inline, noWiki));
 
     italic.addChildren(inline); 
@@ -134,8 +145,8 @@ public class CreoleRenderer {
     _root = root;
   }
   
-  public ResultNode render(final PageReference page, final String in) {
-    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null));
+  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) {
+    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null, urlOutputFilter));
   }
   
   @SuppressWarnings("unchecked")

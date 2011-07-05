@@ -15,7 +15,7 @@
  */
 package net.hillsdon.reviki.wiki.feeds;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
 import org.xml.sax.Attributes;
@@ -82,7 +83,7 @@ public class AtomFeedWriter implements FeedWriter {
     return dateFormat.format(date);
   }
 
-  public void writeAtom(String feedUrl, final Collection<ChangeInfo> changes, final PrintWriter out) throws TransformerConfigurationException, SAXException {
+  public void writeAtom(final String title, final String feedUrl, final Collection<ChangeInfo> changes, final OutputStream out) throws TransformerConfigurationException, SAXException {
     StreamResult streamResult = new StreamResult(out);
     SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     
@@ -103,7 +104,7 @@ public class AtomFeedWriter implements FeedWriter {
     handler.endPrefixMapping("");
     handler.startElement(ATOM_NS, "feed", "feed", NO_ATTRIBUTES);
     addElement(handler, "id", feedUrl);
-    addElement(handler, "title", "reviki feed");
+    addElement(handler, "title", title);
     addLink(handler, feedUrl, "self");
     addLink(handler, _wikiUrls.pagesRoot(), null);
     addUpdated(handler, changes.isEmpty() ? new Date(0) : changes.iterator().next().getDate());
@@ -112,11 +113,11 @@ public class AtomFeedWriter implements FeedWriter {
       if (change.getKind() == StoreKind.PAGE) {
         handler.startElement(ATOM_NS, "entry", "entry", NO_ATTRIBUTES);
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
-        addLink(handler, _wikiUrls.page(change.getPage()), null);
+        addLink(handler, _wikiUrls.page(null, change.getPage(), URLOutputFilter.NULL), null);
         
         // We include the revision in the ID, even though it doesn't make a lot of sense
         // because feed reader software gets really confused in the face of duplicate ids.
-        addElement(handler, "id", _wikiUrls.page(change.getPage()) + "?revision=" + change.getRevision());
+        addElement(handler, "id", _wikiUrls.page(null, change.getPage(), URLOutputFilter.NULL) + "?revision=" + change.getRevision());
         
         handler.startElement(ATOM_NS, "author", "author", NO_ATTRIBUTES);
         addElement(handler, "name", change.getUser());

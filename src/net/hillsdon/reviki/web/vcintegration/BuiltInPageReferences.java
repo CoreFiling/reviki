@@ -38,6 +38,7 @@ public final class BuiltInPageReferences {
   public static final PageReference PAGE_HEADER = new PageReferenceImpl("ConfigHeader");
   public static final PageReference PAGE_FOOTER = new PageReferenceImpl("ConfigFooter");
 
+  public static final PageReference CONFIG_SVN = new PageReferenceImpl("ConfigSvnLocation");
   public static final PageReference CONFIG_AUTO_PROPERTIES = new PageReferenceImpl("ConfigAutoProperties");
   public static final PageReference CONFIG_INTER_WIKI_LINKS = new PageReferenceImpl("ConfigInterWikiLinks");
   public static final PageReference CONFIG_PLUGINS = new PageReferenceImpl("ConfigPlugins");

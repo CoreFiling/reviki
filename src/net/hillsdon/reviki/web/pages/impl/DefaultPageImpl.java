@@ -15,6 +15,11 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
+import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,15 +32,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.fij.text.Strings;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
+import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageRevisionReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
@@ -47,7 +56,9 @@ import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
@@ -58,50 +69,90 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequiredString;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRevision;
-import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
-import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
 public class DefaultPageImpl implements DefaultPage {
 
+  public static final String ATTR_PREVIEW = "preview";
+
   public static final String SUBMIT_SAVE = "save";
+
   public static final String SUBMIT_COPY = "copy";
+
   public static final String SUBMIT_RENAME = "rename";
+
   public static final String SUBMIT_UNLOCK = "unlock";
-  public static final String SUBMIT_PREVIEW = "preview";
+
+  public static final String SUBMIT_PREVIEW = ATTR_PREVIEW;
 
   public static final String PARAM_TO_PAGE = "toPage";
+
   public static final String PARAM_FROM_PAGE = "fromPage";
+
   public static final String PARAM_CONTENT = "content";
+
   public static final String PARAM_BASE_REVISION = "baseRevision";
+
   public static final String PARAM_LOCK_TOKEN = "lockToken";
+
   public static final String PARAM_COMMIT_MESSAGE = "description";
+
   public static final String PARAM_MINOR_EDIT = "minorEdit";
+
   public static final String PARAM_DIFF_REVISION = "diff";
+
+  public static final String PARAM_REVISION = "revision";
+
   public static final String PARAM_ATTACHMENT_NAME = "attachmentName";
 
+  public static final String PARAM_SESSION_ID = "sessionId";
+
   public static final String ATTR_PAGE_INFO = "pageInfo";
+
   public static final String ATTR_BACKLINKS = "backlinks";
+
   public static final String ATTR_BACKLINKS_LIMITED = "backlinksLimited";
+
   public static final String ATTR_RENDERED_CONTENTS = "renderedContents";
+
   public static final String ATTR_MARKED_UP_DIFF = "markedUpDiff";
-  
+
+  public static final String ATTR_DIFF_START_REV = "diffStartRev";
+
+  public static final String ATTR_DIFF_END_REV = "diffEndRev";
+
+  /**
+   * Because the diff view may be looking at renamed pages.
+   */
+  public static final String ATTR_DIFF_TITLE = "diffTitle";
+
+  public static final String ATTR_SHOW_REV = "showHeadRev";
+
+  public static final String ATTR_SESSION_ID = "sessionId";
+
   public static final String ERROR_NO_FILE = "Please browse to a non-empty file to upload.";
+
+  public static final String ERROR_SESSION_EXPIRED = "Your session has expired. Please try again.";
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
   private final CachingPageStore _store;
+
   private final MarkupRenderer _renderer;
+
   private final WikiGraph _graph;
+
   private final DiffGenerator _diffGenerator;
+
   private final WikiUrls _wikiUrls;
+
   private final FeedWriter _feedWriter;
-  
-  public DefaultPageImpl(final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+
+  private final WikiConfiguration _configuration;
+
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+    _configuration = configuration;
     _store = store;
     _renderer = renderer;
     _graph = graph;
@@ -109,8 +160,8 @@ public class DefaultPageImpl implements DefaultPage {
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
   }
-  
-  public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+  public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
     }
@@ -136,7 +187,7 @@ public class DefaultPageImpl implements DefaultPage {
       if (baseRevision == null) {
         baseRevision = PageInfo.UNCOMMITTED;
       }
-      
+
       if (file == null || file.getSize() == 0) {
         request.setAttribute("flash", ERROR_NO_FILE);
         return attachments(page, path, request, response);
@@ -144,7 +195,8 @@ public class DefaultPageImpl implements DefaultPage {
       else {
         InputStream in = file.getInputStream();
         try {
-          storeAttachment(page, attachmentName, baseRevision, file.getName(), in);
+          // IE sends the full file path.
+          storeAttachment(page, attachmentName, baseRevision, FilenameUtils.getName(file.getName()), in);
           return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {
@@ -159,14 +211,15 @@ public class DefaultPageImpl implements DefaultPage {
     }
   }
 
-  @SuppressWarnings("unchecked") // commons-upload...
-  private List<FileItem> getFileItems(HttpServletRequest request) throws FileUploadException {
+  @SuppressWarnings("unchecked")
+  // commons-upload...
+  private List<FileItem> getFileItems(final HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     List<FileItem> items = upload.parseRequest(request);
     return items;
   }
-  
+
   private void storeAttachment(final PageReference page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
@@ -179,8 +232,7 @@ public class DefaultPageImpl implements DefaultPage {
     _store.attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
   }
 
-
-  public View attachment(final PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
     return new View() {
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
@@ -188,9 +240,11 @@ public class DefaultPageImpl implements DefaultPage {
           public void setContentType(final String contentType) {
             response.setContentType(contentType);
           }
+
           public void setFileName(final String name) {
             response.setHeader("Content-Disposition", "attachment: filename=" + attachmentName);
           }
+
           public OutputStream stream() throws IOException {
             return response.getOutputStream();
           }
@@ -199,48 +253,103 @@ public class DefaultPageImpl implements DefaultPage {
     };
   }
 
-  public View attachments(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     request.setAttribute("attachments", _store.attachments(page));
     return new JspView("Attachments");
   }
 
-  public View editor(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  private boolean isLockTokenValid(final PageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
+    final String username = (String) request.getAttribute(RequestAttributes.USERNAME);
+    return pageInfo.isNewOrLockedByUser(username) && (!preview || pageInfo.isNew() || lockTokenMatches(pageInfo, request));
+  }
+
+  private boolean lockTokenMatches(final PageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {
+    return pageInfo.getLockToken().equals(getRequiredString(request, PARAM_LOCK_TOKEN));
+  }
+
+  private boolean isSessionIdValid(final HttpServletRequest request) {
+    final String postedSessionId = request.getParameter(PARAM_SESSION_ID);
+    final String requestedSessionId = request.getRequestedSessionId();
+    return requestedSessionId != null && postedSessionId != null && postedSessionId.equals(requestedSessionId) && request.isRequestedSessionIdValid();
+  }
+
+  public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
-    request.setAttribute("pageInfo", pageInfo);
-    if (!pageInfo.lockedByUserIfNeeded((String) request.getAttribute(RequestAttributes.USERNAME))) {
-      request.setAttribute("flash", "Could not lock the page.");
-      return new JspView("ViewPage");
+    request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+    copySessionIdAsAttribute(request);
+    if (!isLockTokenValid(pageInfo, request, preview)) {
+      if (preview) {
+        return diffEditorView(page, null, request);
+      }
+      else {
+        request.setAttribute("flash", "Could not lock the page.");
+        return new JspView("ViewPage");
+      }
     }
     else {
-      if (request.getParameter(SUBMIT_PREVIEW) != null) {
-        pageInfo = pageInfo.withAlternativeContent(getRequiredString(request, PARAM_CONTENT));
-        request.setAttribute("pageInfo", pageInfo);
-        ResultNode rendered = _renderer.render(pageInfo, pageInfo.getContent());
-        request.setAttribute("preview", rendered.toXHTML());
+      if (preview) {
+        if (!isSessionIdValid(request)) {
+          return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
+        }
+        else {
+          final String oldContent = pageInfo.getContent();
+          final String newContent = getContent(request);
+          pageInfo = pageInfo.withAlternativeContent(newContent);
+          request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+          ResultNode rendered = _renderer.render(pageInfo, newContent, new ResponseSessionURLOutputFilter(request, response));
+          request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
+          request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
+        }
       }
       return new JspView("EditPage");
     }
   }
 
-  public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    long revison = getRevision(request);
-    Long diffRevision = getLong(request.getParameter(PARAM_DIFF_REVISION), PARAM_DIFF_REVISION);
-    addBacklinksInformation(request, page);
+  private void copySessionIdAsAttribute(final HttpServletRequest request) {
+    request.setAttribute(ATTR_SESSION_ID, request.getSession().getId());
+  }
 
-    final PageInfo main = _store.get(page, revison);
+  public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    final String revisionParam = request.getParameter(PARAM_REVISION);
+    final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
+    addBacklinksInformation(request, page);
+    final PageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
     request.setAttribute(ATTR_PAGE_INFO, main);
-    if (diffRevision != null) {
-      PageInfo base = _store.get(page, diffRevision);
-      request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(base.getContent(), main.getContent()));
+    request.setAttribute(ATTR_SHOW_REV, revisionParam != null);
+    if (diffParam != null) {
+      request.setAttribute(ATTR_DIFF_TITLE, page.getPath());
+      final PageInfo compare = pageInfoFromRevisionParam(page, diffParam, PARAM_DIFF_REVISION);
+      request.setAttribute(ATTR_DIFF_END_REV, revisionText(main.getRevision()));
+      request.setAttribute(ATTR_DIFF_START_REV, revisionText(compare.getRevision()));
+      request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(compare.getContent(), main.getContent()));
+      if (compare.getRevision() > main.getRevision() && main.getRevision() > -1) {
+        request.setAttribute("flash", "Note this diff is reversed.");
+      }
       return new JspView("ViewDiff");
     }
     else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
       return new RawPageView(main);
     }
     else {
-      ResultNode rendered = _renderer.render(main, main.getContent());
+      ResultNode rendered = _renderer.render(main, main.getContent(), new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
+    }
+  }
+
+  private String revisionText(final long revision) {
+    if (revision == -1) {
+      return "latest";
+    }
+    else if (revision == -2) {
+      return "uncommitted";
+    }
+    else if (revision == -3) {
+      return "deleted";
+    }
+    else {
+      return "r" + revision;
     }
   }
 
@@ -254,17 +363,17 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_BACKLINKS, pageNames);
   }
 
-  public View history(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View history(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      final String feedUrl = _wikiUrls.page(page.getName()) + "?history&ctype=atom";
-      return new FeedView(_feedWriter, changes, feedUrl);
+      final String feedUrl = _wikiUrls.page(null, page.getName(), URLOutputFilter.NULL) + "?history&ctype=atom";
+      return new FeedView(_configuration, _feedWriter, changes, feedUrl);
     }
     request.setAttribute("changes", changes);
     return new JspView("History");
   }
 
-  public View set(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View set(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean hasSaveParam = request.getParameter(SUBMIT_SAVE) != null;
     final boolean hasCopyParam = request.getParameter(SUBMIT_COPY) != null;
     final boolean hasRenameParam = request.getParameter(SUBMIT_RENAME) != null;
@@ -272,14 +381,23 @@ public class DefaultPageImpl implements DefaultPage {
     if (!(hasSaveParam ^ hasCopyParam ^ hasRenameParam ^ hasUnlockParam)) {
       throw new InvalidInputException("Exactly one action must be specified.");
     }
-    
+
     if (hasSaveParam) {
-      String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
-      String content = getRequiredString(request, PARAM_CONTENT);
-      if (!content.endsWith(Strings.CRLF)) {
-        content = content + Strings.CRLF;
+      copySessionIdAsAttribute(request);
+      if (!isSessionIdValid(request)) {
+        return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
       }
-      _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
+      String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
+      String content = getContent(request);
+      try {
+        _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
+      }
+      catch (LostLockException e) {
+        return diffEditorView(page, null, request);
+      }
+      catch (ConflictException e) {
+        return diffEditorView(page, "Page has been updated since you started. Please do not save unless you feel that you can merge the changes.", request);
+      }
     }
     else if (hasCopyParam) {
       final String fromPage = getString(request, PARAM_FROM_PAGE);
@@ -317,19 +435,80 @@ public class DefaultPageImpl implements DefaultPage {
     }
     return new RedirectToPageView(_wikiUrls, page);
   }
-  
+
+  private View diffEditorView(final PageReference page, final String customMessage, final HttpServletRequest request) throws PageStoreException, InvalidInputException {
+    PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    String message;
+    final String content = getContent(request);
+    final String newContent = pageInfo.getContent();
+    pageInfo = pageInfo.withAlternativeContent(content);
+    request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(newContent, content));
+    if (pageInfo.isLocked() && !pageInfo.isNewOrLockedByUser((String) request.getAttribute(RequestAttributes.USERNAME))) {
+      message = "Page was locked by " + pageInfo.getLockedBy() + " on " + pageInfo.getLockedSince() + ".";
+      pageInfo = pageInfo.withoutLockToken();
+    }
+    else {
+      message = "Lock was lost!";
+    }
+    if (customMessage != null) {
+      message = customMessage;
+    }
+    request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+    request.setAttribute("flash", message);
+    return new JspView("EditPage");
+  }
+
+  private String getContent(final HttpServletRequest request) throws InvalidInputException {
+    String content = getRequiredString(request, PARAM_CONTENT);
+    content = content + Strings.CRLF;
+    return content;
+  }
+
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
     return getLong(getRequiredString(request, PARAM_BASE_REVISION), PARAM_BASE_REVISION);
   }
-  
-  String createLinkingCommitMessage(PageReference page, final HttpServletRequest request) {
+
+  String createLinkingCommitMessage(final PageReference page, final HttpServletRequest request) {
     boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
     String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
     if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(page.getName());
+    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName(), URLOutputFilter.NULL);
   }
-  
+
+  private PageInfo pageInfoFromRevisionParam(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException, PageStoreException {
+    final PageRevisionReference reference = getPageRevisionReference(defaultPage, revisionText, paramName);
+    return _store.get(reference.getPage(), reference.getRevision());
+  }
+
+  /**
+   * Gets the PageInfo from a diff or rev parameter. I.e. "1234" or "PageName.1234"
+   * @param defaultPage The page (used when the parameter does not override the page).
+   * @param revisionText The parameter value.
+   * @param paramName The name of the parameter for error messages.
+   * @return The PageInfo.
+   * @throws InvalidInputException When the parameter value is not of the correct form.
+   * @throws PageStoreException
+   */
+  PageRevisionReference getPageRevisionReference(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException {
+    if (revisionText == null) {
+      return new PageRevisionReference(defaultPage, -1);
+    }
+
+    final int dotIndex = revisionText.lastIndexOf('.');
+    if (dotIndex != -1) {
+      final Long revision = getLong(revisionText.substring(dotIndex + 1), paramName);
+      final String pageName = revisionText.substring(0, dotIndex);
+      final PageReference pageReference = pageName.length() > 0 ? new PageReferenceImpl(pageName) : defaultPage;
+      return new PageRevisionReference(pageReference, revision);
+    }
+    return new PageRevisionReference(defaultPage, getLong(revisionText, paramName));
+  }
+
+  private static long getRevision(final HttpServletRequest request) throws InvalidInputException {
+    Long givenRevision = getLong(request.getParameter(PARAM_REVISION), PARAM_REVISION);
+    return givenRevision == null ? -1 : givenRevision;
+  }
 
 }

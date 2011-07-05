@@ -47,7 +47,7 @@ public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
     long newRevision = super.set(ref, lockToken, baseRevision, content, commitMessage);
     try {
-      _indexer.index(ref.getPath(), newRevision, content);
+      _indexer.index(getWiki(), ref.getPath(), newRevision, content);
     }
     catch (IOException e) {
        LOG.error("Error adding to search index, skipping page: " + ref, e);

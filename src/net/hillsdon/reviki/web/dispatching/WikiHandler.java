@@ -15,8 +15,18 @@
  */
 package net.hillsdon.reviki.web.dispatching;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.web.common.RequestHandler;
+import net.hillsdon.reviki.web.common.View;
 
 public interface WikiHandler extends RequestHandler {
+
+  /**
+   * @return A view if we need to handle authentication.
+   */
+  View test(HttpServletRequest request, HttpServletResponse response) throws PageStoreInvalidException, Exception;
 
 }

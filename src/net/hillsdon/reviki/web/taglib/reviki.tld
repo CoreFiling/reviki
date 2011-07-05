@@ -6,16 +6,6 @@
     <uri>http://www.hillsdon.net/ns/reviki/tags</uri>
 
     <tag>
-      <name>wikiLink</name>
-      <tag-class>net.hillsdon.reviki.web.taglib.WikiLinkTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-        <name>page</name>
-        <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
-      </attribute>
-    </tag>
-    <tag>
       <name>wikiUrl</name>
       <tag-class>net.hillsdon.reviki.web.taglib.WikiUrlTag</tag-class>
       <body-content>empty</body-content>
@@ -24,20 +14,45 @@
         <required>true</required>
         <rtexprvalue>true</rtexprvalue>
       </attribute>
-    </tag>
-    <tag>
-      <name>resourceUrl</name>
-      <tag-class>net.hillsdon.reviki.web.taglib.ResourceUrlTag</tag-class>
-      <body-content>empty</body-content>
       <attribute>
-        <name>path</name>
-        <required>true</required>
+        <name>extra</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>session</name>
+        <required>false</required>
         <rtexprvalue>true</rtexprvalue>
       </attribute>
     </tag>
     <tag>
-      <name>url</name>
-      <tag-class>net.hillsdon.reviki.web.taglib.UrlTag</tag-class>
+      <name>wikiPage</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.WikiPageTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+        <name>wiki</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>page</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>extra</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>session</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+    </tag>
+    <tag>
+      <name>resourceUrl</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.ResourceUrlTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
         <name>path</name>

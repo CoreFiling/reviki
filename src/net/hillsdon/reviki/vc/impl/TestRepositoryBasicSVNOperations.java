@@ -20,16 +20,20 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 
 import junit.framework.TestCase;
-
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.StoreKind;
 
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 
 public class TestRepositoryBasicSVNOperations extends TestCase {
 
+  public void testSVNPathUtilIsWeird() throws Exception {
+    assertEquals(/* What no slash? */ "Foo", SVNPathUtil.append("/", "Foo"));
+  }
+  
   public void testDetectMimeTypeResetsInputStream() throws Exception {
     BufferedInputStream stream = new BufferedInputStream(new ByteArrayInputStream(new byte[] {0}));
     String mimeType = RepositoryBasicSVNOperations.detectMimeType(stream);
@@ -39,27 +43,48 @@ public class TestRepositoryBasicSVNOperations extends TestCase {
   }
 
   public void testAttachmentDir() {
-    ChangeInfo changeInfo = changeInfo("/wiki2/AttachmentsTest11969665985340-attachments");
+    ChangeInfo changeInfo = changeInfo("/wiki2", "/wiki2/AttachmentsTest11969665985340-attachments");
     assertEquals(StoreKind.OTHER, changeInfo.getKind());
     assertEquals("AttachmentsTest11969665985340-attachments", changeInfo.getName());
   }
 
   public void testAttachment() {
-    ChangeInfo changeInfo = changeInfo("/wiki2/AttachmentsTest11969665985340-attachments/file.txt");
+    ChangeInfo changeInfo = changeInfo("/wiki2", "/wiki2/AttachmentsTest11969665985340-attachments/file.txt");
+    assertEquals(StoreKind.ATTACHMENT, changeInfo.getKind());
+    assertEquals("file.txt", changeInfo.getName());
+    assertEquals("AttachmentsTest11969665985340", changeInfo.getPage());
+  }
+
+  public void testAttachmentSlashAsRootPath() {
+    ChangeInfo changeInfo = changeInfo("/", "/AttachmentsTest11969665985340-attachments/file.txt");
     assertEquals(StoreKind.ATTACHMENT, changeInfo.getKind());
     assertEquals("file.txt", changeInfo.getName());
     assertEquals("AttachmentsTest11969665985340", changeInfo.getPage());
   }
 
   public void testPage() {
-    ChangeInfo changeInfo = changeInfo("/wiki2/ThisIsAPage");
+    ChangeInfo changeInfo = changeInfo("/wiki2", "/wiki2/ThisIsAPage");
+    assertEquals("ThisIsAPage", changeInfo.getPage());
+    assertEquals(StoreKind.PAGE, changeInfo.getKind());
+  }
+
+  public void testPageSlashAsRootPath() {
+    ChangeInfo changeInfo = changeInfo("/", "/ThisIsAPage");
     assertEquals(StoreKind.PAGE, changeInfo.getKind());
     assertEquals("ThisIsAPage", changeInfo.getPage());
   }
-  
-  private ChangeInfo changeInfo(final String path) {
-    return RepositoryBasicSVNOperations.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), "/wiki2", path);
+
+  private ChangeInfo changeInfo(String rootPath, final String path) {
+    return RepositoryBasicSVNOperations.classifiedChange(new SVNLogEntry(Collections.singletonMap(path, new SVNLogEntryPath(path, 'M', null, -1)), -1, "", null, ""), rootPath, path);
   }
-  
+
+  public void testPathMunging() throws Exception {
+    assertEquals("", RepositoryBasicSVNOperations.fixFullLoggedPath(""));
+    assertEquals("", RepositoryBasicSVNOperations.fixFullLoggedPath("/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("/test/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("/test"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("test/"));
+    assertEquals("/test", RepositoryBasicSVNOperations.fixFullLoggedPath("test"));
+  }
   
 }

@@ -23,17 +23,21 @@ import org.picocontainer.PicoContainer;
 
 public abstract class AbstractSession implements Session {
 
-  private final PicoContainer _container;
+  private final MutablePicoContainer _container;
   private final PicoContainer _parentContainer;
 
   public AbstractSession(final AbstractSession parent, final Object... bonusImplementations) {
     _parentContainer = parent == null ? null : parent._container;
-    MutablePicoContainer container = new PicoBuilder(_parentContainer).withCaching().build();
+    MutablePicoContainer container = new PicoBuilder(_parentContainer).withCaching().withLifecycle().build();
     for (Object o : bonusImplementations) {
       container.addComponent(o);
     }
     configure(container);
     _container = container;
+  }
+  
+  public void start() {
+    _container.start();
   }
   
   protected PicoContainer getParentContainer() {

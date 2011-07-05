@@ -20,7 +20,7 @@ body {
   font-family: Verdana, Arial, sans-serif
 }
 table {
-  border-collapse: collapse;
+  border-spacing: 0;
 }
 th {
   text-align: left;
@@ -67,17 +67,17 @@ hr {
   height: 1px;
   border: 0px;
   border-style: solid;
-  clear: both;
+  clear: left;
 }
 
 /* Diff display */
 span.diff {
 }
 ins.diff {
-	background:#E6FFE6;
+	background: #aaffaa;
 }
 del.diff {
-	background:#FFE6E6;
+	background: #ffaaaa;
 }
 
 /* JHighlighter styles */
@@ -158,3 +158,66 @@ th.wiki-content, td.wiki-content {
   border: 1px solid gray;
   padding: 4px;
 }
+
+/* History */
+table.history {
+	margin:20px 150px 20px 20px;
+	max-width:55em;
+}
+
+th.history {
+	background-color:#FFFFF0;
+}
+
+table.history, td.history, th.history {
+	border:1px dashed grey;
+	border-collapse:collapse;
+}
+
+/* Search */
+h2.results-wiki {
+	font-weight: bold;
+	border-bottom: 1px solid #aaa;
+	color: #222;
+	width: 50%;
+}
+
+.same-wiki {
+	background: #f8f8f8;
+	margin: 0;
+	width: 100%;
+}
+
+.same-wiki:hover {
+	background: #f0f088;
+}
+
+.ac_results li {
+	padding: 0 !important;
+}
+
+#tabs {
+  margin: 0 2em 2em 0;
+  border: none;
+  position: inherit;
+}
+
+#tabs #wiki-rendering {
+  width: auto;
+}
+
+.tab-content {
+  max-height: 600px;
+  overflow-y: auto;
+  clear: left;
+}
+
+#tab-header {
+  display: inline-block;
+  border-width: 0 0 1px 0;
+}
+
+#tab-header li a {
+  padding: 0.2em 0.5em;
+}
+

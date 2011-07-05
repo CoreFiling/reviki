@@ -18,18 +18,23 @@
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
   <link rel="shortcut icon" href="<sw:resourceUrl path="favicon.ico"/>" />
   <c:if test="${wikiIsValid != null and wikiIsValid}">
-    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges"/>?ctype=atom" />
-    <link rel="search" href="<sw:wikiUrl page="FindPage"/>/opensearch.xml" type="application/opensearchdescription+xml" title="Wiki Search" />
+    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" extra="?ctype=atom"  session="false"/>" />
+    <link rel="search" href="<sw:wikiUrl page="FindPage" extra="/opensearch.xml" session="false" />" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
-  <link rel="stylesheet" href="${cssUrl}" media="all" type="text/css" />
+  <link rel="stylesheet" href="<c:out value="${cssUrl}"/>" media="all" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="jquery.suggest.css"/>" media="screen" type="text/css" />
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.core.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.widget.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.tabs.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.dimensions.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.bgiframe.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.suggest.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.hotkeys-0.7.9.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
   <script type="text/javascript">
-    reviki.BASE_URL = "<sw:wikiUrl page=""/>"
+    reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>"
   </script>
 </head>
 <body>
@@ -48,9 +53,9 @@
         <c:if test="${not empty menuItems}">
           <li class="menu menu-separator"></li>
         </c:if>
-        <li class="menu"><sw:wikiLink page="FrontPage"/></li>
-        <li class="menu"><sw:wikiLink page="RecentChanges"/></li>
-        <li class="menu"><sw:wikiLink page="AllPages"/></li>
+        <li class="menu"><sw:wikiPage page="FrontPage"/></li>
+        <li class="menu"><sw:wikiPage page="RecentChanges"/></li>
+        <li class="menu"><sw:wikiPage page="AllPages"/></li>
         <li class="menu">
           <form id="searchForm" name="searchForm" style="display: inline; margin-top:0.2em;" action="<sw:wikiUrl page="FindPage"/>" method="get">
             <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
@@ -72,7 +77,7 @@
   </div>
   <div id="footer" class="auxillary">
   ${renderedFooter}
-    <p id="build-details">Built from r$BuildRevision$.</p>
+    <p id="build-details">Version $Version$.</p>
   </div>
   <tiles:insertAttribute name="body-level" ignore="true" />
 </body>

@@ -15,41 +15,70 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
-import java.util.Collections;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import java.util.Map;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class TestPageStoreConfiguration extends TestCase {
 
   private SimplePageStore _store;
   private PageStoreConfiguration _configuration;
+  private ApplicationUrls _applicationUrls;
 
   @Override
   protected void setUp() throws Exception {
     _store = new SimplePageStore();
-    _configuration = new PageStoreConfiguration(_store);
+    _applicationUrls = createMock(ApplicationUrls.class);
+    WikiUrls wikiUrls = createMock(WikiUrls.class);
+    expect(wikiUrls.getWikiName()).andReturn("other");
+    expect(wikiUrls.interWikiTemplate()).andStubReturn(".../other/%s");
+    expect(_applicationUrls.getAvailableWikiUrls()).andStubReturn(ImmutableSet.of(wikiUrls));
+    replay(_applicationUrls, wikiUrls);
+    _configuration = new PageStoreConfiguration(_store, _applicationUrls);
   }
 
-  private void assertNoInterWikiLinks() throws PageStoreException {
-    assertTrue(_configuration.getInterWikiLinker().getWikiToFormatStringMap().isEmpty());
+  private void assertOnlyBuiltInWikiLinks() throws PageStoreException {
+    Map<String, String> expected = ImmutableMap.of("other", ".../other/%s");
+    assertEquals(expected, _configuration.getInterWikiLinker().getWikiToFormatStringMap());
   }
-  
+
   public void testInterWikiLinkerEmptyWhenNoPage() throws Exception {
-    assertNoInterWikiLinks();
+    assertOnlyBuiltInWikiLinks();
   }
-  
+
   public void testAddingPagePopulatesInterWikiLinker() throws Exception  {
     _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "c2 http://c2.com/cgi/wiki?%s\r\n", "");
-    assertEquals(Collections.singletonMap("c2", "http://c2.com/cgi/wiki?%s"), _configuration.getInterWikiLinker().getWikiToFormatStringMap());
+    Map<String, String> expected = ImmutableMap.of(
+        "other", ".../other/%s",
+        "c2", "http://c2.com/cgi/wiki?%s"
+    );
+    assertEquals(expected, _configuration.getInterWikiLinker().getWikiToFormatStringMap());
   }
-  
+
+  public void testUserEntryWinsOverBuiltInEntry() throws Exception {
+    _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "other http://www.example.com/elsewhere/%s\r\n", "");
+    Map<String, String> expected = ImmutableMap.of(
+        "other", "http://www.example.com/elsewhere/%s"
+    );
+    assertEquals(expected, _configuration.getInterWikiLinker().getWikiToFormatStringMap());
+  }
+
   // Currently most things are considered valid, we split on first whitespace...
   public void testInvalidEntryIgnored() throws Exception {
     _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "nospace\r\n", "");
-    assertNoInterWikiLinks();
+    assertOnlyBuiltInWikiLinks();
   }
-  
+
 }

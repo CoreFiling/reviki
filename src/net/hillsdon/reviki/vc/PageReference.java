@@ -15,36 +15,36 @@
  */
 package net.hillsdon.reviki.vc;
 
-import net.hillsdon.fij.core.Transform;
+import com.google.common.base.Function;
 
 /**
  * Quite possibly this class is more trouble that it is worth.
- * 
+ *
  * @author mth
  */
 public interface PageReference extends Comparable<PageReference> {
 
-  public static final Transform<PageReference, String> TO_NAME = new Transform<PageReference, String>() {
-    public String transform(PageReference in) {
+  public static final Function<PageReference, String> TO_NAME = new Function<PageReference, String>() {
+    public String apply(final PageReference in) {
       return in.getPath();
     }
   };
-  
+
   /**
    * @return A user friendly title.
    */
   String getTitle();
-  
+
   /**
    * @return The name of the page.
    */
   String getName();
-  
+
   /**
    * @return The path used by the page store to store the page.
    */
   String getPath();
-  
+
   /**
    * @return {@link #getPath()}.
    */

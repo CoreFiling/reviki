@@ -20,13 +20,9 @@ import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLI
 
 public class TestMisc extends WebTestSupport {
 
-  public void testRootRedirectsToList() throws Exception {
-    assertTrue(getWebPage("").getTitleText().contains("List"));
-  }
-
   public void testWikiRootRedirectsToFrontPage() throws Exception {
-    assertTrue(getWebPage("test/").getTitleText().contains("Front Page"));
-    assertTrue(getWebPage("test").getTitleText().contains("Front Page"));
+    assertTrue(getWebPage("pages/test/").getTitleText().contains("Front Page"));
+    assertTrue(getWebPage("pages/test").getTitleText().contains("Front Page"));
   }
   
   public void testNoBackLinkToSelf() throws Exception {
@@ -45,7 +41,7 @@ public class TestMisc extends WebTestSupport {
   
   public void testCssFromWikiUsedInsideWikisUrlSpaceOtherwiseDefaultCss() throws Exception {
     String defaultCss = "/resources/default-style.css";
-    String perWikiCss = BASE_URL + "/test/ConfigCss?ctype=raw";
+    String perWikiCss = BASE_URL + "/pages/test/ConfigCss?ctype=raw";
     assertTrue(getWikiList().asXml().contains(defaultCss));
     String whatever = getWikiPage("WhatEver").asXml();
     assertTrue(whatever.contains(perWikiCss));

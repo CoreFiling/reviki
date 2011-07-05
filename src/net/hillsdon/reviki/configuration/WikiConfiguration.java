@@ -16,20 +16,46 @@
 package net.hillsdon.reviki.configuration;
 
 import java.io.File;
+import java.util.List;
 
 import org.tmatesoft.svn.core.SVNURL;
 
+import com.google.common.base.Function;
+
 /**
  * Configuration details for a particular wiki.
- * 
+ *
  * @author mth
  */
 public interface WikiConfiguration {
+
+  Function<WikiConfiguration, String> TO_NAME = new Function<WikiConfiguration, String>() {
+    public String apply(final WikiConfiguration wiki) {
+      return wiki.getWikiName();
+    }
+  };
+
+  Function<WikiConfiguration, File> TO_SEARCH_INDEX_DIR = new Function<WikiConfiguration, File>() {
+    public File apply(final WikiConfiguration wiki) {
+      return wiki.getSearchIndexDirectory();
+    }
+  };
 
   /**
    * @return The name of the wiki this is the configuration for.
    */
   String getWikiName();
+
+  /**
+   * @return The fixed base URL, if any.  Otherwise the base URL should be derived
+   *         from the request.
+   */
+  String getFixedBaseUrl();
+
+  /**
+   * @return The fixed base URL, if any, for the named wiki.
+   */
+  String getFixedBaseUrl(String wikiName);
 
   /**
    * @return The SVN URL for our data store.
@@ -46,6 +72,11 @@ public interface WikiConfiguration {
    * @return The directory to store the search engine index in or null if not possible.
    */
   File getSearchIndexDirectory();
+
+  /**
+   * @return An array of directories to the other wikis use to store the search engine indices in.
+   */
+  List<File> getOtherSearchIndexDirectories();
 
   /**
    * @return true if the configuration is OK.

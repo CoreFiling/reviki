@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import java.util.Set;
+
 
 public interface ApplicationUrls extends ResourceUrls {
 
@@ -25,29 +27,28 @@ public interface ApplicationUrls extends ResourceUrls {
 
   /**
    * Prefer adding methods to using this one.
-   * 
+   *
    * @param relative With leading '/'.
    * @return An absolute URL within this application.
    */
   String url(String relative);
-  
+
   /**
    * @return URL for the wiki list.
    */
   String list();
-  
+
   /**
-   * Same as {@link #get(String, String)} with same argument for each parameter.
+   * Note the returned value may be specific to the current request.
+   *
+   * @param name The wiki name.
+   * @return The relevant URLs.
    */
   WikiUrls get(String name);
 
   /**
-   * Note the returned value may be specific to the current request.
-   * 
-   * @param name The wiki name (null for default).
-   * @param givenWikiName The given wiki name.
-   * @return The relevant URLs.
+   * @return The various available {@link WikiUrls}.
    */
-  WikiUrls get(String name, String givenWikiName);
-  
+  Set<WikiUrls> getAvailableWikiUrls();
+
 }

@@ -19,18 +19,19 @@ import static net.hillsdon.xml.xpathcontext.Coercion.CONTEXT;
 import static net.hillsdon.xml.xpathcontext.Coercion.NUMBER;
 import static net.hillsdon.xml.xpathcontext.Coercion.STRING;
 
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.xml.xpathcontext.XPathContext;
 import net.hillsdon.xml.xpathcontext.XPathContextFactory;
@@ -40,39 +41,58 @@ import org.xml.sax.InputSource;
 public class TestFeedWriter extends TestCase {
 
   private static final String FEED_URL = "http://www.example.com/dooby/RecentChanges/feed";
+  private static final String POUND_SIGN = "\u00a3";
+  private static final String TITLE = "Reviki Feed Title";
 
   public void test() throws Exception {
-    StringWriter out = new StringWriter();
-    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description", StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
+    List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description with special character " + POUND_SIGN, StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
-      public String feed() {
+      public String feed(final URLOutputFilter urlOutputFilter) {
         return "this isn't used";
       }
-      public String page(final String name) {
+      public String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
         return "page";
       }
       public String pagesRoot() {
         return "root";
       }
-      public String search() {
+      public String pagesRoot(final String wikiName) {
+        return null;
+      }
+      public String search(final URLOutputFilter urlOutputFilter) {
         return "search";
       }
-      public String resource(String path) {
+      public String resource(final String path) {
         return "favicon";
       }
+      public String page(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+        return "page";
+      }
+      public WikiConfiguration getWiki() {
+        throw new UnsupportedOperationException();
+      }
+      public String interWikiTemplate() {
+        throw new UnsupportedOperationException();
+      }
+      public String getWikiName() {
+        return "foo";
+      }
     };
-    new AtomFeedWriter(urls).writeAtom(FEED_URL, changes, new PrintWriter(out));
-    InputSource input = new InputSource(new StringReader(out.toString()));
-    
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    new AtomFeedWriter(urls).writeAtom(TITLE, FEED_URL, changes, out);
+    InputSource input = new InputSource(new ByteArrayInputStream(out.toByteArray()));
+
     try {
       XPathContext feed = XPathContextFactory.newInstance().newXPathContext(input);
       feed.setNamespaceBindings(Collections.singletonMap("atom", AtomFeedWriter.ATOM_NS));
-      
+
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:link/@href", STRING));
       assertEquals(FEED_URL, feed.evaluate("atom:feed/atom:id", STRING));
+      assertEquals(TITLE, feed.evaluate("atom:feed/atom:title", STRING));
       assertEquals(1.0, feed.evaluate("count(//atom:entry)", NUMBER));
       XPathContext entry = feed.evaluate("atom:feed/atom:entry", CONTEXT);
       assertEquals("page?revision=123", entry.evaluate("atom:id", STRING));
+      assertEquals("Change description with special character " + POUND_SIGN, entry.evaluate("atom:summary", STRING));
     }
     catch (RuntimeException ex) {
       // Seems to be available in Eclipse, on the command line on my development box, but not elsewhere.

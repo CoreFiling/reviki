@@ -18,11 +18,6 @@ The SVN integration uses svnkit, which is open source software.
 The original software and related information is available at
 http://svnkit.com/
 
-URL rewriting uses UrlRewriteFilter by tuckey, which is open
-source software.  The original sofrware and related information
-is available at
-http://code.google.com/p/urlrewritefilter/
-
 The following open source third-party libraries are used for 
 testing (i.e. not part of the WAR file):
 

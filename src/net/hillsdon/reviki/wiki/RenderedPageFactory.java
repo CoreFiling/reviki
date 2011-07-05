@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 public class RenderedPageFactory {
 
@@ -28,8 +29,8 @@ public class RenderedPageFactory {
     _renderer = renderer;
   }
   
-  public RenderedPage create(final String pageName, final String content) throws IOException, PageStoreException {
-    return new RenderedPage(pageName, _renderer.render(new PageReferenceImpl(pageName), content));
+  public RenderedPage create(final String pageName, final String content, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return new RenderedPage(pageName, _renderer.render(new PageReferenceImpl(pageName), content, urlOutputFilter));
   }
   
 }

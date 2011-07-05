@@ -15,46 +15,21 @@
  */
 package net.hillsdon.reviki.web.taglib;
 
-import java.io.IOException;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 /**
- * Uses an {@link InternalLinker} to create links to wiki pages.
+ * Uses an {@link InternalLinker} to create URLs to wiki pages.
  * 
  * @copyright
  * @author mth
  */
-public class WikiUrlTag extends TagSupport {
+public class WikiUrlTag extends AbstractWikiLinkTag {
 
   private static final long serialVersionUID = 1L;
-  private String _page;
 
-  public String getPage() {
-    return _page;
-  }
-
-  public void setPage(final String page) {
-    _page = page;
-  }
-
-  public int doStartTag() throws JspException {
-    try {
-      InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
-      if (linker != null) {
-        JspWriter out = pageContext.getOut();
-        out.write(Escape.html(linker.url(getPage())));
-      }
-    }
-    catch (IOException e) {
-      throw new JspException(e);
-    }
-    return SKIP_BODY;
+  protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
+    return linker.url(getPage(), getExtra(), urlOutputFilter);
   }
   
 }

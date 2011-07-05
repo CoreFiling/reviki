@@ -8,7 +8,7 @@
   <tiles:putAttribute name="content">
     <ul>
       <c:forEach var="path" items="${pageList}">
-        <li><sw:wikiLink page="${path}"/></li>
+        <li><sw:wikiPage page="${path}"/></li>
       </c:forEach>
     </ul>
   </tiles:putAttribute>

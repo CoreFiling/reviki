@@ -34,6 +34,7 @@ import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import static java.lang.String.format;
 import static net.hillsdon.reviki.text.WikiWordUtils.isWikiWord;
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getLong;
@@ -70,7 +71,7 @@ public class FindPage extends AbstractSpecialPage {
       return new View() {
         public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
           response.setContentType("application/opensearchdescription+xml");
-          String searchURL = _wikiUrls.search();
+          String searchURL = _wikiUrls.search(new ResponseSessionURLOutputFilter(request, response));
           String faviconURL = _wikiUrls.resource("favicon.ico");
           response.getWriter().write(format(OPENSEARCH_DESCRIPTION, Escape.html(faviconURL), Escape.html(searchURL)));
         }
@@ -90,7 +91,7 @@ public class FindPage extends AbstractSpecialPage {
       return new RedirectToPageView(_wikiUrls, queryPage);
     }
     
-    final Set<SearchMatch> results = _searchEngine.search(query, true);
+    final Set<SearchMatch> results = _searchEngine.search(query, true, pageExists);
     Long limit = getLong(request.getParameter("limit"), "limit");
     if (limit != null) {
       results.retainAll(new ArrayList<SearchMatch>(results).subList(0, (int) Math.min(results.size(), limit)));

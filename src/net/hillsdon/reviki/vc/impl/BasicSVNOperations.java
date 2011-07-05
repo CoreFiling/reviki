@@ -28,6 +28,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -36,13 +37,13 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
  * The low-level SVN operations in terms of our classes where useful.
- * 
+ *
  * This interface insulates the {@link SVNPageStore} from the {@link SVNRepository}
  * to enable testing of the logic in the page store.
- * 
+ *
  * In order to combine multiple operations {@link #execute(SVNAction)} has now
  * been exposed so it may make sense to change the layering here.
- * 
+ *
  * @author mth
  */
 public interface BasicSVNOperations {
@@ -50,7 +51,7 @@ public interface BasicSVNOperations {
   /**
    * Returns the most recent changes first.
    */
-  List<ChangeInfo> log(String path, long limit, boolean pathOnly, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
+  List<ChangeInfo> log(String path, long limit, LogEntryFilter logEntryFilter, boolean stopOnCopy, long startRevision, long endRevision) throws PageStoreAuthenticationException, PageStoreException;
 
   String getRoot() throws PageStoreAuthenticationException, PageStoreException;
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
@@ -77,7 +78,7 @@ public interface BasicSVNOperations {
    * Caller must closeDir afterwards.
    */
   void createDirectory(ISVNEditor commitEditor, String dir) throws SVNException;
-  
+
   /**
    * Currently does open/closeDir.
    */
@@ -94,5 +95,9 @@ public interface BasicSVNOperations {
   void unlock(PageReference ref, String lockToken) throws PageStoreAuthenticationException, PageStoreException;
   void lock(PageReference ref, long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException;
   SVNLock getLock(String path) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
+
+  List<SVNDirEntry> ls(String path) throws NotFoundException, PageStoreException;
+
+  void dispose();
 
 }

@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.urls.impl;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -40,23 +41,35 @@ public class TestWikiUrlsImpl extends TestCase {
   protected void setUp() throws Exception {
     _configuration = createMock(WikiConfiguration.class);
     _applicationUrls = createMock(ApplicationUrls.class);
+    //expect(_configuration.getWikiName()).andReturn("reviki").anyTimes();
+  }
+
+  public void testNoFixedBaseUrl() {
     expect(_applicationUrls.url((String) EasyMock.anyObject())).andAnswer(new IAnswer<String>() {
       public String answer() {
         String relative = (String) EasyMock.getCurrentArguments()[0];
         return "http://www.example.com/reviki" + relative;
       }
     }).anyTimes();
-  }
-
-  public void testNoFixedBaseUrl() {
+    expect(_configuration.getWikiName()).andReturn("foo");
+    expect(_configuration.getFixedBaseUrl((String) EasyMock.anyObject())).andReturn(null).anyTimes();
     WikiUrlsImpl urls = createURLs("foo");
-    assertEquals("http://www.example.com/reviki/foo/", urls.pagesRoot());
-    assertEquals("http://www.example.com/reviki/foo/Spaced+Out", urls.page("Spaced Out"));
-    assertEquals("http://www.example.com/reviki/foo/RecentChanges?ctype=atom", urls.feed());
-    assertEquals("http://www.example.com/reviki/foo/FindPage", urls.search());
+    assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
+    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page(null, "Spaced Out", URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed(URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search(URLOutputFilter.NULL));
   }
 
+  public void testFixedBaseUrlJustGoesAheadAndUsesIt() {
+    expect(_configuration.getWikiName()).andReturn(null);
+    expect(_configuration.getFixedBaseUrl(null)).andReturn("http://www.example.com/wiki").anyTimes();
+    replay(_configuration);
+    WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);
+    assertEquals("http://www.example.com/wiki/FooPage", urls.page(null, "FooPage", URLOutputFilter.NULL));
+  }
+  
   private WikiUrlsImpl createURLs(final String wikiName) {
+    //expect(_configuration.getFixedBaseUrl()).andReturn(null);
     expect(_configuration.getWikiName()).andReturn(wikiName).anyTimes();
     replay(_configuration, _applicationUrls);
     return new WikiUrlsImpl(_applicationUrls, _configuration);

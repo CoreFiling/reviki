@@ -13,7 +13,7 @@
         </li>
       </c:forEach>
     </ul>
-    <c:if test="${empty configuration.wikiNames}">
+    <c:if test="${empty configuration.wikis}">
     <p>
     There are no wikis configured yet.
     </p>
@@ -26,7 +26,7 @@
       <p>
       Enter a wiki name below to go to the FrontPage for that wiki. 
       </p>
-      <form id="jump" name="jump" action="<sw:url path="/jump"/>">
+      <form id="jump" name="jump" action="<c:url value="/jump"/>">
       <input type="text" name="name"/><input type="submit" name="go" value="Go"/>
       </form>
     </c:if>

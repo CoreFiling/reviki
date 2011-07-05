@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.web.vcintegration;
 
-import net.hillsdon.fij.core.Factory;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.impl.SearchIndexPopulatingPageStore;
 import net.hillsdon.reviki.vc.MimeIdentifier;
@@ -26,23 +25,28 @@ import net.hillsdon.reviki.vc.impl.DeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.PageListCachingPageStore;
 import net.hillsdon.reviki.vc.impl.SVNPageStore;
 
-public class PerRequestPageStoreFactory implements Factory<PageStore> {
+import com.google.common.base.Supplier;
 
+public class PerRequestPageStoreFactory implements Supplier<PageStore> {
+
+  private final String _wiki;
   private final SearchEngine _indexer;
   private final DeletedRevisionTracker _tracker;
   private final BasicSVNOperations _operations;
   private final AutoPropertiesApplier _autoPropertiesApplier;
   private final MimeIdentifier _mimeIdentifier;
 
-  public PerRequestPageStoreFactory(final SearchEngine indexer, final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+  public PerRequestPageStoreFactory(final String wiki, final SearchEngine indexer, final DeletedRevisionTracker tracker, final BasicSVNOperations operations, final AutoPropertiesApplier autoPropertiesApplier, final MimeIdentifier mimeIdentifier) {
+    _wiki = wiki;
     _indexer = indexer;
     _tracker = tracker;
     _operations = operations;
     _autoPropertiesApplier = autoPropertiesApplier;
     _mimeIdentifier = mimeIdentifier;
   }
-  
-  public PageStore newInstance() {
-    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_tracker, _operations, _autoPropertiesApplier, _mimeIdentifier)))); 
+
+  public PageStore get() {
+    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_wiki, _tracker, _operations, _autoPropertiesApplier, _mimeIdentifier))));
   }
+
 }

@@ -19,11 +19,16 @@ import org.picocontainer.MutablePicoContainer;
 
 /**
  * PicoContainer DI based sessions.
- * 
+ *
  * @author mth
  */
 public interface Session {
-  
+
+  /**
+   * This will call {@link org.picocontainer.Startable#start()} on objects in the session.
+   */
+  void start();
+
   void configure(MutablePicoContainer container);
-  
+
 }

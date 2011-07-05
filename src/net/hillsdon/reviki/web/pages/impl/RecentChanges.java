@@ -15,13 +15,14 @@
  */
 package net.hillsdon.reviki.web.pages.impl;
 
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.fij.core.Predicate;
-import net.hillsdon.fij.core.Predicates;
+import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -34,13 +35,14 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
-import static net.hillsdon.fij.core.Functional.filter;
-import static net.hillsdon.fij.core.Functional.list;
-
-import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 public class RecentChanges extends AbstractSpecialPage {
 
@@ -49,9 +51,9 @@ public class RecentChanges extends AbstractSpecialPage {
    */
   static final long RECENT_CHANGES_DEFAULT_HISTORY_SIZE = 50;
   static final long RECENT_CHANGES_MAX_HISTORY_SIZE = 250;
-  
+
   private static final Predicate<ChangeInfo> MAJOR_ONLY = new Predicate<ChangeInfo>() {
-    public Boolean transform(final ChangeInfo in) {
+    public boolean apply(final ChangeInfo in) {
       return !in.isMinorEdit();
     }
   };
@@ -59,26 +61,28 @@ public class RecentChanges extends AbstractSpecialPage {
   private final PageStore _store;
   private final FeedWriter _feedWriter;
   private final WikiUrls _wikiUrls;
+  private final WikiConfiguration _configuration;
 
-  public RecentChanges(final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter, final WikiUrls wikiUrls) {
+  public RecentChanges(final WikiConfiguration configuration, final DefaultPage defaultPage, final CachingPageStore store, final FeedWriter feedWriter, final WikiUrls wikiUrls) {
     super(defaultPage);
+    _configuration = configuration;
     _store = store;
     _feedWriter = feedWriter;
     _wikiUrls = wikiUrls;
   }
 
   @Override
-  public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean showMinor = request.getParameter("showMinor") != null;
     final List<ChangeInfo> recentChanges = getRecentChanges(getLimit(request), showMinor);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      return new FeedView(_feedWriter, recentChanges, _wikiUrls.feed());
+      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed(URLOutputFilter.NULL));
     }
     return new JspView("RecentChanges");
   }
 
-  private Long getLimit(HttpServletRequest request) throws InvalidInputException {
+  private Long getLimit(final HttpServletRequest request) throws InvalidInputException {
     Long limit = RequestParameterReaders.getLong(request, "limit");
     if (limit == null) {
       limit = RECENT_CHANGES_DEFAULT_HISTORY_SIZE;
@@ -88,7 +92,7 @@ public class RecentChanges extends AbstractSpecialPage {
   }
 
   private List<ChangeInfo> getRecentChanges(final long limit, final boolean showMinor) throws PageStoreException {
-    return list(filter(_store.recentChanges(limit), showMinor ? Predicates.<ChangeInfo>all() : MAJOR_ONLY));
+    return ImmutableList.copyOf(Iterables.filter(_store.recentChanges(limit), showMinor ? Predicates.<ChangeInfo>alwaysTrue() : MAJOR_ONLY));
   }
 
   public String getName() {

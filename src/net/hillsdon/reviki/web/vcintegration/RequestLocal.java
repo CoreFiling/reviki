@@ -17,29 +17,29 @@ package net.hillsdon.reviki.web.vcintegration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.hillsdon.fij.accessors.Accessor;
-import net.hillsdon.fij.core.Transform;
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 
 /**
  * A thread-local bound to the request lifecycle.
- * 
+ *
  * @author mth
  *
  * @param <T> Class.
  */
-public class RequestLocal<T> implements Accessor<T>, RequestLifecycleAware {
+public class RequestLocal<T> implements Supplier<T>, RequestLifecycleAware {
 
   private final ThreadLocal<T> _threadLocal = new ThreadLocal<T>();
-  private final Transform<HttpServletRequest, T> _factory;
+  private final Function<HttpServletRequest, T> _factory;
 
-  public RequestLocal(final Transform<HttpServletRequest, T> factory) {
+  public RequestLocal(final Function<HttpServletRequest, T> factory) {
     _factory = factory;
   }
 
   public void create(final HttpServletRequest request) {
-    _threadLocal.set(_factory.transform(request));
+    _threadLocal.set(_factory.apply(request));
   }
-  
+
   public void destroy() {
     _threadLocal.set(null);
   }

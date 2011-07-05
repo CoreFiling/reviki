@@ -30,7 +30,7 @@ public class TestRecentChanges extends TestCase {
     _store = EasyMock.createMock(CachingPageStore.class);
     _feedWriter = EasyMock.createMock(FeedWriter.class);
     _wikiUrls = EasyMock.createMock(WikiUrls.class);
-    _recentChanges = new RecentChanges(_defaultPage, _store, _feedWriter, _wikiUrls);
+    _recentChanges = new RecentChanges(null, _defaultPage, _store, _feedWriter, _wikiUrls);
   }
   
   private void replay() {

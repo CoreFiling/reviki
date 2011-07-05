@@ -15,7 +15,8 @@
  */
 package net.hillsdon.reviki.configuration;
 
-import java.util.Collection;
+import java.util.List;
+
 
 public interface DeploymentConfiguration {
 
@@ -44,6 +45,6 @@ public interface DeploymentConfiguration {
   /**
    * @return Names of the configured wikis.
    */
-  Collection<String> getWikiNames();
+  List<WikiConfiguration> getWikis();
 
 }
