@@ -50,5 +50,10 @@ public interface PageReference extends Comparable<PageReference> {
    */
   String toString();
 
+  /**
+   * @return The path used by the page store to store attachments for this page.
+   */
+  String getAttachmentPath();
+
 }
 

@@ -22,7 +22,7 @@ import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 
 /**
  * Impl.
- * 
+ *
  * @author mth
  */
 public class PageReferenceImpl implements PageReference {
@@ -36,9 +36,13 @@ public class PageReferenceImpl implements PageReference {
   public final String getTitle() {
     return WikiWordUtils.pathToTitle(getName());
   }
-  
+
   public final String getPath() {
     return _path;
+  }
+
+  public final String getAttachmentPath() {
+    return _path + "-attachments";
   }
 
   public final int compareTo(final PageReference o) {
@@ -57,7 +61,7 @@ public class PageReferenceImpl implements PageReference {
     }
     return false;
   }
-  
+
   @Override
   public final int hashCode() {
     return _path.hashCode();

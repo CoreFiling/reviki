@@ -18,6 +18,7 @@ package net.hillsdon.reviki.vc.impl;
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.Date;
 import java.util.List;
@@ -25,16 +26,22 @@ import java.util.List;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.vc.impl.SVNPageStore.SVNRenameAction;
 
 import org.easymock.EasyMock;
+import org.tmatesoft.svn.core.SVNErrorCode;
+import org.tmatesoft.svn.core.SVNErrorMessage;
+import org.tmatesoft.svn.core.SVNException;
 
 /**
  * Unit tests {@link SVNPageStore} by exploring its interactions with
- * {@link BasicSVNOperations}.  Mostly useful for edge cases etc. as 
- * this is done via mocks, the more substantial testing of this code 
+ * {@link BasicSVNOperations}.  Mostly useful for edge cases etc. as
+ * this is done via mocks, the more substantial testing of this code
  * is done via the webtests for now.
- * 
+ *
  * @author mth
  */
 public class TestSVNPageStore extends TestCase {
@@ -48,14 +55,14 @@ public class TestSVNPageStore extends TestCase {
     _operations = createMock(BasicSVNOperations.class);
     _store = new SVNPageStore("wiki", _tracker, _operations, createMock(AutoPropertiesApplier.class), new FixedMimeIdentifier());
   }
-  
+
   public void testGetLatestRevisionJustDelegates() throws Exception {
     expect(_operations.getLatestRevision()).andReturn(4L);
     replay();
     assertEquals(4, _store.getLatestRevision());
     verify();
   }
-  
+
   public void testHistoryLogsToHeadIfNoDeletedRevision() throws Exception {
     final String path = "ThePage";
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
@@ -65,7 +72,7 @@ public class TestSVNPageStore extends TestCase {
     assertEquals(asList(previousEdit), _store.history(new PageReferenceImpl(path)));
     verify();
   }
-  
+
   public void testHistoryLogsUptoDeletedRevisionAndIncludesIt() throws Exception {
     final String path = "ThePage";
     final ChangeInfo previousEdit  = new ChangeInfo(path, path, "mth", new Date(), 3, "An edit", StoreKind.PAGE, ChangeType.MODIFIED, null, -1);
@@ -92,12 +99,56 @@ public class TestSVNPageStore extends TestCase {
     assertEquals(asList(edit, copyAdd, copyRemove, create), _store.history(new PageReferenceImpl(copyName)));
     verify();
   }
-  
+
+  public void testRename() throws Exception {
+    String originalName = "TheOriginalPage";
+    String newName = "TheRenamedPage";
+    final PageReference originalPage = new PageReferenceImpl(originalName);
+    final PageReference newPage = new PageReferenceImpl(newName);
+    _operations.moveFile(null, originalName, 1, newName);
+    replay();
+    SVNRenameAction action = new SVNPageStore.SVNRenameAction("", newPage, false, originalPage, 1);
+    action.driveCommitEditor(null, _operations);
+    verify();
+  }
+
+  public void testRenameWithAttachments() throws Exception {
+    String originalName = "TheOriginalPage";
+    String newName = "TheRenamedPage";
+    final PageReference originalPage = new PageReferenceImpl(originalName);
+    final PageReference newPage = new PageReferenceImpl(newName);
+    _operations.moveFile(null, originalName, 1, newName);
+    _operations.moveDir(null, originalName + "-attachments", 1, newName + "-attachments");
+    replay();
+    SVNRenameAction action = new SVNPageStore.SVNRenameAction("", newPage, true, originalPage, 1);
+    action.driveCommitEditor(null, _operations);
+    verify();
+  }
+
+  public void testRenameLocked() throws Exception {
+    String originalName = "TheOriginalPage";
+    String newName = "TheRenamedPage";
+    final PageReference originalPage = new PageReferenceImpl(originalName);
+    final PageReference newPage = new PageReferenceImpl(newName);
+    _operations.moveFile(null, originalName, 1, newName);
+    expectLastCall().andThrow(new SVNException(SVNErrorMessage.create(SVNErrorCode.RA_DAV_REQUEST_FAILED)));
+    replay();
+    SVNRenameAction action = new SVNPageStore.SVNRenameAction("", newPage, false, originalPage, 1);
+    try {
+      action.driveCommitEditor(null, _operations);
+      fail("Expected RenameException");
+    }
+    catch (RenameException ex) {
+      // OK
+    }
+    verify();
+  }
+
   private void verify() {
     EasyMock.verify(_tracker, _operations);
   }
   private void replay() {
     EasyMock.replay(_tracker, _operations);
   }
-  
+
 }

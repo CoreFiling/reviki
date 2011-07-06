@@ -52,6 +52,7 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;
+import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
 
@@ -76,6 +77,37 @@ import com.google.common.collect.Ordering;
  * @author mth
  */
 public class SVNPageStore implements PageStore {
+
+  static final class SVNRenameAction extends SVNEditAction {
+    private final PageReference _toPath;
+    private final boolean _needToMoveAttachmentDir;
+    private final PageReference _fromPath;
+    private final long _baseRevision;
+
+    SVNRenameAction(final String commitMessage, final PageReference toPath, final boolean needToMoveAttachmentDir, final PageReference fromPath, final long baseRevision) {
+      super(commitMessage);
+      _toPath = toPath;
+      _needToMoveAttachmentDir = needToMoveAttachmentDir;
+      _fromPath = fromPath;
+      _baseRevision = baseRevision;
+    }
+
+    @Override
+    protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException, RenameException {
+      try {
+        operations.moveFile(commitEditor, _fromPath.getPath(), _baseRevision, _toPath.getPath());
+        if (_needToMoveAttachmentDir) {
+          operations.moveDir(commitEditor, _fromPath.getAttachmentPath(), _baseRevision, _toPath.getAttachmentPath());
+        }
+      }
+      catch (SVNException e) {
+        if (SVNErrorCode.RA_DAV_REQUEST_FAILED.equals(e.getErrorMessage().getErrorCode())) {
+           throw new RenameException(e);
+        }
+        throw e;
+      }
+    }
+  }
 
   private static final Predicate<ChangeInfo> IS_CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
     public boolean apply(final ChangeInfo in) {
@@ -269,7 +301,7 @@ public class SVNPageStore implements PageStore {
       latestRevision = -1;
     }
 
-    final String dir = attachmentPath(ref);
+    final String dir = ref.getAttachmentPath();
     final boolean needToCreateAttachmentDir =  _operations.checkPath(dir, baseRevision) == SVNNodeKind.NONE;
     _operations.execute(new SVNEditAction(commitMessage) {
       @Override
@@ -296,7 +328,7 @@ public class SVNPageStore implements PageStore {
   }
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
-    final String attachmentPath = attachmentPath(ref);
+    final String attachmentPath = ref.getAttachmentPath();
     final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     if (_operations.checkPath(attachmentPath, -1).equals(SVNNodeKind.DIR)) {
       final Collection<ChangeInfo> changed = _operations.log(attachmentPath, -1, LogEntryFilter.DESCENDANTS, false, 0, -1);
@@ -324,12 +356,8 @@ public class SVNPageStore implements PageStore {
     return results.values();
   }
 
-  private String attachmentPath(final PageReference ref) {
-    return ref.getPath() + "-attachments";
-  }
-
   public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
-    final String path = SVNPathUtil.append(attachmentPath(ref), attachment);
+    final String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
     final OutputStream out = new LazyOutputStream() {
       @Override
       protected OutputStream lazyInit() throws IOException {
@@ -366,18 +394,8 @@ public class SVNPageStore implements PageStore {
   }
 
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    final String fromAttachmentDir = attachmentPath(from);
-    final String toAttachmentDir = attachmentPath(to);
-    final boolean needToMoveAttachmentDir =  _operations.checkPath(fromAttachmentDir, baseRevision) == SVNNodeKind.DIR;
-    return _operations.execute(new SVNEditAction(commitMessage) {
-      @Override
-      protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException {
-        operations.moveFile(commitEditor, from.getPath(), baseRevision, to.getPath());
-        if (needToMoveAttachmentDir) {
-          operations.moveDir(commitEditor, fromAttachmentDir, baseRevision, toAttachmentDir);
-        }
-      }
-    });
+    final boolean needToMoveAttachmentDir =  _operations.checkPath(from.getAttachmentPath(), baseRevision) == SVNNodeKind.DIR;
+    return _operations.execute(new SVNRenameAction(commitMessage, to, needToMoveAttachmentDir, from, baseRevision));
   }
 
   private Map<String, String> createLocksMap(final String path, final String lockToken) {

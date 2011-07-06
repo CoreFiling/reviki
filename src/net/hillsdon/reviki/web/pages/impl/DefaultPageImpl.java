@@ -42,6 +42,7 @@ import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.PageRevisionReference;
@@ -420,7 +421,30 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (hasRenameParam) {
       final PageReference toPage = new PageReferenceImpl(getRequiredString(request, PARAM_TO_PAGE));
-      _store.rename(page, toPage, -1, createLinkingCommitMessage(toPage, request));
+      try {
+        _store.rename(page, toPage, -1, createLinkingCommitMessage(toPage, request));
+      }
+      catch (RenameException ex) {
+        PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+        String message;
+        if (pageInfo.isLocked()) {
+          message = "Cannot rename while page is locked. Page was locked by ";
+          if (pageInfo.isNewOrLockedByUser((String) request.getAttribute(RequestAttributes.USERNAME))) {
+            message += "you ";
+          }
+          else {
+            message += pageInfo.getLockedBy();
+          }
+          message += " on " + pageInfo.getLockedSince() + ".";
+        }
+        else {
+          message = "Rename failed";
+        }
+        pageInfo = pageInfo.withoutLockToken();
+        request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+        request.setAttribute("flash", message);
+        return new JspView("Rename");
+      }
       return new RedirectToPageView(_wikiUrls, toPage);
     }
     else if (hasUnlockParam) {
