@@ -83,7 +83,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
   
   private PageInfo withContentIfSpecialAndNew(final PageReference ref, PageInfo page) throws PageStoreException {
     try {
-      if (page.isNew() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
+      if (page.isNewPage() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
         String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
         page = new PageInfoImpl(getWiki(), page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
       }

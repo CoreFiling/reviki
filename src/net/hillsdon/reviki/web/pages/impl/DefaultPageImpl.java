@@ -261,7 +261,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   private boolean isLockTokenValid(final PageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
     final String username = (String) request.getAttribute(RequestAttributes.USERNAME);
-    return pageInfo.isNewOrLockedByUser(username) && (!preview || pageInfo.isNew() || lockTokenMatches(pageInfo, request));
+    return pageInfo.isNewOrLockedByUser(username) && (!preview || pageInfo.isNewPage() || lockTokenMatches(pageInfo, request));
   }
 
   private boolean lockTokenMatches(final PageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {

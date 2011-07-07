@@ -87,7 +87,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
         // Note we pass 'upto' as the revision here.  At the moment we get
         // back the revision of deleted pages as -2 which isn't such a good
         // thing to set our 'highest indexed revision' to...
-        if (info.isNew()) {
+        if (info.isNewPage()) {
           _delegate.delete(info.getWiki(), info.getPath(), upto);
         }
         else {

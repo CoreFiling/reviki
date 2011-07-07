@@ -38,7 +38,7 @@ public class TestSpecialPagePopulatingPageStore extends TestCase {
   
   public void testPopulatesSomePages() throws Exception {
     PageInfo frontPage = _special.get(PAGE_FRONT_PAGE, -1);
-    assertTrue(frontPage.isNew());
+    assertTrue(frontPage.isNewPage());
     assertEquals(PageInfo.UNCOMMITTED, frontPage.getLastChangedRevision());
     assertTrue(frontPage.getContent().contains("Welcome to"));
   }

@@ -31,7 +31,7 @@ public class TestConfigPageCachingPageStore extends TestCase {
     PageReference ref = new PageReferenceImpl("ConfigFoo");
     ConfigPageCachingPageStore store = new ConfigPageCachingPageStore(new SimplePageStore());
     store.getUnderlying().set(ref, "", 1, "Hey there", "Initial commit");
-    assertFalse(store.get(ref, 2).isNew());
+    assertFalse(store.get(ref, 2).isNewPage());
     assertFalse(store.isCached(ref));
   }
   

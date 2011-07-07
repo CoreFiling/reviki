@@ -71,7 +71,7 @@ public interface PageStore {
 
   /**
    * The page info may represent a page that doesn't exist yet (or has been deleted,
-   * we don't currently distinguish) check {@link PageInfo#isNew()}.
+   * we don't currently distinguish) check {@link PageInfo#isNewPage()}.
    * 
    * @param ref A page name.
    * @param revision Revision, -1 for head.

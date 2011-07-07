@@ -79,7 +79,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   public String getRevisionName() {
-    if (isNew()) {
+    if (isNewPage()) {
       return "New";
     }
     return "r" + getLastChangedRevision();
@@ -101,7 +101,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     return _lockedSince;
   }
   
-  public boolean isNew() {
+  public boolean isNewPage() {
     return _revision == UNCOMMITTED || _revision == DELETED;
   }
   
@@ -110,7 +110,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   public boolean isNewOrLockedByUser(final String user) {
-    return isNew() || isLockedByUser(user);
+    return isNewPage() || isLockedByUser(user);
   }
 
   private boolean isLockedByUser(final String user) {

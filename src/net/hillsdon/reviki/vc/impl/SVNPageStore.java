@@ -219,7 +219,7 @@ public class SVNPageStore implements PageStore {
 
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
     final PageInfo page = get(ref, -1);
-    if (page.isNew()) {
+    if (page.isNewPage()) {
       return page;
     }
     if (page.isLocked()) {

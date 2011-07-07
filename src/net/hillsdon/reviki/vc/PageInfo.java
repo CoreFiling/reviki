@@ -19,7 +19,7 @@ import java.util.Date;
 
 /**
  * Contents at a particular revision.
- * 
+ *
  * @author mth
  */
 public interface PageInfo extends PageReference  {
@@ -27,14 +27,14 @@ public interface PageInfo extends PageReference  {
   // Magic revisions.  Prefer isFoo() methods.
   long UNCOMMITTED = -2;
   long DELETED = -3;
-  
+
   String getWiki();
 
   String getContent();
-  
+
   long getRevision();
   String getRevisionName();
-  
+
   long getLastChangedRevision();
   String getLastChangedUser();
   Date getLastChangedDate();
@@ -44,11 +44,11 @@ public interface PageInfo extends PageReference  {
   boolean isLocked();
   boolean isNewOrLockedByUser(String user);
   Date getLockedSince();
-  
-  boolean isNew();
+
+  boolean isNewPage();
   boolean isDeleted();
-  
+
   PageInfo withAlternativeContent(String content);
   PageInfo withoutLockToken();
-  
+
 }

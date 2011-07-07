@@ -64,7 +64,7 @@ public class PageStoreConfiguration implements Configuration {
 
   private void addSpecifiedInterWikiLinks(final InterWikiLinker linker) throws PageStoreException {
     PageInfo page = _store.get(new PageReferenceImpl("ConfigInterWikiLinks"), -1);
-    if (!page.isNew()) {
+    if (!page.isNewPage()) {
       parseLinkEntries(linker, page.getContent());
     }
   }

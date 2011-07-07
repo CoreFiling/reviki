@@ -23,10 +23,10 @@ public class TestPageInfo extends TestCase {
   public void testRevisionNameAndIsNew() {
     PageInfo uncommitted = new PageInfoImpl("wiki", "name", "content", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null, null);
     assertEquals("New", uncommitted.getRevisionName());
-    assertTrue(uncommitted.isNew());
+    assertTrue(uncommitted.isNewPage());
     PageInfo committed = new PageInfoImpl("wiki", "name", "content", 5, 2, null, null, null, null, null);
     assertEquals("r2", committed.getRevisionName());
-    assertFalse(committed.isNew());
+    assertFalse(committed.isNewPage());
   }
   
 }

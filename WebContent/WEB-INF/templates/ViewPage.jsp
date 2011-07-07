@@ -6,7 +6,7 @@
 <c:set var="lastEditAction">
   <c:choose>
     <c:when test="${pageInfo.deleted}">Deleted</c:when>
-    <c:when test="${not pageInfo.new}">Last changed</c:when>
+    <c:when test="${not pageInfo.newPage}">Last changed</c:when>
   </c:choose>
 </c:set>
 
@@ -23,7 +23,7 @@
       <li class="menu">
         <a name="attachments" href="<c:url value="${page.name}/attachments/"/>">Attachments</a>
       </li>
-      <c:if test="${not pageInfo.new}">
+      <c:if test="${not pageInfo.newPage}">
         <li class="menu">
           <a name="rename" href="<c:url value="${page.name}?rename"/>">Rename</a>
         </li>
@@ -43,7 +43,7 @@
     ${renderedContents}
     </div>
     <div class="auxillary">
-	    <c:if test="${pageInfo.new and empty pageInfo.content}">
+	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
 	    <form id="editContent" name="editContent" action="<c:url value="${page.name}"/>" method="post">
 	      <input type="submit" value="Edit this new page" />
