@@ -28,7 +28,7 @@
         </c:if>
         <c:if test="${not empty markedUpDiff}">
           <div id="diff-area" class="tab-content">
-            <div id="wiki-rendering">${markedUpDiff}</div>
+            <div>${markedUpDiff}</div>
           </div>
         </c:if>
       </div>
