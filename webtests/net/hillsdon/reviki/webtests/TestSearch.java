@@ -57,7 +57,7 @@ public class TestSearch extends WebTestSupport {
   public void testPageWithSpacesShowsInBacklinks() throws Exception {
     final String refers = uniqueWikiPageName("SearchSpaces BacklinkTesta");
     final String referred = uniqueWikiPageName("SearchSpaces BacklinkTestb");
-    editWikiPage(refers, referred, "", true);
+    editWikiPage(refers, "[["+referred+"]]", "", true);
     final HtmlPage page = getWikiPage(referred);
     getAnchorByHrefContains(page, Escape.urlEncodeUTF8(refers));
   }
