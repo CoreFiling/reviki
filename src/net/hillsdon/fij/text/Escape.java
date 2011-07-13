@@ -15,7 +15,8 @@
  */
 package net.hillsdon.fij.text;
 
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 
 
 public class Escape {
@@ -31,10 +32,11 @@ public class Escape {
    * @return
    */
   public static String urlEncodeUTF8(final String content) {
+
     try {
-      return java.net.URLEncoder.encode(content, "UTF-8");
+      return URIUtil.encodeWithinPath(content, "UTF-8");
     }
-    catch (UnsupportedEncodingException ex) {
+    catch(URIException ex) {
       throw new Error("Java supports UTF-8!", ex);
     }
   }

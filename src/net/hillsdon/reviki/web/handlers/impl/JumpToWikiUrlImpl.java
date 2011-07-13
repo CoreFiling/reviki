@@ -16,12 +16,12 @@
 package net.hillsdon.reviki.web.handlers.impl;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
@@ -39,9 +39,9 @@ public class JumpToWikiUrlImpl implements JumpToWikiUrl {
   public JumpToWikiUrlImpl(final ApplicationUrls urls) {
     _urls = urls;
   }
-  
+
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
-    final String wiki = URLEncoder.encode(getRequiredString(request, "name"), "UTF-8");
+    final String wiki = Escape.urlEncodeUTF8(getRequiredString(request, "name"));
     return new RedirectToPageView(_urls.get(wiki), PAGE_FRONT_PAGE);
   }
 

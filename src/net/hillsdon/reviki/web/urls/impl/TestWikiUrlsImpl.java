@@ -29,7 +29,7 @@ import static org.easymock.EasyMock.replay;
 
 /**
  * Test for {@link WikiUrlsImpl}.
- * 
+ *
  * @author mth
  */
 public class TestWikiUrlsImpl extends TestCase {
@@ -55,7 +55,8 @@ public class TestWikiUrlsImpl extends TestCase {
     expect(_configuration.getFixedBaseUrl((String) EasyMock.anyObject())).andReturn(null).anyTimes();
     WikiUrlsImpl urls = createURLs("foo");
     assertEquals("http://www.example.com/reviki/pages/foo/", urls.pagesRoot());
-    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page(null, "Spaced Out", URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/Spaced%20Out", urls.page(null, "Spaced Out", URLOutputFilter.NULL));
+    assertEquals("http://www.example.com/reviki/pages/foo/Spaced+Out", urls.page(null, "Spaced+Out", URLOutputFilter.NULL));
     assertEquals("http://www.example.com/reviki/pages/foo/RecentChanges?ctype=atom", urls.feed(URLOutputFilter.NULL));
     assertEquals("http://www.example.com/reviki/pages/foo/FindPage", urls.search(URLOutputFilter.NULL));
   }
@@ -67,12 +68,12 @@ public class TestWikiUrlsImpl extends TestCase {
     WikiUrlsImpl urls = new WikiUrlsImpl(_applicationUrls, _configuration);
     assertEquals("http://www.example.com/wiki/FooPage", urls.page(null, "FooPage", URLOutputFilter.NULL));
   }
-  
+
   private WikiUrlsImpl createURLs(final String wikiName) {
     //expect(_configuration.getFixedBaseUrl()).andReturn(null);
     expect(_configuration.getWikiName()).andReturn(wikiName).anyTimes();
     replay(_configuration, _applicationUrls);
     return new WikiUrlsImpl(_applicationUrls, _configuration);
   }
-  
+
 }

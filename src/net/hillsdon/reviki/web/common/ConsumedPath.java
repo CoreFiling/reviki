@@ -15,50 +15,41 @@
  */
 package net.hillsdon.reviki.web.common;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import javax.servlet.http.HttpServletRequest;
-
 public class ConsumedPath {
 
   public static final ConsumedPath EMPTY = new ConsumedPath(Collections.<String>emptyList());
-  
+
   private ListIterator<String> _iterator;
   private List<String> _list;
 
-  public ConsumedPath(final String requestURI, final String contextPath) {
-    this(createPartList(requestURI, contextPath));
+  /**
+   * @param requestPath The full decoded path segment
+   * @param contextPath The context path
+   */
+  public ConsumedPath(final String requestPath, final String contextPath) {
+    this(createPartList(requestPath, contextPath));
   }
-  
+
   /**
    * Suitable for testing.
-   * @param parts The remaining parts.
+   * @param parts The remaining parts
    */
   public ConsumedPath(final List<String> parts) {
     _list = parts;
     _iterator = parts.listIterator();
   }
 
-  private static List<String> createPartList(final String requestURI, final String contextPath) {
-    String path = requestURI.substring(contextPath.length() + 1);
-    int query = path.lastIndexOf('?');
-    if (query != -1) {
-      path = path.substring(0, query);
-    }
+  private static List<String> createPartList(final String requestPath, final String contextPath) {
+    String path = requestPath.substring(contextPath.length() + 1);
     List<String> parts = new ArrayList<String>();
     for (String part : path.split("/")) {
-      try {
-        parts.add(URLDecoder.decode(part, "UTF-8"));
-      }
-      catch (UnsupportedEncodingException ex) {
-        parts.add(part);
-      }
+      parts.add(part);
     }
     return parts;
   }
@@ -71,7 +62,7 @@ public class ConsumedPath {
       return null;
     }
   }
-  
+
   public String next() {
     try {
       return _iterator.next();
@@ -92,10 +83,10 @@ public class ConsumedPath {
     next();
     return this;
   }
-  
+
   @Override
   public String toString() {
     return _list.toString();
   }
-  
+
 }

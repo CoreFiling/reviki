@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.dispatching.impl;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.net.URI;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -61,14 +62,14 @@ public class DispatcherImpl implements Dispatcher {
   public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     request.setCharacterEncoding("UTF-8");
     request.setAttribute(ApplicationUrls.KEY, _applicationUrls);
-    
-    // Avoid getRequestURL as that contains jsessionid (at least on Jetty).
+
+    // We should be able to use request.getPathInfo() as it's documented as
+    // having been correctly decoded by the container,
+    // however Tomcat at least fails with UTF-8.
+    final String requestPath = getStrippedPath(URI.create(request.getRequestURI()));
     final String contextPath = request.getContextPath();
-    final String servletPath = request.getServletPath();
-    final String pathInfo = request.getPathInfo();
-    final String reconstructedRequestURI = contextPath + servletPath + (pathInfo == null ? "" : pathInfo);
-    ConsumedPath path = new ConsumedPath(reconstructedRequestURI, contextPath);
-    
+    ConsumedPath path = new ConsumedPath(requestPath, contextPath);
+
     try {
       _requestLifecycleAwareManager.requestStarted(request);
       View view = handle(path, request, response);
@@ -85,6 +86,27 @@ public class DispatcherImpl implements Dispatcher {
     finally {
       _requestCompletedHandler.requestComplete();
     }
+  }
+
+  /**
+   * Return the path segment of the URI with ;jssesionid parameter stripped of
+   * (if necessary).
+   *
+   * The container handles the jsessionid for us but unfortunately Tomcat and
+   * Jetty behave differently with respect to whether they include it in
+   * getRequestURI().
+   *
+   * @param requestURI
+   * @return requestURI with the ;jsessionid path segment parameter stripped.
+   * @throws AssertionError
+   */
+  String getStrippedPath(final URI requestURI) {
+    String path = requestURI.getPath();
+    int jsessionId = path.indexOf(";jsessionid");
+    if (jsessionId != -1) {
+      path = path.substring(0, jsessionId);
+    }
+    return path;
   }
 
   // This should be moved out of here...

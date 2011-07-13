@@ -1,5 +1,6 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
@@ -34,7 +35,7 @@
       </div>
     </c:if>
 
-    <form id="editForm" name="editForm" action="<c:url value="${page.name}"/>" style="clear:left" method="post">
+    <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>

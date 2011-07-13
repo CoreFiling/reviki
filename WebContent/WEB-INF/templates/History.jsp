@@ -2,12 +2,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/functions' prefix='fn' %>
+<%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
+ 
+ <c:set var="encodedPageName" value="${sw:urlEncode(page.name)}" />
  
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title">History for <c:out value="${page.title}"/></tiles:putAttribute>
-  <tiles:putAttribute name="heading">History for <a href="<c:url value="${page}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
+  <tiles:putAttribute name="heading">History for <a href="<c:url value="${encodedPageName}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <form method="get" name="compareForm" action="<c:url value="${page.name}"/>">
+    <form method="get" name="compareForm" action="<c:url value="${encodedPageName}"/>">
 	    <table class="history">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
