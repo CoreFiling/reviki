@@ -74,7 +74,7 @@ public final class WikiWordUtils {
   }
 
   private static boolean hasNoWhitespace(final String text) {
-    return text.split("\\s").length == 1;
+    return text.split("\\s", -1).length == 1;
   }
   
   /**

@@ -36,6 +36,8 @@ public class TestWikiWordUtils extends TestCase {
     assertFalse(isWikiWord("parserGenerator"));
     assertFalse(isWikiWord("12th"));
     assertFalse(isWikiWord(""));
+    assertFalse(isWikiWord("parser "));
+    assertFalse(isWikiWord("Parser "));
   }
   
   public void testOddCharacters() {
