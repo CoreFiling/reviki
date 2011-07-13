@@ -25,13 +25,13 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 /**
  * Links like c2:WikiPage and WikiPage but very generous as to
  * what counts as a wiki word.
- * 
+ *
  * @author mth
  */
 public class CustomWikiLinkNode extends LinkNode {
-  
+
   public CustomWikiLinkNode(final LinkPartsHandler handler) {
-    super("(\\p{Alnum}+:)?(\\p{Alnum}+)", new CustomLinkContentSplitter(), handler);
+    super("(\\p{Alnum}+:)?(\\p{Alnum}([\\p{Alnum}\\.]*\\p{Alnum})?)", new CustomLinkContentSplitter(), handler);
   }
 
   @Override

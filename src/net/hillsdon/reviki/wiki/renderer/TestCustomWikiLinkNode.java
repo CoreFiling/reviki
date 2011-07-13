@@ -19,10 +19,45 @@ import junit.framework.TestCase;
 
 public class TestCustomWikiLinkNode extends TestCase {
 
-  public void test() {
-    CustomWikiLinkNode node = new CustomWikiLinkNode(null);
-    // We used to reject the 'See' and never consider the following text.
-    assertNotNull(node.find("\nSee ConfigInterWikiLinks (ugly at present) for configuration."));
+  private CustomWikiLinkNode _node;
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    _node = new CustomWikiLinkNode(null);
   }
-  
+
+  public void test() {
+    // We used to reject the 'See' and never consider the following text.
+    assertNotNull(_node.find("\nSee ConfigInterWikiLinks (ugly at present) for configuration."));
+  }
+
+  public void testNoMatch() {
+    assertNull(_node.find("Some text without link"));
+  }
+
+  public void testMatch() {
+    assertEquals("WikiLink", _node.find("Some text with a WikiLink").group());
+  }
+
+  public void testMatchDot() {
+    assertEquals("Link1.0", _node.find("Some text with a Link1.0").group());
+  }
+
+  public void testMatchInterWikiDot() {
+    assertEquals("wiki:Link1.0", _node.find("Some text with a wiki:Link1.0").group());
+  }
+
+  public void testMatchInterWikiMultipleDots() {
+    assertEquals("wiki:Link1.0.0", _node.find("Some text with a wiki:Link1.0.0").group());
+  }
+
+  public void testMatchInterWikiMultipleAdjacentDots() {
+    assertEquals("wiki:Link1..0", _node.find("Some text with a wiki:Link1..0").group());
+  }
+
+  public void testMatchInterWikiMultipleAdjacentDotsEnding() {
+    assertEquals("wiki:Link1", _node.find("Some text with a wiki:Link1..").group());
+  }
+
 }
