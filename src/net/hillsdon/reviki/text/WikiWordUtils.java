@@ -27,11 +27,11 @@ import java.util.List;
 public final class WikiWordUtils {
 
   /**
-   * Takes the last '/' component of a '/' separated path and splits the last
+   * Extracts the last component of a '/' separated path and splits the last
    * component as a wiki word.
-   * 
+   *
    * @param path The path.
-   * @return e.g. "foo/BarHumbug" gives "Bar humbug".
+   * @return e.g. "foo/BarHumbug" gives "Bar Humbug".
    */
   public static String pathToTitle(final String path) {
     List<String> parts = splitCamelCase(lastComponentOfPath(path));
@@ -57,7 +57,7 @@ public final class WikiWordUtils {
    * @return true if it looks like a wiki word.
    */
   public static boolean isWikiWord(final String text) {
-    return hasNoWhitespace(text) && startsUpperCase(text) && (isAbbreviation(text) || hasCamelCaseParts(text)); 
+    return hasNoWhitespace(text) && startsUpperCase(text) && (isAbbreviation(text) || hasCamelCaseParts(text));
   }
 
   private static boolean hasCamelCaseParts(final String text) {
@@ -76,10 +76,10 @@ public final class WikiWordUtils {
   private static boolean hasNoWhitespace(final String text) {
     return text.split("\\s", -1).length == 1;
   }
-  
+
   /**
    * Splits camel case.
-   * 
+   *
    * Behaviour undefined for strings containing punctuation/whitespace.
    * Note that here uppercase is defined as !Character.isLowerCase(char)
    * notably, this includeds digits.
@@ -90,19 +90,23 @@ public final class WikiWordUtils {
     int takenLength = 0;
     boolean lastLower = false;
     boolean nextLower = isNextLower(chars, -1);
+    boolean lastNeutral = false;
+    boolean currentNeutral = false;
     for (int i = 0; i < chars.length; ++i) {
       boolean currentUpper = !nextLower;
       boolean lastUpper = !lastLower && i > 0;
       nextLower = isNextLower(chars, i);
+      currentNeutral = isCurrentNeutral(chars, i);
 
       // Step up is e.g. aB, step down is Ab.
-      boolean stepUp = lastLower && currentUpper;
-      boolean nextStepDown = lastUpper && currentUpper && nextLower;
+      boolean stepUp = lastLower && (currentUpper && !currentNeutral);
+      boolean nextStepDown = (lastUpper && !lastNeutral) && (currentUpper && !currentNeutral) && nextLower;
       if (stepUp || nextStepDown) {
         result.add(in.substring(takenLength, i));
         takenLength = i;
       }
       lastLower = !currentUpper;
+      lastNeutral = currentNeutral;
     }
     result.add(in.substring(takenLength));
     return result;
@@ -112,6 +116,14 @@ public final class WikiWordUtils {
     if (currentPos + 1 < chars.length) {
       char c = chars[currentPos + 1];
       return  Character.isLowerCase(c);
+    }
+    return false;
+  }
+
+  private static boolean isCurrentNeutral(final char[] chars, final int currentPos) {
+    if (currentPos < chars.length) {
+      char c = chars[currentPos];
+      return  !Character.isLetterOrDigit(c);
     }
     return false;
   }
