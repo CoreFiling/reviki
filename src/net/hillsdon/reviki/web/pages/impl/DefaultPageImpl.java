@@ -227,7 +227,10 @@ public class DefaultPageImpl implements DefaultPage {
       storeName = fileName;
     }
     else if (storeName.indexOf('.') == -1) {
-      storeName += fileName.substring(fileName.indexOf('.'));
+      final int indexOfDotInFileName = fileName.indexOf('.');
+      if(indexOfDotInFileName!=-1) {
+        storeName += fileName.substring(indexOfDotInFileName);
+      }
     }
     String operation = baseRevision < 0 ? "Added" : "Updated";
     _store.attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);

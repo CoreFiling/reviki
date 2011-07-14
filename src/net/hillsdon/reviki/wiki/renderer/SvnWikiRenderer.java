@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
@@ -38,10 +39,10 @@ public class SvnWikiRenderer implements MarkupRenderer {
   private final InternalLinker _internalLinker;
   private final CreoleRenderer _creole;
 
-  public SvnWikiRenderer(final Configuration configuration, final InternalLinker internalLinker,  final Supplier<List<Macro>> macros) {
+  public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
     _configuration = configuration;
     _internalLinker = internalLinker;
-    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, _internalLinker, _configuration);
+    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, _internalLinker, _configuration);
     _creole = new CreoleRenderer(
         new RenderNode[] {
             new UnescapedHtmlNode(true),
@@ -51,7 +52,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
         new RenderNode[] {
             new JavaSyntaxHighlightedNode(false),
             new UnescapedHtmlNode(false),
-            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, _internalLinker, _configuration)),
+            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, _internalLinker, _configuration)),
             new CreoleLinkNode(linkHandler),
             new CustomWikiLinkNode(linkHandler),
             new MacroNode(macros, false),

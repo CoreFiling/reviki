@@ -39,7 +39,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
  * 
  * @author mth
  */
-public class SimplePageStore implements CachingPageStore {
+public class SimplePageStore extends AbstractPageStore implements CachingPageStore {
 
   private String _wiki;
   private Map<PageReference, PageInfo> _pages = new LinkedHashMap<PageReference, PageInfo>();

@@ -35,26 +35,26 @@ public class InternalLinker {
 
   private boolean exists(final String name) {
     try {
-      return _store.list().contains(new PageReferenceImpl(name));
+      return _store.exists(new PageReferenceImpl(name));
     }
     catch (PageStoreException e) {
       throw new RuntimeException(e);
     }
   }
-  
+
   public String url(final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
     return _wikiUrls.page(null, pageName, extra, urlOutputFilter);
   }
-  
+
   public String url(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
     return _wikiUrls.page(wikiName, pageName, extra, urlOutputFilter);
   }
-  
+
   public String aHref(final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
     String x = aHref(null, pageName, linkText, extra, urlOutputFilter);
     return x;
   }
-  
+
   /**
    * Generate a hyperlink.
    * @param wikiName If not-null it will generate a foreign-wiki link (which will always be deemed to exist)
@@ -68,7 +68,7 @@ public class InternalLinker {
     if (!exists && isAcronym(pageName)) {
       return Escape.html(pageName);
     }
-    
+
     final String otherAttrs = exists ? "" : "rel='nofollow' ";
     final String cssClass = exists ? "existing-page" : "new-page";
     return format("<a %sclass='%s' href='%s'>%s</a>",
@@ -78,5 +78,5 @@ public class InternalLinker {
       Escape.html(linkText)
     );
   }
-  
+
 }

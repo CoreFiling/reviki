@@ -49,6 +49,12 @@ public interface PageStore {
    * @return A all pages.
    */
   Set<PageReference> list() throws PageStoreException;
+  
+  /**
+   * @param page A page name.
+   * @return Whether page exists.
+   */
+  boolean exists(PageReference page) throws PageStoreException;
 
   /**
    * @param limit Maximum number of entries to return.

@@ -18,6 +18,7 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.Collections;
 
+import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
@@ -41,10 +42,10 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
   protected String render(final String input) throws IOException, PageStoreException {
     SvnWikiRenderer renderer = new SvnWikiRenderer(
         new FakeConfiguration(),
-        new InternalLinker(
-            new ExampleDotComWikiUrls(),
-            new SimplePageStore()),
-            Suppliers.ofInstance(Collections.<Macro>emptyList()));
+        new SimplePageStore(),
+            new InternalLinker(
+                new ExampleDotComWikiUrls(),
+                new SimplePageStore()), Suppliers.ofInstance(Collections.<Macro>emptyList()));
     return renderer.render(new PageReferenceImpl(""), input, URLOutputFilter.NULL).toXHTML();
   }
 

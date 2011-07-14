@@ -130,7 +130,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class), cachingPageStore);
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), internalLinker, new Supplier<List<Macro>>() {
+    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
         List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
         macros.addAll(_plugins.getImplementations(Macro.class));

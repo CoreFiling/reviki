@@ -76,7 +76,7 @@ import com.google.common.collect.Ordering;
  *
  * @author mth
  */
-public class SVNPageStore implements PageStore {
+public class SVNPageStore extends AbstractPageStore {
 
   static final class SVNRenameAction extends SVNEditAction {
     private final PageReference _toPath;
@@ -317,7 +317,7 @@ public class SVNPageStore implements PageStore {
 
         if (addLinkToPage) {
           final boolean isImage = _mimeIdentifier.isImage(storeName);
-          final String link = (isImage ? "{{" : "[[") + storeName + (isImage ? "}}" : "]]");
+          final String link = (isImage ? "{{" : "[[") + "attachments/" + storeName + "|" + storeName + (isImage ? "}}" : "]]");
           final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
           commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), -1);
           set(commitEditor, ref.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)));

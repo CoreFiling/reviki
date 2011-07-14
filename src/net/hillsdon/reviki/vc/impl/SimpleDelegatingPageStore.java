@@ -24,7 +24,7 @@ import net.hillsdon.reviki.vc.PageStore;
  * 
  * @author mth
  */
-public class SimpleDelegatingPageStore extends AbstractDelegatingPageStore implements PageStore {
+public class SimpleDelegatingPageStore extends AbstractDelegatingPageStore {
 
   private final PageStore _delegate;
 

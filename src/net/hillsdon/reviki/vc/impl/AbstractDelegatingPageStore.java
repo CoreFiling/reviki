@@ -38,7 +38,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
  * 
  * @author mth
  */
-public abstract class AbstractDelegatingPageStore implements PageStore {
+public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
 
   /**
    * @return The delegate to use.  This is called for each delegation.
