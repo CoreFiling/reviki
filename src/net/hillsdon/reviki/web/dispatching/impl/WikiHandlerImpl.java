@@ -47,7 +47,7 @@ import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
 
 /**
  * A particular wiki (sub-wiki, whatever).
- * 
+ *
  * @author mth
  */
 public class WikiHandlerImpl implements WikiHandler {
@@ -89,17 +89,17 @@ public class WikiHandlerImpl implements WikiHandler {
       }
     });
   }
-  
+
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return handleInternal(path, request, response, new RequestHandler() {
       public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setAttribute(WikiUrls.KEY, _wikiUrls);
-        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath(), "", URLOutputFilter.NULL) + "?ctype=raw");
+        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath(), null, "ctype=raw", null, URLOutputFilter.NULL));
         request.setAttribute("internalLinker", _internalLinker);
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);
         }
-        
+
         _syncUpdater.sync();
         addSideBarEtcToRequest(request, response);
         return _pageHandler.handle(path, request, response);

@@ -29,7 +29,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.
- * 
+ *
  * @copyright
  * @author mth
  */
@@ -38,7 +38,8 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
   private static final long serialVersionUID = 1L;
   private String _wiki;
   private String _page;
-  private String _extra = "";
+  private String _extraPath = null;
+  private String _query = null;
   private boolean _session = true;
 
   public String getPage() {
@@ -48,21 +49,29 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
   public void setPage(final String page) {
     _page = page;
   }
-  
+
   public String getWiki() {
     return _wiki;
   }
-  
+
   public void setWiki(final String wiki) {
     _wiki = wiki;
   }
 
-  public String getExtra() {
-    return _extra;
+  public String getExtraPath() {
+    return _extraPath;
   }
 
-  public void setExtra(final String extra) {
-    _extra = extra;
+  public void setExtraPath(final String extraPath) {
+    _extraPath = extraPath;
+  }
+
+  public String getQuery() {
+    return _query;
+  }
+
+  public void setQuery(String query) {
+    _query = query;
   }
 
   public boolean isSession() {
@@ -90,6 +99,6 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
   }
 
   protected abstract String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter);
-  
+
 }
 

@@ -15,12 +15,15 @@
  */
 package net.hillsdon.fij.text;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 
 
 public class Escape {
-
+  
   /**
    * Avoid encoding an entire link that you wish a browser to use,
    * such as "http://....". Instead, encode only what is required.
@@ -31,10 +34,30 @@ public class Escape {
    * @param content
    * @return
    */
-  public static String urlEncodeUTF8(final String content) {
+  public static String urlEncodeUTF8(final String path) {
+    return urlEncodeUTF8(path, null, null, null);
+  }
+  
+  public static String urlEncodeUTF8(final String path, final String query, final String fragment) {
+    return urlEncodeUTF8(path, query, fragment, null);
+  }
 
+  public static String urlEncodeUTF8(final String path, final String query, final String fragment, final String extraPath) {
     try {
-      return URIUtil.encodeWithinPath(content, "UTF-8");
+      StringBuilder sb = new StringBuilder();
+      sb.append(URIUtil.encodeWithinPath(path, "UTF-8"));
+      if (extraPath != null) {
+        sb.append(extraPath);
+      }
+      if (query != null) {
+        sb.append("?");
+        sb.append(URIUtil.encodeQuery(query, "UTF-8"));
+      }
+      if (fragment != null) {
+        sb.append("#");
+        sb.append(URIUtil.encodeWithinPath(fragment, "UTF-8"));
+      }
+      return sb.toString();
     }
     catch(URIException ex) {
       throw new Error("Java supports UTF-8!", ex);

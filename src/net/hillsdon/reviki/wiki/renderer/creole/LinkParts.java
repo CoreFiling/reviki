@@ -21,10 +21,28 @@ public class LinkParts {
   private final String _text;
   private final String _wiki;
   private final String _refd;
+  private final String _fragment;
+  private final String _pagePath;
+
   public LinkParts(final String text, final String wiki, final String refd) {
     _text = text;
     _wiki = wiki;
     _refd = refd == null ? "" : refd;
+    if (!isURL()) {
+      final int indexOfHash = _refd.lastIndexOf('#');
+      if (indexOfHash != -1) {
+        _fragment = _refd.substring(indexOfHash + 1);
+        _pagePath = _refd.substring(0, indexOfHash);
+      }
+      else {
+        _fragment = null;
+        _pagePath = _refd;
+      }
+    }
+    else {
+      _fragment = null;
+      _pagePath = null;
+    }
   }
   public String getText() {
     return _text;
@@ -35,6 +53,12 @@ public class LinkParts {
   public String getRefd() {
     return _refd;
   }
+  public String getPagePath() {
+    return _pagePath;
+  }
+  public String getFragment() {
+    return _fragment;
+  }
   public boolean isURL() {
     return _wiki == null && getRefd().matches("\\p{L}+?:.*");
   }
@@ -43,9 +67,9 @@ public class LinkParts {
   public String toString() {
     return getClass().getSimpleName() + Arrays.asList(_text, _wiki, _refd).toString();
   }
-  
-  // Eclipse generated, yes it is obsene but it's easy and correct. 
-  
+
+  // Eclipse generated, yes it is obsene but it's easy and correct.
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -84,5 +108,5 @@ public class LinkParts {
       return false;
     return true;
   }
-  
+
 }

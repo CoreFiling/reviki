@@ -19,7 +19,12 @@
         <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-        <name>extra</name>
+        <name>extraPath</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>query</name>
         <required>false</required>
         <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -44,7 +49,12 @@
         <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-        <name>extra</name>
+        <name>extraPath</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>query</name>
         <required>false</required>
         <rtexprvalue>true</rtexprvalue>
       </attribute>

@@ -27,11 +27,12 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 public abstract class AbstractWikiUrls implements WikiUrls {
 
   public final String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
-    return page(wikiName, name, "", urlOutputFilter);
+    return page(wikiName, name, null, null, null, urlOutputFilter);
   }
 
-  public String page(final String wikiName, final String pageName, final String extraUnescaped, final URLOutputFilter urlOutputFilter) {
-    return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.urlEncodeUTF8(pageName) + extraUnescaped);
+  public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+    String path = pageName;
+    return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.urlEncodeUTF8(path, query, fragment, extraPath));
   }
 
   public String interWikiTemplate() {
@@ -51,7 +52,7 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   }
 
   public final String feed(final String wikiName, final URLOutputFilter urlOutputFilter) {
-    return page(wikiName, "RecentChanges", "?ctype=atom", urlOutputFilter);
+    return page(wikiName, "RecentChanges", null, "ctype=atom", null, urlOutputFilter);
   }
 
   public final String resource(final String path) {

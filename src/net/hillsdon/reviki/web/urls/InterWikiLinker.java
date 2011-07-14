@@ -45,12 +45,12 @@ public class InterWikiLinker {
    * @throws UnknownWikiException If wikiName is unknown.
    * @see #addWiki(String, String)
    */
-  public String url(final String wikiName, final String pageName) throws UnknownWikiException {
+  public String url(final String wikiName, final String pageName, final String fragment) throws UnknownWikiException {
     String formatString = _links.get(wikiName);
     if (formatString == null) {
       throw new UnknownWikiException();
     }
-    return formatString.replace("%s", Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName)));
+    return formatString.replace("%s", Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(pageName), null, fragment));
   }
 
   /**

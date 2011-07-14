@@ -18,16 +18,16 @@ public class TestInterWikiLinker extends TestCase {
 
   public void testSubstitution() throws Exception {
     _linker.addWiki("foo", "%s%s");
-    assertEquals("barbar", _linker.url("foo", "bar"));
-    assertEquals("%20%20", _linker.url("foo", " "));
-    assertEquals("++", _linker.url("foo", "+"));
+    assertEquals("barbar", _linker.url("foo", "bar", null));
+    assertEquals("%20%20", _linker.url("foo", " ", null));
+    assertEquals("++", _linker.url("foo", "+", null));
   }
 
   public void testSubstitutionWithPercentEscapes() throws Exception {
     // This used to go wrong because of foolish use of String.format.
     String urlPrefix = "https://bugs.example.org/buglist.cgi?product=True%20North%20iXBRL%20Module&";
     _linker.addWiki("foo", urlPrefix + "priority=P%s");
-    assertEquals(urlPrefix + "priority=P2", _linker.url("foo", "2"));
+    assertEquals(urlPrefix + "priority=P2", _linker.url("foo", "2", null));
   }
 
 }

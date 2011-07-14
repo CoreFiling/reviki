@@ -42,16 +42,16 @@ public class InternalLinker {
     }
   }
 
-  public String url(final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
-    return _wikiUrls.page(null, pageName, extra, urlOutputFilter);
+  public String url(final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(null, pageName, extraPath, query, fragment, urlOutputFilter);
   }
 
-  public String url(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
-    return _wikiUrls.page(wikiName, pageName, extra, urlOutputFilter);
+  public String url(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+    return _wikiUrls.page(wikiName, pageName, extraPath, query, fragment, urlOutputFilter);
   }
 
-  public String aHref(final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
-    String x = aHref(null, pageName, linkText, extra, urlOutputFilter);
+  public String aHref(final String pageName, final String linkText, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+    String x = aHref(null, pageName, linkText, extraPath, query, fragment, urlOutputFilter);
     return x;
   }
 
@@ -62,7 +62,7 @@ public class InternalLinker {
    * @param linkText The text to display
    * @return The html
    */
-  public String aHref(final String wikiName, final String pageName, final String linkText, final String extra, final URLOutputFilter urlOutputFilter) {
+  public String aHref(final String wikiName, final String pageName, final String linkText, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
     // Special case: only link acronyms with real pages or on foreign wikis.
     final boolean exists = wikiName!=null || exists(pageName);
     if (!exists && isAcronym(pageName)) {
@@ -74,7 +74,7 @@ public class InternalLinker {
     return format("<a %sclass='%s' href='%s'>%s</a>",
       otherAttrs,
       cssClass,
-      Escape.html(url(wikiName, pageName, extra, urlOutputFilter)),
+      Escape.html(url(wikiName, pageName, query, extraPath, fragment, urlOutputFilter)),
       Escape.html(linkText)
     );
   }

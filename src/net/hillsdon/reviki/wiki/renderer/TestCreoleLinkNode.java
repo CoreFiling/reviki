@@ -43,6 +43,10 @@ public class TestCreoleLinkNode extends TestCase {
     assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage1.1'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage1.1|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
+  public void testInternalWithAnchor() {
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage#anchor'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage#anchor|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+  }
+
   public void testInterWiki() {
     assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }

@@ -20,7 +20,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 /**
  * Uses an {@link InternalLinker} to create URLs to wiki pages.
- * 
+ *
  * @copyright
  * @author mth
  */
@@ -29,8 +29,8 @@ public class WikiUrlTag extends AbstractWikiLinkTag {
   private static final long serialVersionUID = 1L;
 
   protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
-    return linker.url(getPage(), getExtra(), urlOutputFilter);
+    return linker.url(getPage(), getExtraPath(), getQuery(), null, urlOutputFilter);
   }
-  
+
 }
 

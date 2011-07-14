@@ -44,7 +44,7 @@ public interface WikiUrls extends ResourceUrls {
 
   String search(URLOutputFilter urlOutputFilter);
 
-  String page(String wikiName, String pageName, String extra, URLOutputFilter urlOutputFilter);
+  String page(String wikiName, String pageName, String extraPath, String query, String fragment, URLOutputFilter urlOutputFilter);
 
   String page(String wikiName, String pageName, URLOutputFilter urlOutputFilter);
 

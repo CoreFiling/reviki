@@ -65,7 +65,7 @@ public class TestFeedWriter extends TestCase {
       public String resource(final String path) {
         return "favicon";
       }
-      public String page(final String wikiName, final String pageName, final String extra, final URLOutputFilter urlOutputFilter) {
+      public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
         return "page";
       }
       public WikiConfiguration getWiki() {

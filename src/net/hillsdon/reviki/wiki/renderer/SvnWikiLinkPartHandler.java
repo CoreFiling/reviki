@@ -58,7 +58,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     // Inter-wiki
     else if (link.getWiki() != null) {
       try {
-        return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getRefd()), link.getText(), urlOutputFilter);
+        return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getPagePath(), link.getFragment()), link.getText(), urlOutputFilter);
       }
       catch (UnknownWikiException e) {
         return link.getText();
@@ -98,7 +98,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
         return link(page, renderer, "attachment", attachmentRefd, link.getText(), urlOutputFilter);
       }
       else {
-        return _internalLinker.aHref(link.getRefd(), link.getText(), "", urlOutputFilter);
+        return _internalLinker.aHref(link.getPagePath(), link.getText(), null, null, link.getFragment(), urlOutputFilter);
       }
     }
   }
