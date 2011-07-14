@@ -59,7 +59,7 @@ import org.apache.lucene.search.Hit;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
@@ -371,7 +371,7 @@ public class LuceneSearcher implements SearchEngine {
         // Prefer path, then title then content matches (match equality is on page name)
         for (String field : ALL_SEARCH_FIELDS) {
           if (field.equals(FIELD_PATH_LOWER)) {
-            final Query query = new PrefixQuery(new Term(FIELD_PATH_LOWER, queryString.toLowerCase()));
+            final Query query = new WildcardQuery(new Term(FIELD_PATH_LOWER, "*" + queryString.toLowerCase() + "*"));
             results.addAll(doQuery(reader, analyzer, searcher, field, provideExtracts, query));
           }
           else {

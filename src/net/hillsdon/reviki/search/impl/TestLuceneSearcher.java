@@ -47,8 +47,11 @@ public class TestLuceneSearcher extends TestCase {
   private static final String PAGE_THE_NAME = "TheName";
   private static final String PAGE_THE_NAME2 = "TheName2";
   private static final String PAGE_THE_NAME3 = "TheName3";
+  private static final String PAGE_THE_NAME4 = "TheNameJoint";
   private static final Set<SearchMatch> JUST_THE_PAGE = unmodifiableSet(singleton(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null)));
-  private static final Set<SearchMatch> ALL_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null)));
+  private static final Set<SearchMatch> JUST_THE_PAGE4 = unmodifiableSet(singleton(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME4, null)));
+  private static final Set<SearchMatch> FIRST_3 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null)));
+  private static final Set<SearchMatch> ALL_4 = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME3, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME4, null)));
 
   private static File createTempDir() throws IOException {
     File file = File.createTempFile("testDir", "");
@@ -115,6 +118,15 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
     assertEquals(JUST_THE_PAGE, _searcher.search(PAGE_THE_NAME, true, false));
     assertEquals(JUST_THE_PAGE, _searcher.search("path:The*", false, false));
+  }
+
+  public void testFindsByPathMultipleWords() throws Exception {
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "the content");
+    _searcher.index(WIKI_NAME, PAGE_THE_NAME4, -1, "the content");
+    assertEquals(ALL_4, _searcher.search("TheNam", false, false));
+    assertEquals(JUST_THE_PAGE4, _searcher.search("NameJoi", false, false));
   }
 
   public void testFindsCaseInsensitivelyByPath() throws Exception {
@@ -191,7 +203,7 @@ public class TestLuceneSearcher extends TestCase {
     _searcher.index(WIKI_NAME, PAGE_THE_NAME, -1, "some content");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME2, -1, "some");
     _searcher.index(WIKI_NAME, PAGE_THE_NAME3, -1, "content");
-    assertEquals(ALL_3, _searcher.search("some OR content", false, false));
+    assertEquals(FIRST_3, _searcher.search("some OR content", false, false));
   }
 
   public void testLowercaseOrIsNotKeyword() throws Exception {
