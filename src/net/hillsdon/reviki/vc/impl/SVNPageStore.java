@@ -48,7 +48,6 @@ import net.hillsdon.reviki.vc.MimeIdentifier;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;

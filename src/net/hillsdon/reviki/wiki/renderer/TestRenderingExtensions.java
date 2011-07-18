@@ -18,7 +18,6 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.Collections;
 
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;

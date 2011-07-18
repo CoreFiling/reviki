@@ -1,6 +1,5 @@
 package net.hillsdon.reviki.web.dispatching.impl;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
