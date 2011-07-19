@@ -23,14 +23,13 @@
   </c:if>
   <link rel="stylesheet" href="<c:out value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
-  <link rel="stylesheet" href="<sw:resourceUrl path="jquery.suggest.css"/>" media="screen" type="text/css" />
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.core.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.widget.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.tabs.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.dimensions.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.bgiframe.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.suggest.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.position.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.html.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.hotkeys.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.textchange.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>

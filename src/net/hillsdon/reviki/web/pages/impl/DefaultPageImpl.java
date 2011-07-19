@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
+import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
@@ -76,6 +79,8 @@ import org.apache.commons.io.IOUtils;
 public class DefaultPageImpl implements DefaultPage {
 
   public static final String ATTR_PREVIEW = "preview";
+
+  public static final String SUBMIT_DELETE = "delete";
 
   public static final String SUBMIT_SAVE = "save";
 
@@ -238,27 +243,42 @@ public class DefaultPageImpl implements DefaultPage {
 
   public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
-    return new View() {
-      public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
-        _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
-          public void setContentType(final String contentType) {
-            response.setContentType(contentType);
-          }
+    if (request.getParameter(SUBMIT_DELETE) != null) {
+      long baseRevision = -1;
+      _store.deleteAttachment(page, attachmentName, baseRevision, "");
+      return new RedirectToPageView(_wikiUrls, page, "/attachments/");
+    }
+    else {
+      return new View() {
+        public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
+          _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
+            public void setContentType(final String contentType) {
+              response.setContentType(contentType);
+            }
 
-          public void setFileName(final String name) {
-            response.setHeader("Content-Disposition", "attachment: filename=" + attachmentName);
-          }
+            public void setFileName(final String name) {
+              response.setHeader("Content-Disposition", "attachment: filename=" + attachmentName);
+            }
 
-          public OutputStream stream() throws IOException {
-            return response.getOutputStream();
-          }
-        });
-      }
-    };
+            public OutputStream stream() throws IOException {
+              return response.getOutputStream();
+            }
+          });
+        }
+      };
+    }
   }
 
   public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    request.setAttribute("attachments", _store.attachments(page));
+    Collection<AttachmentHistory> allAttachments = _store.attachments(page);
+    Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
+    Collection<AttachmentHistory> deletedAttachments = new LinkedList<AttachmentHistory>();
+    for (AttachmentHistory history: allAttachments) {
+      if (history.isAttachmentDeleted()) deletedAttachments.add(history);
+      else currentAttachments.add(history);
+    }
+    request.setAttribute("currentAttachments", currentAttachments);
+    request.setAttribute("deletedAttachments", deletedAttachments);
     return new JspView("Attachments");
   }
 

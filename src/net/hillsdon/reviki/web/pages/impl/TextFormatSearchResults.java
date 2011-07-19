@@ -25,13 +25,13 @@ import net.hillsdon.reviki.web.common.View;
 
 /**
  * Currently used by the JavaScript to display the autocomplete search box.
- * 
+ *
  * Perhaps JSON would be better.
- * 
+ *
  * @author mth
  */
 public class TextFormatSearchResults implements View {
-  
+
   private final Iterable<SearchMatch> _results;
 
   public TextFormatSearchResults(final Iterable<SearchMatch> results) {
@@ -42,17 +42,13 @@ public class TextFormatSearchResults implements View {
     response.setContentType("text/plain");
     PrintWriter writer = response.getWriter();
     for (SearchMatch matcher : _results) {
-      String spanClass;
-      String spanText;
       if (matcher.isSameWiki()) {
         writer.println(matcher.getPage());
       }
       else {
-        //TODO: Can't currently find a clean way to pass wiki name / foreign flag to jquery suggest.
-        //Unlike autocomplete, it doesn't have an easy way to provide a parser for items.
-        writer.println(matcher.getPage());
+        writer.println(matcher.getWiki() + ":" + matcher.getPage());
       }
     }
   }
-  
+
 }

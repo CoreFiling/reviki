@@ -60,7 +60,7 @@ public class TestAttachments extends WebTestSupport {
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
     assertEquals(ERROR_NO_FILE, getErrorMessage(attachments));
   }
-  
+
   public void testUploadAndDownloadAttachment() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "Content", "", true);
@@ -70,13 +70,35 @@ public class TestAttachments extends WebTestSupport {
     // A link should have been added to the page.
     page = getWikiPage(name);
     assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
-    
+
     attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
     form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
     attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
     assertEquals("File 2.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
+    HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
+    assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
+  }
+
+  public void testUploadAndDeleteAttachment() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    HtmlPage page = editWikiPage(name, "Content", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
+    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+
+    page = getWikiPage(name);
+    attachments = clickAttachmentsLink(page, name);
+    HtmlAnchor delete = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?delete')]").get(0);
+    attachments = delete.click();
+
+    // There shouldn't be any link directly to the attachment
+    for(Object o: attachments.getByXPath("//a[contains(@href, 'file.txt')]")) {
+      HtmlAnchor anchor = (HtmlAnchor) o;
+      assertEquals(true, anchor.getHrefAttribute().contains("?revision"));
+    }
+
+    // Previous version should still be available
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
   }

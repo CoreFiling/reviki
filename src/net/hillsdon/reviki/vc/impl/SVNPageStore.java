@@ -274,6 +274,16 @@ public class SVNPageStore extends AbstractPageStore {
     return PageInfo.DELETED;
   }
 
+  public long deleteAttachment(final PageReference pageRef, final String attachmentName, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    final String path = pageRef.getAttachmentPath() + "/" + attachmentName;
+    return _operations.execute(new SVNEditAction(commitMessage) {
+      @Override
+      protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException {
+        _operations.delete(commitEditor, path, baseRevision);
+      }
+    });
+  }
+
   private void set(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException, IOException {
     if (baseRevision < 0) {
       _operations.create(commitEditor, path, content);
@@ -335,18 +345,18 @@ public class SVNPageStore extends AbstractPageStore {
         if (change.getKind() == StoreKind.ATTACHMENT) {
           AttachmentHistory history = results.get(change.getName());
           if (history == null) {
-            history = new AttachmentHistory();
+            history = new AttachmentHistory(change.getChangeType()==ChangeType.DELETED);
             results.put(change.getName(), history);
           }
-          history.getVersions().add(change);
+          if(change.getChangeType()!=ChangeType.DELETED) history.getVersions().add(change);
         }
       }
       // We need to log and ls - consider the case of copying an attachment *directory*.
       for (SVNDirEntry attachment : _operations.ls(attachmentPath)) {
         if (!results.containsKey(attachment.getName())) {
-          AttachmentHistory history = new AttachmentHistory();
+          AttachmentHistory history = new AttachmentHistory(false);
           ChangeInfo change = new ChangeInfo(ref.getName(), attachment.getName(), attachment.getAuthor(), attachment.getDate(), attachment.getRevision(), attachment.getCommitMessage(), StoreKind.ATTACHMENT, ChangeType.ADDED, null, -1);
-          history.getVersions().add(change);
+          if(change.getChangeType()!=ChangeType.DELETED) history.getVersions().add(change);
           results.put(attachment.getName(), history);
         }
       }

@@ -264,9 +264,9 @@ public class LuceneSearcher implements SearchEngine {
           if (iterator.hasNext()) {
             Hit hit = (Hit) iterator.next();
             String outgoingLinks = hit.getDocument().get(FIELD_OUTGOING_LINKS);
-            Set<String> results = ImmutableSet.copyOf(outgoingLinks.split("\\s"));
+            Set<String> results = Sets.newHashSet(outgoingLinks.split("\\s"));
             results.remove(page);
-            return results;
+            return ImmutableSet.copyOf(results);
           }
           return Collections.emptySet();
         }

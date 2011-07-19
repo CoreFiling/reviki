@@ -31,27 +31,28 @@ import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;
 
 /**
  * Partial implementation suitable for tests.
- * 
+ *
  * @author mth
  */
 public class SimplePageStore extends AbstractPageStore implements CachingPageStore {
 
   private String _wiki;
   private Map<PageReference, PageInfo> _pages = new LinkedHashMap<PageReference, PageInfo>();
-  
+
   public SimplePageStore() {
     this("");
   }
-  
+
   public SimplePageStore(final String wiki) {
     _wiki = wiki;
   }
-  
+
   public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     PageInfo page = _pages.get(ref);
     if (page == null) {
@@ -74,6 +75,10 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     PageInfo page = new PageInfoImpl(getWiki(), ref.getPath(), content, revision, revision, null, null, null, null, null);
     _pages.put(ref, page);
     return revision;
+  }
+
+  public long deleteAttachment(PageReference ref, String attachmentName, long baseRevision, String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    throw new UnsupportedOperationException();
   }
 
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
@@ -125,5 +130,5 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
   public String getWiki() throws PageStoreException {
     return _wiki;
   }
-  
+
 }

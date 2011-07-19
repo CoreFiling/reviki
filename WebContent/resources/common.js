@@ -19,17 +19,130 @@ reviki.formAsJavaScriptLink = function(formId, linkText) {
 	  parent.insertBefore(a, space);
 	}
 }
+
+
+function parseTxtResults(txt, q, options) {
+  
+  var items = [];
+  var tokens = txt.split(options.delimiter);
+  
+  // parse returned data for non-empty items and prepare them for the autocomplete
+  for (var i = 0; i < tokens.length; i++) {
+    var tokenValue = $.trim(tokens[i]);
+    if (tokenValue) {
+      colonIndex = tokenValue.indexOf(':');
+      if (colonIndex > -1) {
+        tokenCategory = tokenValue.substring(0, colonIndex + 1);
+        tokenValue = tokenValue.substring(colonIndex + 1);
+      }
+      else {
+        tokenCategory = "";
+      }
+      tokenLabel = tokenValue.replace(
+          new RegExp(q, 'ig'), 
+          function(q) { return '<span class="' + options.matchClass + '">' + q + '</span>' }
+          );
+      items[items.length] = {label:tokenLabel, value:tokenValue, category:tokenCategory};
+    }
+  }
+  return items;
+}
+
 reviki.configureAutoSuggest = function() {
-  var queryInput = $("#query");
-  if (queryInput.length == 1) {
-    queryInput.attr["autocomplete"] = "off";
-    queryInput.suggest(reviki.SEARCH_URL + "?ctype=txt&limit=20&force", {
-      param: "query",
-      onSelect: function() {
-        $("#searchForm").submit();
+  var options = {};
+  options.source = reviki.SEARCH_URL + "?ctype=txt&limit=20&force";
+  options.param = 'query';
+  options.delay = 100;
+  options.selectClass = 'ui-autocomplete-over';
+  options.matchClass = 'ui-autocomplete-match';
+  options.minchars = 2;
+  options.delimiter = '\n';
+  
+  var searchBox = $("#query"); 
+  var cancelSearch = false;
+  var prevQuery = "";
+  var cache = {};
+  var lastXhr;
+  
+  $.widget( "custom.catcomplete", $.ui.autocomplete, {
+    _renderMenu: function( ul, items ) {
+      var self = this,
+        currentCategory = "";
+      $.each( items, function( index, item ) {
+        if ( item.category != currentCategory ) {
+          ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+          currentCategory = item.category;
+        }
+        self._renderItem( ul, item );
+      });
+    }
+  });
+  
+  var suggestions = searchBox.catcomplete({
+    minLength: options.minchars,
+    delay: options.delay,
+    select: function(event, ui) {
+      $("#searchForm").val(ui.item.value);
+      $("#searchForm").submit();
+      return false;
+    },
+    html: true
+  });
+  
+  searchBox.catcomplete("option", "source", function(request, response) {
+    var term;
+    term = request.term;
+    if (term in cache) {
+      response(cache[term]);
+      return;
+    }
+    query = {};
+    query[options.param] = term;
+    lastXhr = $.ajax({
+      url: options.source,
+      data: query,
+      success: function(txtData, status, xhr) {
+        if(!cancelSearch) {
+          data = parseTxtResults(txtData, term, options);
+          cache[term] = data;
+          if(xhr==lastXhr) {
+            response(data);
+            suggestions.removeClass("ui-autocomplete-loading");
+          } 
+          else {
+            suggestions.data("catcomplete").pending--;
+          } 
+        }
+        else {
+          // don't response with any data if the search was cancelled, as doing so would refresh the suggestions
+          cancelSearch = false;
+          suggestions.removeClass("ui-autocomplete-loading");
+          suggestions.data("catcomplete").pending--;
+          suggestions.data("catcomplete").term = prevQuery;
+        }
+      },
+      error: function(txt) {
+        response([{label:'<span class="ui-autocomplete-searcherror">Error during the search</span>', value:""}]);
       }
     });
-  }
+  });
+  // remember the query so that it doesn't get replaced by the currently selected value
+  searchBox.bind("catcompletefocus", function(event, ui) {
+    if(!cancelSearch) {
+      cancelSearch = true;
+      prevQuery = searchBox.val();
+    }
+    else if(prevQuery == searchBox.val()) {
+      // resume searching if the searchBox didn't change (e.g. focus on item on mouse over)
+      cancelSearch = false;
+    }
+  });
+  // resume searching if the user returned to the search box
+  searchBox.bind("textchange", function(event) {
+    if(prevQuery == searchBox.val()) {
+      cancelSearch = false;
+    }
+  });
 }
 
 function shortcutForButton(id, shortcutKey, confirmMsg) {

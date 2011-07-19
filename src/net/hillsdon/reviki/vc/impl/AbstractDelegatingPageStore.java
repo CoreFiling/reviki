@@ -34,8 +34,8 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
 
 
 /**
- * Delegates all functionality to given delegate.  Subclass to alter behaviour. 
- * 
+ * Delegates all functionality to given delegate.  Subclass to alter behaviour.
+ *
  * @author mth
  */
 public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
@@ -44,10 +44,10 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
    * @return The delegate to use.  This is called for each delegation.
    */
   protected abstract PageStore getDelegate();
-  
+
   /**
    * With bonus null check.
-   * 
+   *
    * @return The page store.
    */
   private PageStore getDelegateInternal() {
@@ -72,6 +72,10 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
 
   public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
     return getDelegateInternal().set(ref, lockToken, baseRevision, content, commitMessage);
+  }
+
+  public long deleteAttachment(PageReference ref, String attachmentName, long baseRevision, String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    return getDelegateInternal().deleteAttachment(ref, attachmentName, baseRevision, commitMessage);
   }
 
   public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
@@ -109,11 +113,11 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
   public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
     return getDelegateInternal().copy(from, fromRevision, to, commitMessage);
   }
-  
+
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
     return getDelegateInternal().rename(from, to, baseRevision, commitMessage);
   }
- 
+
   public void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException {
     getDelegateInternal().assertValid();
   }

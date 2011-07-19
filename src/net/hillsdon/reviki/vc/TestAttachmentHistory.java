@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 public class TestAttachmentHistory extends TestCase {
 
   public void testGetPreviousVersions() {
-    AttachmentHistory history = new AttachmentHistory();
+    AttachmentHistory history = new AttachmentHistory(false);
     ChangeInfo firstCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Added.", StoreKind.ATTACHMENT, ChangeType.MODIFIED, null, -1);
     ChangeInfo secondCommit = new ChangeInfo("FooPage", "FooPage", "mth", new Date(), 1, "Latest edit.", StoreKind.ATTACHMENT, ChangeType.MODIFIED, null, -1);
     history.getVersions().add(secondCommit);
@@ -31,5 +31,5 @@ public class TestAttachmentHistory extends TestCase {
     assertEquals(secondCommit, history.getLatestVersion());
     assertEquals(Collections.singletonList(firstCommit), history.getPreviousVersions());
   }
-  
+
 }

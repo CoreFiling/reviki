@@ -19,6 +19,9 @@ import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.getCurrentArguments;
 
 import java.util.Date;
 import java.util.List;
@@ -32,9 +35,11 @@ import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.vc.impl.SVNPageStore.SVNRenameAction;
 
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNErrorMessage;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
  * Unit tests {@link SVNPageStore} by exploring its interactions with
@@ -49,8 +54,10 @@ public class TestSVNPageStore extends TestCase {
   private SVNPageStore _store;
   private DeletedRevisionTracker _tracker;
   private BasicSVNOperations _operations;
+  private ISVNEditor _commitEditor;
 
   protected void setUp() {
+    _commitEditor = createMock(ISVNEditor.class);
     _tracker = createMock(DeletedRevisionTracker.class);
     _operations = createMock(BasicSVNOperations.class);
     _store = new SVNPageStore("wiki", _tracker, _operations, createMock(AutoPropertiesApplier.class), new FixedMimeIdentifier());
@@ -60,6 +67,24 @@ public class TestSVNPageStore extends TestCase {
     expect(_operations.getLatestRevision()).andReturn(4L);
     replay();
     assertEquals(4, _store.getLatestRevision());
+    verify();
+  }
+
+  public void testDeleteAttachment() throws Exception {
+    final String pageName = "ThePage";
+    final PageReference pageRef = new PageReferenceImpl(pageName);
+    final String attachmentName = "attachment.txt";
+    _operations.execute((SVNEditAction) anyObject());
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+      public Object answer() throws Throwable {
+        SVNEditAction action = (SVNEditAction) getCurrentArguments()[0];
+        action.driveCommitEditor(_commitEditor, _operations);
+        return 2L;
+      }
+    });
+    _operations.delete((ISVNEditor) anyObject(), eq("ThePage-attachments/attachment.txt"), eq(-1L));
+    replay();
+    assertEquals(2, _store.deleteAttachment(pageRef, attachmentName, -1, "A delete"));
     verify();
   }
 
