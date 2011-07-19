@@ -6,8 +6,8 @@
     <uri>http://www.hillsdon.net/ns/reviki/tags</uri>
 	<function>
 		<name>urlEncode</name>
-        <function-class>net.hillsdon.fij.text.Escape</function-class>
-        <function-signature>java.lang.String urlEncodeUTF8(java.lang.String)</function-signature>
+        <function-class>org.apache.commons.httpclient.util.URIUtil</function-class>
+        <function-signature>java.lang.String encodeWithinPath(java.lang.String)</function-signature>
 	</function>
     <tag>
       <name>wikiUrl</name>
