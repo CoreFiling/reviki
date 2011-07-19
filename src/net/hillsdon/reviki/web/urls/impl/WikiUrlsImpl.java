@@ -15,6 +15,9 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
@@ -55,7 +58,12 @@ public class WikiUrlsImpl extends AbstractWikiUrls {
 
     String relative = "/pages/";
     if (givenWikiName != null) {
-      relative += Escape.urlEncodeUTF8(givenWikiName) + "/";
+      try {
+        relative += URIUtil.encodeWithinPath(givenWikiName) + "/";
+      }
+      catch (URIException e) {
+        throw new RuntimeException(e);
+      }
     }
     return _applicationUrls.url(relative);
   }

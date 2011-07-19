@@ -15,8 +15,16 @@
  */
 package net.hillsdon.reviki.web.taglib;
 
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.servlet.jsp.JspException;
+
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create URLs to wiki pages.
@@ -28,8 +36,19 @@ public class WikiUrlTag extends AbstractWikiLinkTag {
 
   private static final long serialVersionUID = 1L;
 
-  protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
-    return linker.url(getPage(), getExtraPath(), getQuery(), null, urlOutputFilter);
+  protected String doOutput(LinkResolutionContext resolver, URLOutputFilter urlOutputFilter) throws JspException {
+    URI uri;
+    try {
+      uri = resolver.resolve(null, getPage());
+      String path = uri.getPath() + (getExtraPath()==null ? "" : getExtraPath());
+      return urlOutputFilter.filterURL(new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path, getQuery(), uri.getFragment()).toASCIIString());
+    }
+    catch (UnknownWikiException e) {
+      throw new JspException(e);
+    }
+    catch (URISyntaxException e) {
+      throw new JspException(e);
+    }
   }
 
 }

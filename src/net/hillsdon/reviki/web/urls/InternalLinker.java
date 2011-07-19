@@ -15,68 +15,27 @@
  */
 package net.hillsdon.reviki.web.urls;
 
-import static java.lang.String.format;
-import static net.hillsdon.reviki.text.WikiWordUtils.isAcronym;
-import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.CachingPageStore;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import java.net.URI;
+import java.net.URISyntaxException;
 
+/**
+ * Can create links to pages on the same wiki given a page name.
+ */
 public class InternalLinker {
 
-  private final PageStore _store;
   private final WikiUrls _wikiUrls;
 
-  public InternalLinker(final WikiUrls wikiUrls, final CachingPageStore store) {
+  public InternalLinker(final WikiUrls wikiUrls) {
     _wikiUrls = wikiUrls;
-    _store = store;
   }
-
-  private boolean exists(final String name) {
-    try {
-      return _store.exists(new PageReferenceImpl(name));
-    }
-    catch (PageStoreException e) {
-      throw new RuntimeException(e);
-    }
+  
+  public URI uri(final String pageName) throws UnknownWikiException, URISyntaxException {
+    return _wikiUrls.page(pageName);
   }
-
-  public String url(final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
-    return _wikiUrls.page(null, pageName, extraPath, query, fragment, urlOutputFilter);
-  }
-
-  public String url(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
-    return _wikiUrls.page(wikiName, pageName, extraPath, query, fragment, urlOutputFilter);
-  }
-
-  public String aHref(final String pageName, final String linkText, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
-    String x = aHref(null, pageName, linkText, extraPath, query, fragment, urlOutputFilter);
-    return x;
-  }
-
-  /**
-   * Generate a hyperlink.
-   * @param wikiName If not-null it will generate a foreign-wiki link (which will always be deemed to exist)
-   * @param pageName The name of the page on wikiName
-   * @param linkText The text to display
-   * @return The html
-   */
-  public String aHref(final String wikiName, final String pageName, final String linkText, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
-    // Special case: only link acronyms with real pages or on foreign wikis.
-    final boolean exists = wikiName!=null || exists(pageName);
-    if (!exists && isAcronym(pageName)) {
-      return Escape.html(pageName);
-    }
-
-    final String otherAttrs = exists ? "" : "rel='nofollow' ";
-    final String cssClass = exists ? "existing-page" : "new-page";
-    return format("<a %sclass='%s' href='%s'>%s</a>",
-      otherAttrs,
-      cssClass,
-      Escape.html(url(wikiName, pageName, query, extraPath, fragment, urlOutputFilter)),
-      Escape.html(linkText)
-    );
+  
+  public URI uri(final String pageName, final String query) throws UnknownWikiException, URISyntaxException {
+    URI uri = _wikiUrls.page(pageName);
+    return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), query, uri.getFragment());
   }
 
 }

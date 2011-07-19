@@ -28,7 +28,7 @@ public class CustomLinkContentSplitter implements LinkContentSplitter {
     if (wikiName != null) {
       wikiName = wikiName.substring(0, wikiName.length() - 1);
     }
-    return new LinkParts(in.group(), wikiName, pageName);
+    return new LinkParts(in.group(), wikiName, pageName, null, null);
   }
 
 }

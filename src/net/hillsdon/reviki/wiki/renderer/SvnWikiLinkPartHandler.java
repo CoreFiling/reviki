@@ -15,96 +15,99 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.net.URISyntaxException;
+
 import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
 import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
-  public static final String IMAGE = "<img class='%s' src='%s' alt='%s' />";
+  public static final String IMAGE = "<img %sclass='%s' src='%s' alt='%s' />";
 
-  public static final String ANCHOR = "<a class='%s' href='%s'>%s</a>";
+  public static final String ANCHOR = "<a %sclass='%s' href='%s'>%s</a>";
 
   private final InternalLinker _internalLinker;
-
-  private final Configuration _configuration;
 
   private final String _formatString;
 
   private final PageStore _store;
 
+  private final LinkResolutionContext _linkResolutionContext;
+
+  private InterWikiLinker _interWikiLinker;
+
+  private final Configuration _configuration;
+  
+  public SvnWikiLinkPartHandler(final String formatString, final LinkResolutionContext parentContext) {
+    _formatString = formatString;
+    _internalLinker = null;
+    _store = null;
+    _configuration = null;
+    _linkResolutionContext = parentContext;
+  }
+
   public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final Configuration configuration) {
     _formatString = formatString;
     _internalLinker = internalLinker;
-    _configuration = configuration;
     _store = store;
+    _configuration = configuration;
+    _linkResolutionContext = null;
+  }
+  
+  public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final InterWikiLinker interWikiLinker) {
+    _formatString = formatString;
+    _internalLinker = internalLinker;
+    _store = store;
+    _configuration = null;
+    _linkResolutionContext = null;
+    
+    _interWikiLinker = interWikiLinker;
   }
 
-  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) {
-    // External URL
-    if (link.isURL()) {
-      return link(page, renderer, "external", link.getRefd(), link.getText(), urlOutputFilter);
-    }
-    // Inter-wiki
-    else if (link.getWiki() != null) {
+  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
+    final String xhtmlContent = new CompositeResultNode(renderer.render(page, link.getText(), null, urlOutputFilter)).toXHTML();
+    return handle(page, xhtmlContent, link, urlOutputFilter);
+  }
+
+  public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
+    // Lazily initialise interWikiLinker from configuration. Trying to do this in the constructor causes an exception.
+    if (_interWikiLinker == null && _configuration != null) {
       try {
-        return link(page, renderer, "inter-wiki", _configuration.getInterWikiLinker().url(link.getWiki(), link.getPagePath(), link.getFragment()), link.getText(), urlOutputFilter);
-      }
-      catch (UnknownWikiException e) {
-        return link.getText();
+        _interWikiLinker = _configuration.getInterWikiLinker();
       }
       catch (PageStoreException e) {
-        return link.getText();
+        throw new IllegalArgumentException(e);
       }
     }
-    // This wiki
+    
+    LinkResolutionContext resolver;
+    if (_linkResolutionContext != null) {
+      resolver = _linkResolutionContext.derive(page);
+    }
     else {
-      // Add page prefix if it is an attachment for the current page.
-      final String refd = link.getRefd();
-      final boolean hasPagePart = refd.contains("/");
-      final boolean hasDot = refd.contains(".");
-      
-      boolean pageExists;
-      try {
-        pageExists = _store.exists(new PageReferenceImpl(refd));
-      }
-      catch (PageStoreException e) {
-        throw new RuntimeException(e);
-      }
-
-      final boolean isAttachment = hasPagePart || (hasDot && !pageExists);
-
-      if (isAttachment) {
-        String attachmentRefd;
-        if (refd.startsWith("attachments/")) {
-          attachmentRefd = page.getPath() + "/" + refd;
-        }
-        else if (hasPagePart) {
-          attachmentRefd = refd.replaceFirst("/", "/attachments/");
-        }
-        else {
-          attachmentRefd = page.getPath() + "/attachments/" + refd;
-        }
-        return link(page, renderer, "attachment", attachmentRefd, link.getText(), urlOutputFilter);
-      }
-      else {
-        return _internalLinker.aHref(link.getPagePath(), link.getText(), null, null, link.getFragment(), urlOutputFilter);
-      }
+      resolver = new LinkResolutionContext(_internalLinker, _interWikiLinker, _store, page);
     }
-  }
-
-  private String link(final PageReference page, final RenderNode renderer, final String clazz, final String url, final String text, final URLOutputFilter urlOutputFilter) {
-    return String.format(_formatString, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), new CompositeResultNode(renderer.render(page, text, null, urlOutputFilter)).toXHTML());
+    String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
+    String clazz = link.getStyleClass(resolver);
+    String url = link.getURL(resolver);
+    if (!link.exists(resolver) && WikiWordUtils.isAcronym(page.getName())) {
+      return link.getText();
+    }
+    
+    return String.format(_formatString, noFollow, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), xhtmlContent);
   }
 
 }

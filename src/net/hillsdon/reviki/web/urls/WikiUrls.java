@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.web.urls;
 
+import java.net.URI;
+
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 /**
@@ -41,12 +43,14 @@ public interface WikiUrls extends ResourceUrls {
   String pagesRoot();
 
   String pagesRoot(String wikiName);
-
+  
   String search(URLOutputFilter urlOutputFilter);
 
   String page(String wikiName, String pageName, String extraPath, String query, String fragment, URLOutputFilter urlOutputFilter);
 
   String page(String wikiName, String pageName, URLOutputFilter urlOutputFilter);
+  
+  URI page(String pageName);
 
   String feed(URLOutputFilter urlOutputFilter);
 

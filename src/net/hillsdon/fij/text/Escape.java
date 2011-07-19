@@ -22,24 +22,15 @@ import org.apache.commons.httpclient.util.URIUtil;
 public class Escape {
   
   /**
-   * Avoid encoding an entire link that you wish a browser to use,
-   * such as "http://....". Instead, encode only what is required.
-   * For example:
-   * <ul>
-   * <li>pagesRoot() + Escape.urlEncodeUTF8(name));</li>
-   * </ul>
-   * @param content
+   * Generate a correctly encoded URI string from the given components.
+   * 
+   * @param path The unencoded path. Will be encoded according to RFC3986.
+   * @param query The unencoded query. May be null. Will be x-www-form-urlencoded.
+   * @param fragment The unencoded fragment. May be null. Will be encoded according to RFC3986.
+   * @param extraPath The <strong>encoded</strong> extra part to append to the path.
    * @return
    */
-  public static String urlEncodeUTF8(final String path) {
-    return urlEncodeUTF8(path, null, null, null);
-  }
-  
-  public static String urlEncodeUTF8(final String path, final String query, final String fragment) {
-    return urlEncodeUTF8(path, query, fragment, null);
-  }
-
-  public static String urlEncodeUTF8(final String path, final String query, final String fragment, final String extraPath) {
+  public static String constructEncodedURI(final String path, final String query, final String fragment, final String extraPath) {
     try {
       StringBuilder sb = new StringBuilder();
       sb.append(URIUtil.encodeWithinPath(path, "UTF-8"));

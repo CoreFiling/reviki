@@ -15,70 +15,67 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public class LinkParts {
   private final String _text;
-  private final String _wiki;
-  private final String _refd;
-  private final String _fragment;
-  private final String _pagePath;
 
-  public LinkParts(final String text, final String wiki, final String refd) {
+  private LinkTarget _target;
+  
+  public LinkParts(final String text, final String wiki, String pageName, final String fragment, String attachment) {
     _text = text;
-    _wiki = wiki;
-    _refd = refd == null ? "" : refd;
-    if (!isURL()) {
-      final int indexOfHash = _refd.lastIndexOf('#');
-      if (indexOfHash != -1) {
-        _fragment = _refd.substring(indexOfHash + 1);
-        _pagePath = _refd.substring(0, indexOfHash);
-      }
-      else {
-        _fragment = null;
-        _pagePath = _refd;
-      }
+    
+    if (attachment != null) {
+      _target = new AttachmentLinkTarget(wiki, "attachments".equals(pageName) ? null : pageName, attachment);
     }
     else {
-      _fragment = null;
-      _pagePath = null;
+      _target = new PageLinkTarget(wiki, pageName, fragment);
     }
   }
+
+  public LinkParts(final String text, final URI uri) {
+    _text = text;
+    _target = new ExternalLinkTarget(uri);
+  }
+
   public String getText() {
     return _text;
-  }
-  public String getWiki() {
-    return _wiki;
-  }
-  public String getRefd() {
-    return _refd;
-  }
-  public String getPagePath() {
-    return _pagePath;
-  }
-  public String getFragment() {
-    return _fragment;
-  }
-  public boolean isURL() {
-    return _wiki == null && getRefd().matches("\\p{L}+?:.*");
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + Arrays.asList(_text, _wiki, _refd).toString();
+    return getClass().getSimpleName() + Arrays.asList(_text, _target).toString();
+  }
+  
+  public boolean exists(LinkResolutionContext linkResolutionContext) {
+    return _target.exists(linkResolutionContext);
   }
 
-  // Eclipse generated, yes it is obsene but it's easy and correct.
+  public boolean isURL() {
+    return _target.isURL();
+  }
+
+  public String getStyleClass(LinkResolutionContext linkResolutionContext) {
+    return _target.getStyleClass(linkResolutionContext);
+  }
+
+  public String getURL(LinkResolutionContext linkResolutionContext) throws URISyntaxException, UnknownWikiException {
+    return _target.getURL(linkResolutionContext);
+  }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((_refd == null) ? 0 : _refd.hashCode());
+    result = prime * result + ((_target == null) ? 0 : _target.hashCode());
     result = prime * result + ((_text == null) ? 0 : _text.hashCode());
-    result = prime * result + ((_wiki == null) ? 0 : _wiki.hashCode());
     return result;
   }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -87,12 +84,12 @@ public class LinkParts {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final LinkParts other = (LinkParts) obj;
-    if (_refd == null) {
-      if (other._refd != null)
+    LinkParts other = (LinkParts) obj;
+    if (_target == null) {
+      if (other._target != null)
         return false;
     }
-    else if (!_refd.equals(other._refd))
+    else if (!_target.equals(other._target))
       return false;
     if (_text == null) {
       if (other._text != null)
@@ -100,13 +97,11 @@ public class LinkParts {
     }
     else if (!_text.equals(other._text))
       return false;
-    if (_wiki == null) {
-      if (other._wiki != null)
-        return false;
-    }
-    else if (!_wiki.equals(other._wiki))
-      return false;
     return true;
+  }
+
+  public boolean isNoFollow(LinkResolutionContext resolver) {
+    return _target.isNoFollow(resolver);
   }
 
 }

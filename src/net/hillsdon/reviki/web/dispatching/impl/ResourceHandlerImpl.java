@@ -15,15 +15,16 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.fij.text.Escape;
+import org.apache.commons.httpclient.util.URIUtil;
+
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 public class ResourceHandlerImpl implements ResourceHandler {
 
@@ -36,14 +37,15 @@ public class ResourceHandlerImpl implements ResourceHandler {
 
     while (path.hasNext()) {
       sb.append("/");
-      sb.append(Escape.urlEncodeUTF8(URLOutputFilter.NULL.filterURL(path.next())));
+      sb.append(URIUtil.encodeWithinPath(path.next()));
     }
 
     final String resource = sb.toString();
 
     return new View() {
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        request.getRequestDispatcher(resource).forward(request, response);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher(resource);
+        requestDispatcher.forward(request, response);
       }
     };
   }

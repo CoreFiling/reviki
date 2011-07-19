@@ -40,6 +40,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.RenderedPage;
 import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
@@ -239,7 +240,7 @@ public class LuceneSearcher implements SearchEngine {
     try {
       return doReadOperation(new ReadOperation<Set<String>>() {
         public Set<String> execute(final IndexReader reader, final Searcher searcher, final Analyzer analyzer) throws IOException, ParseException {
-          final String pageEscaped = escape(Escape.urlEncodeUTF8(page));
+          final String pageEscaped = escape(URIUtil.encodeWithinPath(page));
           Set<String> results = Sets.newLinkedHashSet(Iterables.transform(query(reader, createAnalyzer(), searcher, FIELD_OUTGOING_LINKS, pageEscaped, false), SearchMatch.TO_PAGE_NAME));
           results.remove(page);
           return results;

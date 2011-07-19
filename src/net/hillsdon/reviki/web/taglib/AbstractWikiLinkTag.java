@@ -23,9 +23,14 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.Configuration;
+import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.
@@ -84,12 +89,13 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
 
   public int doStartTag() throws JspException {
     try {
-      InternalLinker linker = (InternalLinker) pageContext.getRequest().getAttribute("internalLinker");
+      LinkResolutionContext resolver = (LinkResolutionContext) pageContext.getRequest().getAttribute("linkResolutionContext");
+      
       final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
-      if (linker != null) {
+      if (resolver != null) {
         JspWriter out = pageContext.getOut();
         URLOutputFilter urlOutputFilter = isSession() ? new ResponseSessionURLOutputFilter((HttpServletRequest) pageContext.getRequest(), response) : URLOutputFilter.NULL;
-        out.write(doOutput(linker, urlOutputFilter));
+        out.write(doOutput(resolver, urlOutputFilter));
       }
     }
     catch (IOException e) {
@@ -98,7 +104,7 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
     return SKIP_BODY;
   }
 
-  protected abstract String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter);
+  protected abstract String doOutput(LinkResolutionContext resolver, URLOutputFilter urlOutputFilter) throws JspException;
 
 }
 

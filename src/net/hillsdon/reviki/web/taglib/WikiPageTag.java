@@ -15,8 +15,19 @@
  */
 package net.hillsdon.reviki.web.taglib;
 
+import java.net.URISyntaxException;
+
+import javax.servlet.jsp.JspException;
+
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.
@@ -28,8 +39,17 @@ public class WikiPageTag extends AbstractWikiLinkTag {
 
   private static final long serialVersionUID = 1L;
 
-  protected String doOutput(InternalLinker linker, URLOutputFilter urlOutputFilter) {
-    return linker.aHref(getWiki(), getPage(), getPage(), getExtraPath(), getQuery(), null, urlOutputFilter);
+  protected String doOutput(LinkResolutionContext resolver, URLOutputFilter urlOutputFilter) throws JspException {
+    SvnWikiLinkPartHandler handler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, resolver);
+    try {
+      return handler.handle(new PageReferenceImpl(getPage()), getPage(), new LinkParts(getPage(), getWiki(), getPage(), null, null), urlOutputFilter);
+    }
+    catch (URISyntaxException e) {
+      throw new JspException(e);
+    }
+    catch (UnknownWikiException e) {
+      throw new JspException(e);
+    }
   }
 
 }

@@ -37,6 +37,7 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
+import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -44,6 +45,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * A particular wiki (sub-wiki, whatever).
@@ -70,7 +72,9 @@ public class WikiHandlerImpl implements WikiHandler {
   private final ResourceHandler _resources;
   private final PageHandler _pageHandler;
 
-  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls) {
+  private final Configuration _configuration;
+
+  public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls, Configuration configuration) {
     _cachingPageStore = cachingPageStore;
     _renderer = renderer;
     _internalLinker = internalLinker;
@@ -79,6 +83,7 @@ public class WikiHandlerImpl implements WikiHandler {
     _resources = resources;
     _pageHandler = handler;
     _wikiUrls = wikiUrls;
+    _configuration = configuration;
   }
 
   public View test(HttpServletRequest request, HttpServletResponse response) throws PageStoreInvalidException, Exception {
@@ -94,8 +99,14 @@ public class WikiHandlerImpl implements WikiHandler {
     return handleInternal(path, request, response, new RequestHandler() {
       public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setAttribute(WikiUrls.KEY, _wikiUrls);
-        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.url(BuiltInPageReferences.CONFIG_CSS.getPath(), null, "ctype=raw", null, URLOutputFilter.NULL));
+        request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.uri(BuiltInPageReferences.CONFIG_CSS.getPath(), "ctype=raw").toASCIIString());
+        
+        // Used for resolving links in the context of this request
         request.setAttribute("internalLinker", _internalLinker);
+        request.setAttribute("configuration", _configuration);
+        request.setAttribute("pageStore", _cachingPageStore);
+        request.setAttribute("linkResolutionContext", new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _cachingPageStore));
+        
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);
         }

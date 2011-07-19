@@ -15,9 +15,9 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.MatchResult;
-
-import net.hillsdon.fij.text.Strings;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -28,20 +28,67 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     return split(in);
   }
 
+  /**
+   * Splits links of the form target or text|target where target is
+   * 
+   * PageName wiki:PageName PageName#fragment wiki:PageName#fragment
+   * scheme://valid/absolute/uri
+   * 
+   * @param in The String to split
+   * @return The split LinkParts
+   */
   LinkParts split(final String in) {
-    String link = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
+    String target = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
     String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
+    if (target == null) {
+      target = "";
+    }
     if (text == null) {
-      text = link;
+      text = target;
     }
-    String[] parts = link == null ? new String[] {""} : StringUtils.split(link, ":", 2);
-    String wiki = null;
-    // Link can be PageName, wiki:PageName or a URL.  Assume URL based on ':/'.
-    if (parts.length == 2 && !"/".equals(Strings.sCharAt(parts[1], 0))) {
-      wiki = parts[0];
-      link = parts[1];
+    // Link target can be PageName, wiki:PageName or a URL.
+    URI uri = null;
+    try {
+      uri = new URI(target);
+      if (uri.getPath()==null || !uri.isAbsolute()) {
+        uri = null;
+      }
     }
-    return new LinkParts(text, wiki, link);
+    catch (URISyntaxException e) {
+      // uri remains null
+    }
+
+    if (uri != null) {
+      return new LinkParts(text, uri);
+    }
+    else {
+      // Split into wiki:pageName
+      String[] parts = target.split(":", 2);
+      String wiki = null;
+      String pageName = target;
+      if (parts.length == 2) {
+        wiki = parts[0];
+        pageName = parts[1];
+      }
+
+      // Split into pageName#fragment
+      parts = pageName.split("#", 2);
+      String fragment = null;
+      if (parts.length == 2) {
+        pageName = parts[0];
+        fragment = parts[1];
+      }
+      
+      // Split into pageName/attachment
+      parts = pageName.split("/", 2);
+      String attachment = null;
+      if (parts.length == 2) {
+        pageName = parts[0];
+        attachment = parts[1];
+      }
+
+      return new LinkParts(text, wiki, pageName, fragment, attachment);
+    }
   }
 
 }

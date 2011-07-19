@@ -1,10 +1,13 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URI;
+
 import junit.framework.TestCase;
 
 public class TestCreoleLinkContentsSplitter extends TestCase {
 
-  private static final String URL = "http://www.example.com/foo";
+  private static final String EXAMPLE_URI_STRING = "http://www.example.com/foo";
+  private static final URI EXAMPLE_URI = URI.create(EXAMPLE_URI_STRING);
   
   private CreoleLinkContentsSplitter _splitter;
   
@@ -24,13 +27,16 @@ public class TestCreoleLinkContentsSplitter extends TestCase {
     _splitter.split("a||b");
   }
   
-  public void testExpectedInputs() {
-    assertEquals(new LinkParts(URL, null, URL), _splitter.split(URL));
-    assertEquals(new LinkParts("Some text", null, URL), _splitter.split(URL + "|" + "Some text"));
-    assertEquals(new LinkParts("foo:Bar", "foo", "Bar"), _splitter.split("foo:Bar"));
-    assertEquals(new LinkParts("text", "foo", "Bar"), _splitter.split("foo:Bar|text"));
-    assertEquals(new LinkParts("Bar", null, "Bar"), _splitter.split("Bar"));
-    assertEquals(new LinkParts("text", null, "Bar"), _splitter.split("Bar|text"));
+  public void testExpectedInputsURI() {
+    assertEquals(new LinkParts(EXAMPLE_URI_STRING, EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING));
+    assertEquals(new LinkParts("Some text", EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING + "|" + "Some text"));
+  }
+    
+  public void testExpectedInputsWiki() {
+    assertEquals(new LinkParts("foo:Bar", "foo", "Bar", null, null), _splitter.split("foo:Bar"));
+    assertEquals(new LinkParts("text", "foo", "Bar", null, null), _splitter.split("foo:Bar|text"));
+    assertEquals(new LinkParts("Bar", null, "Bar", null, null), _splitter.split("Bar"));
+    assertEquals(new LinkParts("text", null, "Bar", null, null), _splitter.split("Bar|text"));
   }
   
 }

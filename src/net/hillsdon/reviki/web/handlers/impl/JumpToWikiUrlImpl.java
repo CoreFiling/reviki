@@ -21,7 +21,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.fij.text.Escape;
+import org.apache.commons.httpclient.util.URIUtil;
+
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
@@ -41,7 +42,7 @@ public class JumpToWikiUrlImpl implements JumpToWikiUrl {
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException, ServletException, InvalidInputException {
-    final String wiki = Escape.urlEncodeUTF8(getRequiredString(request, "name"));
+    final String wiki = URIUtil.encodeWithinPath(getRequiredString(request, "name"));
     return new RedirectToPageView(_urls.get(wiki), PAGE_FRONT_PAGE);
   }
 

@@ -17,6 +17,7 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import static java.util.Arrays.asList;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public abstract class AbstractRegexNode implements RenderNode {
@@ -69,8 +71,18 @@ public abstract class AbstractRegexNode implements RenderNode {
         String beforeMatch = text.substring(0, earliestMatch.start());
         String afterMatch = text.substring(earliestMatch.end());
         fallback(page, result, beforeMatch, urlOutputFilter);
-        result.add(earliestRule.handle(page, earliestMatch, this, urlOutputFilter));
-        text = afterMatch;
+        try {
+          result.add(earliestRule.handle(page, earliestMatch, this, urlOutputFilter));
+          text = afterMatch;
+        }
+        catch (URISyntaxException e) {
+          fallback(page, result, text, urlOutputFilter);
+          text = "";
+        }
+        catch (UnknownWikiException e) {
+          fallback(page, result, text, urlOutputFilter);
+          text = "";
+        }
       }
       else {
         fallback(page, result, text, urlOutputFilter);

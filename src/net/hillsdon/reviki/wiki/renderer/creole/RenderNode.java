@@ -15,11 +15,13 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public interface RenderNode {
@@ -61,7 +63,9 @@ public interface RenderNode {
    * @param matcher A matcher that found a match using our find method and we were deemed the best.
    * @param parent TODO
    * @return Replacement text for the match (this method should recurse to complete rendering of the match).
+   * @throws UnknownWikiException 
+   * @throws URISyntaxException 
    */
-  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter);
+  ResultNode handle(PageReference page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
 
 }

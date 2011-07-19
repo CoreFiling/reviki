@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import org.apache.commons.httpclient.util.URIUtil;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
 
@@ -59,6 +61,6 @@ public class TestSearch extends WebTestSupport {
     final String referred = uniqueWikiPageName("SearchSpaces BacklinkTestb");
     editWikiPage(refers, "[["+referred+"]]", "", true);
     final HtmlPage page = getWikiPage(referred);
-    getAnchorByHrefContains(page, Escape.urlEncodeUTF8(refers));
+    getAnchorByHrefContains(page, URIUtil.encodeWithinPath(refers));
   }
 }

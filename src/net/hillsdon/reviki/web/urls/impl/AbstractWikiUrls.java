@@ -15,6 +15,9 @@
  */
 package net.hillsdon.reviki.web.urls.impl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -29,10 +32,24 @@ public abstract class AbstractWikiUrls implements WikiUrls {
   public final String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
     return page(wikiName, name, null, null, null, urlOutputFilter);
   }
-
+  
   public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
     String path = pageName;
-    return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.urlEncodeUTF8(path, query, fragment, extraPath));
+    return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.constructEncodedURI(path, query, fragment, extraPath));
+  }
+  
+  public URI page(final String pageName) {
+    URI root = URI.create(pagesRoot());
+    try {
+      String path = root.getPath();
+      if (!path.endsWith("/")) {
+        path = path + "/";
+      }
+      return new URI(root.getScheme(), root.getUserInfo(), root.getHost(), root.getPort(), path + pageName, root.getQuery(), root.getFragment());
+    }
+    catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String interWikiTemplate() {

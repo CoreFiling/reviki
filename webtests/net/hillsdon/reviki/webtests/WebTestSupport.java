@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 import net.hillsdon.fij.text.Escape;
 
+import org.apache.commons.httpclient.util.URIUtil;
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
@@ -136,7 +137,7 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On error.
    */
   protected HtmlPage getWikiPage(final String name) throws IOException {
-    return getWebPage("pages/test/" + Escape.urlEncodeUTF8(name));
+    return getWebPage("pages/test/" + URIUtil.encodeWithinPath(name));
   }
 
   private int _counter = 0;

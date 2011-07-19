@@ -15,11 +15,16 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URISyntaxException;
+
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public interface LinkPartsHandler {
 
-  String handle(PageReference page, RenderNode renderer, LinkParts parts, URLOutputFilter urlOutputFilter);
+  String handle(PageReference page, RenderNode renderer, LinkParts parts, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
+
+  String handle(PageReference page, String xhtmlContent, LinkParts parts, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
   
 }

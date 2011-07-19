@@ -54,6 +54,7 @@ import net.hillsdon.reviki.web.pages.impl.PageSourceImpl;
 import net.hillsdon.reviki.web.pages.impl.RecentChanges;
 import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -127,10 +128,11 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
-    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class), cachingPageStore);
+    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
 
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-    _renderer = new SvnWikiRenderer(new PageStoreConfiguration(pageStore, applicationUrls), pageStore, internalLinker, new Supplier<List<Macro>>() {
+    Configuration pageStoreConfiguration = new PageStoreConfiguration(pageStore, applicationUrls);
+    _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
         List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
         macros.addAll(_plugins.getImplementations(Macro.class));
@@ -145,6 +147,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(RequestLifecycleAwareManager.class, RequestLifecycleAwareManagerImpl.class);
 
     container.addComponent(wikiGraph);
+    container.addComponent(Configuration.class, pageStoreConfiguration);
     container.addComponent(internalLinker);
     container.addComponent(renderedPageFactory);
     container.addComponent(_plugins);

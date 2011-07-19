@@ -21,6 +21,8 @@ import static net.hillsdon.xml.xpathcontext.Coercion.STRING;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -52,6 +54,15 @@ public class TestFeedWriter extends TestCase {
       }
       public String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
         return "page";
+      }
+      public URI page(final String pageName) {
+        URI root = URI.create(pagesRoot());
+        try {
+          return new URI(root.getScheme(), root.getUserInfo(), root.getHost(), root.getPort(), root.getPath() + "/" + pageName, root.getQuery(), root.getFragment());
+        }
+        catch (URISyntaxException e) {
+          throw new RuntimeException(e);
+        }
       }
       public String pagesRoot() {
         return "root";
