@@ -214,6 +214,7 @@ reviki.setupShortcutKeys = function() {
 }
 
 reviki.confirmLeave = false;
+reviki.unlockOnUnload = true;
 
 reviki.confirmLeaveFunc = function() {
   reviki.lockToken = $("input[name=lockToken]").val();
@@ -223,15 +224,16 @@ reviki.confirmLeaveFunc = function() {
 }
 
 reviki.leaving = function() {
-  $.ajax({
-    type: "POST",
-    url: $("#editForm").action,
-    data: "unlock=&lockToken=" + reviki.lockToken,
-    success: function(msg){
-      alert(msg);
-    }
-  });
-
+  if(reviki.unlockOnUnload) {
+    $.ajax({
+      type: "POST",
+      url: $("#editForm").action,
+      data: "unlock=&lockToken=" + reviki.lockToken,
+      success: function(msg){
+        alert(msg);
+      }
+    });
+  }
 }
 
 reviki.addConfirm = function() {
@@ -240,6 +242,10 @@ reviki.addConfirm = function() {
 
 reviki.removeConfirm = function() {
   reviki.confirmLeave = false;
+}
+
+reviki.removeUnlockOnUnload = function() {
+  reviki.unlockOnUnload = false;
 }
 
 reviki.setupLeaveConfirm = function() {
@@ -253,6 +259,9 @@ reviki.setupLeaveConfirm = function() {
     $("#editForm").bind("submit", reviki.removeConfirm);
     $("#cancel").bind("click", reviki.removeConfirm);
     $("#save").bind("click", reviki.removeConfirm);
+    $("#editForm").bind("submit", reviki.removeUnlockOnUnload);
+    $("#cancel").bind("click", reviki.removeUnlockOnUnload);
+    $("#save").bind("click", reviki.removeUnlockOnUnload);
     window.onunload = reviki.leaving;
     window.onbeforeunload = reviki.confirmLeaveFunc;
   }
