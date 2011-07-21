@@ -84,7 +84,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
     // Lazily initialise interWikiLinker from configuration. Trying to do this in the constructor causes an exception.
-    if (_interWikiLinker == null && _configuration != null) {
+    if (_configuration != null) {
       try {
         _interWikiLinker = _configuration.getInterWikiLinker();
       }
