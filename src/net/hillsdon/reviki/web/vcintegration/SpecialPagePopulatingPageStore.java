@@ -22,6 +22,7 @@ import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_F
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_SIDEBAR;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_ICONS;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -43,12 +44,12 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Returns default FrontPage etc if there isn't one in the repository.
- * 
+ *
  * @author mth
  */
 public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
-  
+
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
   private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       PAGE_FRONT_PAGE,
@@ -57,18 +58,18 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
       PAGE_SIDEBAR,
       CONFIG_PLUGINS,
       CONFIG_AUTO_PROPERTIES,
-      CONFIG_INTER_WIKI_LINKS
-   )); 
+      CONFIG_INTER_WIKI_LINKS,
+      CONFIG_ICONS
+   ));
   private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReferenceImpl("AllPages"),
       new PageReferenceImpl("ConfigSvnLocation"),
       new PageReferenceImpl("OrphanedPages"),
-      new PageReferenceImpl("RecentChanges"), 
       new PageReferenceImpl("RecentChanges"),
       PAGE_HEADER,
       PAGE_FOOTER
     );
-  
+
   public SpecialPagePopulatingPageStore(final PageStore delegate) {
     super(delegate);
   }
@@ -80,7 +81,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     list.addAll(SPECIAL_PAGES_WITHOUT_CONTENT);
     return list;
   }
-  
+
   private VersionedPageInfo withContentIfSpecialAndNew(final PageReference ref, VersionedPageInfo page) throws PageStoreException {
     try {
       if (page.isNewPage() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
@@ -106,5 +107,4 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     page = withContentIfSpecialAndNew(ref, page);
     return page;
   }
-  
 }

@@ -36,7 +36,8 @@ public class FixedMimeIdentifier implements MimeIdentifier {
     "jpeg",
     "jpg",
     "svg",
-    "png"
+    "png",
+    "ico"
   );
 
   public boolean isImage(final String fileName) {

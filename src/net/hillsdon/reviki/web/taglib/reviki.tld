@@ -74,5 +74,14 @@
         <rtexprvalue>true</rtexprvalue>
       </attribute>
     </tag>
-    
+    <tag>
+      <name>iconUrl</name>
+      <tag-class>net.hillsdon.reviki.web.taglib.IconUrlTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+        <name>name</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+    </tag>    
 </taglib>
