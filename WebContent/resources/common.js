@@ -88,7 +88,7 @@ reviki.configureAutoSuggest = function() {
     minLength: options.minchars,
     delay: options.delay,
     select: function(event, ui) {
-      searchForm.val(ui.item.value);
+      searchBox.val(ui.item.value);
       searchForm.submit();
       return false;
     },
