@@ -44,6 +44,8 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
   public static final String KEY_PREFIX_SVN_URL = "svn-url-";
   public static final String KEY_PREFIX_BASE_URL = "base-url-";
   public static final String KEY_BASE_URL = "base-url";
+  public static final String KEY_PREFIX_SVN_USER = "svn-user-";
+  public static final String KEY_PREFIX_SVN_PASSWORD = "svn-pass-";
 
   private final PersistentStringMap _properties;
   private final DataDir _dataDir;
@@ -69,6 +71,16 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
       LOG.error("Invalid URL in properties.", ex);
       return null;
     }
+  }
+
+  public String getSVNUser(final String wikiName) {
+    String user = _properties.get(KEY_PREFIX_SVN_USER + wikiName);
+    return user;
+  }
+
+  public String getSVNPassword(final String wikiName) {
+    String password = _properties.get(KEY_PREFIX_SVN_PASSWORD + wikiName);
+    return password;
   }
 
   public String getFixedBaseUrl(final String wikiName) {
@@ -99,6 +111,14 @@ public class PropertiesDeploymentConfiguration implements DeploymentConfiguratio
     catch (SVNException e) {
       throw new IllegalArgumentException("Invalid SVN URL", e);
     }
+  }
+
+  void setSVNUser(final String wikiName, final String user) {
+    _properties.put(KEY_PREFIX_SVN_USER + wikiName, user);
+  }
+
+  void setSVNPassword(final String wikiName, final String pass) {
+    _properties.put(KEY_PREFIX_SVN_PASSWORD + wikiName, pass);
   }
 
   boolean isComplete(final String wikiName) {

@@ -16,6 +16,10 @@
 package net.hillsdon.reviki.wiki;
 
 import static java.util.Arrays.asList;
+
+import java.util.Collections;
+
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import junit.framework.TestCase;
 
@@ -27,16 +31,16 @@ public class TestRenderedPage extends TestCase {
   protected void setUp() throws Exception {
     _factory = new RenderedPageFactory(MarkupRenderer.AS_IS);
   }
-  
+
   private RenderedPage create(String content) throws Exception {
-    return _factory.create("FrontPage", content, URLOutputFilter.NULL);
+    return _factory.create(new PageInfoImpl("wiki", "FrontPage", content, Collections.<String, String>emptyMap()), URLOutputFilter.NULL);
   }
 
   public void testGetPage() throws Exception {
     RenderedPage rendered = create("");
     rendered.getPage().equals("FrontPage");
   }
-  
+
   public void testGetOutgoingLinksExistingPage() throws Exception {
     RenderedPage existingPage = create("<a href='pages/Foo'>Foo</a> to <a class='existing-page other-class' href='pages/Bar'>Bar description</a>");
     assertEquals(asList("Bar"), existingPage.findOutgoingWikiLinks());
@@ -46,5 +50,5 @@ public class TestRenderedPage extends TestCase {
     RenderedPage newPage = create("<a href='pages/Foo'>Foo</a> to <a class='other-class new-page' href='pages/Bar'>Bar description</a>");
     assertEquals(asList("Bar"), newPage.findOutgoingWikiLinks());
   }
-  
+
 }

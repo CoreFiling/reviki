@@ -16,9 +16,10 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -32,43 +33,44 @@ public class TestCreoleLinkNode extends TestCase {
   @Override
   protected void setUp() throws Exception {
     SimplePageStore pages = new SimplePageStore();
-    pages.set(new PageReferenceImpl("ExistingPage"), "", -1, "Content", "");
-    pages.set(new PageReferenceImpl("ExistingPage1.1"), "", -1, "Content", "");
+    pages.set(new PageInfoImpl(null, "ExistingPage", "Content", Collections.<String, String>emptyMap()), "", -1, "");
+    pages.set(new PageInfoImpl(null, "ExistingPage1.1", "Content", Collections.<String, String>emptyMap()), "", -1, "");
     _node = new CreoleLinkNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration()));
   }
 
   public void testInternal() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
-    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/FooPage'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[ExistingPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testInternalWithDot() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage1.1'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage1.1|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage1.1'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[ExistingPage1.1|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testInternalWithAnchor() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage#anchor'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ExistingPage#anchor|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='existing-page' href='http://www.example.com/reviki/pages/test-wiki/ExistingPage#anchor'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[ExistingPage#anchor|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testInterWiki() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='inter-wiki' href='http://www.example.com/foo/Wiki?FooPage'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[foo:FooPage|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testExternal() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='external' href='http://www.example.com'>Tasty</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[http://www.example.com|Tasty]]"), null, URLOutputFilter.NULL).toXHTML());
     // No text, we use URL.  Useful if we fail to match some links.
-    assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='external' href='http://www.example.com/'>http://www.example.com/</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[http://www.example.com/]]"), null, URLOutputFilter.NULL).toXHTML());
     // Backward external link!
-    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Tasty'>http://www.example.com</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[Tasty|http://www.example.com]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testAttachments() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null, URLOutputFilter.NULL).toXHTML());
-    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null, URLOutputFilter.NULL).toXHTML());
+    // The class isn't too clever here.
+    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/WhereEver/attachments/attachment.txt'>Read this</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[attachment.txt|Read this]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/ElseWhere/attachments/attachment.txt'>Read this too</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[ElseWhere/attachment.txt|Read this too]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testAttachmentWithoutExtension() throws URISyntaxException, UnknownWikiException {
-    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/WhereEver/attachments/attachment'>Read this</a>", _node.handle(new PageReferenceImpl("WhereEver"), _node.find("[[attachments/attachment|Read this]]"), null, URLOutputFilter.NULL).toXHTML());
+    assertEquals("<a class='attachment' href='http://www.example.com/reviki/pages/test-wiki/WhereEver/attachments/attachment'>Read this</a>", _node.handle(new PageInfoImpl("WhereEver"), _node.find("[[attachments/attachment|Read this]]"), null, URLOutputFilter.NULL).toXHTML());
   }
 
   public void testInterWikiAttachment() {

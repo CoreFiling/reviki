@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
@@ -52,7 +52,7 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 /**
  * An incomplete Creole 1.0 renderer.
- * 
+ *
  * @see <a href="http://www.wikicreole.org/wiki/Creole1.0">The 1.0 specification.</a>
  * @author mth
  */
@@ -64,7 +64,7 @@ public class CreoleRenderer {
     public RawUrlNode() {
       super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
     }
-    public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
+    public ResultNode handle(final PageInfo page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
       String escaped = Escape.html(matcher.group(0));
       String escapedFiltered = Escape.html(urlOutputFilter.filterURL(matcher.group(0)));
       return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escapedFiltered, escaped));
@@ -82,7 +82,7 @@ public class CreoleRenderer {
   }
 
   private final RenderNode _root;
-  
+
   public CreoleRenderer(final RenderNode[] customBlock, final RenderNode[] customInline) {
     RegexMatchToTag root = new RegexMatchToTag("", "", 0);
     RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
@@ -116,39 +116,39 @@ public class CreoleRenderer {
     tableHeading.addChildren(concat(inline, noWiki));
     tableCell.addChildren(concat(inline, noWiki));
 
-    italic.addChildren(inline); 
+    italic.addChildren(inline);
     bold.addChildren(inline);
     strikethrough.addChildren(inline);
-    
+
     paragraph.addChildren(inline);
     RenderNode fallback = new RegexMatchToTag("", "", 0);
     fallback.addChildren(paragraph);
-    
+
     RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
                               .addChildren(unorderedList, orderedList).addChildren(inline);
     root.addChildren(customBlock);
     root.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule);
     root.setFallback(fallback);
     root.addChildren(
-        noWiki, 
+        noWiki,
         horizontalRule,
         table,
         orderedList.addChildren(listItem),
         unorderedList.addChildren(listItem),
         new Heading(6).addChildren(inline),
         new Heading(5).addChildren(inline),
-        new Heading(4).addChildren(inline), 
-        new Heading(3).addChildren(inline), 
-        new Heading(2).addChildren(inline), 
+        new Heading(4).addChildren(inline),
+        new Heading(3).addChildren(inline),
+        new Heading(2).addChildren(inline),
         new Heading(1).addChildren(inline)
      );
     _root = root;
   }
-  
-  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) {
-    return new CompositeResultNode(_root.render(page, in.replaceAll("\r", ""), null, urlOutputFilter));
+
+  public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
+    return new CompositeResultNode(_root.render(page, page.getContent().replaceAll("\r", ""), null, urlOutputFilter));
   }
-  
+
   @SuppressWarnings("unchecked")
   private static <T> T[] concat(final T[] some, final T... more) {
     T[] all = (T[]) Array.newInstance(some.getClass().getComponentType(), some.length + more.length);
@@ -156,5 +156,5 @@ public class CreoleRenderer {
     System.arraycopy(more, 0, all, some.length, more.length);
     return all;
   }
-  
+
 }

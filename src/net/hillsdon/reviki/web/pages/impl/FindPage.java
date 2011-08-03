@@ -50,11 +50,11 @@ public class FindPage extends AbstractSpecialPage {
   + "<Description>Wiki Search</Description>\n"
   + "<Url type='text/html' template='%s?query={searchTerms}'/>\n"
   + "</OpenSearchDescription>\n";
-  
+
   static final String PARAM_QUERY = "query";
   private static final String PARAM_QUERY_ALTERNATE = "q";
 
-  
+
   private final PageStore _store;
   private final SearchEngine _searchEngine;
   private final WikiUrls _wikiUrls;
@@ -84,13 +84,13 @@ public class FindPage extends AbstractSpecialPage {
     if (query == null) {
       return super.get(page, path, request, response);
     }
-    
+
     final PageReference queryPage = new PageReferenceImpl(query);
     boolean pageExists = _store.list().contains(queryPage);
     if (request.getParameter("force") == null && pageExists) {
       return new RedirectToPageView(_wikiUrls, queryPage);
     }
-    
+
     final Set<SearchMatch> results = _searchEngine.search(query, true, pageExists);
     Long limit = getLong(request.getParameter("limit"), "limit");
     if (limit != null) {
@@ -104,6 +104,7 @@ public class FindPage extends AbstractSpecialPage {
         request.setAttribute("suggestCreate", query);
       }
       request.setAttribute("results", results);
+      request.setAttribute("thisWiki", _wikiUrls.getWikiName());
       return new JspView("SearchResults");
     }
   }

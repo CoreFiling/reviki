@@ -15,13 +15,13 @@
  */
 package net.hillsdon.reviki.wiki.renderer.macro;
 
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 
 /**
  * A very simple macro interface.
  *
  * We'll probably want to have standardized parameter parsing outside of the macro.
- * 
+ *
  * @author mth
  */
 public interface Macro {
@@ -29,7 +29,7 @@ public interface Macro {
   String getName();
 
   ResultFormat getResultFormat();
-  
-  String handle(PageReference page, String remainder) throws Exception;
-  
+
+  String handle(PageInfo page, String remainder) throws Exception;
+
 }

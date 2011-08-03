@@ -65,11 +65,11 @@ public interface BasicSVNOperations {
   /**
    * Caller must openDir.
    */
-  void create(ISVNEditor commitEditor, String path, InputStream content) throws SVNException, IOException;
+  void create(ISVNEditor commitEditor, String path, InputStream content, Map<String, String> properties) throws SVNException, IOException;
   /**
    * Caller must openDir.
    */
-  void edit(ISVNEditor commitEditor, String path, long baseRevision, InputStream content) throws SVNException;
+  void edit(ISVNEditor commitEditor, String path, long baseRevision, InputStream content, Map<String, String> properties) throws SVNException;
   /**
    * Caller must openDir.
    */

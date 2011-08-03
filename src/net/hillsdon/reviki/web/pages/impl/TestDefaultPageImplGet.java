@@ -27,15 +27,17 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.PageRevisionReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -93,7 +95,7 @@ public class TestDefaultPageImplGet extends TestCase {
   public void testNoRevisionNoDiffViewsHead() throws Exception {
     // We should get all the links.
     expectGetIncomingLinks(getCountIncomingLinks(MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY));
-    PageInfo expectedPageInfo = expectGetContent();
+    VersionedPageInfo expectedPageInfo = expectGetContent();
     expectRenderContent();
     replay();
     JspView view = (JspView) _page.get(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
@@ -186,23 +188,23 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   private void expectRenderContent() throws Exception  {
-    expect(_renderer.render(eq(THE_PAGE), eq("Content"), isA(URLOutputFilter.class))).andReturn(new LiteralResultNode("Content")).once();
+    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())), isA(URLOutputFilter.class))).andReturn(new LiteralResultNode("Content")).once();
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {
     expect(_graph.incomingLinks(THE_PAGE.getPath())).andReturn(ImmutableSet.copyOf(returnedPages)).once();
   }
 
-  private PageInfo expectGetContent() throws Exception  {
+  private VersionedPageInfo expectGetContent() throws Exception  {
     return expectGetContent(-1, "Content");
   }
 
-  private PageInfo expectGetContent(final int revision, final String content) throws Exception  {
+  private VersionedPageInfo expectGetContent(final int revision, final String content) throws Exception  {
     return expectGetContent(THE_PAGE, revision, content);
   }
 
-  private PageInfo expectGetContent(final PageReference page, final int revision, final String content) throws Exception {
-    PageInfo pageInfo = new PageInfoImpl("wiki", page.getPath(), content, revision, revision, "", new Date(), "", "", null);
+  private VersionedPageInfo expectGetContent(final PageReference page, final int revision, final String content) throws Exception {
+    VersionedPageInfo pageInfo = new VersionedPageInfoImpl("wiki", page.getPath(), content, revision, revision, "", new Date(), "", "", null);
     expect(_store.get(page, revision)).andReturn(pageInfo).once();
     return pageInfo;
   }

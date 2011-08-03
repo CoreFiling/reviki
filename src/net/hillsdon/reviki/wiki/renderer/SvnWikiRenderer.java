@@ -18,7 +18,7 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.List;
 
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.Configuration;
@@ -59,8 +59,8 @@ public class SvnWikiRenderer implements MarkupRenderer {
         });
   }
 
-  public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return _creole.render(page, in, urlOutputFilter);
+  public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return _creole.render(page, urlOutputFilter);
   }
 
 }

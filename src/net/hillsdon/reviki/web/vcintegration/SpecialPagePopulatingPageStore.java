@@ -29,11 +29,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 
@@ -81,11 +81,11 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     return list;
   }
   
-  private PageInfo withContentIfSpecialAndNew(final PageReference ref, PageInfo page) throws PageStoreException {
+  private VersionedPageInfo withContentIfSpecialAndNew(final PageReference ref, VersionedPageInfo page) throws PageStoreException {
     try {
       if (page.isNewPage() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
         String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
-        page = new PageInfoImpl(getWiki(), page.getPath(), text, PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
+        page = new VersionedPageInfoImpl(getWiki(), page.getPath(), text, VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
       }
     }
     catch (IOException ex) {
@@ -94,15 +94,15 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     return page;
   }
 
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    PageInfo page = super.get(ref, revision);
+  public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+    VersionedPageInfo page = super.get(ref, revision);
     page = withContentIfSpecialAndNew(ref, page);
     return page;
   }
 
   @Override
-  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
-    PageInfo page = super.tryToLock(ref);
+  public VersionedPageInfo tryToLock(final PageReference ref) throws PageStoreException {
+    VersionedPageInfo page = super.tryToLock(ref);
     page = withContentIfSpecialAndNew(ref, page);
     return page;
   }

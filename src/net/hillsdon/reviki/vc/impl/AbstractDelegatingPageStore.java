@@ -25,6 +25,7 @@ import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
@@ -58,7 +59,7 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
     return delegate;
   }
 
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+  public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     return getDelegateInternal().get(ref, revision);
   }
 
@@ -70,15 +71,15 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
     return getDelegateInternal().recentChanges(limit);
   }
 
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    return getDelegateInternal().set(ref, lockToken, baseRevision, content, commitMessage);
+  public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    return getDelegateInternal().set(page, lockToken, baseRevision, commitMessage);
   }
 
   public long deleteAttachment(PageReference ref, String attachmentName, long baseRevision, String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
     return getDelegateInternal().deleteAttachment(ref, attachmentName, baseRevision, commitMessage);
   }
 
-  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
+  public VersionedPageInfo tryToLock(final PageReference ref) throws PageStoreException {
     return getDelegateInternal().tryToLock(ref);
   }
 

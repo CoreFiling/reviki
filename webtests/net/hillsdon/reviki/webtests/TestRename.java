@@ -15,7 +15,7 @@
  */
 package net.hillsdon.reviki.webtests;
 
-import static net.hillsdon.reviki.webtests.TestAttachments.getAttachmentAtEndOfLink;
+import static net.hillsdon.reviki.webtests.TestAttachments.getTextAttachmentAtEndOfLink;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -41,7 +41,7 @@ public class TestRename extends WebTestSupport {
   public void testRenameRenamesBothPageAndMovesAttachments() throws Exception {
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     String toPageName = uniqueWikiPageName("RenameTestTo");
-    HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "Whatever", true);
+    HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "", "Whatever", true);
     uploadAttachment(TestAttachments.ATTACHMENT_UPLOAD_FILE_1, fromPageName);
 
     page = renamePage(fromPageName, toPageName);
@@ -49,10 +49,10 @@ public class TestRename extends WebTestSupport {
     assertTrue(page.getWebResponse().getRequestUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = clickAttachmentsLink(page, toPageName);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "file.txt")));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "file.txt")));
 
     assertSearchDoesNotFindPage(page, fromPageName);
-    editWikiPage(fromPageName, "This checks old page is new.", "Whatever", true);
+    editWikiPage(fromPageName, "This checks old page is new.", "", "Whatever", true);
   }
 
 }

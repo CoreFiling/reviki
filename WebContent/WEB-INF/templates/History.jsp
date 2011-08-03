@@ -52,6 +52,7 @@
 	              </c:when>
 	              <c:otherwise>
 	                <a href="<c:url value="${change.name}"/>?revision=${change.revision}"><c:out value="${change.name}" /> r<c:out value="${change.revision}"/></a>
+                    (<a href="<c:url value="${change.name}"/>?revision=${change.revision}&amp;ctype=raw">source</a>)
 	              </c:otherwise>
 	            </c:choose>
 	          </td>

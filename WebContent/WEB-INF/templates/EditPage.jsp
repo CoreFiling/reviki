@@ -36,10 +36,16 @@
     </c:if>
 
     <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
+      <textarea rows="10" cols="80" id="attributes" name="attributes"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea><br />
       <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
+      <c:set var="attrs" value=""/>
+      <c:forEach var="entry" items="${originalAttributes}">
+        <c:set var="attrs" value="${attrs} ${entry.key} &#10;"/>
+      </c:forEach>
+      <input type="hidden" name="originalAttrs" value="${attrs}" />
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
       <input style="width:5em;" name="save" type="submit" value="Save" id="save"/>

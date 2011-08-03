@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.search.QuerySyntaxException;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.RenderedPage;
@@ -53,6 +53,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
@@ -94,6 +95,7 @@ public class LuceneSearcher implements SearchEngine {
   private static final String FIELD_PATH = "path";
   private static final String FIELD_PATH_LOWER = "path-lower";
   private static final String FIELD_CONTENT = "content";
+  private static final String FIELD_ATTRIBUTES = "attributes";
   /**
    * We tokenize the wiki word to allow e.g. 'another' to find 'AnotherNewPage'.
    */
@@ -103,8 +105,9 @@ public class LuceneSearcher implements SearchEngine {
   private static final String FIELD_PROPERTY_KEY = "property";
   private static final String FIELD_PROPERTY_VALUE = "property-value";
   private static final String PROPERTY_LAST_INDEXED_REVISION = "last-indexed-revision";
+  private static final String PROPERTY_BUILT = "index-was-built";
 
-  private static final String[] ALL_SEARCH_FIELDS = new String[] {FIELD_PATH, FIELD_PATH_LOWER, FIELD_TITLE_TOKENIZED, FIELD_CONTENT};
+  private static final String[] ALL_SEARCH_FIELDS = new String[] {FIELD_PATH, FIELD_PATH_LOWER, FIELD_TITLE_TOKENIZED, FIELD_CONTENT, FIELD_ATTRIBUTES};
 
   private final String _wikiName;
   private final File _dir;
@@ -155,11 +158,16 @@ public class LuceneSearcher implements SearchEngine {
     perField.addAnalyzer(FIELD_PROPERTY_VALUE, id);
     perField.addAnalyzer(FIELD_OUTGOING_LINKS, text);
     perField.addAnalyzer(FIELD_CONTENT, text);
+    perField.addAnalyzer(FIELD_ATTRIBUTES, id);
     return perField;
   }
 
-  private Document createWikiPageDocument(final String wiki, final String path, final String content) throws IOException, PageStoreException {
-    RenderedPage renderedPage = _renderedPageFactory.create(path, content, URLOutputFilter.NULL);
+  private Document createWikiPageDocument(final PageInfo page) throws IOException, PageStoreException {
+    RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+    final String path = page.getPath();
+    final String wiki = page.getWiki();
+    final String content = page.getContent();
+    final List<String> attributes = attributesToStringList(page.getAttributes());
     Document document = new Document();
     final String title = pathToTitle(path);
     final String pathLower = lastComponentOfPath(path).toLowerCase();
@@ -171,6 +179,10 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_OUTGOING_LINKS, Joiner.on(" ").join(renderedPage.findOutgoingWikiLinks()), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
+    // Store the attributes like this, so that we only get matches which are exact
+    for(String attribute : attributes) {
+      document.add(new Field(FIELD_ATTRIBUTES, attribute, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    }
     return document;
   }
 
@@ -215,22 +227,41 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
 
+  public void index(final PageInfo page) throws IOException, PageStoreException {
+    index(page, false);
+  }
+
+
   // Lucene allows multiple non-deleting readers and at most one writer at a time.
   // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
-  public synchronized void index(final String wiki, final String path, final long revision, final String content) throws IOException, PageStoreException {
+  public synchronized void index(final PageInfo page, final boolean buildingIndex) throws IOException, PageStoreException {
     if (_dir == null) {
       return;
     }
-    createIndexIfNecessary();
-    replaceWikiDocument(createWikiPageDocument(wiki, path, content));
-    rememberLastIndexedRevision(revision);
+    if (!isIndexBeingBuilt() || buildingIndex) {
+      createIndexIfNecessary();
+      replaceWikiDocument(createWikiPageDocument(page));
+    }
+  }
+
+  private List<String> attributesToStringList(Map<String, String> attributes) {
+    List<String> attrs= new ArrayList<String>();
+    for(Map.Entry<String, String> entry: attributes.entrySet()) {
+      attrs.add("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+    }
+    return attrs;
+  }
+
+  public void delete(final String wiki, final String path) throws IOException {
+    delete(wiki, path, false);
   }
 
   // See comment on index.
-  public synchronized void delete(final String wiki, final String path, final long revision) throws IOException {
-    createIndexIfNecessary();
-    deleteWikiDocument(wiki, path);
-    rememberLastIndexedRevision(revision);
+  public synchronized void delete(final String wiki, final String path, boolean buildingIndex) throws IOException {
+    if (!isIndexBeingBuilt() || buildingIndex) {
+      createIndexIfNecessary();
+      deleteWikiDocument(wiki, path);
+    }
   }
 
   public Set<String> incomingLinks(final String page) throws IOException, PageStoreException {
@@ -478,12 +509,25 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
 
-  private void rememberLastIndexedRevision(final long revision) throws CorruptIndexException, LockObtainFailedException, IOException {
+  public void rememberHighestIndexedRevision(final long revision) throws CorruptIndexException, LockObtainFailedException, IOException {
     replaceProperty(createPropertyDocument(PROPERTY_LAST_INDEXED_REVISION, String.valueOf(revision)));
+  }
+
+  public boolean isIndexBeingBuilt() throws IOException {
+    createIndexIfNecessary();
+    String property = getProperty(PROPERTY_BUILT);
+    if (property != null) {
+      return Boolean.valueOf(property);
+    }
+    return false;
+  }
+
+  public void rememberIndexBeingBuilt(boolean built) throws IOException {
+    createIndexIfNecessary();
+    replaceProperty(createPropertyDocument(PROPERTY_BUILT, String.valueOf(built)));
   }
 
   public String escape(final String in) {
     return QueryParser.escape(in);
   }
-
 }

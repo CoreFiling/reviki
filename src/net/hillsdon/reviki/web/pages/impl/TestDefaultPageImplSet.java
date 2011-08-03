@@ -23,6 +23,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +35,7 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
@@ -49,7 +51,7 @@ import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
 /**
  * Test for {@link SetPageImpl}.
- * 
+ *
  * @author mth
  */
 public class TestDefaultPageImplSet extends TestCase {
@@ -59,7 +61,7 @@ public class TestDefaultPageImplSet extends TestCase {
   private static final String OLD_CONTENT = "old content";
   private static final String NEW_CONTENT = "new content";
   private static final String DIFF_CONTENT = "diff content";
-  
+
   private FeedWriter _feedWriter;
   private DiffGenerator _diffGenerator;
   private CachingPageStore _store;
@@ -68,9 +70,9 @@ public class TestDefaultPageImplSet extends TestCase {
   private DefaultPageImpl _page;
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
-  private PageInfoImpl _pageInfo;
+  private VersionedPageInfoImpl _pageInfo;
   private Object[] _allMocks;
-  
+
   @Override
   protected void setUp() throws Exception {
     _feedWriter = createMock(FeedWriter.class);
@@ -81,7 +83,7 @@ public class TestDefaultPageImplSet extends TestCase {
     _page = new DefaultPageImpl(null, _store, null, null, _diffGenerator, _wikiUrls, _feedWriter);
     _request = new MockHttpServletRequest();
     _response = null;
-    _pageInfo = new PageInfoImpl("wiki", "ThePage", OLD_CONTENT, 0, 0, "user", new Date(), null, null, null);
+    _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", OLD_CONTENT, 0, 0, "user", new Date(), null, null, null);
     _allMocks = new Object[] { _feedWriter, _diffGenerator, _store, _storeUnder};
   }
 
@@ -121,6 +123,8 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testSaveRequiresLockToken() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_SAVE, "");
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, NEW_CONTENT);
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
     _request.setParameter(DefaultPageImpl.PARAM_BASE_REVISION, "1");
     expectDiffView();
@@ -134,6 +138,8 @@ public class TestDefaultPageImplSet extends TestCase {
     _request.setParameter(DefaultPageImpl.SUBMIT_SAVE, "");
     _request.setParameter(DefaultPageImpl.PARAM_LOCK_TOKEN, "dooby");
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, NEW_CONTENT);
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
     expectDiffView();
     replay();
@@ -152,12 +158,15 @@ public class TestDefaultPageImplSet extends TestCase {
     _request.setParameter(DefaultPageImpl.PARAM_BASE_REVISION, "1");
     _request.setParameter(DefaultPageImpl.PARAM_LOCK_TOKEN, "dooby");
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, NEW_CONTENT);
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setParameter(DefaultPageImpl.PARAM_COMMIT_MESSAGE, "Message");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
 
     final String expectedCommitMessage = "Message\n" + getURLOfCalledOnPage();
     final String expectedContent = NEW_CONTENT + Strings.CRLF;
-    expect(_store.set(CALLED_ON_PAGE, "dooby", 1, expectedContent, expectedCommitMessage)).andReturn(2L).once();
+    expect(_store.getWiki()).andReturn("wiki");
+    expect(_store.set(new PageInfoImpl("wiki", CALLED_ON_PAGE.getPath(), expectedContent, Collections.<String, String>emptyMap()), "dooby", 1, expectedCommitMessage)).andReturn(2L).once();
     replay();
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(CALLED_ON_PAGE, view.getPage());
@@ -247,6 +256,8 @@ public class TestDefaultPageImplSet extends TestCase {
     final String username = "user";
     _request.setParameter(DefaultPageImpl.SUBMIT_SAVE, "");
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, NEW_CONTENT);
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID + "AAA");
     _request.setAttribute(RequestAttributes.USERNAME, username);
     expectDiffView();

@@ -19,11 +19,12 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import java.util.Collections;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.WikiUrls;
@@ -59,7 +60,7 @@ public class TestPageStoreConfiguration extends TestCase {
   }
 
   public void testAddingPagePopulatesInterWikiLinker() throws Exception  {
-    _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "c2 http://c2.com/cgi/wiki?%s\r\n", "");
+    _store.set(new PageInfoImpl(null, "ConfigInterWikiLinks", "c2 http://c2.com/cgi/wiki?%s\r\n", Collections.<String, String>emptyMap()), "", -1, "");
     Map<String, String> expected = ImmutableMap.of(
         "other", ".../other/%s",
         "c2", "http://c2.com/cgi/wiki?%s"
@@ -68,7 +69,7 @@ public class TestPageStoreConfiguration extends TestCase {
   }
 
   public void testUserEntryWinsOverBuiltInEntry() throws Exception {
-    _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "other http://www.example.com/elsewhere/%s\r\n", "");
+    _store.set(new PageInfoImpl(null, "ConfigInterWikiLinks", "other http://www.example.com/elsewhere/%s\r\n", Collections.<String, String>emptyMap()), "", -1, "");
     Map<String, String> expected = ImmutableMap.of(
         "other", "http://www.example.com/elsewhere/%s"
     );
@@ -77,7 +78,7 @@ public class TestPageStoreConfiguration extends TestCase {
 
   // Currently most things are considered valid, we split on first whitespace...
   public void testInvalidEntryIgnored() throws Exception {
-    _store.set(new PageReferenceImpl("ConfigInterWikiLinks"), "", -1, "nospace\r\n", "");
+    _store.set(new PageInfoImpl(null, "ConfigInterWikiLinks", "nospace\r\n", Collections.<String, String>emptyMap()), "", -1, "");
     assertOnlyBuiltInWikiLinks();
   }
 

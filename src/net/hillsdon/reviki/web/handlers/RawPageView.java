@@ -18,7 +18,7 @@ package net.hillsdon.reviki.web.handlers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.web.common.View;
 
 /**
@@ -30,9 +30,9 @@ import net.hillsdon.reviki.web.common.View;
  */
 public class RawPageView implements View {
   
-  private final PageInfo _page;
+  private final VersionedPageInfo _page;
 
-  public RawPageView(final PageInfo page) {
+  public RawPageView(final VersionedPageInfo page) {
     _page = page;
   }
 

@@ -48,7 +48,7 @@ public class TestSearch extends WebTestSupport {
    */
   public void testNewPageCanBeFoundByNameInSearchIndex() throws Exception {
     String name = uniqueWikiPageName("SearchIndexTest");
-    HtmlPage page = editWikiPage(name, "Should be found by search", "", true);
+    HtmlPage page = editWikiPage(name, "Should be found by search", "", "", true);
     assertSearchFindsPageUsingQuery(page, name, "found by search");
     assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name));
     HtmlPage searchResult = search(page, name);
@@ -59,7 +59,7 @@ public class TestSearch extends WebTestSupport {
   public void testPageWithSpacesShowsInBacklinks() throws Exception {
     final String refers = uniqueWikiPageName("SearchSpaces BacklinkTesta");
     final String referred = uniqueWikiPageName("SearchSpaces BacklinkTestb");
-    editWikiPage(refers, "[["+referred+"]]", "", true);
+    editWikiPage(refers, "[["+referred+"]]", "", "", true);
     final HtmlPage page = getWikiPage(referred);
     getAnchorByHrefContains(page, URIUtil.encodeWithinPath(refers));
   }

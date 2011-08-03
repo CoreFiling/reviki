@@ -52,12 +52,14 @@ public class PluginsImpl implements Plugins {
   private final DefaultPicoContainer _context;
   private final ConcurrentMap<String, PluginAtRevision> _plugin = new ConcurrentHashMap<String, PluginAtRevision>();
   private final PageStore _store;
+  private long _lastSyncedRevision;
 
   /**
    */
   public PluginsImpl(final PageStore store) {
     _store = store;
     _context = new DefaultPicoContainer();
+    _lastSyncedRevision = 0;
   }
 
   public <T> List<T> getImplementations(final Class<T> clazz) {
@@ -85,6 +87,7 @@ public class PluginsImpl implements Plugins {
       // Ideally we'd report this on ConfigPlugins only.
       LOG.error("Error encountered updating plugins", ex);
     }
+    _lastSyncedRevision = upto;
   }
 
   private void updatePlugin(final ChangeInfo change) throws PageStoreException, IOException {
@@ -130,7 +133,7 @@ public class PluginsImpl implements Plugins {
   }
 
   public long getHighestSyncedRevision() throws IOException {
-    return 0;
+    return _lastSyncedRevision;
   }
 
 }

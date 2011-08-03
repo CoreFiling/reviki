@@ -77,13 +77,13 @@ public interface PageStore {
 
   /**
    * The page info may represent a page that doesn't exist yet (or has been deleted,
-   * we don't currently distinguish) check {@link PageInfo#isNewPage()}.
+   * we don't currently distinguish) check {@link VersionedPageInfo#isNewPage()}.
    *
    * @param ref A page name.
    * @param revision Revision, -1 for head.
    * @return Information (including current content) for the page.
    */
-  PageInfo get(PageReference ref, long revision) throws PageStoreException;
+  VersionedPageInfo get(PageReference ref, long revision) throws PageStoreException;
 
   /**
    * If the page is an existing page then try to take out a lock.
@@ -96,11 +96,11 @@ public interface PageStore {
    * @param ref A page name.
    * @return Information (including current content) for the page.
    */
-  PageInfo tryToLock(PageReference ref) throws PageStoreException;
+  VersionedPageInfo tryToLock(PageReference ref) throws PageStoreException;
 
   /**
    * @param ref Page.
-   * @param lockToken The token for the lock, see {@link PageInfo#getLockToken()}.
+   * @param lockToken The token for the lock, see {@link VersionedPageInfo#getLockToken()}.
    */
   void unlock(PageReference ref, String lockToken) throws PageStoreException;
 
@@ -109,15 +109,14 @@ public interface PageStore {
    *
    * Setting the page content to the empty string will delete the page.
    *
-   * @param ref A page name.s
-   * @param lockToken  The token for the edit lock, if any, see {@link PageInfo#getLockToken()}.
+   * @param page The page we want to store containing the content and attributes.
+   * @param lockToken  The token for the edit lock, if any, see {@link VersionedPageInfo#getLockToken()}.
    * @param baseRevision Used to check the edited copy was the latest.
-   * @param content The new content.
    * @param commitMessage An optional commit message.
    * @return The new revision number.
    * @throws InterveningCommitException If base revision is not the same as the head at the point immediately prior to the commit.
    */
-  long set(PageReference ref, String lockToken, long baseRevision, String content, String commitMessage) throws InterveningCommitException, PageStoreException;
+  long set(PageInfo page, String lockToken, long baseRevision, String commitMessage) throws InterveningCommitException, PageStoreException;
 
   /**
    * Delete attachment by calling this method.

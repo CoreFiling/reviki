@@ -25,7 +25,7 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.WikiSession;
 import net.hillsdon.reviki.search.impl.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.impl.LuceneSearcher;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
@@ -73,6 +73,7 @@ import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.graph.WikiGraphImpl;
+import net.hillsdon.reviki.wiki.macros.AttrMacro;
 import net.hillsdon.reviki.wiki.macros.IncomingLinksMacro;
 import net.hillsdon.reviki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.reviki.wiki.macros.SearchMacro;
@@ -112,8 +113,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ResultNode render(final PageReference page, final String in, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(page, in, urlOutputFilter);
+      public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+        return _renderer.render(page, urlOutputFilter);
       }
     });
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));
@@ -123,7 +124,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
 
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
     Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
-    RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
+    final RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
@@ -134,7 +135,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     Configuration pageStoreConfiguration = new PageStoreConfiguration(pageStore, applicationUrls);
     _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
-        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine)));
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new AttrMacro(pageStore)));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }

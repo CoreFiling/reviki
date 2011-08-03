@@ -12,27 +12,37 @@
         <table>
           <c:forEach var="attachment" items="${currentAttachments}">
             <tr>
-              <td>
+              <td class="attachmentNameAndDescription">
                 <a href="<c:url value="${attachment.name}"/>"><c:out value ="${attachment.name}" /></a> 
-                <c:if test="${not empty attachment.previousVersions}">(latest)</c:if>
+                <c:if test="${not empty attachment.previousVersions}">(latest)</c:if> - <c:out value="${attachment.versions[0].commitMessage}"/>
               </td>
               <td>
                 <form name="replaceAttachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
-                  <input type="file" name="file" /> 
-                  <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>" /> 
-                  <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>" />
-                  <input type="submit" value="Upload new version" />
+                  <table>
+                    <tr>
+                      <td class="text-align-right"><label for="file_${attachment.name}">File:</label></td>
+                      <td><input type="file" name="file" id="file_${attachment.name}"/> 
+                          <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>" />
+                          <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>" /></td>
+                      <td><input type="submit" value="Upload new version" /></td>
+                    </tr>
+                    <tr>
+                      <td class="text-align-right"><label for="message_${attachment.name}">Message:</label></td>
+                      <td><input type="text" name="attachmentMessage" id="message_${attachment.name}"/></td>
+                    </tr>
+                  </table>
                 </form>
               </td>
               <td><a href="<c:url value="${attachment.name}?delete"/>">delete</a>
               </td>
             </tr>
             <tr>
-              <td>
+              <td class="attachmentNameAndDescription">
                 <c:if test="${not empty attachment.previousVersions}">
                   <ul>
                     <c:forEach var="version" items="${attachment.previousVersions}">
-                      <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a></li>
+                      <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a>
+                    - <c:out value="${version.commitMessage}"/></li>
                     </c:forEach>
                   </ul>
                 </c:if>
@@ -53,11 +63,12 @@
             <td><c:out value="${attachment.name}" /></td>
           </tr>
           <tr>
-            <td>
+            <td class="attachmentNameAndDescription">
               <c:if test="${not empty attachment.versions}">
                 <ul>
                   <c:forEach var="version" items="${attachment.versions}">
-                    <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a></li>
+                    <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a>
+                    - <c:out value="${version.commitMessage}"/></li>
                   </c:forEach>
                 </ul>
               </c:if>
@@ -69,12 +80,16 @@
     <h4>Upload a new attachment</h4>
     <form name="attachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
       <table>
-        <tr><th style="text-align: right;"><label for="file">File to upload</label></th>
+        <tr><th class="text-align-right"><label for="file">File to upload</label></th>
           <td><input id="file" type="file" name="file" /></td>
         </tr>
         <tr>
-          <th style="text-align: right;"><label for="attachmentName">Attachment name (optional)</label></th>
+          <th class="text-align-right"><label for="attachmentName">Attachment name (optional)</label></th>
           <td><input id="attachmentName" type="text" name="attachmentName" /></td>
+        </tr>
+        <tr>
+          <th class="text-align-right"><label for="attachmentMessage">Message (optional)</label></th>
+          <td><input id="attachmentMessage" type="text" name="attachmentMessage" /></td>
         </tr>
         <tr>
           <td></td>

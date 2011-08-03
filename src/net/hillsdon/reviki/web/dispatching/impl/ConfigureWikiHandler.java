@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.configuration.DeploymentConfiguration;
+import net.hillsdon.reviki.configuration.SearchIndexBuilder;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.InvalidInputException;
@@ -33,7 +35,7 @@ import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class ConfigureWikiHandler implements RequestHandler {
-  
+
   private final WikiConfiguration _perWikiConfiguration;
   private final DeploymentConfiguration _configuration;
   private final ActiveWikis _activeWikis;
@@ -53,12 +55,16 @@ public class ConfigureWikiHandler implements RequestHandler {
     request.setAttribute("configuration", _perWikiConfiguration);
     if ("POST".equals(request.getMethod())) {
       String url = request.getParameter("url");
+      String user = request.getParameter("user");
+      String pass = request.getParameter("pass");
       try {
         _perWikiConfiguration.setUrl(url);
+        _perWikiConfiguration.setSVNUser(user);
+        _perWikiConfiguration.setSVNPassword(pass);
         _perWikiConfiguration.save();
         if (_perWikiConfiguration.isComplete()) {
           WikiHandler handler = _activeWikis.createWikiHandler(_perWikiConfiguration);
-          
+
           try {
             View authenticationView = handler.test(request, response);
             if (authenticationView != null) {
@@ -70,8 +76,17 @@ public class ConfigureWikiHandler implements RequestHandler {
             // TODO: Preserve SVN location.
             return new JspView("Configuration");
           }
-          
+
           _activeWikis.installHandler(_perWikiConfiguration, handler);
+        }
+        try {
+          SearchIndexBuilder indexBuilder = new SearchIndexBuilder(_configuration);
+          indexBuilder.indexWiki(_perWikiConfiguration);
+        }
+        catch(PageStoreAuthenticationException e) {
+          request.setAttribute("flash", "SVN username and password are invalid.");
+          // TODO: Preserve SVN location.
+          return new JspView("Configuration");
         }
         return RedirectToPageView.create(BuiltInPageReferences.PAGE_FRONT_PAGE, _applicationUrls, _perWikiConfiguration);
       }
@@ -84,5 +99,5 @@ public class ConfigureWikiHandler implements RequestHandler {
       return new JspView("Configuration");
     }
   }
-  
+
 }

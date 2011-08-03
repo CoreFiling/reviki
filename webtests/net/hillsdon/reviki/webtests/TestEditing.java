@@ -37,9 +37,9 @@ public class TestEditing extends WebTestSupport {
 
   public void testEditPageIncrementsRevision() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
-    HtmlPage initial = editWikiPage(name, "Initial content", "", true);
+    HtmlPage initial = editWikiPage(name, "Initial content", "", "", true);
     long initialRevision = getRevisionNumberFromTitle(initial);
-    HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", "", false);
+    HtmlPage edited = editWikiPage(name, "Initial content.  Extra content.", "", "", false);
     assertEquals(initialRevision + 1, getRevisionNumberFromTitle(edited));
   }
 
@@ -50,8 +50,32 @@ public class TestEditing extends WebTestSupport {
 
   public void testCancelEditExistingPage() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
-    editWikiPage(name, "Whatever", "", true);
+    editWikiPage(name, "Whatever", "", "", true);
     editThenCancel(name);
+  }
+
+  public void testEditAttributes() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    editWikiPage(name, "Initial Status: <<attr:status>>", "", "", true);
+    HtmlPage edited = editWikiPage(name, "Initial Status: <<attr:status>>", "status = completed", "", false);
+    String editedPageText = edited.asText();
+    assertTrue(editedPageText.contains("Initial Status: completed"));
+  }
+
+  public void testEditAttributesNewPage() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    HtmlPage edited = editWikiPage(name, "Initial Status: <<attr:status>>", "status = completed", "", true);
+    String editedPageText = edited.asText();
+    assertTrue(editedPageText.contains("Initial Status: completed"));
+  }
+
+  public void testDeleteAttributes() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    HtmlPage edited = editWikiPage(name, "Initial Status: <<attr:status>>", "status = completed", "", true);
+    assertTrue(edited.asText().contains("Initial Status: completed"));
+    edited = editWikiPage(name, "Initial Status: <<attr:status>>", "", "", false);
+    assertTrue(edited.asText().contains("Initial Status:"));
+    assertFalse(edited.asText().contains("Initial Status: completed"));
   }
 
   public void testPreview() throws Exception {
@@ -80,6 +104,29 @@ public class TestEditing extends WebTestSupport {
     assertEquals(expectedContent + NEWLINE_TEXTAREA, content.getText());
     // This checks for the rendering...
     assertNotNull(editPage.getAnchorByHref(expectedContent));
+  }
+
+  public void testPreviewWithChangedAttributes() throws Exception {
+    String name = uniqueWikiPageName("PreviewPageTest");
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlTextArea attributes = form.getTextAreaByName("attributes");
+    String expectedContent = "SomeContent";
+    String expectedAttributes = "\"text\" = \"" + expectedContent + "\"";
+    attributes.setText(expectedAttributes);
+    HtmlTextArea content = form.getTextAreaByName("content");
+    String expectedContentSource = "<<attr:text>>";
+    content.setText(expectedContentSource);
+
+    // Now if we preview we should get the previewed text rendered, and in
+    // the edit area.
+    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    editPage.asText().contains(expectedContent);
+    form = editPage.getFormByName(ID_EDIT_FORM);
+    attributes = form.getTextAreaByName("attributes");
+    assertEquals(expectedAttributes + NEWLINE_TEXTAREA, attributes.getText());
+    content = form.getTextAreaByName("content");
+    assertEquals(expectedContentSource + NEWLINE_TEXTAREA, content.getText());
   }
 
   private void editThenCancel(final String name) throws Exception {
@@ -118,7 +165,7 @@ public class TestEditing extends WebTestSupport {
   private HtmlPage loseLockHelper(final String buttonValue) throws Exception, IOException, JaxenException {
     final String name = uniqueWikiPageName("LoseLockPreviewTest");
     // User 1 make page
-    editWikiPage(name, "content", "", true);
+    editWikiPage(name, "content", "", "", true);
     // User 1 edit
     HtmlPage pageUser1 = clickEditLink(getWikiPage(name));
     // Set the content to "user1"

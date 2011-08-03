@@ -17,7 +17,7 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import java.util.regex.Matcher;
 
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
@@ -26,7 +26,7 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 /**
  * Obviously this has security issues...
- * 
+ *
  * @author mth
  */
 public class UnescapedHtmlNode extends AbstractRegexNode {
@@ -36,7 +36,7 @@ public class UnescapedHtmlNode extends AbstractRegexNode {
                 : "(?s)\\[<html>\\](.*?)\\[</html>\\]");
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
+  public ResultNode handle(final PageInfo page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
     return new LiteralResultNode(matcher.group(1));
   }
 

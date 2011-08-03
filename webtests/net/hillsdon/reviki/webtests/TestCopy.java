@@ -40,7 +40,7 @@ public class TestCopy extends WebTestSupport {
   public void testCopy() throws Exception {
     String fromPageName = uniqueWikiPageName("CopyTestFrom");
     String toPageName = uniqueWikiPageName("CopyTestTo");
-    editWikiPage(fromPageName, "Catchy tunes", "Whatever", true);
+    editWikiPage(fromPageName, "Catchy tunes", "", "Whatever", true);
     HtmlPage page = getWikiPage(fromPageName);
     page = (HtmlPage) page.getAnchorByName("copy").click();
     HtmlForm form = page.getFormByName("copyForm");

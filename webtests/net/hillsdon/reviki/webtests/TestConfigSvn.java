@@ -71,15 +71,20 @@ public class TestConfigSvn extends WebTestSupport {
     createOurDirectory(_repository.getCommitEditor("Creating test directory", null));
     final HtmlPage confSvnPage = getWebPage("pages/" + wikiName);
     // Enter svn url + DIRECTORY
-    final HtmlInput input = (HtmlInput) confSvnPage.getByXPath("//input[@name='url']").iterator().next();
+    HtmlInput input = (HtmlInput) confSvnPage.getByXPath("//input[@name='url']").iterator().next();
     input.setValueAttribute(getSvnLocation() + DIRECTORY);
+    // Enter svn username and password
+    input = (HtmlInput) confSvnPage.getByXPath("//input[@name='user']").iterator().next();
+    input.setValueAttribute(getUsername());
+    input = (HtmlInput) confSvnPage.getByXPath("//input[@name='pass']").iterator().next();
+    input.setValueAttribute(getPassword());
     // Click Save and hopefully get FrontPage
     HtmlPage frontPage = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
     assertTrue(frontPage.getTitleText().contains("Front Page"));
 
     // Perform an edit to make sure
     final String text = "Some text";
-    frontPage = editWikiPage(frontPage, text, "Some change", null);
+    frontPage = editWikiPage(frontPage, text, "Some change", "", null);
     assertTrue(frontPage.asText().contains(text));
   }
 

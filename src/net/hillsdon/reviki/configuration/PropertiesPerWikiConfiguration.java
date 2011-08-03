@@ -47,6 +47,14 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
     _deploymentConfiguration.setUrl(_wikiName, location);
   }
 
+  public void setSVNUser(final String user) {
+    _deploymentConfiguration.setSVNUser(_wikiName, user);
+  }
+
+  public void setSVNPassword(final String pass) {
+    _deploymentConfiguration.setSVNPassword(_wikiName, pass);
+  }
+
   public SVNURL getUrl() {
     return _deploymentConfiguration.getUrl(_wikiName);
   }
@@ -73,6 +81,14 @@ class PropertiesPerWikiConfiguration implements WikiConfiguration {
 
   public String getFixedBaseUrl(final String wikiName) {
     return _deploymentConfiguration.getFixedBaseUrl(wikiName);
+  }
+
+  public String getSVNUser() {
+    return _deploymentConfiguration.getSVNUser(_wikiName);
+  }
+
+  public String getSVNPassword() {
+    return _deploymentConfiguration.getSVNPassword(_wikiName);
   }
 
   @Override

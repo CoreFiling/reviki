@@ -49,25 +49,58 @@ public class TestChangeNotificationDispatcherImpl extends TestCase {
     _syncedUptoFourSubscriber = createMock(ChangeSubscriber.class);
     _syncedUptoFiveSubscriber = createMock(ChangeSubscriber.class);
   }
-  
+
   public void testDispatchesChangesSkippingThoseNotApplicableToSubscribersBasedOnSyncedRevision() throws Exception {
-    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L).anyTimes();
-    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L).anyTimes();
-    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L).anyTimes();
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
     expect(_operations.getLatestRevision()).andReturn(5L).once();
     expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
     _syncedUptoThreeSubscriber.handleChanges(5, asList(REVISION_FOUR_CHANGE, REVISION_FIVE_CHANGE));
     expectLastCall();
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
     _syncedUptoFourSubscriber.handleChanges(5, asList(REVISION_FIVE_CHANGE));
     expectLastCall();
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
     // Note we don't expect a call for _syncedUptoFiveSubscriber.
-    
+
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
     replay(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
-    _dispatcher = new ChangeNotificationDispatcherImpl(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber);
+    _dispatcher = new ChangeNotificationDispatcherImpl(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
     _dispatcher.sync();
     verify(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
-    
+
     assertEquals(5L, _dispatcher.getLastSynced());
   }
-  
+
+  public void testDispatcherLastSynced() throws Exception {
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    expect(_operations.getLatestRevision()).andReturn(5L).once();
+    expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
+    _syncedUptoThreeSubscriber.handleChanges(5, asList(REVISION_FOUR_CHANGE, REVISION_FIVE_CHANGE));
+    expectLastCall();
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
+    _syncedUptoFourSubscriber.handleChanges(5, asList(REVISION_FIVE_CHANGE));
+    expectLastCall();
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    // Note we don't expect a call for _syncedUptoFiveSubscriber.
+
+    expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
+    // Assume that the subscriber failed to sync properly, e.g. searcher while index is being built
+    expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
+    replay(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
+    _dispatcher = new ChangeNotificationDispatcherImpl(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
+    _dispatcher.sync();
+    verify(_operations, _syncedUptoThreeSubscriber, _syncedUptoFourSubscriber, _syncedUptoFiveSubscriber);
+
+    assertEquals(4L, _dispatcher.getLastSynced());
+  }
+
 }

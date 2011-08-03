@@ -7,6 +7,7 @@ import static org.easymock.EasyMock.verify;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.eq;
 
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
@@ -53,8 +55,8 @@ public class TestDefaultPageImplEditor extends TestCase {
   private ResultNode _resultNode;
 
   private FeedWriter _feedWriter;
-  private PageInfoImpl _pageInfo;
-    
+  private VersionedPageInfoImpl _pageInfo;
+
   private static final String USERNAME = "user";
 
   @Override
@@ -63,7 +65,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _response = null;
     _store = createMock(CachingPageStore.class);
     _pageStore = createMock(PageStore.class);
-    _pageInfo = new PageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
+    _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
     _renderer = createMock(MarkupRenderer.class);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
@@ -88,6 +90,8 @@ public class TestDefaultPageImplEditor extends TestCase {
   public void testInvalidSessionIdPreview() throws Exception {
     _request.setParameter(DefaultPageImpl.PARAM_LOCK_TOKEN, LOCK_TOKEN);
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, "malicious content!");
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setAttribute(RequestAttributes.USERNAME, USERNAME);
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID + "AAA");
@@ -111,10 +115,12 @@ public class TestDefaultPageImplEditor extends TestCase {
   public void testPreviewShowsContent() throws Exception {
     _request.setParameter(DefaultPageImpl.PARAM_LOCK_TOKEN, LOCK_TOKEN);
     _request.setParameter(DefaultPageImpl.PARAM_CONTENT, "new content");
+    _request.setParameter(DefaultPageImpl.PARAM_ATTRIBUTES, "");
+    _request.setParameter(DefaultPageImpl.PARAM_ORIGINAL_ATTRIBUTES, "");
     _request.setAttribute(RequestAttributes.USERNAME, USERNAME);
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
-    expect(_renderer.render(eq(THE_PAGE), eq("new content" + Strings.CRLF), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
+    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "new content" + Strings.CRLF, Collections.<String, String>emptyMap())), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
     expect(_resultNode.toXHTML()).andReturn("rendered preview");
     expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();

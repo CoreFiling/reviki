@@ -26,6 +26,7 @@ import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeSubscriber;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -37,10 +38,10 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Notifies the search engine of page changes immediately after they happen.
- * 
+ *
  * Important else we get backlinks wrong for new pages (as we only check
  * for commits at the beginning of each request).
- * 
+ *
  * @author mth
  */
 public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubscriber {
@@ -53,16 +54,16 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
   public ExternalCommitAwareSearchEngine(final SearchEngine delegate) {
     _delegate = delegate;
   }
-  
+
   /**
    * Setter to avoid circularity.  If set we'll notice external commits otherwise just delegate.
    */
   public void setPageStore(final PageStore store) {
     _store = store;
   }
-  
-  public void index(final String wiki, final String path, final long revision, final String content) throws IOException, PageStoreException {
-    _delegate.index(wiki, path, revision, content);
+
+  public void index(final PageInfo page) throws IOException, PageStoreException {
+    _delegate.index(page);
   }
 
   public Set<SearchMatch> search(final String query, final boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException {
@@ -72,31 +73,37 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
   public long getHighestSyncedRevision() throws IOException {
     return _delegate.getHighestIndexedRevision();
   }
-  
+
   public synchronized void handleChanges(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {
-    // We're going to work from head for the indexing so collapse edits down to page names.
-    final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
-    for (ChangeInfo change : chronological) {
-      if (change.getKind() == StoreKind.PAGE) {
-        minimized.add(new PageReferenceImpl(change.getPage()));
-      }
-    }
-    for (PageReference page : minimized) {
-      try {
-        PageInfo info = _store.get(page, -1);
-        // Note we pass 'upto' as the revision here.  At the moment we get
-        // back the revision of deleted pages as -2 which isn't such a good
-        // thing to set our 'highest indexed revision' to...
-        if (info.isNewPage()) {
-          _delegate.delete(info.getWiki(), info.getPath(), upto);
-        }
-        else {
-          _delegate.index(info.getWiki(), info.getPath(), upto, info.getContent());
+    if(_delegate.getHighestIndexedRevision() == -1 && !_delegate.isIndexBeingBuilt()) throw new PageStoreException(new Exception("Search index couldn't be built, please provide valid SVN authentication details in ConfigSvnLocation page."));
+    final boolean newDataToIndex = _delegate.getHighestIndexedRevision() >= 0 && !_delegate.isIndexBeingBuilt();
+    if (newDataToIndex) {
+
+      // We're going to work from head for the indexing so collapse edits down to page names.
+      final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
+      for (ChangeInfo change : chronological) {
+        if (change.getKind() == StoreKind.PAGE) {
+          minimized.add(new PageReferenceImpl(change.getPage()));
         }
       }
-      catch (Exception ex) {
-        LOG.error(ex);
+      for (PageReference page : minimized) {
+        try {
+          VersionedPageInfo info = _store.get(page, -1);
+          // Note we pass 'upto' as the revision here.  At the moment we get
+          // back the revision of deleted pages as -2 which isn't such a good
+          // thing to set our 'highest indexed revision' to...
+          if (info.isNewPage()) {
+            _delegate.delete(info.getWiki(), info.getPath());
+          }
+          else {
+            _delegate.index(info);
+          }
+        }
+        catch (Exception ex) {
+          LOG.error(ex);
+        }
       }
+      _delegate.rememberHighestIndexedRevision(upto);
     }
   }
 
@@ -104,8 +111,16 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.getHighestIndexedRevision();
   }
 
-  public void delete(final String wiki, final String path, final long revision) throws IOException {
-    _delegate.delete(wiki, path, revision);
+  public void rememberHighestIndexedRevision(long revision) throws IOException {
+    _delegate.rememberHighestIndexedRevision(revision);
+  }
+
+  public boolean isIndexBeingBuilt() throws IOException {
+    return _delegate.isIndexBeingBuilt();
+  }
+
+  public void delete(final String wiki, final String path) throws IOException {
+    _delegate.delete(wiki, path);
   }
 
   public String escape(final String in) {
@@ -119,5 +134,5 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
   public Set<String> outgoingLinks(final String page) throws IOException, PageStoreException {
     return _delegate.outgoingLinks(page);
   }
-  
+
 }

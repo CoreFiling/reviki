@@ -12,17 +12,25 @@
         <c:forEach var="match" items="${results}">
           <c:if test="${lastWiki != match.wiki}">
             <c:if test="${lastWiki != null}"></ul></c:if>
-        	<h2 class="results-wiki">
-        	  <c:choose>
+        	<c:choose>
         	    <c:when test="${match.sameWiki}">
-        	    This Wiki (${match.wiki})
+        	    <h2 class="results-wiki">
+                  This Wiki (${thisWiki})
+                </h2>
         	    </c:when>
         	    <c:otherwise>
-        	    ${match.wiki}
+                <c:if test="${lastWiki == null}">
+                  <h2 class="results-wiki">
+                    This Wiki (${thisWiki})
+                  </h2>
+                  <p>No results found.</p>
+                </c:if>
+        	    <h2 class="results-wiki">
+                  ${match.wiki}
+                </h2>
         	    </c:otherwise>
         	  </c:choose>
-        	</h2>
-          	<ul>
+        	<ul>
           </c:if>
           <li>
             <sw:wikiPage wiki="${match.wiki}" page="${match.page}"/>

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import net.hillsdon.reviki.wiki.renderer.macro.ResultFormat;
 
@@ -31,7 +31,7 @@ import com.google.common.collect.Iterables;
 
 public abstract class AbstractListOfPagesMacro implements Macro {
 
-  public final String handle(final PageReference page, final String remainder) throws Exception {
+  public final String handle(final PageInfo page, final String remainder) throws Exception {
     List<String> pages = new ArrayList<String>(getPages(remainder));
     sort(pages);
 

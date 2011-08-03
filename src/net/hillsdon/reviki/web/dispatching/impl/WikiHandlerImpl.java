@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -39,7 +39,6 @@ import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
@@ -57,7 +56,11 @@ public class WikiHandlerImpl implements WikiHandler {
   private static final class RequestAuthenticationView implements View {
     public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
       response.setHeader("WWW-Authenticate", "Basic realm=\"Wiki login\"");
-      response.sendError(401);
+      response.setStatus(401);
+      String message = "Authentication required to access this page.";
+      request.setAttribute("customMessage", message);
+      request.setAttribute(ATTRIBUTE_WIKI_IS_VALID, false);
+      request.getRequestDispatcher("/WEB-INF/templates/Error.jsp").forward(request, response);
     }
   }
 
@@ -142,8 +145,8 @@ public class WikiHandlerImpl implements WikiHandler {
   private void addSideBarEtcToRequest(final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException {
     for (PageReference ref : COMPLIMENTARY_CONTENT_PAGES) {
       final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
-      PageInfo page = _cachingPageStore.get(ref, -1);
-      request.setAttribute(requestVarName, _renderer.render(ref, page.getContent(), new ResponseSessionURLOutputFilter(request, response)).toXHTML());
+      VersionedPageInfo page = _cachingPageStore.get(ref, -1);
+      request.setAttribute(requestVarName, _renderer.render(page, new ResponseSessionURLOutputFilter(request, response)).toXHTML());
     }
   }
 

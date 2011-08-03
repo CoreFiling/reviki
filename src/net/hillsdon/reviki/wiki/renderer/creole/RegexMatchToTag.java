@@ -19,7 +19,7 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 import net.hillsdon.reviki.wiki.renderer.result.TagResultNode;
@@ -30,7 +30,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
   private final Integer _contentGroup;
   private final Pattern _replaceRe;
   private final String _replaceString;
-  
+
   public RegexMatchToTag(final String matchRe, final String tag, final Integer contentGroup) {
     this(matchRe, tag, contentGroup, null, null);
   }
@@ -43,7 +43,7 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     _replaceString = replaceString;
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
+  public ResultNode handle(final PageInfo page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
     if (_contentGroup == null) {
       return new TagResultNode(_tag);
     }
@@ -53,10 +53,10 @@ public class RegexMatchToTag extends AbstractRegexNode implements RenderNode {
     }
     return new TagResultNode(_tag, render(page, text, this, urlOutputFilter));
   }
-  
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + "<" + _tag + ">";
   }
-  
+
 }

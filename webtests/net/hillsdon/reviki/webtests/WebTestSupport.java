@@ -164,20 +164,21 @@ public abstract class WebTestSupport extends TestCase {
   /**
    * @param name Page name, a WikiWord.
    * @param content Content to set.
+   * @param attributes Attributes to set.
    * @param descriptionOfChange Description of the change.
    * @param isNew Used to assert the page is either new or existing.
    * @return The page after the 'Save' button has been clicked.
    * @throws IOException On failure.
    */
-  public HtmlPage editWikiPage(final String name, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
-    return editWikiPage(getWikiPage(name), content, descriptionOfChange, isNew);
+  public HtmlPage editWikiPage(final String name, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
+    return editWikiPage(getWikiPage(name), content, attributes, descriptionOfChange, isNew);
   }
 
   private void assertMatches(final String re, final String text) {
     assertTrue(text, text.matches(re));
   }
 
-  protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String descriptionOfChange, final Boolean isNew) throws Exception {
+  protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
     URL pageUrl = page.getWebResponse().getRequestUrl();
     final String newSign = isNew != null && isNew ? " - New" : "";
     if (isNew != null) {
@@ -189,6 +190,7 @@ public abstract class WebTestSupport extends TestCase {
     }
     HtmlForm editForm = page.getFormByName("editForm");
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
+    editForm.getTextAreaByName("attributes").setText(attributes == null ? "" : attributes);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
     page = (HtmlPage) editForm.getInputByValue("Save").click();
 
@@ -238,10 +240,15 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   public HtmlPage uploadAttachment(final String fileName, final String pageName) throws IOException {
+    return uploadAttachment(fileName, pageName, "");
+  }
+
+  public HtmlPage uploadAttachment(final String fileName, final String pageName, final String message) throws IOException {
     HtmlPage attachments = clickAttachmentsLink(getWikiPage(pageName), pageName);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     form.getInputByName("file").setValueAttribute(fileName);
     form.getInputByName("attachmentName").setValueAttribute("file");
+    form.getInputByName("attachmentMessage").setValueAttribute(message);
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
     return attachments;
 

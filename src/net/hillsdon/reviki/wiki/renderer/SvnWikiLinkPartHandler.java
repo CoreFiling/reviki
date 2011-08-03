@@ -16,9 +16,9 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.net.URISyntaxException;
-
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -50,7 +50,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   private InterWikiLinker _interWikiLinker;
 
   private final Configuration _configuration;
-  
+
   public SvnWikiLinkPartHandler(final String formatString, final LinkResolutionContext parentContext) {
     _formatString = formatString;
     _internalLinker = null;
@@ -66,18 +66,18 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _configuration = configuration;
     _linkResolutionContext = null;
   }
-  
+
   public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final InterWikiLinker interWikiLinker) {
     _formatString = formatString;
     _internalLinker = internalLinker;
     _store = store;
     _configuration = null;
     _linkResolutionContext = null;
-    
+
     _interWikiLinker = interWikiLinker;
   }
 
-  public String handle(final PageReference page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
+  public String handle(final PageInfo page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
     final String xhtmlContent = new CompositeResultNode(renderer.render(page, link.getText(), null, urlOutputFilter)).toXHTML();
     return handle(page, xhtmlContent, link, urlOutputFilter);
   }
@@ -92,7 +92,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
         throw new IllegalArgumentException(e);
       }
     }
-    
+
     LinkResolutionContext resolver;
     if (_linkResolutionContext != null) {
       resolver = _linkResolutionContext.derive(page);
@@ -106,7 +106,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     if (!link.exists(resolver) && WikiWordUtils.isAcronym(page.getName())) {
       return link.getText();
     }
-    
+
     return String.format(_formatString, noFollow, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), xhtmlContent);
   }
 

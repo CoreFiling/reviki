@@ -35,9 +35,9 @@ public class TestRecentChanges extends WebTestSupport {
    */
   public void testRecentChanges() throws Exception {
     String createdFirst = uniqueWikiPageName("RecentChangesTestFirst");
-    editWikiPage(createdFirst, "Content", "", true);
+    editWikiPage(createdFirst, "Content", "", "", true);
     String createdSecond = uniqueWikiPageName("RecentChangesTestSecond");
-    editWikiPage(createdSecond, "Content", "", true);
+    editWikiPage(createdSecond, "Content", "", "", true);
 
     Iterator<HtmlAnchor> links = getRecentChangesLinks();
     HtmlAnchor first = links.next();
@@ -47,7 +47,7 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(second.asText(), createdFirst);
 
     String descriptionOfChange = format("Bump %s up to top.", createdFirst);
-    editWikiPage(createdFirst, "Different content", descriptionOfChange, false);
+    editWikiPage(createdFirst, "Different content", "", descriptionOfChange, false);
     links = getRecentChangesLinks();
     first = links.next();
     links.next();

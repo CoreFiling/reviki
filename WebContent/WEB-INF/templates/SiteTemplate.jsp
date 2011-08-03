@@ -75,7 +75,7 @@
     </div>
     <tiles:insertAttribute name="content"/>
   </div>
-  <div id="footer" class="auxillary">
+  <div id="footer" class="auxillary clear-both">
   ${renderedFooter}
     <p id="build-details">Version $Version$.</p>
   </div>

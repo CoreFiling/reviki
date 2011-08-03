@@ -29,6 +29,7 @@ import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
@@ -43,7 +44,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
 public class SimplePageStore extends AbstractPageStore implements CachingPageStore {
 
   private String _wiki;
-  private Map<PageReference, PageInfo> _pages = new LinkedHashMap<PageReference, PageInfo>();
+  private Map<PageReference, VersionedPageInfo> _pages = new LinkedHashMap<PageReference, VersionedPageInfo>();
 
   public SimplePageStore() {
     this("");
@@ -53,10 +54,10 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     _wiki = wiki;
   }
 
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    PageInfo page = _pages.get(ref);
+  public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+    VersionedPageInfo page = _pages.get(ref);
     if (page == null) {
-      page = new PageInfoImpl(getWiki(), ref.getPath(), "", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null, null);
+      page = new VersionedPageInfoImpl(getWiki(), ref.getPath(), "", VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, null, null, null, null, null);
       _pages.put(ref, page);
     }
     return page;
@@ -70,10 +71,10 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     return Collections.emptyList();
   }
 
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreException {
+  public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreException {
     long revision = baseRevision + 1;
-    PageInfo page = new PageInfoImpl(getWiki(), ref.getPath(), content, revision, revision, null, null, null, null, null);
-    _pages.put(ref, page);
+    VersionedPageInfo versionedPage = new VersionedPageInfoImpl(page.getWiki(), page.getPath(), page.getContent(), revision, revision, null, null, null, null, null, page.getAttributes());
+    _pages.put(new PageReferenceImpl(page.getPath()), versionedPage);
     return revision;
   }
 
@@ -81,7 +82,7 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     throw new UnsupportedOperationException();
   }
 
-  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
+  public VersionedPageInfo tryToLock(final PageReference ref) throws PageStoreException {
     return get(ref, -1);
   }
 

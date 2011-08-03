@@ -26,8 +26,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,11 +46,12 @@ import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.NotFoundException;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.PageRevisionReference;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -76,6 +81,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
+
 public class DefaultPageImpl implements DefaultPage {
 
   public static final String ATTR_PREVIEW = "preview";
@@ -98,6 +106,10 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final String PARAM_CONTENT = "content";
 
+  public static final String PARAM_ATTRIBUTES = "attributes";
+
+  public static final String PARAM_ORIGINAL_ATTRIBUTES = "originalAttrs";
+
   public static final String PARAM_BASE_REVISION = "baseRevision";
 
   public static final String PARAM_LOCK_TOKEN = "lockToken";
@@ -112,9 +124,13 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final String PARAM_ATTACHMENT_NAME = "attachmentName";
 
+  public static final String PARAM_ATTACHMENT_MESSAGE = "attachmentMessage";
+
   public static final String PARAM_SESSION_ID = "sessionId";
 
   public static final String ATTR_PAGE_INFO = "pageInfo";
+
+  public static final String ATTR_ORIGINAL_ATTRIBUTES = "originalAttributes";
 
   public static final String ATTR_BACKLINKS = "backlinks";
 
@@ -173,11 +189,12 @@ public class DefaultPageImpl implements DefaultPage {
     }
     List<FileItem> items = getFileItems(request);
     try {
-      if (items.size() > 3) {
+      if (items.size() > 4) {
         throw new InvalidInputException("One file at a time.");
       }
       String attachmentName = null;
       Long baseRevision = null;
+      String attachmentMessage = null;
       FileItem file = null;
       for (FileItem item : items) {
         if (PARAM_ATTACHMENT_NAME.equals(item.getFieldName())) {
@@ -186,12 +203,18 @@ public class DefaultPageImpl implements DefaultPage {
         if (PARAM_BASE_REVISION.equals(item.getFieldName())) {
           baseRevision = RequestParameterReaders.getLong(item.getString().trim(), PARAM_BASE_REVISION);
         }
+        if (PARAM_ATTACHMENT_MESSAGE.equals(item.getFieldName())) {
+          attachmentMessage = item.getString().trim();
+          if (attachmentMessage.length() == 0) {
+            attachmentMessage = null;
+          }
+        }
         if (!item.isFormField()) {
           file = item;
         }
       }
       if (baseRevision == null) {
-        baseRevision = PageInfo.UNCOMMITTED;
+        baseRevision = VersionedPageInfo.UNCOMMITTED;
       }
 
       if (file == null || file.getSize() == 0) {
@@ -202,7 +225,7 @@ public class DefaultPageImpl implements DefaultPage {
         InputStream in = file.getInputStream();
         try {
           // IE sends the full file path.
-          storeAttachment(page, attachmentName, baseRevision, FilenameUtils.getName(file.getName()), in);
+          storeAttachment(page, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
           return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {
@@ -226,7 +249,7 @@ public class DefaultPageImpl implements DefaultPage {
     return items;
   }
 
-  private void storeAttachment(final PageReference page, final String attachmentName, final long baseRevision, final String fileName, final InputStream in) throws PageStoreException {
+  private void storeAttachment(final PageReference page, final String attachmentName, final long baseRevision, final String attachmentMessage, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
       storeName = fileName;
@@ -238,7 +261,8 @@ public class DefaultPageImpl implements DefaultPage {
       }
     }
     String operation = baseRevision < 0 ? "Added" : "Updated";
-    _store.attach(page, storeName, baseRevision, in, operation + " attachment " + attachmentName);
+    final String message = attachmentMessage == null ? operation + " attachment " + storeName : attachmentMessage;
+    _store.attach(page, storeName, baseRevision, in, message);
   }
 
   public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -257,7 +281,7 @@ public class DefaultPageImpl implements DefaultPage {
             }
 
             public void setFileName(final String name) {
-              response.setHeader("Content-Disposition", "attachment: filename=" + attachmentName);
+              response.setHeader("Content-Disposition", "inline; filename=" + attachmentName);
             }
 
             public OutputStream stream() throws IOException {
@@ -282,12 +306,12 @@ public class DefaultPageImpl implements DefaultPage {
     return new JspView("Attachments");
   }
 
-  private boolean isLockTokenValid(final PageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
+  private boolean isLockTokenValid(final VersionedPageInfo pageInfo, final HttpServletRequest request, final boolean preview) throws InvalidInputException {
     final String username = (String) request.getAttribute(RequestAttributes.USERNAME);
     return pageInfo.isNewOrLockedByUser(username) && (!preview || pageInfo.isNewPage() || lockTokenMatches(pageInfo, request));
   }
 
-  private boolean lockTokenMatches(final PageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {
+  private boolean lockTokenMatches(final VersionedPageInfo pageInfo, final HttpServletRequest request) throws InvalidInputException {
     return pageInfo.getLockToken().equals(getRequiredString(request, PARAM_LOCK_TOKEN));
   }
 
@@ -299,7 +323,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
-    PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     copySessionIdAsAttribute(request);
     if (!isLockTokenValid(pageInfo, request, preview)) {
@@ -320,12 +344,21 @@ public class DefaultPageImpl implements DefaultPage {
           final String oldContent = pageInfo.getContent();
           final String newContent = getContent(request);
           pageInfo = pageInfo.withAlternativeContent(newContent);
+          pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+            public boolean apply(String value) {
+              if (value == null) {
+                return false;
+              }
+              return true;
+            }
+          }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ResultNode rendered = _renderer.render(pageInfo, newContent, new ResponseSessionURLOutputFilter(request, response));
+          ResultNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
           request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
+      request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
       return new JspView("EditPage");
     }
   }
@@ -338,12 +371,12 @@ public class DefaultPageImpl implements DefaultPage {
     final String revisionParam = request.getParameter(PARAM_REVISION);
     final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
     addBacklinksInformation(request, page);
-    final PageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
+    final VersionedPageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
     request.setAttribute(ATTR_PAGE_INFO, main);
     request.setAttribute(ATTR_SHOW_REV, revisionParam != null);
     if (diffParam != null) {
       request.setAttribute(ATTR_DIFF_TITLE, page.getPath());
-      final PageInfo compare = pageInfoFromRevisionParam(page, diffParam, PARAM_DIFF_REVISION);
+      final VersionedPageInfo compare = pageInfoFromRevisionParam(page, diffParam, PARAM_DIFF_REVISION);
       request.setAttribute(ATTR_DIFF_END_REV, revisionText(main.getRevision()));
       request.setAttribute(ATTR_DIFF_START_REV, revisionText(compare.getRevision()));
       request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(compare.getContent(), main.getContent()));
@@ -356,7 +389,7 @@ public class DefaultPageImpl implements DefaultPage {
       return new RawPageView(main);
     }
     else {
-      ResultNode rendered = _renderer.render(main, main.getContent(), new ResponseSessionURLOutputFilter(request, response));
+      ResultNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }
@@ -412,9 +445,13 @@ public class DefaultPageImpl implements DefaultPage {
         return diffEditorView(page, ERROR_SESSION_EXPIRED, request);
       }
       String lockToken = getRequiredString(request, PARAM_LOCK_TOKEN);
+      if ("".equals(lockToken)) {
+        lockToken = null;
+      }
       String content = getContent(request);
+      Map<String, String> attributes = getAttributes(request);
       try {
-        _store.set(page, lockToken, getBaseRevision(request), content, createLinkingCommitMessage(page, request));
+        _store.set(new PageInfoImpl(_store.getWiki(), page.getPath(), content, attributes), lockToken, getBaseRevision(request), createLinkingCommitMessage(page, request));
       }
       catch (LostLockException e) {
         return diffEditorView(page, null, request);
@@ -448,7 +485,7 @@ public class DefaultPageImpl implements DefaultPage {
         _store.rename(page, toPage, -1, createLinkingCommitMessage(toPage, request));
       }
       catch (RenameException ex) {
-        PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+        VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
         String message;
         if (pageInfo.isLocked()) {
           message = "Cannot rename while page is locked. Page was locked by ";
@@ -484,7 +521,7 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   private View diffEditorView(final PageReference page, final String customMessage, final HttpServletRequest request) throws PageStoreException, InvalidInputException {
-    PageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
     String message;
     final String content = getContent(request);
     final String newContent = pageInfo.getContent();
@@ -500,6 +537,15 @@ public class DefaultPageImpl implements DefaultPage {
     if (customMessage != null) {
       message = customMessage;
     }
+    request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
+    pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+      public boolean apply(String value) {
+        if (value == null) {
+          return false;
+        }
+        return true;
+      }
+    }));
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute("flash", message);
     return new JspView("EditPage");
@@ -509,6 +555,35 @@ public class DefaultPageImpl implements DefaultPage {
     String content = getRequiredString(request, PARAM_CONTENT);
     content = content + Strings.CRLF;
     return content;
+  }
+
+  private Map<String, String> getAttributes(final HttpServletRequest request) throws InvalidInputException {
+    String attributesString = getRequiredString(request, PARAM_ATTRIBUTES).trim();
+    String[] lines = attributesString.split("\n");
+    String regexp = "(\\\")?([^\\\"]+)(\\\")?(\\s)*(=)(\\s)*(\\\")?([^\\\"]+)(\\\")?";
+    Pattern pattern = Pattern.compile(regexp);
+    Matcher matcher = null;
+    String attrPart = null;
+    String valuePart = null;
+    Map<String, String> attributes = new LinkedHashMap<String, String>();
+    for(String line: lines){
+      line = line.trim();
+      matcher = pattern.matcher(line);
+      if (matcher.find()) {
+        attrPart = matcher.group(2);
+        valuePart = matcher.group(8);
+        attributes.put(attrPart.trim(), valuePart.trim());
+      }
+    }
+    String originalAttributesString = getRequiredString(request, PARAM_ORIGINAL_ATTRIBUTES).trim();
+    String[] originalAttrs = originalAttributesString.split("\n");
+    for(String attr: originalAttrs) {
+      attr = attr.trim();
+      if (attr.length() > 0 && !attributes.containsKey(attr)) {
+        attributes.put(attr, null);
+      }
+    }
+    return attributes;
   }
 
   private Long getBaseRevision(final HttpServletRequest request) throws InvalidInputException {
@@ -524,7 +599,7 @@ public class DefaultPageImpl implements DefaultPage {
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName(), URLOutputFilter.NULL);
   }
 
-  private PageInfo pageInfoFromRevisionParam(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException, PageStoreException {
+  private VersionedPageInfo pageInfoFromRevisionParam(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException, PageStoreException {
     final PageRevisionReference reference = getPageRevisionReference(defaultPage, revisionText, paramName);
     return _store.get(reference.getPage(), reference.getRevision());
   }

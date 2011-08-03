@@ -15,11 +15,13 @@
  */
 package net.hillsdon.reviki.search.impl;
 
+import java.util.Collections;
+
 import junit.framework.TestCase;
 import net.hillsdon.reviki.search.SearchEngine;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -37,22 +39,23 @@ public class TestSearchIndexPopulatingPageStore extends TestCase {
     _mockedSearchEngine = createMock(SearchEngine.class);
     _populatingPageStore = new SearchIndexPopulatingPageStore(_mockedSearchEngine, _mockedDelegate);
   }
-  
+
   public void testDelegatesThenIndexesAgainstNewRevisionNumber() throws Exception {
-    final PageReference ref = new PageReferenceImpl("SomePage");
     final String lockToken = "";
     final long baseRevision = 12;
     final String content = "New content";
     final String commitMessage = "Did something";
-    
+    final PageInfo page = new PageInfoImpl(null, "SomePage", content, Collections.<String, String>emptyMap());
+
     final long newRevision = 15;
-  
-    expect(_mockedDelegate.set(ref, lockToken, baseRevision, content, commitMessage)).andReturn(newRevision );
-    _mockedSearchEngine.index("wiki", ref.getPath(), newRevision, content);
-    expect(_mockedDelegate.getWiki()).andReturn("wiki");
+
+    expect(_mockedDelegate.set(page, lockToken, baseRevision, commitMessage)).andReturn(newRevision );
+    expect(_mockedSearchEngine.isIndexBeingBuilt()).andReturn(false);
+    _mockedSearchEngine.index(page);
+    _mockedSearchEngine.rememberHighestIndexedRevision(newRevision);
     replay(_mockedDelegate, _mockedSearchEngine);
-    _populatingPageStore.set(ref, lockToken, baseRevision, content, commitMessage);
+    _populatingPageStore.set(page, lockToken, baseRevision, commitMessage);
     verify(_mockedDelegate, _mockedSearchEngine);
   }
-  
+
 }

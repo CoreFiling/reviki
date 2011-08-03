@@ -44,10 +44,15 @@ public class DispatcherImpl implements Dispatcher {
   private static final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 
   private final ListWikis _list;
+
   private final WikiChoiceImpl _choice;
+
   private final JumpToWikiUrl _jumpToWiki;
+
   private final ApplicationUrls _applicationUrls;
+
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
+
   private final RequestCompletedHandler _requestCompletedHandler;
 
   public DispatcherImpl(final ListWikis list, final WikiChoiceImpl choice, final JumpToWikiUrl jumpToWiki, final ApplicationUrls applicationUrls, final RequestLifecycleAwareManager requestLifecycleAwareManager, final RequestCompletedHandler requestCompletedHandler) {

@@ -19,7 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
@@ -63,10 +63,8 @@ public class PageStoreConfiguration implements Configuration {
   }
 
   private void addSpecifiedInterWikiLinks(final InterWikiLinker linker) throws PageStoreException {
-    PageInfo page = _store.get(new PageReferenceImpl("ConfigInterWikiLinks"), -1);
-    if (!page.isNewPage()) {
-      parseLinkEntries(linker, page.getContent());
-    }
+    VersionedPageInfo page = _store.get(new PageReferenceImpl("ConfigInterWikiLinks"), -1);
+    parseLinkEntries(linker, page.getContent());
   }
 
   private void parseLinkEntries(final InterWikiLinker linker, final String data) {

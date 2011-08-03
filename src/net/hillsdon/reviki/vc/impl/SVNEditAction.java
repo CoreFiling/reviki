@@ -31,13 +31,13 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
  * Does a commit of some sort.
- * 
+ *
  * @author mth
  */
 public abstract class SVNEditAction implements SVNAction<Long> {
-  
+
   private static final Log LOG = LogFactory.getLog(SVNEditAction.class);
-  
+
   private final String _commitMessage;
   private final Map<String, String> _locks;
 
@@ -49,7 +49,7 @@ public abstract class SVNEditAction implements SVNAction<Long> {
     _commitMessage = commitMessage;
     _locks = locks;
   }
-  
+
   public Long perform(BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException, IOException {
     ISVNEditor commitEditor = null;
     boolean success = false;
@@ -95,11 +95,11 @@ public abstract class SVNEditAction implements SVNAction<Long> {
   /**
    * Actually do something.
    * @param operations TODO
-   * @throws SVNException On failure. 
-   * @throws IOException On failure. 
+   * @throws SVNException On failure.
+   * @throws IOException On failure.
    * @throws NotFoundException On failure.
    * @throws PageStoreException On failure.
    */
   protected abstract void driveCommitEditor(final ISVNEditor commitEditor, BasicSVNOperations operations) throws SVNException, IOException, NotFoundException, PageStoreException;
-  
+
 }

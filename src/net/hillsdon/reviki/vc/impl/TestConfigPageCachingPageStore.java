@@ -15,8 +15,10 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.util.Collections;
+
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isConfigPage;
 
 public class TestConfigPageCachingPageStore extends TestCase {
@@ -26,13 +28,13 @@ public class TestConfigPageCachingPageStore extends TestCase {
     assertTrue(isConfigPage("ConfigFoo"));
     assertFalse(isConfigPage("ConfiguringStuff"));
   }
-  
+
   public void testDoesntCacheOldRevisionsOfConfigPages() throws Exception {
-    PageReference ref = new PageReferenceImpl("ConfigFoo");
+    PageInfo page = new PageInfoImpl(null, "ConfigFoo", "Hey there", Collections.<String, String>emptyMap());
     ConfigPageCachingPageStore store = new ConfigPageCachingPageStore(new SimplePageStore());
-    store.getUnderlying().set(ref, "", 1, "Hey there", "Initial commit");
-    assertFalse(store.get(ref, 2).isNewPage());
-    assertFalse(store.isCached(ref));
+    store.getUnderlying().set(page, "", 1, "Initial commit");
+    assertFalse(store.get(page, 2).isNewPage());
+    assertFalse(store.isCached(page));
   }
-  
+
 }

@@ -10,6 +10,7 @@
     <ul>
       <li>The directory must already exist.</li>
       <li>The URL should not be the root of the repository unless you really want to store the data there.</li>
+      <li>The provided username and password will be used for building of search index. They should have read-only access to the SVN.</li>
     </ul>
     <p>
       If the location contains existing wiki data it may take some minutes for
@@ -22,6 +23,14 @@
           <td><input style="width:25em;" id="url" name="url" value="<c:out value="${configuration.url}"/>"/></td>
         </tr>
         <tr><td colspan="2"><c:out value="${error}"/></td></tr>
+        <tr>
+          <td><label for="user">SVN Username </label></td>
+          <td><input style="width:25em;" id="user" name="user" value="<c:out value="${configuration.SVNUser}"/>"/></td>
+        </tr>
+        <tr>
+          <td><label for="pass">SVN Password </label></td>
+          <td><input type="password" style="width:25em;" id="pass" name="pass" value="<c:out value="${configuration.SVNPassword}"/>"/></td>
+        </tr>
         <tr><td colspan="2"><input type="submit" value="Save"/></td></tr>
       </table>
     </form> 

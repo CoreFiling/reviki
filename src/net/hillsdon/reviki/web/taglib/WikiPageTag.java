@@ -19,9 +19,7 @@ import java.net.URISyntaxException;
 
 import javax.servlet.jsp.JspException;
 
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
-import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;

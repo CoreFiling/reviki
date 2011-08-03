@@ -16,8 +16,12 @@
 package net.hillsdon.reviki.web.vcintegration;
 
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+
+import java.util.Collections;
+
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 
@@ -31,21 +35,21 @@ public class TestSpecialPagePopulatingPageStore extends TestCase {
     _delegate = new SimplePageStore();
     _special = new SpecialPagePopulatingPageStore(_delegate);
   }
-  
+
   public void testAddsSpecialPagesToList() throws Exception {
     assertTrue(_special.list().contains(new PageReferenceImpl("ConfigSvnLocation")));
   }
-  
+
   public void testPopulatesSomePages() throws Exception {
-    PageInfo frontPage = _special.get(PAGE_FRONT_PAGE, -1);
+    VersionedPageInfo frontPage = _special.get(PAGE_FRONT_PAGE, -1);
     assertTrue(frontPage.isNewPage());
-    assertEquals(PageInfo.UNCOMMITTED, frontPage.getLastChangedRevision());
+    assertEquals(VersionedPageInfo.UNCOMMITTED, frontPage.getLastChangedRevision());
     assertTrue(frontPage.getContent().contains("Welcome to"));
   }
-  
+
   public void testOnlyPopulatedThePageIfTheUnderlyingStoreDoesntHaveIt() throws Exception {
-    _delegate.set(PAGE_FRONT_PAGE, "", -1, "foo", "an edit");
+    _delegate.set(new PageInfoImpl(_delegate.getWiki(), PAGE_FRONT_PAGE.getPath(), "foo", Collections.<String, String>emptyMap()), "", -1, "an edit");
     assertEquals("foo", _special.get(PAGE_FRONT_PAGE, -1).getContent());
   }
-  
+
 }

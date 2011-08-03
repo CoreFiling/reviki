@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.AbstractRegexNode;
 import net.hillsdon.reviki.wiki.renderer.creole.HtmlEscapeResultNode;
@@ -55,7 +55,7 @@ public class MacroNode extends AbstractRegexNode {
     return matcher.group(1).trim();
   }
 
-  public ResultNode handle(final PageReference page, final Matcher matcher, final RenderNode parent, final URLOutputFilter urlOutputFilter) {
+  public ResultNode handle(final PageInfo page, final Matcher matcher, final RenderNode parent, final URLOutputFilter urlOutputFilter) {
     // We need to move to a push system for updating macros to avoid this.
     final String macroName = getMacroName(matcher);
     Macro macro = null;

@@ -63,10 +63,30 @@ public interface WikiConfiguration {
   SVNURL getUrl();
 
   /**
+   * @return The default username to access the data store.
+   */
+  String getSVNUser();
+
+  /**
+   * @return The default password to access the data store.
+   */
+  String getSVNPassword();
+
+  /**
    * @param url The URL.
    * @throws IllegalArgumentException If the URI is not a valid SVNURL.
    */
   void setUrl(String url) throws IllegalArgumentException;
+
+  /**
+   * @param user The SVN user.
+   */
+  void setSVNUser(String user);
+
+  /**
+   * @param pass The SVN password.
+   */
+  void setSVNPassword(String pass);
 
   /**
    * @return The directory to store the search engine index in or null if not possible.

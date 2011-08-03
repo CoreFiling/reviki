@@ -18,24 +18,25 @@ package net.hillsdon.reviki.search;
 import java.io.IOException;
 import java.util.Set;
 
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
  * Searches the wiki.
- * 
+ *
  * @author mth
  */
 public interface SearchEngine {
 
   /**
    * Search for pages.
-   * 
+   *
    * @param query Query.
-   * @param provideExtracts true if extracts from the matching text should be provided in the returned matches (slower). 
+   * @param provideExtracts true if extracts from the matching text should be provided in the returned matches (slower).
    * @param singleWiki true if the search should be restricted to the current wiki.
    * @return Matches for the query, in rank order.
-   * @throws IOException On error reading the search index. 
-   * @throws QuerySyntaxException If the query is too broken to use. 
+   * @throws IOException On error reading the search index.
+   * @throws QuerySyntaxException If the query is too broken to use.
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
   Set<SearchMatch> search(String query, boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException;
@@ -58,33 +59,42 @@ public interface SearchEngine {
 
   /**
    * Indexes page change.
-   * 
-   * @param path Page.
-   * @param revision The revision number of the new content.
-   * @param content New content.
-   * @throws IOException On error writing to the search index. 
+   *
+   * @param page Page to be indexed.
+   * @throws IOException On error writing to the search index.
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  void index(String wiki, String path, long revision, String content) throws IOException, PageStoreException;
+  void index(PageInfo page) throws IOException, PageStoreException;
 
   /**
-   * @return The highest revision number indexed (as passed to index).
-   * @throws IOException On error reading from the search index. 
+   * @return The highest revision number indexed (as passed to index). Returns -1 if the index has failed to built.
+   * @throws IOException On error reading from the search index.
    */
   long getHighestIndexedRevision() throws IOException;
 
   /**
+   * @param revision The highest revision number indexed.
+   * @throws IOException On error reading from the search index.
+   */
+  void rememberHighestIndexedRevision(long revision) throws IOException;
+
+  /**
+   * @return True if the index is currently being built, false otherwise.
+   * @throws IOException On error reading from the search index.
+   */
+  boolean isIndexBeingBuilt() throws IOException;
+
+  /**
    * @param wiki Wiki name.
    * @param path Page.
-   * @param revision Revision at which we noticed its passing.
-   * @throws IOException 
+   * @throws IOException
    */
-  void delete(String wiki, String path, long revision) throws IOException;
+  void delete(String wiki, String path) throws IOException;
 
   /**
    * @param in A string.
    * @return A quoted version that escapes any characters that have special significance in the search syntax.
    */
   String escape(String in);
-  
+
 }

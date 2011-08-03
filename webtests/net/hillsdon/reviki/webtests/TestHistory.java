@@ -33,8 +33,8 @@ public class TestHistory extends WebTestSupport {
   @SuppressWarnings("unchecked")
   public void test() throws Exception {
     String pageName = uniqueWikiPageName("HistoryTest");
-    HtmlPage page = editWikiPage(pageName, "Initial content", "", true);
-    page = editWikiPage(pageName, "Altered content", "s/Initial/Altered", false);
+    HtmlPage page = editWikiPage(pageName, "Initial content", "", "", true);
+    page = editWikiPage(pageName, "Altered content", "", "s/Initial/Altered", false);
     HtmlPage history = (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
     List<HtmlTableRow> historyRows = (List<HtmlTableRow>) history.getByXPath("//tr[td]");
     assertEquals(3, historyRows.size());
@@ -66,11 +66,11 @@ public class TestHistory extends WebTestSupport {
   public void testCompare() throws Exception {
     final String page1 = uniqueWikiPageName("HistoryCompare1.999@'.999Test");
     final String page2 = uniqueWikiPageName("HistoryCompare2.999@'.999Test");
-    editWikiPage(page1, "1", "", true);
-    editWikiPage(page1, "2", "", false);
-    editWikiPage(page1, "3", "", false);
+    editWikiPage(page1, "1", "", "", true);
+    editWikiPage(page1, "2", "", "", false);
+    editWikiPage(page1, "3", "", "", false);
     HtmlPage page = renamePage(page1, page2);
-    editWikiPage(page2, "4", "", false);
+    editWikiPage(page2, "4", "", "", false);
     page = (HtmlPage) page.getAnchorByName("history").click();
     HtmlForm form = page.getFormByName("compareForm");
     List<HtmlInput> fromList = form.getInputsByName("diff");

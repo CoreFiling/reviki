@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.vc.InterveningCommitException;
-import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Intercepts page edits in order to update the search index.
- * 
+ *
  * @author mth
  */
 public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
@@ -44,15 +44,23 @@ public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
   }
 
   @Override
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    long newRevision = super.set(ref, lockToken, baseRevision, content, commitMessage);
+  public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    long newRevision = super.set(page, lockToken, baseRevision, commitMessage);
     try {
-      _indexer.index(getWiki(), ref.getPath(), newRevision, content);
+      if(!_indexer.isIndexBeingBuilt()) {
+        if(page.getContent().trim().length() > 0) {
+          _indexer.index(page);
+        }
+        else {
+          _indexer.delete(page.getWiki(), page.getPath());
+        }
+        _indexer.rememberHighestIndexedRevision(newRevision);
+      }
     }
     catch (IOException e) {
-       LOG.error("Error adding to search index, skipping page: " + ref, e);
+      LOG.error("Error adding to search index, skipping page: " + page, e);
     }
     return newRevision;
   }
-  
+
 }

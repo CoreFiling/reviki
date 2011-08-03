@@ -27,14 +27,15 @@ import net.hillsdon.reviki.vc.PageStoreException;
 
 /**
  * This initial implementation is an in-memory cache so will repopulate itself on every restart.
- * 
+ *
  * @author mth
  */
 public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
 
   private final Map<String, ChangeInfo> _lastChangeForPath = new ConcurrentHashMap<String, ChangeInfo>();
   private final Map<String, ChangeInfo> _lastChangeForPathExistingOnly = new ConcurrentHashMap<String, ChangeInfo>();
- 
+  private long _lastSyncedRevision = 0;
+
   public ChangeInfo getChangeThatDeleted(final String path) {
     final ChangeInfo lastChangeForPath = _lastChangeForPath.get(path);
     if (lastChangeForPath != null && lastChangeForPath.isDeletion()) {
@@ -42,7 +43,7 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
     }
     return null;
   }
-  
+
   public Set<String> currentExistingEntries() {
     return Collections.unmodifiableSet(_lastChangeForPathExistingOnly.keySet());
   }
@@ -60,10 +61,11 @@ public class InMemoryDeletedRevisionTracker implements DeletedRevisionTracker {
         }
       }
     }
+    _lastSyncedRevision = upto;
   }
 
   public long getHighestSyncedRevision() throws IOException {
-    return 0;
+    return _lastSyncedRevision;
   }
-  
+
 }

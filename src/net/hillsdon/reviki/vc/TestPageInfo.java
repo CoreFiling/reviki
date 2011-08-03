@@ -16,15 +16,15 @@
 package net.hillsdon.reviki.vc;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 
 public class TestPageInfo extends TestCase {
 
   public void testRevisionNameAndIsNew() {
-    PageInfo uncommitted = new PageInfoImpl("wiki", "name", "content", PageInfo.UNCOMMITTED, PageInfo.UNCOMMITTED, null, null, null, null, null);
+    VersionedPageInfo uncommitted = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, null, null, null, null, null);
     assertEquals("New", uncommitted.getRevisionName());
     assertTrue(uncommitted.isNewPage());
-    PageInfo committed = new PageInfoImpl("wiki", "name", "content", 5, 2, null, null, null, null, null);
+    VersionedPageInfo committed = new VersionedPageInfoImpl("wiki", "name", "content", 5, 2, null, null, null, null, null);
     assertEquals("r2", committed.getRevisionName());
     assertFalse(committed.isNewPage());
   }

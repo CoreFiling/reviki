@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ import net.hillsdon.reviki.vc.AlreadyLockedException;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.NotFoundException;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -205,8 +206,8 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   public void lock(final PageReference ref, final long revision) throws AlreadyLockedException, PageStoreAuthenticationException, PageStoreException {
-    execute(new SVNAction<PageInfo>() {
-      public PageInfo perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
+    execute(new SVNAction<VersionedPageInfo>() {
+      public VersionedPageInfo perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         try {
           Map<String, Long> pathsToRevisions = singletonMap(ref.getPath(), revision);
           repository.lock(pathsToRevisions, "Locked by reviki.", false, new SVNLockHandlerAdapter());
@@ -281,7 +282,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     }
   }
 
-  public void create(final ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
+  public void create(final ISVNEditor commitEditor, final String path, final InputStream content, Map<String, String> attributes) throws SVNException, IOException {
     final BufferedInputStream bis = new BufferedInputStream(content);
     final String autoDetectedMimeType = detectMimeType(bis);
 
@@ -289,25 +290,33 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     commitEditor.applyTextDelta(path, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
     String checksum = deltaGenerator.sendDelta(path, bis, commitEditor, true);
-
-    final Map<String, String> autoprops = _autoPropertiesApplier.apply(path);
-    for (Map.Entry<String, String> entry : autoprops.entrySet()) {
-      commitEditor.changeFileProperty(path, entry.getKey(), SVNPropertyValue.create(entry.getValue()));
-    }
-    if (!autoprops.containsKey(SVNProperty.MIME_TYPE) && autoDetectedMimeType != null) {
+    final Map<String, String> autoProperties = _autoPropertiesApplier.apply(path);
+    final Map<String, String> allProperties = new LinkedHashMap<String, String>();
+    allProperties.putAll(autoProperties);
+    allProperties.putAll(attributes);
+    setProperties(commitEditor, path, allProperties);
+    if (!allProperties.containsKey(SVNProperty.MIME_TYPE) && autoDetectedMimeType != null) {
       commitEditor.changeFileProperty(path, SVNProperty.MIME_TYPE, SVNPropertyValue.create(autoDetectedMimeType));
     }
-
     commitEditor.closeFile(path, checksum);
   }
 
-  public void edit(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
+  public void edit(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content, Map<String, String> attributes)  throws SVNException {
     commitEditor.openFile(path, baseRevision);
     commitEditor.applyTextDelta(path, null);
     SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
     // We don't keep the base around so we can't provide it here.
     String checksum = deltaGenerator.sendDelta(path, content, commitEditor, true);
+    setProperties(commitEditor, path, attributes);
     commitEditor.closeFile(path, checksum);
+  }
+
+  private void setProperties(final ISVNEditor commitEditor, final String path, final Map<String, String> properties) throws SVNException{
+    if (properties!=null) {
+      for (Map.Entry<String, String> entry : properties.entrySet()) {
+        commitEditor.changeFileProperty(path, entry.getKey(), SVNPropertyValue.create(entry.getValue()));
+      }
+    }
   }
 
   public void copy(final ISVNEditor commitEditor, final String fromPath, final long fromRevision, final String toPath) throws SVNException {

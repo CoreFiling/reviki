@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -40,7 +40,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
     SvnWikiRenderer renderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()));
-    return renderer.render(new PageReferenceImpl(""), input, URLOutputFilter.NULL).toXHTML();
+    return renderer.render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
   }
 
 }

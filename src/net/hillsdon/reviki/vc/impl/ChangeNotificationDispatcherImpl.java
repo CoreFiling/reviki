@@ -61,7 +61,11 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
         notifyListeners(latest, ImmutableList.copyOf(Iterables.reverse(logs)));
       }
     }
-    _lastSynced = latest;
+    // Some subscribers might not have been synchronised, e.g. searcher if the index is only being built
+    _lastSynced = _subscribers[0].getHighestSyncedRevision();
+    for (int i = 1; i < _subscribers.length; i++) {
+      _lastSynced = Math.min(_lastSynced, _subscribers[i].getHighestSyncedRevision());
+    }
   }
 
   private void notifyListeners(final long upto, final List<ChangeInfo> chronological) throws PageStoreException, IOException {

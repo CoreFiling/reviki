@@ -28,6 +28,7 @@ th {
 th, td {
   padding-left: 0.4em;
   padding-right: 0.4em;
+  padding-top: 0.4em;
 }
 a.new-page {
   color: #888888;
@@ -221,3 +222,14 @@ h2.results-wiki {
   padding: 0.2em 0.5em;
 }
 
+.clear-both {
+  clear:both;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.attachmentNameAndDescription {
+  width: 35%;
+}

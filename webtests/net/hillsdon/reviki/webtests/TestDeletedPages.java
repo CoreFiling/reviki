@@ -20,7 +20,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
  * Deleted pages cause potential problems all over the place.
- * 
+ *
  * @author mth
  */
 public class TestDeletedPages extends WebTestSupport {
@@ -33,7 +33,7 @@ public class TestDeletedPages extends WebTestSupport {
       _page = page;
     }
   }
-  
+
   public void testClearTextDeletesPage() throws Exception {
     HtmlPage deleted = createThenDeletePage()._page;
     assertTrue(deleted.asText().contains("new page"));
@@ -45,11 +45,11 @@ public class TestDeletedPages extends WebTestSupport {
     // This used to give an error.
     historyLink.click();
   }
-  
+
   public void testCanRecreateDeletedPage() throws Exception {
     NamedPage page = createThenDeletePage();
     String expectedContent = "The new content";
-    assertTrue(editWikiPage(page._name, expectedContent, "Recreated", true).asText().contains(expectedContent));
+    assertTrue(editWikiPage(page._name, expectedContent, "", "Recreated", true).asText().contains(expectedContent));
   }
 
   public void testSearchDoesNotFindDeletedPage() throws Exception {
@@ -60,19 +60,19 @@ public class TestDeletedPages extends WebTestSupport {
   public void testCanViewDeletedPage() throws Exception {
     final String content = "Distinctive content";
     final String name = uniqueWikiPageName("EditPageTest");
-    
-    HtmlPage original = editWikiPage(name, content, "", true);
+
+    HtmlPage original = editWikiPage(name, content, "", "", true);
     long originalRevision = getRevisionNumberFromTitle(original);
-    editWikiPage(name, "", "Deleted", false);
+    editWikiPage(name, "", "", "Deleted", false);
     HtmlPage originalByRevision = getWebPage("pages/test/" + name + "?revision=" + originalRevision);
     assertTrue(originalByRevision.asText().contains(content));
   }
-  
+
   private NamedPage createThenDeletePage() throws Exception {
     String name = uniqueWikiPageName("EditPageTest");
-    editWikiPage(name, "Initial content", "", true);
-    HtmlPage page = editWikiPage(name, "", "", false);
+    editWikiPage(name, "Initial content", "", "", true);
+    HtmlPage page = editWikiPage(name, "", "", "", false);
     return new NamedPage(name, page);
   }
-  
+
 }

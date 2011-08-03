@@ -49,16 +49,16 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().copy(commitEditor, fromPath, fromRevision, toPath);
   }
 
-  public void create(final ISVNEditor commitEditor, final String path, final InputStream content) throws SVNException, IOException {
-    getDelegate().create(commitEditor, path, content);
+  public void create(final ISVNEditor commitEditor, final String path, final InputStream content, final Map<String, String> properties) throws SVNException, IOException {
+    getDelegate().create(commitEditor, path, content, properties);
   }
 
   public void delete(final ISVNEditor commitEditor, final String path, final long baseRevision) throws SVNException {
     getDelegate().delete(commitEditor, path, baseRevision);
   }
 
-  public void edit(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException {
-    getDelegate().edit(commitEditor, path, baseRevision, content);
+  public void edit(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content, final Map<String, String> properties) throws SVNException {
+    getDelegate().edit(commitEditor, path, baseRevision, content, properties);
   }
 
   public void createDirectory(final ISVNEditor commitEditor, final String dir) throws SVNException {

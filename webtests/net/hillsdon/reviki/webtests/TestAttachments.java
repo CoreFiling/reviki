@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
 
+import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -45,6 +46,11 @@ public class TestAttachments extends WebTestSupport {
     }
   }
 
+  public static String getTextAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
+    TextPage attachment = (TextPage) link.click();
+    return attachment.getContent().trim();
+  }
+
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
     ignoreStatusCodeErrors();
     final HtmlPage page = getWebPage("pages/test/FrontPage/attachments/DoesntExist.txt");
@@ -54,7 +60,7 @@ public class TestAttachments extends WebTestSupport {
 
   public void testUploadNothingGivesError() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
-    HtmlPage page = editWikiPage(name, "content", "", true);
+    HtmlPage page = editWikiPage(name, "content", "", "", true);
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
@@ -63,29 +69,29 @@ public class TestAttachments extends WebTestSupport {
 
   public void testUploadAndDownloadAttachment() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
-    HtmlPage page = editWikiPage(name, "Content", "", true);
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
     HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
 
     // A link should have been added to the page.
     page = getWikiPage(name);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
     attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
     form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
     attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
-    assertEquals("File 2.", getAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
+    assertEquals("File 2.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
   }
 
   public void testUploadAndDeleteAttachment() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
-    HtmlPage page = editWikiPage(name, "Content", "", true);
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
     HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
 
     page = getWikiPage(name);
     attachments = clickAttachmentsLink(page, name);
@@ -100,7 +106,21 @@ public class TestAttachments extends WebTestSupport {
 
     // Previous version should still be available
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
-    assertEquals("File 1.", getAttachmentAtEndOfLink(previousRevision));
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
   }
 
+  public void testUploadAttachmentWithDefaultMessage() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    editWikiPage(name, "Content", "", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
+    assertTrue(attachments.asText().contains("Added attachment file.txt"));
+  }
+
+  public void testUploadAttachmentWithCustomMessage() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    editWikiPage(name, "Content", "", "", true);
+    String message = "Some custom message";
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name, message);
+    assertTrue(attachments.asText().contains(message));
+  }
 }

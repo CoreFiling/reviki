@@ -17,6 +17,7 @@ package net.hillsdon.reviki.vc.impl;
 
 import static java.lang.String.format;
 import static net.hillsdon.fij.text.Strings.fromUTF8;
+import static net.hillsdon.reviki.wiki.macros.AttrMacro.REVIKI_ATTRIBUTE_PREFIX;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +48,7 @@ import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.MimeIdentifier;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -68,6 +70,7 @@ import org.tmatesoft.svn.core.io.ISVNEditor;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 
 /**
@@ -165,7 +168,7 @@ public class SVNPageStore extends AbstractPageStore {
     return names;
   }
 
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+  public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Map<String, String> properties = new HashMap<String, String>();
     SVNNodeKind kind = _operations.checkPath(ref.getPath(), revision);
@@ -178,6 +181,12 @@ public class SVNPageStore extends AbstractPageStore {
       String lockOwner = null;
       String lockToken = null;
       Date lockedSince = null;
+      final Map<String, String> filteredProperties = Maps.filterKeys(properties, new Predicate<String>() {
+        public boolean apply(String key) {
+          return key.startsWith(REVIKI_ATTRIBUTE_PREFIX);
+        }
+      });
+      Map<String, String> attributes = stripPrefix(filteredProperties, REVIKI_ATTRIBUTE_PREFIX);
       try {
         if (revision == -1 || _operations.checkPath(ref.getPath(), -1) == SVNNodeKind.FILE) {
           SVNLock lock = _operations.getLock(ref.getPath());
@@ -191,33 +200,41 @@ public class SVNPageStore extends AbstractPageStore {
       catch (NotFoundException ex) {
         // It was a file at 'revision' but is now deleted so we can't get the lock information.
       }
-      return new PageInfoImpl(_wiki, ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken, lockedSince);
+      return new VersionedPageInfoImpl(_wiki, ref.getPath(), Strings.toUTF8(baos.toByteArray()), actualRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockOwner, lockToken, lockedSince, attributes);
     }
     else if (SVNNodeKind.NONE.equals(kind)) {
-      long pseudoRevision = PageInfo.UNCOMMITTED;
-      long lastChangedRevision = PageInfo.UNCOMMITTED;
+      long pseudoRevision = VersionedPageInfo.UNCOMMITTED;
+      long lastChangedRevision = VersionedPageInfo.UNCOMMITTED;
       String lastChangedAuthor = null;
       Date lastChangedDate = null;
       final ChangeInfo deletingChange = getChangeThatDeleted(ref);
       if (deletingChange != null) {
-        pseudoRevision = PageInfo.DELETED;
+        pseudoRevision = VersionedPageInfo.DELETED;
         lastChangedRevision = deletingChange.getRevision();
         lastChangedAuthor = deletingChange.getUser();
         lastChangedDate = deletingChange.getDate();
       }
-      return new PageInfoImpl(_wiki, ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
+      return new VersionedPageInfoImpl(_wiki, ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
     }
     else {
       throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
     }
   }
 
+  private Map<String, String> stripPrefix(Map<String, String> properties, String propertyPrefix) {
+    Map<String, String> attributes = new LinkedHashMap<String, String>();
+    for(Map.Entry<String, String> entry: properties.entrySet()) {
+      attributes.put(entry.getKey().substring(propertyPrefix.length()), entry.getValue());
+    }
+    return attributes;
+  }
+
   private ChangeInfo getChangeThatDeleted(final PageReference ref) throws PageStoreAuthenticationException, PageStoreException {
     return _tracker.getChangeThatDeleted(ref.getPath());
   }
 
-  public PageInfo tryToLock(final PageReference ref) throws PageStoreException {
-    final PageInfo page = get(ref, -1);
+  public VersionedPageInfo tryToLock(final PageReference ref) throws PageStoreException {
+    final VersionedPageInfo page = get(ref, -1);
     if (page.isNewPage()) {
       return page;
     }
@@ -238,8 +255,9 @@ public class SVNPageStore extends AbstractPageStore {
     _operations.unlock(path, lockToken);
   }
 
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    final String path = ref.getPath();
+  public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
+    final String path = page.getPath();
+    final String content = page.getContent();
     if (content.trim().length() == 0) {
       return delete(path, lockToken, baseRevision, commitMessage);
     }
@@ -247,8 +265,10 @@ public class SVNPageStore extends AbstractPageStore {
       @Override
       protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException, SaveException {
         try {
-          commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), baseRevision);
-          set(commitEditor, path, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)));
+          Map<String, String> properties = addPrefix(page.getAttributes(), REVIKI_ATTRIBUTE_PREFIX);
+          String dir = SVNPathUtil.removeTail(page.getPath());
+          commitEditor.openDir(dir, baseRevision);
+          set(commitEditor, path, baseRevision, new ByteArrayInputStream(Strings.fromUTF8(content)), properties);
           commitEditor.closeDir();
         }
         catch (SVNException e) {
@@ -264,6 +284,14 @@ public class SVNPageStore extends AbstractPageStore {
     });
   }
 
+  private Map<String, String> addPrefix(Map<String, String> attributes, String prefix) {
+    Map<String, String> properties = new LinkedHashMap<String, String>();
+    for(Map.Entry<String, String> entry: attributes.entrySet()) {
+      properties.put(REVIKI_ATTRIBUTE_PREFIX + entry.getKey(), entry.getValue());
+    }
+    return properties;
+  }
+
   private long delete(final String path, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
     _operations.execute(new SVNEditAction(commitMessage, createLocksMap(path, lockToken)) {
       @Override
@@ -271,7 +299,7 @@ public class SVNPageStore extends AbstractPageStore {
         _operations.delete(commitEditor, path, baseRevision);
       }
     });
-    return PageInfo.DELETED;
+    return VersionedPageInfo.DELETED;
   }
 
   public long deleteAttachment(final PageReference pageRef, final String attachmentName, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
@@ -284,12 +312,12 @@ public class SVNPageStore extends AbstractPageStore {
     });
   }
 
-  private void set(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content) throws SVNException, IOException {
+  private void set(final ISVNEditor commitEditor, final String path, final long baseRevision, final InputStream content, final Map<String, String> attributes) throws SVNException, IOException {
     if (baseRevision < 0) {
-      _operations.create(commitEditor, path, content);
+      _operations.create(commitEditor, path, content, attributes);
     }
     else {
-      _operations.edit(commitEditor, path, baseRevision, content);
+      _operations.edit(commitEditor, path, baseRevision, content, attributes);
     }
   }
 
@@ -297,7 +325,7 @@ public class SVNPageStore extends AbstractPageStore {
     _autoPropertiesApplier.read();
 
     final boolean addLinkToPage;
-    final PageInfo pageInfo;
+    final VersionedPageInfo pageInfo;
     final long latestRevision;
     if (baseRevision < 0) {
       latestRevision = getLatestRevision();
@@ -321,7 +349,7 @@ public class SVNPageStore extends AbstractPageStore {
         else {
           commitEditor.openDir(dir, baseRevision);
         }
-        set(commitEditor, dir + "/" + storeName, baseRevision, in);
+        set(commitEditor, dir + "/" + storeName, baseRevision, in, new LinkedHashMap<String, String>());
         commitEditor.closeDir();
 
         if (addLinkToPage) {
@@ -329,7 +357,7 @@ public class SVNPageStore extends AbstractPageStore {
           final String link = (isImage ? "{{" : "[[") + "attachments/" + storeName + "|" + storeName + (isImage ? "}}" : "]]");
           final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
           commitEditor.openDir(SVNPathUtil.removeTail(ref.getPath()), -1);
-          set(commitEditor, ref.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)));
+          set(commitEditor, ref.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)), new LinkedHashMap<String, String>());
           commitEditor.closeDir();
         }
       }
@@ -375,7 +403,17 @@ public class SVNPageStore extends AbstractPageStore {
         return sink.stream();
       }
     };
-    _operations.getFile(path, revision, null, out);
+    Map<String, String> properties = new HashMap<String, String>();
+    // The properties will be set by the repository
+    _operations.getFile(path, revision, properties, out);
+
+    // If the mimetype property was set, replace the default setting in the sink
+    String mimetype = properties.get(SVNProperty.MIME_TYPE);
+    if (mimetype!=null) {
+      sink.setContentType(mimetype);
+    }
+    properties.clear();
+
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
@@ -407,7 +445,13 @@ public class SVNPageStore extends AbstractPageStore {
     return _operations.execute(new SVNRenameAction(commitMessage, to, needToMoveAttachmentDir, from, baseRevision));
   }
 
-  private Map<String, String> createLocksMap(final String path, final String lockToken) {
+  // Exposed for testing
+  Map<String, String> createLocksMap(final String path, final String lockToken) {
+    if ("".equals(lockToken)) {
+      // Something's gone wrong if we end up with the empty string here (null means not locked)
+      // and it causes hard-to-debug problems if we carry on.
+      throw new IllegalArgumentException("Empty lock token");
+    }
     return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
   }
 

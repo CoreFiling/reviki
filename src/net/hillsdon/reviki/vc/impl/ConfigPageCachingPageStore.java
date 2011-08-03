@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -29,26 +30,26 @@ import net.hillsdon.reviki.vc.PageStoreException;
  * The configuration pages are often accessed, e.g. ConfigSideBar,
  * ConfigInterWikiLinks.  We cache them, forgoing instant response
  * to external commits.
- * 
+ *
  * @author mth
  */
 public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implements CachingPageStore {
 
   private static final String CONFIG_PREFIX = "Config";
-  private final ConcurrentMap<PageReference, PageInfo> _cache = new ConcurrentHashMap<PageReference, PageInfo>();
+  private final ConcurrentMap<PageReference, VersionedPageInfo> _cache = new ConcurrentHashMap<PageReference, VersionedPageInfo>();
 
   public ConfigPageCachingPageStore(final PageStore delegate) {
     super(delegate);
   }
 
   @Override
-  public PageInfo get(final PageReference ref, final long revision) throws PageStoreException {
+  public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     if (revision >= 0 || !isConfigPage(ref.getPath())) {
       return super.get(ref, revision);
     }
-    
+
     // Note the map may be replaced by another thread so we don't reget the page from the cache.
-    PageInfo pageInfo = _cache.get(ref);
+    VersionedPageInfo pageInfo = _cache.get(ref);
     if (pageInfo == null || pageInfo.isLocked()) {
       pageInfo = super.get(ref, revision);
       _cache.put(ref, pageInfo);
@@ -57,19 +58,19 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
   }
 
   @Override
-  public long set(final PageReference ref, final String lockToken, final long baseRevision, final String content, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    if (isConfigPage(ref.getName())) {
-      _cache.remove(ref);
+  public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
+    if (isConfigPage(page.getName())) {
+      _cache.remove(page);
     }
-    return super.set(ref, lockToken, baseRevision, content, commitMessage);
+    return super.set(page, lockToken, baseRevision, commitMessage);
   }
 
   static boolean isConfigPage(final String pageName) {
-    return pageName.startsWith(CONFIG_PREFIX) 
+    return pageName.startsWith(CONFIG_PREFIX)
            && pageName.length() > CONFIG_PREFIX.length()
            && Character.isUpperCase(pageName.charAt(CONFIG_PREFIX.length()));
   }
-  
+
   /**
    * @return The underlying page store that non-caching access is delegated to.
    */
@@ -79,7 +80,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
 
   /**
    * Exposed for testing.
-   * 
+   *
    * @param ref A page ref.
    * @return true if we have a cached copy.
    */

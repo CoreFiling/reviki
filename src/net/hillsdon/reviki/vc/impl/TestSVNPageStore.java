@@ -23,22 +23,29 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.getCurrentArguments;
 
+import java.io.OutputStream;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.vc.impl.SVNPageStore.SVNRenameAction;
 
+import org.apache.commons.collections.MapUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNErrorMessage;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 
 /**
@@ -169,11 +176,72 @@ public class TestSVNPageStore extends TestCase {
     verify();
   }
 
+  public void testCreateLocksMapThrowsException() throws Exception {
+    String name = "ThePage";
+    String lockToken = "";
+    try {
+      _store.createLocksMap(name, lockToken);
+      fail("Expected IllegalArgumentException");
+    }
+    catch (IllegalArgumentException ex) {
+      // OK
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testGetPage() throws PageStoreException {
+    final String content = "Content";
+    PageReferenceImpl ref = new PageReferenceImpl("Page");
+    expect(_operations.checkPath(ref.getPath(), -1L)).andReturn(SVNNodeKind.FILE);
+    _operations.getFile(eq(ref.getPath()), eq(-1L), (Map<String, String>) anyObject(), (OutputStream) anyObject());
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+      public Object answer() throws Throwable {
+        OutputStream out = (OutputStream) getCurrentArguments()[3];
+        out.write(content.getBytes());
+        return null;
+      }
+    });
+    expect(_operations.getLock(ref.getPath())).andReturn(null);
+    replay();
+    VersionedPageInfo returnValue = _store.get(ref, -1);
+    assertEquals(ref.getName(), returnValue.getName());
+    assertEquals(content, returnValue.getContent());
+    assertEquals(MapUtils.EMPTY_MAP, returnValue.getAttributes());
+    verify();
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testGetPageWithAttributes() throws PageStoreException {
+    final String content = "Content";
+    PageReferenceImpl ref = new PageReferenceImpl("Page");
+    expect(_operations.checkPath(ref.getPath(), -1L)).andReturn(SVNNodeKind.FILE);
+    _operations.getFile(eq(ref.getPath()), eq(-1L), (Map<String, String>) anyObject(), (OutputStream) anyObject());
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+      public Object answer() throws Throwable {
+        Map<String, String> properties = (Map<String, String>) getCurrentArguments()[2];
+        properties.put("reviki:someKey", "someValue1");
+        properties.put("svn:someKey", "someValue2");
+        properties.put("someOtherKey", "someValue3");
+        OutputStream out = (OutputStream) getCurrentArguments()[3];
+        out.write(content.getBytes());
+        return null;
+      }
+    });
+    expect(_operations.getLock(ref.getPath())).andReturn(null);
+    replay();
+    VersionedPageInfo pageInfo = _store.get(ref, -1);
+    assertEquals(ref.getName(), pageInfo.getName());
+    assertEquals(content, pageInfo.getContent());
+    LinkedHashMap<String, String> expectedProperties = new LinkedHashMap<String, String>();
+    expectedProperties.put("someKey", "someValue1");
+    assertEquals(expectedProperties, pageInfo.getAttributes());
+    verify();
+  }
+
   private void verify() {
     EasyMock.verify(_tracker, _operations);
   }
   private void replay() {
     EasyMock.replay(_tracker, _operations);
   }
-
 }

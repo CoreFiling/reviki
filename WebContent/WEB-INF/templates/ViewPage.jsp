@@ -44,7 +44,7 @@
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
-    <div class="auxillary">
+    <div class="auxillary clear-both">
 	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
 	    <form id="editContent" name="editContent" action="<c:url value="${encodedPageName}"/>" method="post">

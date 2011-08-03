@@ -20,7 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.AutoProperties;
-import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
@@ -44,7 +44,7 @@ public class AutoProperiesFromConfigPage implements AutoProperties {
 
   public Map<String, String> read() {
     try {
-      PageInfo text = _store.get(CONFIG_AUTO_PROPERTIES, -1);
+      VersionedPageInfo text = _store.get(CONFIG_AUTO_PROPERTIES, -1);
       return parseAutoProperties(text.getContent());
     }
     catch (PageStoreException e) {

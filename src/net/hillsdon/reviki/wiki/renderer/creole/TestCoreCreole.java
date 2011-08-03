@@ -16,8 +16,9 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
+import java.util.Collections;
 
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 
 import org.codehaus.jackson.JsonParseException;
@@ -30,7 +31,7 @@ public class TestCoreCreole extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) {
-    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageReferenceImpl(""), input, URLOutputFilter.NULL).toXHTML();
+    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
   }
-  
+
 }
