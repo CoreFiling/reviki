@@ -59,10 +59,16 @@ reviki.configureAutoSuggest = function() {
   options.delimiter = '\n';
   
   var searchBox = $("#query"); 
+  var searchForm = $("#searchForm");
+  var submitted = false;
   var cancelSearch = false;
   var prevQuery = "";
   var cache = {};
   var lastXhr;
+  
+  searchForm.bind('submit', function(evt) {
+    submitted = true;
+  });
   
   $.widget( "custom.catcomplete", $.ui.autocomplete, {
     _renderMenu: function( ul, items ) {
@@ -82,8 +88,8 @@ reviki.configureAutoSuggest = function() {
     minLength: options.minchars,
     delay: options.delay,
     select: function(event, ui) {
-      $("#searchForm").val(ui.item.value);
-      $("#searchForm").submit();
+      searchForm.val(ui.item.value);
+      searchForm.submit();
       return false;
     },
     html: true
@@ -122,7 +128,9 @@ reviki.configureAutoSuggest = function() {
         }
       },
       error: function(txt) {
-        response([{label:'<span class="ui-autocomplete-searcherror">Error during the search</span>', value:""}]);
+        if(!submitted) {
+          response([{label:'<span class="ui-autocomplete-searcherror">Error during the search</span>', value:""}]);
+        }
       }
     });
   });
