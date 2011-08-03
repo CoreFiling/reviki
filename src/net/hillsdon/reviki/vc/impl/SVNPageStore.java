@@ -303,7 +303,7 @@ public class SVNPageStore extends AbstractPageStore {
   }
 
   public long deleteAttachment(final PageReference pageRef, final String attachmentName, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
-    final String path = pageRef.getAttachmentPath() + "/" + attachmentName;
+    final String path = SVNPathUtil.append(pageRef.getAttachmentPath(), attachmentName);
     return _operations.execute(new SVNEditAction(commitMessage) {
       @Override
       protected void driveCommitEditor(final ISVNEditor commitEditor, final BasicSVNOperations operations) throws SVNException, IOException {
