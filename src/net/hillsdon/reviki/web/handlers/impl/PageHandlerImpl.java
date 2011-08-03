@@ -18,6 +18,7 @@ package net.hillsdon.reviki.web.handlers.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.common.ConsumedPath;
@@ -38,13 +39,13 @@ import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_F
 /**
  * Everything that does something to a wiki page or attachment comes through here
  * and is dispatched to the relevant method on the appropriate page implementation.
- * 
+ *
  * @author mth
  */
 public class PageHandlerImpl implements PageHandler {
 
   public static final String PATH_WALK_ERROR_MESSAGE = "No '/' characters allowed in a page name.";
-  
+
   private final PageSource _pageSource;
   private final WikiUrls _wikiUrls;
 
@@ -61,7 +62,7 @@ public class PageHandlerImpl implements PageHandler {
     if (pageName.contains("/")) {
       throw new InvalidInputException(PATH_WALK_ERROR_MESSAGE);
     }
-    
+
     final PageReference pageReference = new PageReferenceImpl(pageName);
     request.setAttribute("page", pageReference);
 
@@ -80,11 +81,14 @@ public class PageHandlerImpl implements PageHandler {
         }
       }
     }
+    else if(path.hasNext() && !"".equals(path.peek()) && !"opensearch.xml".equals(path.peek())) {
+      throw new NotFoundException();
+    }
     else if (request.getParameter("history") != null) {
       return page.history(pageReference, path, request, response);
     }
     else if ("POST".equals(request.getMethod())) {
-      if (request.getParameter(SUBMIT_SAVE) != null 
+      if (request.getParameter(SUBMIT_SAVE) != null
        || request.getParameter(SUBMIT_COPY) != null
        || request.getParameter(SUBMIT_RENAME) != null
        || request.getParameter(SUBMIT_UNLOCK) != null) {

@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+
 import net.hillsdon.reviki.vc.PageReference;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
 
@@ -23,6 +25,16 @@ public class TestMisc extends WebTestSupport {
   public void testWikiRootRedirectsToFrontPage() throws Exception {
     assertTrue(getWebPage("pages/test/").getTitleText().contains("Front Page"));
     assertTrue(getWebPage("pages/test").getTitleText().contains("Front Page"));
+  }
+
+  public void testNestedUrlThrowsException() throws Exception {
+    try {
+      getWebPage("pages/test/somepage/somenestedpage");
+      fail();
+    }
+    catch(FailingHttpStatusCodeException e) {
+      // correct
+    }
   }
 
   public void testNoBackLinkToSelf() throws Exception {
