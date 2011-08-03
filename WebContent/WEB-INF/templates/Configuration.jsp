@@ -10,7 +10,7 @@
     <ul>
       <li>The directory must already exist.</li>
       <li>The URL should not be the root of the repository unless you really want to store the data there.</li>
-      <li>The provided username and password will be used for building of search index. They should have read-only access to the SVN.</li>
+      <li>The provided username and password will be used for building the search index. They should have read-only access to the SVN.</li>
     </ul>
     <p>
       If the location contains existing wiki data it may take some minutes for
