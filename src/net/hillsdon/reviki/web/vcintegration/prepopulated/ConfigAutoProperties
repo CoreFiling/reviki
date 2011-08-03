@@ -4,6 +4,7 @@
 *.doc = svn:mime-type=application/msword
 *.dtd = svn:mime-type=text/x-dtd
 *.html = svn:mime-type=text/html
+*.ico = svn:mime-type=image/x-icon
 *.jpg = svn:mime-type=image/jpeg
 *.odt = svn:mime-type=application/vnd.oasis.opendocument.text
 *.ott = svn:mime-type=application/vnd.oasis.opendocument.text-template
