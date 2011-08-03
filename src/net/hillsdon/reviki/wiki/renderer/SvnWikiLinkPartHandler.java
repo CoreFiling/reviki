@@ -103,7 +103,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
     String clazz = link.getStyleClass(resolver);
     String url = link.getURL(resolver);
-    if (!link.exists(resolver) && WikiWordUtils.isAcronym(page.getName())) {
+    if (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText())) {
       return link.getText();
     }
 
