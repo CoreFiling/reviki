@@ -61,10 +61,11 @@ public interface SearchEngine {
    * Indexes page change.
    *
    * @param page Page to be indexed.
+   * @param buildingIndex Flag indicating whether we are building index.
    * @throws IOException On error writing to the search index.
    * @throws PageStoreException If an error occurs reading wiki-data.
    */
-  void index(PageInfo page) throws IOException, PageStoreException;
+  void index(PageInfo page, boolean buildingIndex) throws IOException, PageStoreException;
 
   /**
    * @return The highest revision number indexed (as passed to index). Returns -1 if the index has failed to built.
@@ -85,11 +86,18 @@ public interface SearchEngine {
   boolean isIndexBeingBuilt() throws IOException;
 
   /**
+   * @param revision Boolean indicating whether the index is being built.
+   * @throws IOException On error reading from the search index.
+   */
+  void setIndexBeingBuilt(boolean buildingIndex) throws IOException;
+
+  /**
    * @param wiki Wiki name.
    * @param path Page.
-   * @throws IOException
+   * @param buildingIndex Flag indicating whether we are building index.
+   * @throws IOException On error writing to the search index.
    */
-  void delete(String wiki, String path) throws IOException;
+  void delete(String wiki, String path, boolean buildingIndex) throws IOException;
 
   /**
    * @param in A string.

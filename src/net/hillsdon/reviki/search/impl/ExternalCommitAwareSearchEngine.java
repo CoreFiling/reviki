@@ -62,8 +62,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     _store = store;
   }
 
-  public void index(final PageInfo page) throws IOException, PageStoreException {
-    _delegate.index(page);
+  public void index(final PageInfo page, boolean buildingIndex) throws IOException, PageStoreException {
+    _delegate.index(page, buildingIndex);
   }
 
   public Set<SearchMatch> search(final String query, final boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException {
@@ -78,7 +78,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     if(_delegate.getHighestIndexedRevision() == -1 && !_delegate.isIndexBeingBuilt()) throw new PageStoreException(new Exception("Search index couldn't be built, please provide valid SVN authentication details in ConfigSvnLocation page."));
     final boolean newDataToIndex = _delegate.getHighestIndexedRevision() >= 0 && !_delegate.isIndexBeingBuilt();
     if (newDataToIndex) {
-
+      _delegate.setIndexBeingBuilt(true);
       // We're going to work from head for the indexing so collapse edits down to page names.
       final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
       for (ChangeInfo change : chronological) {
@@ -93,10 +93,10 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
           // back the revision of deleted pages as -2 which isn't such a good
           // thing to set our 'highest indexed revision' to...
           if (info.isNewPage()) {
-            _delegate.delete(info.getWiki(), info.getPath());
+            _delegate.delete(info.getWiki(), info.getPath(), true);
           }
           else {
-            _delegate.index(info);
+            _delegate.index(info, true);
           }
         }
         catch (Exception ex) {
@@ -104,6 +104,7 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
         }
       }
       _delegate.rememberHighestIndexedRevision(upto);
+      _delegate.setIndexBeingBuilt(false);
     }
   }
 
@@ -119,8 +120,12 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.isIndexBeingBuilt();
   }
 
-  public void delete(final String wiki, final String path) throws IOException {
-    _delegate.delete(wiki, path);
+  public void setIndexBeingBuilt(boolean buildingIndex) throws IOException {
+    _delegate.setIndexBeingBuilt(buildingIndex);
+  }
+
+  public void delete(final String wiki, final String path, boolean buildingIndex) throws IOException {
+    _delegate.delete(wiki, path, buildingIndex);
   }
 
   public String escape(final String in) {

@@ -137,7 +137,7 @@ public class SearchIndexBuilder implements Runnable {
       latestRevision = operations.getLatestRevision();
       long latestIndexed = searcher.getHighestIndexedRevision();
       if (latestIndexed < latestRevision) {
-        searcher.rememberIndexBeingBuilt(true);
+        searcher.setIndexBeingBuilt(true);
         List<ChangeInfo> logs = operations.log("", -1, LogEntryFilter.DESCENDANTS, true, latestIndexed + 1, latestRevision);
 
         final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
@@ -190,7 +190,7 @@ public class SearchIndexBuilder implements Runnable {
 
   private void writeIndexedRevision(LuceneSearcher searcher, long latestRevision) {
     try {
-      searcher.rememberIndexBeingBuilt(false);
+      searcher.setIndexBeingBuilt(false);
       searcher.rememberHighestIndexedRevision(latestRevision);
     } catch(IOException ex) {
       ex.printStackTrace();

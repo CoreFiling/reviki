@@ -51,7 +51,7 @@ public class TestSearchIndexPopulatingPageStore extends TestCase {
 
     expect(_mockedDelegate.set(page, lockToken, baseRevision, commitMessage)).andReturn(newRevision );
     expect(_mockedSearchEngine.isIndexBeingBuilt()).andReturn(false);
-    _mockedSearchEngine.index(page);
+    _mockedSearchEngine.index(page, false);
     _mockedSearchEngine.rememberHighestIndexedRevision(newRevision);
     replay(_mockedDelegate, _mockedSearchEngine);
     _populatingPageStore.set(page, lockToken, baseRevision, commitMessage);

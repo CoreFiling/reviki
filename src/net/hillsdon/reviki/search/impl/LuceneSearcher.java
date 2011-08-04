@@ -227,11 +227,6 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
 
-  public void index(final PageInfo page) throws IOException, PageStoreException {
-    index(page, false);
-  }
-
-
   // Lucene allows multiple non-deleting readers and at most one writer at a time.
   // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
   public synchronized void index(final PageInfo page, final boolean buildingIndex) throws IOException, PageStoreException {
@@ -250,10 +245,6 @@ public class LuceneSearcher implements SearchEngine {
       attrs.add("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
     }
     return attrs;
-  }
-
-  public void delete(final String wiki, final String path) throws IOException {
-    delete(wiki, path, false);
   }
 
   // See comment on index.
@@ -522,9 +513,9 @@ public class LuceneSearcher implements SearchEngine {
     return false;
   }
 
-  public void rememberIndexBeingBuilt(boolean built) throws IOException {
+  public void setIndexBeingBuilt(boolean buildingIndex) throws IOException {
     createIndexIfNecessary();
-    replaceProperty(createPropertyDocument(PROPERTY_BUILT, String.valueOf(built)));
+    replaceProperty(createPropertyDocument(PROPERTY_BUILT, String.valueOf(buildingIndex)));
   }
 
   public String escape(final String in) {

@@ -49,10 +49,10 @@ public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
     try {
       if(!_indexer.isIndexBeingBuilt()) {
         if(page.getContent().trim().length() > 0) {
-          _indexer.index(page);
+          _indexer.index(page, false);
         }
         else {
-          _indexer.delete(page.getWiki(), page.getPath());
+          _indexer.delete(page.getWiki(), page.getPath(), false);
         }
         _indexer.rememberHighestIndexedRevision(newRevision);
       }
