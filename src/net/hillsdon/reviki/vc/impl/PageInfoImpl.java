@@ -10,6 +10,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   private final String _wiki;
   private final String _content;
   private final Map<String, String> _attributes;
+  private boolean _updated;
 
   // For testing purposes.
   public PageInfoImpl(String path) {
@@ -21,6 +22,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     _wiki = wiki;
     _content = content;
     _attributes = attributes;
+    _updated = false;
   }
 
   public String getWiki() {
@@ -43,4 +45,11 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     return new PageInfoImpl(_wiki, super.getPath(), _content, attributes);
   }
 
+  public boolean getPageWasUpdated() {
+    return _updated;
+  }
+
+  public void setPageWasUpdated(boolean updated) {
+    _updated = updated;
+  }
 }

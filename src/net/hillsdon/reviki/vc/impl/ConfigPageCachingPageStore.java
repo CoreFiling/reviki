@@ -50,7 +50,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
 
     // Note the map may be replaced by another thread so we don't reget the page from the cache.
     VersionedPageInfo pageInfo = _cache.get(ref);
-    if (pageInfo == null || pageInfo.isLocked()) {
+    if (pageInfo == null || pageInfo.isLocked() || pageInfo.getPageWasUpdated()) {
       pageInfo = super.get(ref, revision);
       _cache.put(ref, pageInfo);
     }
