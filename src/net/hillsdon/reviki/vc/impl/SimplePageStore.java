@@ -93,7 +93,7 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     return Collections.emptyList();
   }
 
-  public void attach(final PageReference ref, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+  public void attach(final PageInfo page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     throw new UnsupportedOperationException();
   }
 

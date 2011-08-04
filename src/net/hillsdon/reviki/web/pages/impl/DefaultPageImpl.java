@@ -46,6 +46,7 @@ import net.hillsdon.reviki.vc.ConflictException;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -224,8 +225,10 @@ public class DefaultPageImpl implements DefaultPage {
       else {
         InputStream in = file.getInputStream();
         try {
+          // get the page from store - needed to get content of the special pages which were not saved yet
+          PageInfo pageInfo = _store.get(page, -1);
           // IE sends the full file path.
-          storeAttachment(page, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
+          storeAttachment(pageInfo, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
           return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {
@@ -249,7 +252,7 @@ public class DefaultPageImpl implements DefaultPage {
     return items;
   }
 
-  private void storeAttachment(final PageReference page, final String attachmentName, final long baseRevision, final String attachmentMessage, final String fileName, final InputStream in) throws PageStoreException {
+  private void storeAttachment(final PageInfo page, final String attachmentName, final long baseRevision, final String attachmentMessage, final String fileName, final InputStream in) throws PageStoreException {
     String storeName = attachmentName;
     if (storeName == null || storeName.length() == 0) {
       storeName = fileName;

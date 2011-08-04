@@ -87,6 +87,17 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
   }
 
+  public void testUploadAndDownloadAttachmentOnNewPage() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    HtmlPage page = getWikiPage(name);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+
+    // A link should have been added to the page.
+    page = getWikiPage(name);
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
+  }
+
   public void testUploadAndDeleteAttachment() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
     HtmlPage page = editWikiPage(name, "Content", "", "", true);

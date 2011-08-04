@@ -159,13 +159,13 @@ public interface PageStore {
   /**
    * Add an attachment to a page.
    *
-   * @param ref The page name.
+   * @param page The page.
    * @param storeName The name to store the attachment as.
    * @param baseRevision The base revision.
    * @param in Data read from here.
    * @param commitMessage An optional commit message.
    */
-  void attach(PageReference ref, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
+  void attach(PageInfo page, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
 
   /**
    * All attachments for the given page, with information on previous versions of the same.
