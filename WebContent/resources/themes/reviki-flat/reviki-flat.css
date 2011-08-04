@@ -1158,6 +1158,10 @@
   cursor: pointer;
 }
 
+.ui-autocomplete-input {
+  border: 1px solid black;
+}
+
 .ui-autocomplete-loading {
   background: white url('images/ui-loading.gif') right center no-repeat;
 }
