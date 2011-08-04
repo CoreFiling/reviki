@@ -32,6 +32,7 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.WikiChoice;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.redirect.RedirectView;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
@@ -73,7 +74,13 @@ public class WikiChoiceImpl implements WikiChoice, Startable {
   }
 
   public View handle(final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    WikiConfiguration configuration = getWikiConfiguration(path);
+    WikiConfiguration configuration = null;
+    try{
+      configuration = getWikiConfiguration(path);
+    }
+    catch(NotFoundException e) {
+      return new RedirectView(_applicationUrls.list());
+    }
     request.setAttribute("wikiName", configuration.getWikiName());
     RequestHandler handler = getWikiHandler(request, configuration, path);
     return handler.handle(path, request, response);

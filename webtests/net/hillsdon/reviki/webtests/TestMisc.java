@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.webtests;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.hillsdon.reviki.vc.PageReference;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
@@ -35,6 +36,11 @@ public class TestMisc extends WebTestSupport {
     catch(FailingHttpStatusCodeException e) {
       // correct
     }
+  }
+
+  public void testRedirectToWikiList() throws Exception {
+    HtmlPage page = getWebPage("pages/");
+    assertTrue(page.getTitleText().contains("Wiki List"));
   }
 
   public void testNoBackLinkToSelf() throws Exception {
