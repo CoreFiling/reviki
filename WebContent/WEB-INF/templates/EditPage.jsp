@@ -30,7 +30,7 @@
         </c:if>
         <c:if test="${not empty markedUpDiff}">
           <div id="diff-area" class="tab-content">
-            <div>${markedUpDiff}</div>
+            <div id="markedUpDiff">${markedUpDiff}</div>
           </div>
         </c:if>
       </div>

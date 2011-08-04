@@ -248,3 +248,7 @@ h2.results-wiki {
 .attachmentNameAndDescription {
   width: 35%;
 }
+
+#markedUpDiff {
+  padding: 1em 0;
+}
