@@ -70,19 +70,19 @@ public abstract class AbstractRegexNode implements RenderNode {
       if (earliestRule != null) {
         String beforeMatch = text.substring(0, earliestMatch.start());
         String afterMatch = text.substring(earliestMatch.end());
+        fallback(page, result, beforeMatch, urlOutputFilter);
         try {
           ResultNode resultNode = earliestRule.handle(page, earliestMatch, this, urlOutputFilter);
-          fallback(page, result, beforeMatch, urlOutputFilter);
           result.add(resultNode);
           text = afterMatch;
         }
         catch (URISyntaxException e) {
-          fallback(page, result, text, urlOutputFilter);
-          text = "";
+          fallback(page, result, text.substring(earliestMatch.start(), earliestMatch.end()), urlOutputFilter);
+          text = afterMatch;
         }
         catch (UnknownWikiException e) {
-          fallback(page, result, text, urlOutputFilter);
-          text = "";
+          fallback(page, result, text.substring(earliestMatch.start(), earliestMatch.end()), urlOutputFilter);
+          text = afterMatch;
         }
       }
       else {
