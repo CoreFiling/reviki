@@ -31,7 +31,10 @@ import com.google.common.collect.Iterables;
 
 public abstract class AbstractListOfPagesMacro implements Macro {
 
-  public final String handle(final PageInfo page, final String remainder) throws Exception {
+  public final String handle(final PageInfo page, /* mutable */ String remainder) throws Exception {
+    if(remainder != null && page!=null) {
+      remainder = remainder.replace("@_currentPage", page.getPath());
+    }
     List<String> pages = new ArrayList<String>(getPages(remainder));
     sort(pages);
 
