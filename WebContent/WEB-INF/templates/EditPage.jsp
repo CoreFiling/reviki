@@ -5,15 +5,16 @@
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <c:if test="${not empty preview or not empty markedUpDiff}">
-      <script type='text/javascript'>
-	    $(document).ready(function() {
-		  $("#tabs").tabs();
-		});
-      </script>
+  <script type='text/javascript'>
+    $(document).ready(function() {
+      $("#previewTabs").tabs();
+      $("#editFormTabs").tabs();
+    });
+  </script>
 
-      <div id="tabs">
-        <ul id="tab-header">
+    <c:if test="${not empty preview or not empty markedUpDiff}">
+      <div id="previewTabs">
+        <ul id="previewTab-header">
           <c:if test="${not empty preview}">
             <li><a href="#preview-area">Preview</a></li>
           </c:if>
@@ -36,8 +37,18 @@
     </c:if>
 
     <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
-      <textarea rows="10" cols="80" id="attributes" name="attributes"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea><br />
-      <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
+      <div id="editFormTabs">
+        <ul id="editFormTab-header">
+          <li><a id="editFormContent-link" href="#editFormContent-area">Content</a></li>
+          <li><a id="editFormAttributes-link" href="#editFormAttributes-area">Attributes</a></li>
+        </ul>
+        <div id="editFormContent-area" class="tab-content">
+          <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
+        </div>
+        <div id="editFormAttributes-area" class="tab-content">
+          <textarea rows="10" cols="80" id="attributes" name="attributes"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea><br />
+        </div>
+      </div>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>

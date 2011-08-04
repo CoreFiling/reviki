@@ -197,14 +197,20 @@ h2.results-wiki {
 	padding: 0 !important;
 }
 
-#tabs {
+#previewTabs {
   margin: 0 2em 2em 0;
   border: none;
   position: inherit;
 }
 
-#tabs #wiki-rendering {
+#previewTabs #wiki-rendering {
   width: auto;
+}
+
+#editFormTabs {
+  margin: 0 2em 2em 0;
+  border: none;
+  position: inherit;
 }
 
 .tab-content {
@@ -213,12 +219,21 @@ h2.results-wiki {
   clear: left;
 }
 
-#tab-header {
+#previewTab-header {
   display: inline-block;
   border-width: 0 0 1px 0;
 }
 
-#tab-header li a {
+#previewTab-header li a {
+  padding: 0.2em 0.5em;
+}
+
+#editFormTab-header {
+  display: inline-block;
+  border-width: 0 0 1px 0;
+}
+
+#editFormTab-header li a {
   padding: 0.2em 0.5em;
 }
 

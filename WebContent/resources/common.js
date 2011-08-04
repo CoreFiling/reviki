@@ -4,6 +4,22 @@ reviki = {};
  * but form buttons look ugly so this will replace a form
  * with a JavaScript link.
  */
+
+// Override the hotkeys special keys and set comma and period as special keys as well.
+(function(jQuery){
+
+  jQuery.hotkeys.specialKeys = {
+        8: "backspace", 9: "tab", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
+        20: "capslock", 27: "esc", 32: "space", 33: "pageup", 34: "pagedown", 35: "end", 36: "home",
+        37: "left", 38: "up", 39: "right", 40: "down", 45: "insert", 46: "del",
+        96: "0", 97: "1", 98: "2", 99: "3", 100: "4", 101: "5", 102: "6", 103: "7",
+        104: "8", 105: "9", 106: "*", 107: "+", 109: "-", 110: ".", 111 : "/",
+        112: "f1", 113: "f2", 114: "f3", 115: "f4", 116: "f5", 117: "f6", 118: "f7", 119: "f8",
+        120: "f9", 121: "f10", 122: "f11", 123: "f12", 144: "numlock", 145: "scroll", 
+        188:"comma", 190:"period", 191: "/", 224: "meta"
+  }
+})( jQuery );
+
 reviki.formAsJavaScriptLink = function(formId, linkText) {
   var script = "javascript:document.getElementById('" + formId + "').submit()";
   var form = document.getElementById(formId);
@@ -195,6 +211,31 @@ function editPageKeyHandler(button, confirmMsg) {
   }
 }
 
+function shortcutForLink(linkId, areaToFocusId, shortcutKey) {
+  var link = $("#" + linkId);
+  if (link.length == 1) {
+    $(document).bind('keydown', shortcutKey, function(evt) {
+      return handleShorcutForLink(link, areaToFocusId);
+    });
+    inputs = $("input[type=text]");
+    inputs.bind('keydown', shortcutKey, function(evt) {
+      return handleShorcutForLink(link, areaToFocusId);
+    });
+    $("textarea").bind('keydown', shortcutKey, function(evt) {
+      return handleShorcutForLink(link, areaToFocusId);
+    });
+  }
+}
+
+function handleShorcutForLink(link, areaToFocusId) {
+  link.click();
+  var areaToFocus = $("#" + areaToFocusId);
+  if(areaToFocus.length==1) {
+    areaToFocus.focus();
+  }
+  return false;
+}
+
 reviki.setupShortcutKeys = function() {
   var editButtonForm = $("#editTop");
   if (editButtonForm.length == 1) {
@@ -206,6 +247,8 @@ reviki.setupShortcutKeys = function() {
 
   shortcutForButton("save", "ctrl+return");
   shortcutForButton("cancel", "esc", "Are you sure you wish to cancel?");
+  shortcutForLink("editFormContent-link", "content", "ctrl+comma");
+  shortcutForLink("editFormAttributes-link", "attributes", "ctrl+period");
 
   var searchBar = $("#query");
   if (searchBar.length == 1) {

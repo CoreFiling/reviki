@@ -39,7 +39,7 @@ public class AttrMacro implements Macro {
       final PageReference pageRef;
       if(pagePart == null) {
         Map<String, String> attributes = page.getAttributes();
-        if(attributes != null && !attributes.isEmpty()) {
+        if(attributes != null) {
           String attrValue = attributes.get(attrPart);
           if(attrValue == null) {
             return "";

@@ -325,6 +325,7 @@ public class DefaultPageImpl implements DefaultPage {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
+    request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     copySessionIdAsAttribute(request);
     if (!isLockTokenValid(pageInfo, request, preview)) {
       if (preview) {
@@ -358,7 +359,6 @@ public class DefaultPageImpl implements DefaultPage {
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
-      request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
       return new JspView("EditPage");
     }
   }
