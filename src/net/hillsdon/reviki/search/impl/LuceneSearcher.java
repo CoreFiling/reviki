@@ -57,6 +57,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hit;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -127,6 +128,7 @@ public class LuceneSearcher implements SearchEngine {
     _dir = dir;
     _otherDirs = otherSearchDirs;
     _renderedPageFactory = renderedPageFactory;
+    BooleanQuery.setMaxClauseCount(5096);
   }
 
   private void createIndexIfNecessary() throws IOException {
