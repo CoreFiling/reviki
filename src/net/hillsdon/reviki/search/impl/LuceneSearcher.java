@@ -446,7 +446,6 @@ public class LuceneSearcher implements SearchEngine {
   private LinkedHashSet<SearchMatch> doQuery(final IndexReader reader, final Analyzer analyzer, final Searcher searcher, final String field, final boolean provideExtracts, final Query query) throws IOException, CorruptIndexException {
     Highlighter highlighter = null;
     if (provideExtracts) {
-      query.rewrite(reader);
       highlighter = new Highlighter(new SimpleHTMLFormatter("<strong>", "</strong>"), new SimpleHTMLEncoder(), new QueryScorer(query));
     }
     Hits hits = searcher.search(query);
