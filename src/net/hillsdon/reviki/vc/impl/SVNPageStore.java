@@ -57,6 +57,7 @@ import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
 
+import org.apache.commons.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
@@ -399,27 +400,39 @@ public class SVNPageStore extends AbstractPageStore {
     return results.values();
   }
 
-  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
+  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException, IOException {
     final String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
-    final OutputStream out = new LazyOutputStream() {
+
+    // Create the map where properties will be stored
+    final Map<String, String> properties = new HashMap<String, String>();
+
+    // Buffer the file read from SVN so that we don't trigger the download before setting content type
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    _operations.getFile(path, revision, properties, out);
+    byte[] data = out.toByteArray();
+
+    // Get the svn:mime-type property
+    final String mimetype = properties.get(SVNProperty.MIME_TYPE);
+    properties.clear();
+
+    // Get the response output stream and set the file name and content type
+    final OutputStream responseOut = new LazyOutputStream() {
       @Override
       protected OutputStream lazyInit() throws IOException {
-        sink.setContentType("application/octet-stream");
+        if(mimetype != null) {
+          sink.setContentType(mimetype);
+        }
+        else {
+          sink.setContentType("application/octet-stream");
+        }
         sink.setFileName(attachment);
         return sink.stream();
       }
     };
-    Map<String, String> properties = new HashMap<String, String>();
-    // The properties will be set by the repository
-    _operations.getFile(path, revision, properties, out);
 
-    // If the mimetype property was set, replace the default setting in the sink
-    String mimetype = properties.get(SVNProperty.MIME_TYPE);
-    if (mimetype!=null) {
-      sink.setContentType(mimetype);
-    }
-    properties.clear();
-
+    // Copy the buffered file into the response output stream, this starts the download
+    ByteArrayInputStream istream = new ByteArrayInputStream(data);
+    IOUtils.copy(istream, responseOut);
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
