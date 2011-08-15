@@ -57,7 +57,6 @@ import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
 
-import org.apache.commons.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
@@ -400,26 +399,20 @@ public class SVNPageStore extends AbstractPageStore {
     return results.values();
   }
 
-  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException, IOException {
+  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
-
-    // Create the map where properties will be stored
     final Map<String, String> properties = new HashMap<String, String>();
+    // Get the properties
+    _operations.getFile(path, revision, properties, null);
 
-    // Buffer the file read from SVN so that we don't trigger the download before setting content type
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    _operations.getFile(path, revision, properties, out);
-    byte[] data = out.toByteArray();
-
-    // Get the svn:mime-type property
+    // If the mimetype property was set, replace the default setting in the sink
     final String mimetype = properties.get(SVNProperty.MIME_TYPE);
-    properties.clear();
 
-    // Get the response output stream and set the file name and content type
-    final OutputStream responseOut = new LazyOutputStream() {
+    // Create output and set the content type and file name
+    final OutputStream out = new LazyOutputStream() {
       @Override
       protected OutputStream lazyInit() throws IOException {
-        if(mimetype != null) {
+        if (mimetype!=null) {
           sink.setContentType(mimetype);
         }
         else {
@@ -430,9 +423,8 @@ public class SVNPageStore extends AbstractPageStore {
       }
     };
 
-    // Copy the buffered file into the response output stream, this starts the download
-    ByteArrayInputStream istream = new ByteArrayInputStream(data);
-    IOUtils.copy(istream, responseOut);
+    // Get the file
+    _operations.getFile(path, revision, null, out);
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {

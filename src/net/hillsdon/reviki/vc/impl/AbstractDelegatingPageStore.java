@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -100,7 +99,7 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
     return getDelegateInternal().attachments(ref);
   }
 
-  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException, IOException {
+  public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws PageStoreException {
     getDelegateInternal().attachment(ref, attachment, revision, sink);
   }
 

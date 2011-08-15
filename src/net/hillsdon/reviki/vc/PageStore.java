@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.vc;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -183,7 +182,7 @@ public interface PageStore {
    * @param sink Attachment is written here.
    * @throws NotFoundException If the attachment is not present in the given revision.
    */
-  void attachment(PageReference ref, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException, IOException;
+  void attachment(PageReference ref, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
 
   /**
    * @throws PageStoreInvalidException If the underlying data repository is invalid/not present etc.
