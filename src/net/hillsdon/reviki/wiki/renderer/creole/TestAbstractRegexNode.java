@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
