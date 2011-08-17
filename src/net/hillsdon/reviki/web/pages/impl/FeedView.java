@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 
 public class FeedView implements View {
@@ -43,7 +44,7 @@ public class FeedView implements View {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/atom+xml");
     final String title = _wikiConfiguration.getWikiName() + " wiki";
-    _feedWriter.writeAtom(title, _feedUrl, _changes, response.getOutputStream());
+    _feedWriter.writeAtom(title, new ResponseSessionURLOutputFilter(request, response).filterURL(_feedUrl), _changes, response.getOutputStream());
   }
 
 }

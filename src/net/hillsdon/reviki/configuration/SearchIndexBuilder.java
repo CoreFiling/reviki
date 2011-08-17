@@ -100,6 +100,7 @@ public class SearchIndexBuilder implements Runnable {
     String wikiName = wikiConf.getWikiName();
     File primarySearchDir = wikiConf.getSearchIndexDirectory();
     List<File> otherSearchDirs = wikiConf.getOtherSearchIndexDirectories();
+    // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, urlOutputFilter);

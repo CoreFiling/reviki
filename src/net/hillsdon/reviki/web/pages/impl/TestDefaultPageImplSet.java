@@ -96,7 +96,7 @@ public class TestDefaultPageImplSet extends TestCase {
   }
 
   private String getURLOfCalledOnPage() {
-    return _wikiUrls.page(null, CALLED_ON_PAGE.getName(), URLOutputFilter.NULL);
+    return _wikiUrls.page(null, CALLED_ON_PAGE.getName());
   }
 
   public void testNoActionIsInvalidInputException() throws Exception {
@@ -195,7 +195,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testCopyTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_COPY, "");
     _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
-    expect(_store.copy(CALLED_ON_PAGE, -1, TO_PAGE, "[reviki commit]\n" + _wikiUrls.page(null, TO_PAGE.getName(), URLOutputFilter.NULL))).andReturn(2L).once();
+    expect(_store.copy(CALLED_ON_PAGE, -1, TO_PAGE, "[reviki commit]\n" + _wikiUrls.page(null, TO_PAGE.getName()))).andReturn(2L).once();
     replay();
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(TO_PAGE, view.getPage());
@@ -226,7 +226,7 @@ public class TestDefaultPageImplSet extends TestCase {
   public void testRenameTo() throws Exception {
     _request.setParameter(DefaultPageImpl.SUBMIT_RENAME, "");
     _request.setParameter(DefaultPageImpl.PARAM_TO_PAGE, TO_PAGE.getPath());
-    expect(_store.rename(CALLED_ON_PAGE, TO_PAGE, -1, "[reviki commit]\n" + _wikiUrls.page(null, TO_PAGE.getName(), URLOutputFilter.NULL))).andReturn(2L).once();
+    expect(_store.rename(CALLED_ON_PAGE, TO_PAGE, -1, "[reviki commit]\n" + _wikiUrls.page(null, TO_PAGE.getName()))).andReturn(2L).once();
     replay();
     RedirectToPageView view = (RedirectToPageView) _page.set(CALLED_ON_PAGE, ConsumedPath.EMPTY, _request, _response);
     assertEquals(TO_PAGE, view.getPage());

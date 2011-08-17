@@ -15,10 +15,9 @@
  */
 package net.hillsdon.reviki.webtests;
 
-import org.apache.commons.httpclient.util.URIUtil;
-
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
+
+import org.apache.commons.httpclient.util.URIUtil;
 
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;

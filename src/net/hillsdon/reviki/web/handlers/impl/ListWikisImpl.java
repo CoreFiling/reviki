@@ -73,7 +73,7 @@ public class ListWikisImpl implements ListWikis {
     final List<WikiDescriptor> descriptors = new ArrayList<WikiDescriptor>();
     for (WikiConfiguration wiki : _configuration.getWikis()) {
       final String name = wiki.getWikiName();
-      final String frontPage = _applicationUrls.get(name).page(null, BuiltInPageReferences.PAGE_FRONT_PAGE.getPath(), new ResponseSessionURLOutputFilter(request, response));
+      final String frontPage = _applicationUrls.get(name).page(null, BuiltInPageReferences.PAGE_FRONT_PAGE.getPath());
       descriptors.add(new WikiDescriptor(name, frontPage));
     }
     request.setAttribute("descriptors", descriptors);

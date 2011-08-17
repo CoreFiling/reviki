@@ -44,15 +44,15 @@ public interface WikiUrls extends ResourceUrls {
 
   String pagesRoot(String wikiName);
   
-  String search(URLOutputFilter urlOutputFilter);
+  String search();
 
-  String page(String wikiName, String pageName, String extraPath, String query, String fragment, URLOutputFilter urlOutputFilter);
+  String page(String wikiName, String pageName, String extraPath, String query, String fragment);
 
-  String page(String wikiName, String pageName, URLOutputFilter urlOutputFilter);
+  String page(String wikiName, String pageName);
   
   URI page(String pageName);
 
-  String feed(URLOutputFilter urlOutputFilter);
+  String feed();
 
   String interWikiTemplate();
 

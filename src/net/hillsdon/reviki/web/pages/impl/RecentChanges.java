@@ -77,7 +77,7 @@ public class RecentChanges extends AbstractSpecialPage {
     final List<ChangeInfo> recentChanges = getRecentChanges(getLimit(request), showMinor);
     request.setAttribute("recentChanges", recentChanges);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed(URLOutputFilter.NULL));
+      return new FeedView(_configuration, _feedWriter, recentChanges, _wikiUrls.feed());
     }
     return new JspView("RecentChanges");
   }

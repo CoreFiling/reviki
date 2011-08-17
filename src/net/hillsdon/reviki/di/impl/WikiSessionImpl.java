@@ -112,6 +112,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     File primarySearchDir = configuration.getSearchIndexDirectory();
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
+    // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, urlOutputFilter);

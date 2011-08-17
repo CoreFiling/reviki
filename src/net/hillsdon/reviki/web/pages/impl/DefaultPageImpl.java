@@ -427,7 +427,7 @@ public class DefaultPageImpl implements DefaultPage {
   public View history(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
-      final String feedUrl = _wikiUrls.page(null, page.getName(), URLOutputFilter.NULL) + "?history&ctype=atom";
+      final String feedUrl = _wikiUrls.page(null, page.getName()) + "?history&ctype=atom";
       return new FeedView(_configuration, _feedWriter, changes, feedUrl);
     }
     request.setAttribute("changes", changes);
@@ -600,7 +600,7 @@ public class DefaultPageImpl implements DefaultPage {
     if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName(), URLOutputFilter.NULL);
+    return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName());
   }
 
   private VersionedPageInfo pageInfoFromRevisionParam(final PageReference defaultPage, final String revisionText, final String paramName) throws InvalidInputException, PageStoreException {

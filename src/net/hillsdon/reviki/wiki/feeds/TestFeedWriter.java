@@ -33,7 +33,6 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
 import net.hillsdon.reviki.vc.StoreKind;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.xml.xpathcontext.XPathContext;
 import net.hillsdon.xml.xpathcontext.XPathContextFactory;
@@ -49,10 +48,10 @@ public class TestFeedWriter extends TestCase {
   public void test() throws Exception {
     List<ChangeInfo> changes = Arrays.asList(new ChangeInfo("SomeWikiPage", "SomeWikiPage", "mth", new Date(0), 123, "Change description with special character " + POUND_SIGN, StoreKind.PAGE, ChangeType.MODIFIED, null, -1));
     WikiUrls urls = new WikiUrls() {
-      public String feed(final URLOutputFilter urlOutputFilter) {
+      public String feed() {
         return "this isn't used";
       }
-      public String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
+      public String page(final String wikiName, final String name) {
         return "page";
       }
       public URI page(final String pageName) {
@@ -70,13 +69,13 @@ public class TestFeedWriter extends TestCase {
       public String pagesRoot(final String wikiName) {
         return null;
       }
-      public String search(final URLOutputFilter urlOutputFilter) {
+      public String search() {
         return "search";
       }
       public String resource(final String path) {
         return "favicon";
       }
-      public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+      public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment) {
         return "page";
       }
       public WikiConfiguration getWiki() {

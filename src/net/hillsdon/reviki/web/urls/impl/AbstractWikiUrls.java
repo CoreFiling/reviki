@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
 /**
@@ -29,13 +28,13 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
  */
 public abstract class AbstractWikiUrls implements WikiUrls {
 
-  public final String page(final String wikiName, final String name, final URLOutputFilter urlOutputFilter) {
-    return page(wikiName, name, null, null, null, urlOutputFilter);
+  public final String page(final String wikiName, final String name) {
+    return page(wikiName, name, null, null, null);
   }
   
-  public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment, final URLOutputFilter urlOutputFilter) {
+  public String page(final String wikiName, final String pageName, final String extraPath, final String query, final String fragment) {
     String path = pageName;
-    return urlOutputFilter.filterURL(pagesRoot(wikiName) + Escape.constructEncodedURI(path, query, fragment, extraPath));
+    return pagesRoot(wikiName) + Escape.constructEncodedURI(path, query, fragment, extraPath);
   }
   
   public URI page(final String pageName) {
@@ -56,20 +55,20 @@ public abstract class AbstractWikiUrls implements WikiUrls {
     return pagesRoot(getWiki().getWikiName()) + "%s";
   }
 
-  public final String search(final URLOutputFilter urlOutputFilter) {
-    return search(null, urlOutputFilter);
+  public final String search() {
+    return search(null);
   }
 
-  public final String search(final String wikiName, final URLOutputFilter urlOutputFilter) {
-    return page(wikiName, "FindPage", urlOutputFilter);
+  public final String search(final String wikiName) {
+    return page(wikiName, "FindPage");
   }
 
-  public final String feed(final URLOutputFilter urlOutputFilter) {
-    return feed(null, urlOutputFilter);
+  public final String feed() {
+    return feed(null);
   }
 
-  public final String feed(final String wikiName, final URLOutputFilter urlOutputFilter) {
-    return page(wikiName, "RecentChanges", null, "ctype=atom", null, urlOutputFilter);
+  public final String feed(final String wikiName) {
+    return page(wikiName, "RecentChanges", null, "ctype=atom", null);
   }
 
   public final String resource(final String path) {

@@ -41,7 +41,6 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
   private String _page;
   private String _extraPath = null;
   private String _query = null;
-  private boolean _session = true;
 
   public String getPage() {
     return _page;
@@ -75,14 +74,6 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
     _query = query;
   }
 
-  public boolean isSession() {
-    return _session;
-  }
-
-  public void setSession(final boolean session) {
-    _session = session;
-  }
-
   public int doStartTag() throws JspException {
     try {
       LinkResolutionContext resolver = (LinkResolutionContext) pageContext.getRequest().getAttribute("linkResolutionContext");
@@ -90,7 +81,7 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
       final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
       if (resolver != null) {
         JspWriter out = pageContext.getOut();
-        URLOutputFilter urlOutputFilter = isSession() ? new ResponseSessionURLOutputFilter((HttpServletRequest) pageContext.getRequest(), response) : URLOutputFilter.NULL;
+        URLOutputFilter urlOutputFilter = new ResponseSessionURLOutputFilter((HttpServletRequest) pageContext.getRequest(), response);
         out.write(doOutput(resolver, urlOutputFilter));
       }
     }

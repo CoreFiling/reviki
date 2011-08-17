@@ -113,11 +113,11 @@ public class AtomFeedWriter implements FeedWriter {
       if (change.getKind() == StoreKind.PAGE) {
         handler.startElement(ATOM_NS, "entry", "entry", NO_ATTRIBUTES);
         addElement(handler, "title", WikiWordUtils.pathToTitle(change.getPage()));
-        addLink(handler, _wikiUrls.page(null, change.getPage(), URLOutputFilter.NULL), null);
+        addLink(handler, _wikiUrls.page(null, change.getPage()), null);
         
         // We include the revision in the ID, even though it doesn't make a lot of sense
         // because feed reader software gets really confused in the face of duplicate ids.
-        addElement(handler, "id", _wikiUrls.page(null, change.getPage(), URLOutputFilter.NULL) + "?revision=" + change.getRevision());
+        addElement(handler, "id", _wikiUrls.page(null, change.getPage()) + "?revision=" + change.getRevision());
         
         handler.startElement(ATOM_NS, "author", "author", NO_ATTRIBUTES);
         addElement(handler, "name", change.getUser());

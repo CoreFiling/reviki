@@ -9,7 +9,7 @@
     <ul id="wikiList">
       <c:forEach var="descriptor" items="${descriptors}">
         <li>
-          <a href="<c:out value="${descriptor.frontPageUrl}"/>"><c:out value="${descriptor.name}"/></a>
+          <a href="<c:url value="${descriptor.frontPageUrl}"/>"><c:out value="${descriptor.name}"/></a>
         </li>
       </c:forEach>
     </ul>
