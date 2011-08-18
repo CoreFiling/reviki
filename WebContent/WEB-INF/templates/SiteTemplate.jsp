@@ -18,8 +18,8 @@
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
   <link rel="shortcut icon" href="<sw:iconUrl name="favicon.ico"/>" />
   <c:if test="${wikiIsValid != null and wikiIsValid}">
-    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"  session="false"/>" />
-    <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml" session="false" />" type="application/opensearchdescription+xml" title="Wiki Search" />
+    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"/>" />
+    <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />

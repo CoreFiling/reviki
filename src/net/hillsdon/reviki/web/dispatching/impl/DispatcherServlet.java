@@ -26,11 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.reviki.di.ApplicationSession;
 import net.hillsdon.reviki.web.dispatching.Dispatcher;
 
+import org.apache.lucene.search.BooleanQuery;
 import org.picocontainer.PicoBuilder;
 
 /**
  * We should probably find a web framework that doesn't suck but this'll do for now.
- * 
+ *
  * @author mth
  */
 public class DispatcherServlet extends HttpServlet {
@@ -53,6 +54,12 @@ public class DispatcherServlet extends HttpServlet {
         .getComponent(ApplicationSession.class);
       applicationSession.start();
       _dispatcher = applicationSession.getDispatcher();
+
+      // Default limit of 1024 clauses was too small in some cases (e.g. when searching for "story").
+      // Therefore this limit was increased in r1202, to allow searching for common terms.
+      // This limit was tested on search with 2500 results and worked well.
+      // Should be more than enough for the internal wikis at the moment.
+      BooleanQuery.setMaxClauseCount(4096);
     }
     catch (ClassNotFoundException e) {
       throw new ServletException("Root session class not found", e);
