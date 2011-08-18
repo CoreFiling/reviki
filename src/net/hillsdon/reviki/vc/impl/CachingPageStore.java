@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 
 /**
@@ -31,5 +32,7 @@ public interface CachingPageStore extends PageStore {
    * @return The underlying page store that non-caching access is delegated to.
    */
   PageStore getUnderlying();
+
+  void expire(PageReference pageInfo);
   
 }

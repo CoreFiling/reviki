@@ -229,7 +229,7 @@ public class DefaultPageImpl implements DefaultPage {
           PageInfo pageInfo = _store.get(page, -1);
           // IE sends the full file path.
           storeAttachment(pageInfo, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
-          pageInfo.setPageWasUpdated(true);
+          _store.expire(pageInfo);
           return new RedirectToPageView(_wikiUrls, page, "/attachments/");
         }
         finally {

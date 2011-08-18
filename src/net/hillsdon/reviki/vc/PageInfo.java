@@ -14,8 +14,4 @@ public interface PageInfo extends PageReference {
 
   PageInfo withAlternativeAttributes(Map<String, String> attributes);
 
-  boolean getPageWasUpdated();
-
-  void setPageWasUpdated(boolean updated);
-
 }

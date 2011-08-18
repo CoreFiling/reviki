@@ -132,4 +132,8 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     return _wiki;
   }
 
+  public void expire(PageReference pageInfo) {
+    // Non-caching implementation
+  }
+
 }
