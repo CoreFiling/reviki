@@ -321,7 +321,7 @@ public class SVNPageStore extends AbstractPageStore {
     }
   }
 
-  public void attach(final PageInfo pageInfo, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+  public void attach(final PageReference pageRef, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     _autoPropertiesApplier.read();
 
     final boolean addLinkToPage;
@@ -329,7 +329,7 @@ public class SVNPageStore extends AbstractPageStore {
     final long latestRevision;
     if (baseRevision < 0) {
       latestRevision = getLatestRevision();
-      versionedPageInfo = get(pageInfo, latestRevision);
+      versionedPageInfo = get(pageRef, latestRevision);
       addLinkToPage = !versionedPageInfo.isLocked();
     }
     else {
@@ -338,7 +338,7 @@ public class SVNPageStore extends AbstractPageStore {
       latestRevision = -1;
     }
 
-    final String dir = pageInfo.getAttachmentPath();
+    final String dir = pageRef.getAttachmentPath();
     final boolean needToCreateAttachmentDir =  _operations.checkPath(dir, baseRevision) == SVNNodeKind.NONE;
     _operations.execute(new SVNEditAction(commitMessage) {
       @Override
@@ -355,14 +355,14 @@ public class SVNPageStore extends AbstractPageStore {
         if (addLinkToPage) {
           final boolean isImage = _mimeIdentifier.isImage(storeName);
           final String link = (isImage ? "{{" : "[[") + "attachments/" + storeName + "|" + storeName + (isImage ? "}}" : "]]");
-          final String newContent = pageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
-          commitEditor.openDir(SVNPathUtil.removeTail(pageInfo.getPath()), -1);
+          final String newContent = versionedPageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
+          commitEditor.openDir(SVNPathUtil.removeTail(pageRef.getPath()), -1);
           if(versionedPageInfo.isNewPage()) {
             // create the page
-            set(commitEditor, pageInfo.getPath(), -1, new ByteArrayInputStream(fromUTF8(newContent)), new LinkedHashMap<String, String>());
+            set(commitEditor, pageRef.getPath(), -1, new ByteArrayInputStream(fromUTF8(newContent)), new LinkedHashMap<String, String>());
           }
           else {
-            set(commitEditor, pageInfo.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)), new LinkedHashMap<String, String>());
+            set(commitEditor, pageRef.getPath(), latestRevision, new ByteArrayInputStream(fromUTF8(newContent)), new LinkedHashMap<String, String>());
           }
           commitEditor.closeDir();
         }

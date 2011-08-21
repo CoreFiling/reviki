@@ -91,7 +91,7 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
     return getDelegateInternal().history(ref);
   }
 
-  public void attach(final PageInfo page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
+  public void attach(final PageReference page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     getDelegateInternal().attach(page, storeName, baseRevision, in, commitMessage);
   }
 

@@ -165,7 +165,7 @@ public interface PageStore {
    * @param in Data read from here.
    * @param commitMessage An optional commit message.
    */
-  void attach(PageInfo page, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
+  void attach(PageReference page, String storeName, long baseRevision, InputStream in, String commitMessage) throws PageStoreException;
 
   /**
    * All attachments for the given page, with information on previous versions of the same.
