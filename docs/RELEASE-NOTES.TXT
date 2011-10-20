@@ -4,12 +4,66 @@ Reviki
 0.2.0 (2011-06-24)
 ------------------
 
-* TODO
+Migration note:
+
+Note that changes to the taglib require reviki's entry Tomcat's work directory
+to be deleted and changes to the CSS require custom per-wiki CSS to be deleted
+or updated.
+
+* Improvements to as-you-type search results.
+  [dbug 6868, 7463]
+
+* Added Diff tab to previews.
+  [dbug 5770]
+
+* Added page-scoped attributes that can be defined with a simple key value
+  syntax and referenced via a macro and in search queries.
+
+* Added support for per-wiki favicons via ConfigIcons/favicon.ico attachment.
+  [dbug 5797]
+
+* Support anchors in wiki links such as [[FooBar#Baz]].  Note anchors in pages
+  still require HTML.
+  [dbug 9684]
+
+* The current page can now be referred to by @_currentPage in search macros.
+  [dbug 5785]
+
+* Permit creating a page by uploading an attachment.
+  [dbug 7710]
+
+* Allow commit messages for attachments and show their history on the
+  attachments page.
+  [dbug 8674, 9050]
+
+* Unlock pages when the user navigates away from the edit page without making
+  changes.
+  [dbug 5823]
+
+* Permit linking to pages with dots in the name.  Previously these were assumed
+  to be attachments.  Links now check for pages first, before going on to look
+  for attachments.  To unambiguously refer to an attachment use
+  "[[attachments/file]]".
+  [dbug 5755]
+
+* Fix encoding issues affecting page names containing '+', '?', or Unicode.
+  [dbug 5793, 5820]
+
+* Fixed outgoingLinks macro.
+  [dbug 9179]
+
+* Fix to respect svn:mime-type of attached files when accessing them.
+  [dbug 9367]
+
+* Fix for JSTL EL issue encountered on Tomcat 7.
+  [dbug 9863]
+
 
 0.1.1 (2010-06-24)
 ------------------
 
 * Fix support for reviki base-url property that was broken in 0.1.0.
+
 
 0.1.0 (2010-06-11)
 ------------------
