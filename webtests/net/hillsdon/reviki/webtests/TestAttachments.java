@@ -80,7 +80,7 @@ public class TestAttachments extends WebTestSupport {
     attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
     form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
-    attachments = (HtmlPage) form.getInputByValue("Upload new version").click();
+    attachments = (HtmlPage) form.getInputByValue("Upload New Version").click();
     assertEquals("File 2.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
@@ -106,8 +106,8 @@ public class TestAttachments extends WebTestSupport {
 
     page = getWikiPage(name);
     attachments = clickAttachmentsLink(page, name);
-    HtmlAnchor delete = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?delete')]").get(0);
-    attachments = delete.click();
+    HtmlForm deleteForm = attachments.getFormByName("deleteAttachment");
+    attachments = deleteForm.getInputByValue("Delete Attachment").click();
 
     // There shouldn't be any link directly to the attachment
     for(Object o: attachments.getByXPath("//a[contains(@href, 'file.txt')]")) {

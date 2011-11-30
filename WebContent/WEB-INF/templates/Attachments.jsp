@@ -24,7 +24,7 @@
                       <td><input type="file" name="file" id="file_${attachment.name}"/> 
                           <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>" />
                           <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>" /></td>
-                      <td><input type="submit" value="Upload new version" /></td>
+                      <td><input type="submit" value="Upload New Version" /></td>
                     </tr>
                     <tr>
                       <td class="text-align-right"><label for="message_${attachment.name}">Message:</label></td>
@@ -32,8 +32,6 @@
                     </tr>
                   </table>
                 </form>
-              </td>
-              <td><a href="<c:url value="${attachment.name}?delete"/>">delete</a>
               </td>
             </tr>
             <tr>
@@ -46,6 +44,13 @@
                     </c:forEach>
                   </ul>
                 </c:if>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <form name="deleteAttachment" action="<c:url value="${attachment.name}"/>" method="post" style="display: inline">
+                  <input type="submit" name="delete" value="Delete Attachment" />
+                </form>
               </td>
             </tr>
           </c:forEach>

@@ -27,47 +27,51 @@ import net.hillsdon.reviki.web.pages.SpecialPage;
 /**
  * Delegates everything.  Implementors will need to provide a name
  * and the variant behaviour.
- * 
+ *
  * @author mth
  */
 public abstract class AbstractSpecialPage implements SpecialPage {
 
   private final Page _delegate;
-  
+
   public AbstractSpecialPage(final Page delegate) {
     _delegate = delegate;
   }
-  
-  public View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+  public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().attach(page, path, request, response);
   }
 
-  public View attachment(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().attachment(page, path, request, response);
   }
 
-  public View attachments(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().attachments(page, path, request, response);
   }
 
-  public View editor(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View deleteAttachment(final PageReference pageReference, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    return getDelegate().deleteAttachment(pageReference, path, request, response);
+  }
+
+  public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().editor(page, path, request, response);
   }
 
-  public View get(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().get(page, path, request, response);
   }
 
-  public View history(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View history(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().history(page, path, request, response);
   }
 
-  public View set(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+  public View set(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     return getDelegate().set(page, path, request, response);
   }
 
   protected final Page getDelegate() {
     return _delegate;
   }
-  
+
 }

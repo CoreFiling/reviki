@@ -25,7 +25,7 @@ import net.hillsdon.reviki.web.common.View;
 
 /**
  * Provides implementations of the key functionality for a page in the wiki.
- * 
+ *
  * @author mth
  */
 public interface Page {
@@ -39,5 +39,6 @@ public interface Page {
   View attach(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
   View attachment(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
   View attachments(PageReference page, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
+  View deleteAttachment(PageReference pageReference, ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

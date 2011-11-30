@@ -15,6 +15,12 @@
  */
 package net.hillsdon.reviki.web.handlers.impl;
 
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
+import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,13 +34,9 @@ import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.pages.Page;
 import net.hillsdon.reviki.web.pages.PageSource;
+import net.hillsdon.reviki.web.pages.impl.DefaultPageImpl;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_COPY;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_RENAME;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_SAVE;
-import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.SUBMIT_UNLOCK;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 
 /**
  * Everything that does something to a wiki page or attachment comes through here
@@ -69,11 +71,15 @@ public class PageHandlerImpl implements PageHandler {
     final Page page = _pageSource.get(pageReference);
     if ("attachments".equals(path.peek())) {
       path.next();
+      final boolean isPost = request.getMethod().equals("POST");
       if (path.hasNext()) {
+        if (isPost && request.getParameter(DefaultPageImpl.SUBMIT_DELETE) != null) {
+          return page.deleteAttachment(pageReference, path, request, response);
+        }
         return page.attachment(pageReference, path, request, response);
       }
       else {
-        if (request.getMethod().equals("POST")) {
+        if (isPost) {
           return page.attach(pageReference, path, request, response);
         }
         else {

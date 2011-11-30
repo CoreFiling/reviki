@@ -47,10 +47,11 @@ import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.LostLockException;
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
@@ -66,7 +67,6 @@ import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
@@ -269,32 +269,32 @@ public class DefaultPageImpl implements DefaultPage {
     _store.attach(page, storeName, baseRevision, in, message);
   }
 
+  public View deleteAttachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreAuthenticationException, PageStoreException {
+    final String attachmentName = path.next();
+    final long baseRevision = -1;
+    _store.deleteAttachment(page, attachmentName, baseRevision, "Deleted attachment");
+    return new RedirectToPageView(_wikiUrls, page, "/attachments/");
+  }
+
   public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
-    if (request.getParameter(SUBMIT_DELETE) != null) {
-      long baseRevision = -1;
-      _store.deleteAttachment(page, attachmentName, baseRevision, "");
-      return new RedirectToPageView(_wikiUrls, page, "/attachments/");
-    }
-    else {
-      return new View() {
-        public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
-          _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
-            public void setContentType(final String contentType) {
-              response.setContentType(contentType);
-            }
+    return new View() {
+      public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
+        _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
+          public void setContentType(final String contentType) {
+            response.setContentType(contentType);
+          }
 
-            public void setFileName(final String name) {
-              response.setHeader("Content-Disposition", "inline; filename=" + attachmentName);
-            }
+          public void setFileName(final String name) {
+            response.setHeader("Content-Disposition", "inline; filename=" + attachmentName);
+          }
 
-            public OutputStream stream() throws IOException {
-              return response.getOutputStream();
-            }
-          });
-        }
-      };
-    }
+          public OutputStream stream() throws IOException {
+            return response.getOutputStream();
+          }
+        });
+      }
+    };
   }
 
   public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -302,8 +302,12 @@ public class DefaultPageImpl implements DefaultPage {
     Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
     Collection<AttachmentHistory> deletedAttachments = new LinkedList<AttachmentHistory>();
     for (AttachmentHistory history: allAttachments) {
-      if (history.isAttachmentDeleted()) deletedAttachments.add(history);
-      else currentAttachments.add(history);
+      if (history.isAttachmentDeleted()) {
+        deletedAttachments.add(history);
+      }
+      else {
+        currentAttachments.add(history);
+      }
     }
     request.setAttribute("currentAttachments", currentAttachments);
     request.setAttribute("deletedAttachments", deletedAttachments);
@@ -350,7 +354,7 @@ public class DefaultPageImpl implements DefaultPage {
           final String newContent = getContent(request);
           pageInfo = pageInfo.withAlternativeContent(newContent);
           pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
-            public boolean apply(String value) {
+            public boolean apply(final String value) {
               if (value == null) {
                 return false;
               }
@@ -543,7 +547,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
-      public boolean apply(String value) {
+      public boolean apply(final String value) {
         if (value == null) {
           return false;
         }
