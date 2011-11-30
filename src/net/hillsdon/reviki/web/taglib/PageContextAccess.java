@@ -14,7 +14,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
  */
 public class PageContextAccess {
 
-  static ResourceUrls getBaseResourceUrls(final PageContext pageContext) {
+  static ResourceUrls getBestResourceUrls(final PageContext pageContext) {
     final ServletRequest request = pageContext.getRequest();
     final ApplicationUrls application = (ApplicationUrls) request.getAttribute(ApplicationUrls.KEY);
     final WikiUrls wiki = (WikiUrls) request.getAttribute(WikiUrls.KEY);

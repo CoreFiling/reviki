@@ -47,7 +47,7 @@ public class ResourceUrlTag extends TagSupport {
   @Override
   public int doStartTag() throws JspException {
     try {
-      outputUrl(PageContextAccess.getBaseResourceUrls(pageContext));
+      outputUrl(PageContextAccess.getBestResourceUrls(pageContext));
     }
     catch (IOException e) {
       throw new JspException(e);
