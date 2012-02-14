@@ -246,7 +246,7 @@ reviki.setupShortcutKeys = function() {
   }
 
   shortcutForButton("save", "ctrl+return");
-  shortcutForButton("cancel", "esc", "Are you sure you wish to cancel?");
+  shortcutForButton("cancel", "esc", "Are you sure you wish to abandon your changes?");
   shortcutForLink("editFormContent-link", "content", "ctrl+comma");
   shortcutForLink("editFormAttributes-link", "attributes", "ctrl+period");
 
