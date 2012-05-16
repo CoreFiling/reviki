@@ -29,6 +29,9 @@ Enhancements and bug fixes:
 
 * Added page-scoped attributes that can be defined with a simple key value
   syntax and referenced via a macro and in search queries.
+  
+* Added the ability to delete attachments.
+  [dbug 5814]
 
 * Added support for per-wiki favicons via ConfigIcons/favicon.ico attachment.
   [dbug 5797]
