@@ -1,25 +1,25 @@
 Reviki
 
                               Version History
-0.2.0 (2011-11-31)
+0.2.0 (2012-05-16)
 ------------------
 
 Migration notes:
 
-Note that changes to the taglib require reviki's entry Tomcat's work directory
+Note that changes to the taglib require reviki's entire Tomcat work directory
 to be deleted and changes to the CSS require custom per-wiki CSS to be deleted
 or updated.
 
 Indexing is now attempted in the background.  If your wiki requires
 authenticated read access then username and password properties should be
 provided.  For new wikis these should be entered via the ConfigSvnLocation
-page, but they can be added for existing wikis by adding to the file
+page, but they can be added for existing wikis by adding them to the file
 reviki-data/reviki.properties as shown below for a wiki called "example":
 
 svn-user-example=username
 svn-pass-example=password
 
-Enhancments and bug fixes:
+Enhancements and bug fixes:
 
 * Improvements to as-you-type search results.
   [dbug 6868, 7463]
