@@ -4,6 +4,7 @@
   </description>
 
   <presetdef name="rjavac">
+    <!-- http://stackoverflow.com/a/8114557 -->
     <javac includeantruntime="false" />
   </presetdef>
 
