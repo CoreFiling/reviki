@@ -14,6 +14,7 @@
 
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div id="previewTabs">
+        <noscript><h2>Jump To:</h2></noscript>
         <ul id="previewTab-header">
           <c:if test="${not empty preview}">
             <li><a href="#preview-area">Preview</a></li>
@@ -24,12 +25,18 @@
         </ul>
 
         <c:if test="${not empty preview}">
-          <div id="preview-area" class="tab-content">
+          <noscript>
+            <h2 class="tab-title">Preview</h2>
+          </noscript>
+          <div id="preview-area" class="tab-content nojs">
             <div id="wiki-rendering">${preview}</div>
           </div>
         </c:if>
         <c:if test="${not empty markedUpDiff}">
-          <div id="diff-area" class="tab-content">
+          <noscript>
+            <h2 class="tab-title">Diff</h2>
+          </noscript>
+          <div id="diff-area" class="tab-content nojs">
             <div id="markedUpDiff">${markedUpDiff}</div>
           </div>
         </c:if>
@@ -38,14 +45,21 @@
 
     <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
       <div id="editFormTabs">
+        <noscript><h2>Jump To:</h2></noscript>
         <ul id="editFormTab-header">
           <li><a id="editFormContent-link" href="#editFormContent-area">Content</a></li>
           <li><a id="editFormAttributes-link" href="#editFormAttributes-area">Attributes</a></li>
         </ul>
-        <div id="editFormContent-area" class="tab-content">
+        <noscript>
+          <h2 class="tab-title">Content</h2>
+        </noscript>
+        <div id="editFormContent-area" class="tab-content nojs">
           <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
         </div>
-        <div id="editFormAttributes-area" class="tab-content">
+        <noscript>
+          <h2 class="tab-title">Attributes</h2>
+        </noscript>
+        <div id="editFormAttributes-area" class="tab-content nojs">
           <textarea rows="10" cols="80" id="attributes" name="attributes"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea><br />
         </div>
       </div>

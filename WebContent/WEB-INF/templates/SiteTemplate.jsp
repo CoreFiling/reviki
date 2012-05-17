@@ -34,7 +34,10 @@
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.textchange.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
   <script type="text/javascript">
-    reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>"
+    reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>";
+    $(function() {
+    	$(".nojs").removeClass("nojs");
+    });
   </script>
 </head>
 <body>

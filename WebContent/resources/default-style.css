@@ -197,6 +197,10 @@ h2.results-wiki {
 	padding: 0 !important;
 }
 
+h2.tab-title {
+  text-decoration: underline;
+}
+
 #previewTabs {
   margin: 0 2em 2em 0;
   border: none;
@@ -217,6 +221,12 @@ h2.results-wiki {
   max-height: 600px;
   overflow-y: auto;
   clear: left;
+}
+
+.tab-content.nojs {
+  margin: 2px;
+  padding: 2px;
+  border: 1px solid #ccc;
 }
 
 #previewTab-header {
