@@ -38,7 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.picocontainer.DefaultPicoContainer;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 
 /**
  * An aggregate of all the current plugins.
@@ -73,7 +73,7 @@ public class PluginsImpl implements Plugins {
   public void handleChanges(final long upto, final List<ChangeInfo> chronological) {
     // We want to do the most recent first to prevent repeated work.
     try {
-      for (ChangeInfo change : Lists.reverse(chronological)) {
+      for (ChangeInfo change : Iterables.reverse(chronological)) {
         if (change.getKind() == StoreKind.ATTACHMENT && change.getPage().equals(CONFIG_PLUGINS.getPath())) {
           PluginAtRevision plugin = _plugin.get(change.getName());
           if (plugin == null || plugin.getRevision() < change.getRevision()) {

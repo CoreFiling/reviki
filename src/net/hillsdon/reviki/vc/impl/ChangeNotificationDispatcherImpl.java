@@ -58,7 +58,7 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
     if (latest > _lastSynced) {
       List<ChangeInfo> logs = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, _lastSynced + 1, latest);
       if (!logs.isEmpty()) {
-        notifyListeners(latest, ImmutableList.copyOf(logs).reverse());
+        notifyListeners(latest, ImmutableList.copyOf(Iterables.reverse(logs)));
       }
     }
     // Some subscribers might not have been synchronised, e.g. searcher if the index is only being built

@@ -4,6 +4,7 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
 
 @SuppressWarnings("deprecation")
 public abstract class NullHttpSession implements HttpSession {
@@ -37,10 +38,7 @@ public abstract class NullHttpSession implements HttpSession {
     return null;
   }
 
-  /**
-   * @deprecated
-   */
-  public javax.servlet.http.HttpSessionContext getSessionContext() {
+  public HttpSessionContext getSessionContext() {
     return null;
   }
 

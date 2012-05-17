@@ -2,14 +2,6 @@
   <description>
     reviki build - see http://reviki.org for more information
   </description>
-
-  <presetdef name="rjavac">
-    <!-- http://stackoverflow.com/a/8114557 -->
-    <javac includeantruntime="false">
-      <compilerarg value="-Xlint:deprecation" />
-    </javac>
-  </presetdef>
-
   <property name="version" value="0.2.0" />   
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
@@ -25,7 +17,7 @@
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat.version" value="6.0.35"/>
+  <property name="tomcat.version" value="6.0.29"/>
   <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
   <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
        The wiki should be called 'test' (with no base URL set).
@@ -69,10 +61,10 @@
   </target>
 
   <target name="compile" depends="init">
-    <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5" debug="true">
+    <javac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5" debug="true">
       <compilerarg value="-Xlint:unchecked" />
       <classpath refid="classpath" />
-    </rjavac>
+    </javac>
     <copy todir="${build-web}">
       <fileset dir="${web}">
         <include name="*/**"/>
@@ -108,12 +100,12 @@
   </target>
 
   <target name="functional-tests-compile" depends="compile">
-    <rjavac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
+    <javac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-classes}"/>
       </classpath>
-    </rjavac>
+    </javac>
   </target>
 
   <target name="taglib-jar" depends="compile" description="Rebuild the JSP taglib JAR file">
