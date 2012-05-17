@@ -2,6 +2,11 @@
   <description>
     reviki build - see http://reviki.org for more information
   </description>
+
+  <presetdef name="rjavac">
+    <javac includeantruntime="false" />
+  </presetdef>
+
   <property name="version" value="0.2.0" />   
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
@@ -61,10 +66,10 @@
   </target>
 
   <target name="compile" depends="init">
-    <javac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5" debug="true">
+    <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5" debug="true">
       <compilerarg value="-Xlint:unchecked" />
       <classpath refid="classpath" />
-    </javac>
+    </rjavac>
     <copy todir="${build-web}">
       <fileset dir="${web}">
         <include name="*/**"/>
@@ -100,12 +105,12 @@
   </target>
 
   <target name="functional-tests-compile" depends="compile">
-    <javac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
+    <rjavac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-classes}"/>
       </classpath>
-    </javac>
+    </rjavac>
   </target>
 
   <target name="taglib-jar" depends="compile" description="Rebuild the JSP taglib JAR file">
