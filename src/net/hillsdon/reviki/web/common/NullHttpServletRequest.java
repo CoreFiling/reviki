@@ -144,6 +144,9 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return false;
   }
 
+  /**
+   * @deprecated
+   */
   public boolean isRequestedSessionIdFromUrl() {
     return false;
   }
@@ -208,6 +211,9 @@ public abstract class NullHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
+  /**
+   * @deprecated
+   */
   public String getRealPath(String arg0) {
     return null;
   }
