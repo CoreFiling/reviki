@@ -27,6 +27,7 @@ import net.hillsdon.fij.text.Escape;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.jaxen.JaxenException;
 
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -61,6 +62,14 @@ public abstract class WebTestSupport extends TestCase {
     client.setThrowExceptionOnScriptError(true);
     client.addWebWindowListener(new ValidateOnContentChange());
     client.getCookieManager().setCookiesEnabled(false);
+
+    // Try to log only "interesting" things:
+    // Don't log errors we can't fix due to browser bugs etc.
+    client.setIncorrectnessListener(new SuppressingIncorrectnessListener());
+    // Don't log CSS errors as currently (2012-05-22) the CSS parser does not
+    // cope with IE specific ` filter: Alpha(Opacity = 0)  `
+    client.setCssErrorHandler(new SilentCssErrorHandler());
+
     return client;
   }
 
