@@ -40,4 +40,10 @@
 	<welcome-file-list>
       <welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
+    <mime-mapping> 
+        <extension>js</extension>
+        <!-- Internet Explorer really does not like the RFC and IANA official type of application/javascript
+             http://stackoverflow.com/questions/1288263/why-doesnt-ie8-recognize-type-application-javascript-in-a-script-tag -->
+        <mime-type>text/javascript</mime-type>
+    </mime-mapping>
 </web-app>
