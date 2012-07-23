@@ -2,7 +2,7 @@
 *.css = svn:mime-type=text/css
 *.dia = svn:mime-type=application/x-dia-diagram
 *.doc = svn:mime-type=application/msword
-*.docx = application/vnd.openxmlformats-officedocument.wordprocessingml.document
+*.docx = svn:mime-type=application/vnd.openxmlformats-officedocument.wordprocessingml.document
 *.dtd = svn:mime-type=text/x-dtd
 *.html = svn:mime-type=text/html
 *.ico = svn:mime-type=image/x-icon
@@ -24,9 +24,9 @@
 *.png = svn:mime-type=image/png
 *.pps = svn:mime-type=application/vnd.ms-powerpoint
 *.ppt = svn:mime-type=application/vnd.ms-powerpoint
-*.pptx = application/vnd.openxmlformats-officedocument.presentationml.presentation
+*.pptx = svn:mime-type=application/vnd.openxmlformats-officedocument.presentationml.presentation
 *.txt = svn:mime-type=text/plain
 *.xls = svn:mime-type=application/vnd.ms-excel
-*.xlsx = application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+*.xlsx = svn:mime-type=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 *.xml = svn:mime-type=text/xml
 *.xsl = svn:mime-type=text/x-xslt
