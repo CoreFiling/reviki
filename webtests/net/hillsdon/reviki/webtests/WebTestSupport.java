@@ -229,7 +229,9 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected HtmlPage clickEditLink(final HtmlPage page) throws IOException {
-    return (HtmlPage) page.getAnchorByName("editTopSubmitLink").click();
+    HtmlForm editForm = page.getFormByName("editTop");
+    HtmlPage editPage = (HtmlPage) editForm.getInputByValue("Edit").click();
+    return editPage;
   }
 
   private static final Pattern RE_REVISION = Pattern.compile("r[0-9]+");
