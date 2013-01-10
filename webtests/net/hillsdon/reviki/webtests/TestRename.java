@@ -46,7 +46,7 @@ public class TestRename extends WebTestSupport {
 
     page = renamePage(fromPageName, toPageName);
 
-    assertTrue(page.getWebResponse().getRequestUrl().toURI().getPath().contains(toPageName));
+    assertTrue(page.getWebResponse().getWebRequest().getUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = clickAttachmentsLink(page, toPageName);
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "file.txt")));

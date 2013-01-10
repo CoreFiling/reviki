@@ -52,7 +52,7 @@ public class TestSearch extends WebTestSupport {
     assertSearchFindsPageUsingQuery(page, name, WikiWordUtils.pathToTitle(name));
     HtmlPage searchResult = search(page, name);
     // Goes directly to the page.
-    assertEquals(page.getWebResponse().getRequestUrl(), searchResult.getWebResponse().getRequestUrl());
+    assertEquals(page.getWebResponse().getWebRequest().getUrl(), searchResult.getWebResponse().getWebRequest().getUrl());
   }
 
   public void testPageWithSpacesShowsInBacklinks() throws Exception {

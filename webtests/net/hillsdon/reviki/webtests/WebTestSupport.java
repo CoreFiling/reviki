@@ -188,7 +188,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
-    URL pageUrl = page.getWebResponse().getRequestUrl();
+    URL pageUrl = page.getWebResponse().getWebRequest().getUrl();
     final String newSign = isNew != null && isNew ? " - New" : "";
     if (isNew != null) {
       assertMatches("test - [A-Z].*?" + newSign, page.getTitleText());
@@ -207,7 +207,7 @@ public abstract class WebTestSupport extends TestCase {
     final List<HtmlInput> saveButtons = (List<HtmlInput>) page.getByXPath("//input[@type='submit' and @value='Save']");
     assertEquals(0, saveButtons.size());
 
-    assertURL(pageUrl, page.getWebResponse().getRequestUrl());
+    assertURL(pageUrl, page.getWebResponse().getWebRequest().getUrl());
     return page;
   }
 
