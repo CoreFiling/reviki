@@ -34,10 +34,10 @@ public final class WikiWordUtils {
    * @return e.g. "foo/BarHumbug" gives "Bar Humbug".
    */
   public static String pathToTitle(final String path) {
-    List<String> parts = splitCamelCase(lastComponentOfPath(path));
-    StringBuilder out = new StringBuilder();
-    for (int i = 0; i < parts.size(); ++i) {
-      String part = parts.get(i);
+    final String last = lastComponentOfPath(path);
+    final List<String> parts = splitCamelCase(last);
+    StringBuilder out = new StringBuilder(2 * last.length());
+    for (String part : parts) {
       if (part.length() > 0) {
         if (out.length() > 0) {
           out.append(' ');

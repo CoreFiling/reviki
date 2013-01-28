@@ -63,30 +63,31 @@ public class Escape {
     if (content == null) {
       return "";
     }
-    char[] chars = content.toCharArray();
-    final StringBuffer result = new StringBuffer(2 * chars.length);
-    for (int i = 0; i < chars.length; ++i) {
-      char character = chars[i];
-      if (character == '<') {
-        result.append("&lt;");
-      }
-      else if (character == '>') {
-        result.append("&gt;");
-      }
-      else if (character == '&') {
-        result.append("&amp;");
-      }
-      else if (character == '\"') {
-        result.append("&quot;");
-      }
-      else if (character == '\'') {
-        result.append("&#039;");
-      }
-      else if (character == '\\') {
-         result.append("&#092;");
-      }
-      else {
-        result.append(character);
+    final char[] chars = content.toCharArray();
+    final StringBuilder result = new StringBuilder(2 * chars.length);
+    for (char character : chars) {
+      switch (character) {
+        case '<':
+          result.append("&lt;");
+          break;
+        case '>':
+          result.append("&gt;");
+          break;
+        case '&':
+          result.append("&amp;");
+          break;
+        case '"':
+          result.append("&quot;");
+          break;
+        case '\'':
+          result.append("&#039;");
+          break;
+        case '\\':
+          result.append("&#092;");
+          break;
+        default:
+          result.append(character);
+          break;
       }
     }
     return result.toString();
