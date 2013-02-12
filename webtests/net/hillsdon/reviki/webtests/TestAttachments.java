@@ -20,12 +20,28 @@ import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.hillsdon.reviki.vc.AttachmentHistory;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.StoreKind;
 
 import org.apache.commons.io.IOUtils;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.io.ISVNEditor;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlDeletedText;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -49,6 +65,12 @@ public class TestAttachments extends WebTestSupport {
   public static String getTextAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
     TextPage attachment = (TextPage) link.click();
     return attachment.getContent().trim();
+  }
+  
+  public void testGetAttachmentWithNoResults() {
+    final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
+    ChangeInfo ci = new ChangeInfo("k", "k", "k", new java.util.Date(), 10000, "ro", StoreKind.ATTACHMENT, null, null, 1221221);
+    AttachmentHistory history = results.get(ci.getName());
   }
 
   public void testGetAttachmentThatDoesntExistGives404() throws Exception {
@@ -118,6 +140,38 @@ public class TestAttachments extends WebTestSupport {
     // Previous version should still be available
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void testUploadRenameAndDeleteAttachment() throws Exception {
+    // https://bugs.corefiling.com/show_bug.cgi?id=13574
+    String name = uniqueWikiPageName("AttachmentsTest");
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+
+    // Rename page in SVN
+    String newName = name + "Renamed";
+    renamePage(name, newName);
+
+    // Now try deleting the attachment from the new page, note that this means that the only entry in the attachment's history will be the deletion as other log entries are at the old path
+    page = getWikiPage(newName);
+    attachments = clickAttachmentsLink(page, newName);
+
+    HtmlForm deleteForm = attachments.getFormByName("deleteAttachment");
+    attachments = deleteForm.getInputByValue("Delete Attachment").click();
+
+    assertFalse("Page should not be completely empty!", attachments.asText().isEmpty());
+
+    // There shouldn't be any link directly to the attachment
+    for(Object o: attachments.getByXPath("//a[contains(@href, 'file.txt')]")) {
+      HtmlAnchor anchor = (HtmlAnchor) o;
+      assertEquals(true, anchor.getHrefAttribute().contains("?revision"));
+    }
+
+    // Previous version should still be available
+    List<HtmlDeletedText> previousRevisions = (List<HtmlDeletedText>) attachments.getByXPath("//span[substring(text(), 1, 8)='file.txt']");
+    assertEquals(1, previousRevisions.size());
   }
 
   public void testUploadAttachmentWithDefaultMessage() throws Exception {

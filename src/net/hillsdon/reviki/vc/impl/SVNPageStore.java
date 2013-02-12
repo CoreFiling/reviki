@@ -382,7 +382,7 @@ public class SVNPageStore extends AbstractPageStore {
             history = new AttachmentHistory(change.getChangeType()==ChangeType.DELETED);
             results.put(change.getName(), history);
           }
-          if(change.getChangeType()!=ChangeType.DELETED) history.getVersions().add(change);
+          history.getVersions().add(change);
         }
       }
       // We need to log and ls - consider the case of copying an attachment *directory*.

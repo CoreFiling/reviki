@@ -73,8 +73,14 @@
               <c:if test="${not empty attachment.versions}">
                 <ul>
                   <c:forEach var="version" items="${attachment.versions}">
-                    <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a>
-                    - <c:out value="${version.commitMessage}"/></li>
+                    <c:if test="${version.isDeletion}">
+                      <li><span style="text-decoration: line-through"><c:out value="${attachment.name} (r${version.revision})" /></span>
+                      - <c:out value="${version.commitMessage}"/></li>
+                    </c:if>
+                    <c:if test="${not version.isDeletion}">
+                      <li><a href="<c:url value="${attachment.name}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a>
+                      - <c:out value="${version.commitMessage}"/></li>
+                    </c:if>
                   </c:forEach>
                 </ul>
               </c:if>

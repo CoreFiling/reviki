@@ -116,7 +116,11 @@ public class ChangeInfo {
   public boolean isDeletion() {
     return getChangeType() == ChangeType.DELETED;
   }
-  
+
+  public boolean getIsDeletion() {
+    return isDeletion();
+  }
+
   @Override
   public String toString() {
     return _changeType.toString() + " of " + _page;
