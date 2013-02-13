@@ -20,9 +20,9 @@ import java.util.LinkedList;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 
-import com.google.code.diff_match_patch.Diff;
-import com.google.code.diff_match_patch.diff_match_patch;
-import com.google.code.diff_match_patch.diff_match_patch.Operation;
+import name.fraser.neil.plaintext.diff_match_patch.Diff;
+import name.fraser.neil.plaintext.diff_match_patch;
+import name.fraser.neil.plaintext.diff_match_patch.Operation;
 
 public class DiffGeneratorImpl implements DiffGenerator {
 

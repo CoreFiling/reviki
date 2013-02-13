@@ -77,7 +77,27 @@ public class TestEditing extends WebTestSupport {
     assertTrue(edited.asText().contains("Initial Status:"));
     assertFalse(edited.asText().contains("Initial Status: completed"));
   }
-
+  
+  public void testPreviewDiffBug() throws Exception {
+    // https://bugs.corefiling.com/show_bug.cgi?id=13510
+    // Old versions of the diff_match_patch package have a bug in the diff_cleanupSemantic method
+    // The two comparison strings need to be well crafted to trigger the bug.
+    String name = uniqueWikiPageName("PreviewPageTest");
+    String content = "=" + NEWLINE_TEXTAREA + "This is a lis of things that someone be doing if" + NEWLINE_TEXTAREA + "===Wiki" + NEWLINE_TEXTAREA;
+    String newContent = "||" + NEWLINE_TEXTAREA + "==";
+    
+    HtmlPage edited = editWikiPage(name, content, "", "", true);
+    HtmlPage editPage = clickEditLink(edited);
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlTextArea contentArea = form.getTextAreaByName("content");
+    contentArea.setText(newContent);
+    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    
+    form = editPage.getFormByName(ID_EDIT_FORM);
+    contentArea = form.getTextAreaByName("content");
+    assertEquals(newContent + NEWLINE_TEXTAREA, contentArea.getText());
+  }
+  
   public void testPreview() throws Exception {
     String name = uniqueWikiPageName("PreviewPageTest");
     HtmlPage editPage = clickEditLink(getWikiPage(name));
