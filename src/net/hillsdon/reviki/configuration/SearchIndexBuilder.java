@@ -127,7 +127,7 @@ public class SearchIndexBuilder implements Runnable {
       WikiUrls wikiUrls = urls.get(wikiName);
       InternalLinker internalLinker = new InternalLinker(wikiUrls);
       final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-      _renderer = new SvnWikiRenderer(new PageStoreConfiguration(store, urls), store, internalLinker, new Supplier<List<Macro>>() {
+      _renderer = new SvnWikiRenderer(new PageStoreConfiguration(cachingPageStore, urls), store, internalLinker, new Supplier<List<Macro>>() {
         public List<Macro> get() {
           List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new AttrMacro(store)));
           macros.addAll(_plugins.getImplementations(Macro.class));
