@@ -64,7 +64,6 @@ public class TestInterWikiLinks extends WebTestSupport {
         minElapsedTime = elapsedTime;
       }
     }
-    System.out.println(minElapsedTime);
     return minElapsedTime;
   }
 }
