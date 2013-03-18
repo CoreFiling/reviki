@@ -20,7 +20,6 @@ import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +49,8 @@ public class TestAttachments extends WebTestSupport {
 
   public static final String ATTACHMENT_UPLOAD_FILE_1 = "webtests/file1.txt";
   public static final String ATTACHMENT_UPLOAD_FILE_2 = "webtests/file2.txt";
+  public static final String ATTACHMENT_UPLOAD_FILE_3 = "webtests/a file with spaces.txt";
+  public static final String ATTACHMENT_UPLOAD_FILE_4 = "webtests/afilewith\"doublequote.txt";
 
   public static String getAttachmentAtEndOfLink(final HtmlAnchor link) throws IOException {
     UnexpectedPage attachment = (UnexpectedPage) link.click();
@@ -107,6 +108,28 @@ public class TestAttachments extends WebTestSupport {
 
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
+  }
+
+  public void testUploadAndDownloadAttachmentWithWhitespace() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTestEscapes");
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_3, name, "a file with spaces.txt", "");
+    assertEquals("File 3.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "a%20file%20with%20spaces.txt")));
+
+    // A link should have been added to the page.
+    page = getWikiPage(name);
+    assertEquals("File 3.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/a%20file%20with%20spaces")));
+  }
+
+  public void testUploadAndDownloadAttachmentWithDoubleQuotes() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTestQuotes");
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_4, name, "afilewith\"doublequote.txt", "");
+    assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "afilewith%22doublequote.txt")));
+
+    // A link should have been added to the page.
+    page = getWikiPage(name);
+    assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/afilewith%22doublequote")));
   }
 
   public void testUploadAndDownloadAttachmentOnNewPage() throws Exception {

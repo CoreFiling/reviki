@@ -286,7 +286,8 @@ public class DefaultPageImpl implements DefaultPage {
           }
 
           public void setFileName(final String name) {
-            response.setHeader("Content-Disposition", "inline; filename=" + attachmentName);
+            final String quoteEscapedAttachmentName = attachmentName.replace("\\", "\\\\").replace("\"", "\\\"");
+            response.setHeader("Content-Disposition", "inline; filename=\"" + quoteEscapedAttachmentName + "\"");
           }
 
           public OutputStream stream() throws IOException {

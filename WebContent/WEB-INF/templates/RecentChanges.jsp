@@ -16,6 +16,7 @@
         <th class="history">Description</th>
       </tr>
       <c:forEach var="change" items="${recentChanges}">
+        <c:set var="encodedName" value="${sw:urlEncode(change.name)}"/>
         <tr class="history">
           <td class="history" style="white-space: nowrap;">
             <c:choose>
@@ -25,7 +26,7 @@
                 </a>
               </c:when>
               <c:otherwise>
-                <a href="<c:url value="${change.name}"/>?revision=${change.revision}&amp;diff=${change.revision - 1}">
+                <a href="<c:url value="${encodedName}"/>?revision=${change.revision}&amp;diff=${change.revision - 1}">
                   <f:formatDate type="both" value="${change.date}"/>
                 </a>
               </c:otherwise>
@@ -35,20 +36,20 @@
             <c:set var="link">
               <c:choose>
                 <c:when test="${change.attachment}">
-                  <a href="<c:url value="${change.page}/attachments/${change.name}"/>"><c:out value="${change.page}/attachments/${change.name}"/></a>
+                  <a href="<c:url value="${change.page}/attachments/${encodedName}"/>"><c:out value="${change.page}/attachments/${change.name}"/></a>
                 </c:when>
                 <c:otherwise>
-                  <a href="<c:url value="${change.name}"/>"><c:out value="${change.name}"/></a>
+                  <a href="<c:url value="${encodedName}"/>"><c:out value="${change.name}"/></a>
                 </c:otherwise>
               </c:choose>
             </c:set>
             <c:set var="revisionLink">
               <c:choose>
                 <c:when test="${change.attachment}">
-                  <a href="<c:url value="${change.page}/attachments/${change.name}?revision=${change.revision}"/>">r<c:out value="${change.revision}"/></a>
+                  <a href="<c:url value="${change.page}/attachments/${encodedName}?revision=${change.revision}"/>">r<c:out value="${change.revision}"/></a>
                 </c:when>
                 <c:otherwise>
-                  <a href="<c:url value="${change.name}?revision=${change.revision}"/>">r<c:out value="${change.revision}"/></a>
+                  <a href="<c:url value="${encodedName}?revision=${change.revision}"/>">r<c:out value="${change.revision}"/></a>
                 </c:otherwise>
               </c:choose>
             </c:set>

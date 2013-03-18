@@ -255,14 +255,17 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   public HtmlPage uploadAttachment(final String fileName, final String pageName, final String message) throws IOException {
+    return uploadAttachment(fileName, pageName, "file.txt", message);
+  }
+
+  public HtmlPage uploadAttachment(final String fileName, final String pageName, final String uploadFileName, final String message) throws IOException {
     HtmlPage attachments = clickAttachmentsLink(getWikiPage(pageName), pageName);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
     form.getInputByName("file").setValueAttribute(fileName);
-    form.getInputByName("attachmentName").setValueAttribute("file");
+    form.getInputByName("attachmentName").setValueAttribute(uploadFileName);
     form.getInputByName("attachmentMessage").setValueAttribute(message);
     attachments = (HtmlPage) form.getInputByValue("Upload").click();
     return attachments;
-
   }
 
   protected HtmlPage search(final HtmlPage page, final String query) throws IOException {
