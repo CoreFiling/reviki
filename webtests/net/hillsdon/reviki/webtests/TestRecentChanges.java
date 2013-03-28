@@ -19,7 +19,6 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.util.Iterator;
-
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -56,7 +55,10 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(second.asText(), createdSecond);
 
     HtmlPage recentChanges = getWikiPage("RecentChanges");
+    String recentChangesAsText = recentChanges.asText();
     assertTrue(recentChanges.asText().contains(descriptionOfChange));
+    // Test spacing between page name and revision number https://bugs.corefiling.com/show_bug.cgi?id=40660
+    assertTrue(recentChangesAsText.contains(createdFirst + " r"));
   }
 
   @SuppressWarnings("unchecked")
@@ -65,5 +67,4 @@ public class TestRecentChanges extends WebTestSupport {
     Iterator<HtmlAnchor> links = (Iterator<HtmlAnchor>) recentChanges.getByXPath("//tr/td[position() = 2]/a").iterator();
     return links;
   }
-
 }
