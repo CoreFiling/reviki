@@ -1,6 +1,28 @@
 Reviki
 
                               Version History
+0.2.1 (2013-04-05)
+------------------
+
+* Fix handling of attachment names that contain spaces.
+  [bug 13983]
+
+* Improve performance, especially for pages with a large number of links.
+  [bug 14571]
+
+* Fix an issue that could cause "String index out of range: 0 editing a page"
+  errors when trying to preview a change to a page.
+  [bug 13510]
+
+* Fix an issue that prevented the Attachment page from working if an
+  attachment was deleted after a page had been renamed.
+  [bug 13574]
+
+* Fix a regression introduced in 0.2.0 that prevented Microsoft Office Open
+  XML documents from being uploaded as attachments.
+  [bug 13553]
+
+
 0.2.0 (2012-05-17)
 ------------------
 

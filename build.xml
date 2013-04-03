@@ -10,7 +10,7 @@
     </javac>
   </presetdef>
 
-  <property name="version" value="0.3.0" />   
+  <property name="version" value="0.2.1" />   
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
