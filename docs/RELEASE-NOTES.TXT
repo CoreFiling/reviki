@@ -14,7 +14,7 @@ Reviki
   errors when trying to preview a change to a page.
   [bug 13510]
 
-* Fix an issue that prevented the Attachment page from working if an
+* Fix an issue that prevented the Attachments page from working if an
   attachment was deleted after a page had been renamed.
   [bug 13574]
 
