@@ -27,6 +27,7 @@ import net.hillsdon.fij.text.Escape;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.jaxen.JaxenException;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -53,7 +54,7 @@ public abstract class WebTestSupport extends TestCase {
   private WebClient _altclient = null;
 
   private WebClient setupClient(final String username, final String password) {
-    final WebClient client = new WebClient();
+    final WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
     DefaultCredentialsProvider credentials = new DefaultCredentialsProvider();
     credentials.addCredentials(username, password);
     client.setCredentialsProvider(credentials);
