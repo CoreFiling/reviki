@@ -12,7 +12,7 @@ public class AttachmentListingDebug {
 
   public static void main(String[] args) throws Exception {
     DAVRepositoryFactory.setup();
-    SVNRepository repository = SVNRepositoryFactory.create(SVNURL.parseURIDecoded("http://svn.dsl.local/svn/web/wiki/dsl"));
+    SVNRepository repository = SVNRepositoryFactory.create(SVNURL.parseURIDecoded("https://svn-dev-plaintext.int.corefiling.com/svn/web/wiki/dsl"));
     repository.setAuthenticationManager(SVNWCUtil.createDefaultAuthenticationManager());
     RepositoryBasicSVNOperations operations = new RepositoryBasicSVNOperations(repository, null);
     SVNPageStore store = new SVNPageStore("wiki", new InMemoryDeletedRevisionTracker(), operations, null, null);
