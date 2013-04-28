@@ -6,6 +6,7 @@
   <presetdef name="rjavac">
     <!-- http://stackoverflow.com/a/8114557 -->
     <javac includeantruntime="false">
+      <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:deprecation" />
     </javac>
   </presetdef>
@@ -69,8 +70,7 @@
   </target>
 
   <target name="compile" depends="init">
-    <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.5" debug="true">
-      <compilerarg value="-Xlint:unchecked" />
+    <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.6" source="1.6" debug="true">
       <classpath refid="classpath" />
     </rjavac>
     <copy todir="${build-web}">
