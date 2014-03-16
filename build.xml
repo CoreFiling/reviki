@@ -244,7 +244,7 @@
   <target name="all-tests" depends="unit-tests, functional-tests" description="Run all the tests (starts/stops tomcat)"/>
 
   <target name="release" depends="war, test-jar">
-    <property name="release-dirname" value="reviki-${version}-r${revision}"/>
+    <property name="release-dirname" value="reviki-${version}-r${buildNumber}"/>
     <zip file="${release}/${release-dirname}.zip">
       <zipfileset prefix="${release-dirname}" dir=".">
         <include name="${war}"/>
