@@ -11,7 +11,9 @@
     </javac>
   </presetdef>
 
+  <property name="buildNumber" value="dev" />   
   <property name="version" value="0.3.0" />   
+  <property name="build-details" value="${version} r${buildNumber}" />
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
@@ -54,8 +56,6 @@
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
      <mkdir dir="${release}" />
-     <exec outputproperty="revision" executable="svnversion"/>
-  	 <property name="build-details" value="${version} r${revision}" />
   </target>
 
   <target name="clean" description="Clean-up build artifacts">
