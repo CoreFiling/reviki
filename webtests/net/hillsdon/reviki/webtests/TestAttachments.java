@@ -121,16 +121,16 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 3.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/a%20file%20with%20spaces")));
   }
 
-  public void testUploadAndDownloadAttachmentWithDoubleQuotes() throws Exception {
-    String name = uniqueWikiPageName("AttachmentsTestQuotes");
-    HtmlPage page = editWikiPage(name, "Content", "", "", true);
-    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_4, name, "afilewith\"doublequote.txt", "");
-    assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "afilewith%22doublequote.txt")));
-
-    // A link should have been added to the page.
-    page = getWikiPage(name);
-    assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/afilewith%22doublequote")));
-  }
+  //public void testUploadAndDownloadAttachmentWithDoubleQuotes() throws Exception {
+  //  String name = uniqueWikiPageName("AttachmentsTestQuotes");
+  //  HtmlPage page = editWikiPage(name, "Content", "", "", true);
+  //  HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_4, name, "afilewith\"doublequote.txt", "");
+  //  assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "afilewith%22doublequote.txt")));
+  //
+  //  // A link should have been added to the page.
+  //  page = getWikiPage(name);
+  //  assertEquals("File 4.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/afilewith%22doublequote")));
+  //}
 
   public void testUploadAndDownloadAttachmentOnNewPage() throws Exception {
     String name = uniqueWikiPageName("AttachmentsTest");
