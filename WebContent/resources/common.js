@@ -299,6 +299,14 @@ reviki.removeUnlockOnUnload = function() {
   reviki.unlockOnUnload = false;
 }
 
+reviki.addEditHash = function() {
+  // The hash in the URL Prompts FF
+  // to return to the edit page via the back button
+  if ($("#editForm").length == 1) {
+    window.location.hash = "#edit";
+  }
+}
+
 reviki.setupLeaveConfirm = function() {
   if ($("#editForm").length == 1) {
     if ($("#preview-area").length == 1) {
@@ -321,3 +329,4 @@ reviki.setupLeaveConfirm = function() {
 $(document).ready(reviki.configureAutoSuggest);
 $(document).ready(reviki.setupShortcutKeys);
 $(document).ready(reviki.setupLeaveConfirm);
+$(document).ready(reviki.addEditHash);
