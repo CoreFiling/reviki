@@ -28,6 +28,7 @@ public interface VersionedPageInfo extends PageInfo  {
   // Magic revisions.  Prefer isFoo() methods.
   long UNCOMMITTED = -2;
   long DELETED = -3;
+  long RENAMED = -4;
 
   long getRevision();
   String getRevisionName();
@@ -44,6 +45,8 @@ public interface VersionedPageInfo extends PageInfo  {
 
   boolean isNewPage();
   boolean isDeleted();
+  boolean isRenamed();
+  String getRenamedPageName();
 
   VersionedPageInfo withoutLockToken();
 
