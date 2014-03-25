@@ -90,4 +90,21 @@ public class TestSearchMacro extends WebTestSupport {
     assertTrue(searchingOnPageAsText.contains(searchingFor));
     assertSearchFindsPageUsingQuery(searchingOnPage, searchingFor, "path:" + searchingFor);
   }
+  
+  public void testBackLinksOnReferencedPage() throws Exception {
+    String refs = uniqueWikiPageName("Refs");
+    String findMe = uniqueWikiPageName("FindMe");
+    editWikiPage(refs, String.format("Macro: <<search:path:%s>>", findMe), "", "Search Macro Test", true);
+    
+    editWikiPage(findMe, "I'm here", "", "Search Macro Test", true);
+    
+    HtmlPage refsPage = getWikiPage(refs);
+    String refsPageAsText = refsPage.asText();
+    assertTrue(refsPageAsText.contains(findMe));
+    
+    //editWikiPage(refs, String.format("Macro: <<search:path:%s>>", findMe), "", "prompt", false);
+    HtmlPage findMePage = getWikiPage(findMe);
+    String findMePageAsText = findMePage.asText();
+    assertTrue(findMePageAsText.contains(refs));   
+  }
 }

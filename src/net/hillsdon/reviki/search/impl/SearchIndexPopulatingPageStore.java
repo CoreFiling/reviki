@@ -20,8 +20,10 @@ import java.io.IOException;
 import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 
 import org.apache.commons.logging.Log;
@@ -62,5 +64,22 @@ public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
     }
     return newRevision;
   }
-
+  
+  @Override
+  public VersionedPageInfo get(PageReference ref, long revision) throws PageStoreException {
+    VersionedPageInfo page = super.get(ref, revision);
+    if (!page.isNewPage()) {
+      try {
+        if(!_indexer.isIndexBeingBuilt()) {
+          if(page.getContent().trim().length() > 0) {
+            _indexer.index(page, false);
+          }
+        }
+      }
+      catch (IOException e) {
+        LOG.error("Error adding to search index, skipping page: " + page, e);
+      }
+    }
+    return page;
+  }
 }
