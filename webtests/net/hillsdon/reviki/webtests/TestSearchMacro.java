@@ -102,7 +102,6 @@ public class TestSearchMacro extends WebTestSupport {
     String refsPageAsText = refsPage.asText();
     assertTrue(refsPageAsText.contains(findMe));
     
-    //editWikiPage(refs, String.format("Macro: <<search:path:%s>>", findMe), "", "prompt", false);
     HtmlPage findMePage = getWikiPage(findMe);
     String findMePageAsText = findMePage.asText();
     assertTrue(findMePageAsText.contains(refs));   
