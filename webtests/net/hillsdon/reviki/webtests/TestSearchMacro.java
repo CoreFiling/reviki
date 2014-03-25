@@ -106,4 +106,16 @@ public class TestSearchMacro extends WebTestSupport {
     String findMePageAsText = findMePage.asText();
     assertTrue(findMePageAsText.contains(refs));   
   }
+  
+  public void testMatchingAttributesNoChangeToRenderedPage() throws Exception {
+    String searchingFor = uniqueWikiPageName("SearchMacroSearchingFor");
+    editWikiPage(searchingFor, "Should not be found by macro", "", "Search Macro Test", true);
+    editWikiPage(searchingFor, "Should not be found by macro", "status = completed", "Search Macro Test", false);
+    String searchingOn = uniqueWikiPageName("SearchMacroTest");
+    HtmlPage searchingOnPage = editWikiPage(searchingOn, "Search Macro Results: <<search:path:" + searchingFor + " AND @status:completed>>", "", "Search Macro Test", true);
+    String searchingOnPageAsText = searchingOnPage.asText();
+    assertTrue(searchingOnPageAsText.contains("Search Macro Results:"));
+    assertTrue(searchingOnPageAsText.contains(searchingFor));
+    assertSearchFindsPageUsingQuery(searchingOnPage, searchingFor, "path:" + searchingFor);
+  }
 }

@@ -46,6 +46,10 @@ public class RenderedPage {
     return _pageName;
   }
   
+  public Integer getPageHashCode() {
+    return _rendered.hashCode();
+  }
+  
   /**
    * @return outgoing links in document order.
    * @throws IOException If we fail to parse. 
