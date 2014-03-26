@@ -227,14 +227,6 @@ public class LuceneSearcher implements SearchEngine {
     }
   }
   
-  private boolean isIndexUpToDate(final PageInfo page, final RenderedPage renderedPage) {
-    Integer hashForContent = getPageContentHashCode(page);
-    Integer hashForAttrs = getPageAttrHashCode(page);
-    boolean isContentUpToDate = hashForContent != null && hashForContent.equals(renderedPage.getPageHashCode());
-    boolean isAttrsUpToDate = hashForAttrs != null && hashForAttrs.equals(computePageAttrHashCode(page));
-    return isContentUpToDate && isAttrsUpToDate;
-  }
-  
   private Integer getPageContentHashCode(final PageInfo page) {
     return _contentHashCodes.get(uidFor(page.getWiki(), page.getPath()));
   }
@@ -266,11 +258,9 @@ public class LuceneSearcher implements SearchEngine {
     if (!isIndexBeingBuilt() || buildingIndex) {
       createIndexIfNecessary();
       RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
-      if (!isIndexUpToDate(page, renderedPage)) {
-        replaceWikiDocument(createWikiPageDocument(page, renderedPage));
-        setPageContentHashCode(page, renderedPage.getPageHashCode());
-        setPageAttrHashCode(page, computePageAttrHashCode(page));
-      }
+      replaceWikiDocument(createWikiPageDocument(page, renderedPage));
+      setPageContentHashCode(page, renderedPage.getPageHashCode());
+      setPageAttrHashCode(page, computePageAttrHashCode(page));
     }
   }
 
@@ -554,5 +544,13 @@ public class LuceneSearcher implements SearchEngine {
 
   public String escape(final String in) {
     return QueryParser.escape(in);
+  }
+  
+  public boolean isIndexUpToDate(final PageInfo page) throws IOException, PageStoreException {
+    RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+    Integer hashForContent = getPageContentHashCode(page);
+    Integer hashForAttrs = getPageAttrHashCode(page);
+   
+    return hashForContent != null && hashForAttrs != null && hashForContent.equals(renderedPage.getPageHashCode()) && hashForAttrs.equals(computePageAttrHashCode(page));
   }
 }

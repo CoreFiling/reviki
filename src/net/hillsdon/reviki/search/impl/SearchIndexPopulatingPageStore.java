@@ -70,7 +70,9 @@ public class SearchIndexPopulatingPageStore extends SimpleDelegatingPageStore {
     VersionedPageInfo page = super.get(ref, revision);
     if (!page.isNewPage()) {
       try {
-        _indexer.index(page, false);
+        if (!_indexer.isIndexUpToDate(page)) {
+          _indexer.index(page, false);
+        }
       }
       catch (IOException e) {
         LOG.error("Error adding to search index, skipping page: " + page, e);

@@ -140,4 +140,8 @@ public class ExternalCommitAwareSearchEngine implements SearchEngine, ChangeSubs
     return _delegate.outgoingLinks(page);
   }
 
+  public boolean isIndexUpToDate(PageInfo page) throws IOException, PageStoreException {
+    return _delegate.isIndexUpToDate(page);
+  }
+
 }
