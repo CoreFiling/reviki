@@ -84,6 +84,17 @@ public interface PageStore {
    * @return Information (including current content) for the page.
    */
   VersionedPageInfo get(PageReference ref, long revision) throws PageStoreException;
+  
+  /**
+   * Batch fetch a collection of pages.
+   * The returned PageInfo instances do not contain SVN attribute information.
+   *
+   * @param pages A list of pages to fetch.
+   * @param revision Revision, -1 for head.
+   * @return The PathInfo objects representing the requested pages
+   * @throws PageStoreException
+   */
+  List<PageInfo> getPages(List<PageReference> pages, long revision) throws PageStoreException;
 
   /**
    * If the page is an existing page then try to take out a lock.

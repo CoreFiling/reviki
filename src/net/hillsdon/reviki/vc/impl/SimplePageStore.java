@@ -135,5 +135,9 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
   public void expire(PageReference pageInfo) {
     // Non-caching implementation
   }
+  
+  public List<PageInfo> getPages(List<PageReference> pages, long revision) throws PageStoreException {
+    throw new UnsupportedOperationException();
+  }
 
 }

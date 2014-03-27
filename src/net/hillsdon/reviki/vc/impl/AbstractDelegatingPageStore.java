@@ -126,4 +126,9 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
   public String getWiki() throws PageStoreException {
     return getDelegateInternal().getWiki();
   }
+  
+  public List<PageInfo> getPages(final List<PageReference> paths, final long revision) throws PageStoreException {
+    return getDelegateInternal().getPages(paths, revision);
+  }
+  
 }

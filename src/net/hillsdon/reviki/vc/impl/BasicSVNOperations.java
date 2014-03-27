@@ -15,6 +15,7 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,6 +58,7 @@ public interface BasicSVNOperations {
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   SVNNodeKind checkPath(String path, long revision) throws PageStoreAuthenticationException, PageStoreException;
 
+  Map<String, ByteArrayOutputStream> getFiles(List<String> paths, long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
   void getFile(String path, long revision, Map<String, String> properties, OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
 
