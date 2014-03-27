@@ -169,7 +169,7 @@ public class SVNPageStore extends AbstractPageStore {
     return names;
   }
   
-  public List<PageInfo> getPages(final List<PageReference> pages, final long revision) throws PageStoreException {
+  public Collection<PageInfo> getPages(final Collection<PageReference> pages, final long revision) throws PageStoreException {
     List<PageInfo> outputPages = new LinkedList<PageInfo>();
     List<String> paths = new LinkedList<String>();
     for (PageReference p : pages) {

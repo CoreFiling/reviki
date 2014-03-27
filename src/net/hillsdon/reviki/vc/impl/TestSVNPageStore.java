@@ -26,6 +26,7 @@ import static org.easymock.EasyMock.getCurrentArguments;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -231,7 +232,7 @@ public class TestSVNPageStore extends TestCase {
     expect(_operations.getFiles(eq(paths), eq(-1L))).andReturn(pathsOutput);
     replay();
     
-    List<PageInfo> returnValue = _store.getPages(pages, -1);
+    Collection<PageInfo> returnValue = _store.getPages(pages, -1);
     int j = 0;
     for (PageInfo p : returnValue) {
       assertEquals(p.getPath(), String.format("Path%d", j));
