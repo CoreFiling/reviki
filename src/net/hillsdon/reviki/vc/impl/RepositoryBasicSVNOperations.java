@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -227,7 +228,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   }
   
-  public Map<String, ByteArrayOutputStream> getFiles(final List<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     final Map<String, ByteArrayOutputStream> outputStreams = new LinkedHashMap<String, ByteArrayOutputStream>();
     execute(new SVNAction<Void>() {
       public Void perform(final BasicSVNOperations operation, final SVNRepository repository) throws SVNException, PageStoreException {

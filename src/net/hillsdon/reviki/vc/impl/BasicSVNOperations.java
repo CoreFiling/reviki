@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public interface BasicSVNOperations {
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   SVNNodeKind checkPath(String path, long revision) throws PageStoreAuthenticationException, PageStoreException;
 
-  Map<String, ByteArrayOutputStream> getFiles(List<String> paths, long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
+  Map<String, ByteArrayOutputStream> getFiles(Collection<String> paths, long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
   void getFile(String path, long revision, Map<String, String> properties, OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
 

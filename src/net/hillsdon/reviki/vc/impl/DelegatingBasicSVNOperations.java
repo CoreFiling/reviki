@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +83,7 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().getFile(path, revision, properties, out);
   }
   
-  public Map<String, ByteArrayOutputStream> getFiles(final List<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     return getDelegate().getFiles(paths, revision);
   }
 
