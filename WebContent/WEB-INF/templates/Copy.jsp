@@ -9,7 +9,7 @@
     <p>The edit history from the old page will be viewable from the copy.</p>
     <form name="copyForm" method="post" action="<c:url value="${sw:urlEncode(page.name)}"/>">
       <label for="toPage">New page name </label><input id="toPage" name="toPage" type="text" value=""/>
-      <input name="copy" type="submit" value="Copy"/>
+      <input class="btn btn-default" name="copy" type="submit" value="Copy"/>
     </form>
     <script type='text/javascript'>
       $(document).ready(function() {

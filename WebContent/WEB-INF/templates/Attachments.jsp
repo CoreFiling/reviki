@@ -10,7 +10,7 @@
     <c:choose>
       <c:when test="${not empty currentAttachments}">
         <h4>Current attachments</h4>
-        <table>
+        <table class="table table-striped table-condensed">
           <c:forEach var="attachment" items="${currentAttachments}">
             <c:set var="encodedName" value="${sw:urlEncode(attachment.name)}"/>
             <c:set var="ncName" value="${fn:replace(encodedName, '%', '__')}"/>
@@ -21,13 +21,13 @@
               </td>
               <td>
                 <form name="replaceAttachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
-                  <table>
+                  <table class="table table-striped table-condensed">
                     <tr>
                       <td class="text-align-right"><label for="file_${ncName}">File:</label></td>
                       <td><input type="file" name="file" id="file_${ncName}"/> 
                           <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>" />
                           <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>" /></td>
-                      <td><input type="submit" value="Upload New Version" /></td>
+                      <td><input class="btn btn-default" type="submit" value="Upload New Version" /></td>
                     </tr>
                     <tr>
                       <td class="text-align-right"><label for="message_${ncName}">Message:</label></td>
@@ -65,7 +65,7 @@
     </c:choose>
     <c:if test="${not empty deletedAttachments}">
       <h4>Deleted attachments</h4>
-      <table>
+      <table class="table table-striped table-condensed">
         <c:forEach var="attachment" items="${deletedAttachments}">
           <c:set var="encodedName" value="${sw:urlEncode(attachment.name)}"/>
           <tr>
@@ -94,7 +94,7 @@
     </c:if>
     <h4>Upload a new attachment</h4>
     <form name="attachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
-      <table>
+      <table class="table table-striped table-condensed">
         <tr><th class="text-align-right"><label for="file">File to upload</label></th>
           <td><input id="file" type="file" name="file" /></td>
         </tr>

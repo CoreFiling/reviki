@@ -1103,6 +1103,23 @@
   cursor: default;
 }
 
+.ui-autocomplete ul {
+  position: absolute;
+  z-index: 1;
+  top: 30px; right:
+  0px; display: block;
+  background: white;
+  border: 1px solid black;
+  overflow: hidden;
+}
+
+li.ui-autocomplete-category {
+  list-style: none outside none;
+  font-weight: bold;
+  color: black;
+}
+
+
 /* workarounds */
 * html .ui-autocomplete {
   width: 1px;
@@ -1156,6 +1173,28 @@
 .ui-menu .ui-menu-item a.ui-state-hover,.ui-menu .ui-menu-item a.ui-state-active {
   background-color: #F0F0B8;
   cursor: pointer;
+}
+
+li.ui-menu-item {
+  list-style: none outside none; 
+}
+
+li.ui-menu-item a {
+  color: black;
+}
+
+li.ui-menu-item a.ui-state-hover, li.ui-menu-item a:hover {
+  background-color: powderblue;
+  text-decoration: none;
+}
+
+.ui-tabs-hide {
+  display: none;
+}
+
+li.ui-state-active {
+  background-color: #eeeeee;
+  border-radius: 4px 4px 0 0;
 }
 
 .ui-autocomplete-input {

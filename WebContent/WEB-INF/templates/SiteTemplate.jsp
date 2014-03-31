@@ -21,6 +21,7 @@
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"/>" />
     <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
+  <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
@@ -62,7 +63,7 @@
         <li class="menu">
           <form id="searchForm" name="searchForm" style="display: inline; margin-top:0.2em;" action="<sw:wikiUrl page="FindPage"/>" method="get">
             <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
-            <input value="Go" type="submit"/>
+            <input class="btn btn-default btn-sm" value="Go" type="submit"/>
           </form>
         </li>
       </ul>
@@ -73,6 +74,7 @@
   </div>
   <div id="content-area">
     <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
+    <hr/>
     <div id="sidebar" class="auxillary" style="float:right">
     ${renderedSideBar}
     </div>

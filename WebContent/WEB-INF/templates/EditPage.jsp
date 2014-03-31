@@ -15,7 +15,7 @@
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div id="previewTabs">
         <noscript><h2>Jump To:</h2></noscript>
-        <ul id="previewTab-header">
+        <ul id="previewTab-header" class="nav nav-tabs">
           <c:if test="${not empty preview}">
             <li><a href="#preview-area">Preview</a></li>
           </c:if>
@@ -46,7 +46,7 @@
     <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
       <div id="editFormTabs">
         <noscript><h2>Jump To:</h2></noscript>
-        <ul id="editFormTab-header">
+        <ul id="editFormTab-header" class="nav nav-tabs">
           <li><a id="editFormContent-link" href="#editFormContent-area">Content</a></li>
           <li><a id="editFormAttributes-link" href="#editFormAttributes-area">Attributes</a></li>
         </ul>
@@ -73,9 +73,9 @@
       <input type="hidden" name="originalAttrs" value="${attrs}" />
       <hr/>
       <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
-      <input style="width:5em;" name="save" type="submit" value="Save" id="save"/>
-      <input style="width:5em;" name="unlock" type="submit" value="Cancel" id="cancel"/>
-      <input style="width:5em;" name="preview" type="submit" value="Preview" id="preview"/>
+      <input style="width:5em;" class="btn btn-default btn-success" name="save" type="submit" value="Save" id="save"/>
+      <input style="width:5em;" name="unlock" class="btn btn-default btn-warning" type="submit" value="Cancel" id="cancel"/>
+      <input style="width:5em;" name="preview" class="btn btn-default btn-primary" type="submit" value="Preview" id="preview"/>
       <br />
       <label for="minorEdit">Minor edit?</label>
       <input type="checkbox" id="minorEdit" name="minorEdit" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if> />

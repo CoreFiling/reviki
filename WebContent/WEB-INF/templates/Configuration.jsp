@@ -17,7 +17,7 @@
       indexing to complete after you submit this form.
     </p>
     <form name="configurationForm" action="<c:url value="ConfigSvnLocation"/>" method="post">
-      <table>
+      <table class="table table-striped table-condensed">
         <tr>
           <td><label for="url">SVN URL </label></td>
           <td><input style="width:25em;" id="url" name="url" value="<c:out value="${configuration.url}"/>"/></td>
@@ -31,7 +31,7 @@
           <td><label for="pass">SVN Password </label></td>
           <td><input type="password" style="width:25em;" id="pass" name="pass" value="<c:out value="${configuration.SVNPassword}"/>"/></td>
         </tr>
-        <tr><td colspan="2"><input type="submit" value="Save"/></td></tr>
+        <tr><td colspan="2"><input class="btn btn-default" type="submit" value="Save"/></td></tr>
       </table>
     </form> 
   </tiles:putAttribute>

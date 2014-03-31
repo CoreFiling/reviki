@@ -9,7 +9,7 @@
     <p>Edit history will be retained.  Links to the page will not be updated.</p>
     <form name="renameForm" method="post" action="<c:url value="${sw:urlEncode(page.name)}"/>">
       <label for="toPage">New page name </label><input id="toPage" name="toPage" type="text" value="<c:url value="${sw:urlEncode(page.name)}"/>"/>
-      <input name="rename" type="submit" value="Rename"/>
+      <input class="btn btn-default" name="rename" type="submit" value="Rename"/>
     </form>
     <script type='text/javascript'>
       $(document).ready(function() {

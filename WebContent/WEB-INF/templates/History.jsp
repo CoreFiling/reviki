@@ -11,13 +11,13 @@
   <tiles:putAttribute name="heading">History for <a href="<c:url value="${encodedPageName}"/>"><c:out value="${page.title}"/></a></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <form method="get" name="compareForm" action="<c:url value="${encodedPageName}"/>">
-	    <table class="history">
+	    <table class="history table table-striped table-condensed">
 	      <tr class="history">
 	        <th class="history" style="white-space: nowrap;">Date</th>
 	        <th class="history" style="white-space: nowrap;">Page</th>
 	        <th class="history">User</th>
 	        <th class="history">Description</th>
-	        <th class="history" colspan="2"><input type="submit" value="Compare" name="compare" /></th>
+	        <th class="history" colspan="2"><input class="btn btn-default" type="submit" value="Compare" name="compare" /></th>
 	      </tr>
 	      <tr class="history">
 	        <td class="history" style="white-space: nowrap;"></td>

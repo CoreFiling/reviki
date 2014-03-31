@@ -7,7 +7,7 @@
   <tiles:putAttribute name="title">Recent Changes</tiles:putAttribute>
   <tiles:putAttribute name="heading">Recent Changes</tiles:putAttribute>
   <tiles:putAttribute name="content">
-    <table class="history">
+    <table class="history table table-striped table-condensed">
       <tr class="history">
         <th class="history" style="white-space: nowrap;">Date</th>
         <th class="history">Page</th>
