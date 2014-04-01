@@ -43,32 +43,47 @@
     </c:if>
 
     <form class="form" role="form" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" method="post">
-      <div class="form-group row">
-        <div class="col-sm-9">
-          <ul class="nav nav-tabs">
-            <li class="active"><a href="#content" data-toggle="tab">Content</a></li>
-            <li><a href="#attributes" data-toggle="tab">Attributes</a></li>
-          </ul>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-sm-9">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#content" data-toggle="tab">Content</a></li>
+              <li><a href="#attributes" data-toggle="tab">Attributes</a></li>
+            </ul>
+          </div><!--col-->
+        </div><!--row-->
 
-          <div class="tab-content">
-            <div class="tab-pane active" id="content">
-              <div class="well">
-                <textarea id="contentArea" style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
-              </div><!--well-->
-            </div>
-            <div class="tab-pane" id="attributes">
-              <div class="well">
-                <textarea style="resize: none;" name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
-              </div><!--well-->
-            </div>
+        <div class="tab-content">
+          <div class="tab-pane active" id="content">
+            <div class="row">
+              <div class="col-sm-9">
+                <div class="well">
+                  <textarea id="contentArea" style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
+                </div><!--well-->
+              </div><!--col-->
+              <div class="col-sm-2">
+                <div id="sidebar" class="panel">
+                  ${renderedSideBar}
+                </div>
+              </div><!--col-->
+            </div><!--row-->
           </div>
-        </div>
-        <div class="col-sm-2">
-          <div id="sidebar" class="panel">
-            ${renderedSideBar}
+          <div class="tab-pane" id="attributes">
+            <div class="row">
+              <div class="col-sm-9">
+                <div class="well">
+                  <textarea style="resize: none;" name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
+                </div><!--well-->
+              </div><!--col-->
+              <div class="col-sm-2">
+                <div id="sidebar" class="panel">
+                  ${renderedSideBar}
+                </div>
+              </div><!--col-->
+            </div><!--row-->
           </div>
-        </div>
-      </div>
+        </div><!--tabcontent-->
+      </div><!--form-group-->
 
       <div class="form-group row">
         <div class="col-sm-3 col-md-4">
