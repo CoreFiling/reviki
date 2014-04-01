@@ -53,7 +53,7 @@
           <div class="tab-content">
             <div class="tab-pane active" id="content">
               <div class="well">
-                <textarea style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
+                <textarea id="contentArea" style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
               </div><!--well-->
             </div>
             <div class="tab-pane" id="attributes">
@@ -106,7 +106,7 @@
     <c:if test="${empty preview}">
       <script type='text/javascript'>
       $(document).ready(function() {
-        $("#content").focus();
+        $("#contentArea").focus();
       });
       </script>
     </c:if>
