@@ -7,9 +7,18 @@
   <tiles:putAttribute name="heading">Copy <sw:wikiPage page="${page}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <p>The edit history from the old page will be viewable from the copy.</p>
-    <form name="copyForm" method="post" action="<c:url value="${sw:urlEncode(page.name)}"/>">
-      <label for="toPage">New page name </label><input id="toPage" name="toPage" type="text" value=""/>
-      <input class="btn btn-default" name="copy" type="submit" value="Copy"/>
+    <form class="form-horizontal" name="copyForm" method="post" action="<c:url value="${sw:urlEncode(page.name)}"/>">
+      <div class="form-group">
+        <label for="toPage" class="col-sm-2 control-label">New page name </label>
+        <div class="col-sm-5">
+          <input id="toPage" class="form-control" name="toPage" type="text" value=""/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button class="btn btn-default" name="copy" type="submit">Copy</button>
+        </div>
+      </div>
     </form>
     <script type='text/javascript'>
       $(document).ready(function() {

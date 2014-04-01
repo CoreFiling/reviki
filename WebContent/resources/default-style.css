@@ -2,8 +2,6 @@ h1.title {
   margin: 0;
   clear: both;
   display: block;
-  border-bottom: 1px solid black;
-  border-top: 1px solid black;
   font-size: 150%;
 }
 h1 {
@@ -37,26 +35,17 @@ a:visited {
   color: #002649;
 }
 
-#topbar {
-  top: 0px;
-  right: 0px;
-  width: 100%;
-  background-color: #f5f5f5;
-}
-
-#topbar ul {
-  float: left;
-  margin: 0px;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
 #query {
-margin-top: 7px;
+  border-color: #CCC;
 }
 
 .menu li form input[type="submit"] {
-  margin-top: -4px;
+  margin-top: 0px;
+}
+
+.navbar-nav > li > a {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 table {
@@ -79,19 +68,16 @@ li.menu {
   padding: 0 2px;
 }
 li.menu-separator {
-  margin-right: 0.5em;
-  padding-right: 0.5em; 
-  border-right: 1px solid black;
+  height: 50px;
+  margin-right: 0 9px;
+  border-left: 1px solid #CCC;
 }
 ul.menu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-#topbar {
-  float: right;
-  margin-bottom: 0.3em;
-}
+
 #wiki-rendering {
   width: 55em;
 }
@@ -240,83 +226,6 @@ h2.results-wiki {
 
 .ac_results li {
 	padding: 0 !important;
-}
-
-h2.tab-title {
-  text-decoration: underline;
-}
-
-#previewTabs {
-  margin: 0 2em 2em 0;
-  border: none;
-  position: inherit;
-}
-
-#previewTabs #wiki-rendering {
-  width: auto;
-}
-
-#editFormTabs {
-  margin: 0 2em 2em 0;
-  border: none;
-  position: inherit;
-}
-
-#editFormTabs textarea {
-  width: 85%;
-  border: 3px solid #eeeeee;
-}
-
-#description {
-  margin-top: 11px;
-}
-
-label[for="minorEdit"] {
-  display: inline;
-}
-
-#minorEdit {
-  margin-top: 0px;
-}
-
-.tab-content {
-  max-height: 600px;
-  overflow-y: auto;
-  clear: left;
-}
-
-.tab-content > div {
-  width: 95%; border: 1px solid #cccccc; margin-bottom: 10px;
-}
-
-.tab-content.nojs {
-  margin: 2px;
-  padding: 2px;
-  border: 1px solid #ccc;
-}
-
-#previewTab-header {
-  display: inline-block;
-  border-width: 0 0 1px 0;
-  height: 25px;
-  border-bottom: 0;
-  margin-bottom: 12px;
-}
-
-#previewTab-header li a {
-  padding: 0.2em 0.5em;
-}
-
-#editFormTab-header {
-  height: 25px;
-  border-bottom: 0;
-  margin-bottom: 12px;
-  display: inline-block;
-  border-width: 0 0 1px 0;
-}
-
-#editFormTab-header li a {
-  padding: 0.2em 0.5em;
 }
 
 .clear-both {

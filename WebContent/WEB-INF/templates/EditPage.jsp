@@ -5,64 +5,95 @@
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-  <script type='text/javascript'>
-    $(document).ready(function() {
-      $("#previewTabs").tabs();
-      $("#editFormTabs").tabs();
-    });
-  </script>
-
+  <div class="container">
     <c:if test="${not empty preview or not empty markedUpDiff}">
-      <div id="previewTabs">
-        <noscript><h2>Jump To:</h2></noscript>
-        <ul id="previewTab-header" class="nav nav-tabs">
-          <c:if test="${not empty preview}">
-            <li><a href="#preview-area">Preview</a></li>
-          </c:if>
-          <c:if test="${not empty markedUpDiff}">
-            <li><a href="#diff-area">Diff</a></li>
-          </c:if>
-        </ul>
+      <div class="row">
+        <div class="col-sm-9">
+          <ul class="nav nav-tabs">
+            <c:if test="${not empty preview}">
+              <li class="active"><a href="#preview-area" data-toggle="tab">Preview</a></li>
+            </c:if>
+            <c:if test="${not empty markedUpDiff}">
+              <li><a href="#diff-area" data-toggle="tab">Diff</a></li>
+            </c:if>
+          </ul>
 
-        <c:if test="${not empty preview}">
-          <noscript>
-            <h2 class="tab-title">Preview</h2>
-          </noscript>
-          <div id="preview-area" class="tab-content nojs">
-            <div id="wiki-rendering">${preview}</div>
-          </div>
-        </c:if>
-        <c:if test="${not empty markedUpDiff}">
-          <noscript>
-            <h2 class="tab-title">Diff</h2>
-          </noscript>
-          <div id="diff-area" class="tab-content nojs">
-            <div id="markedUpDiff">${markedUpDiff}</div>
-          </div>
-        </c:if>
-      </div>
+          <div class="tab-content">
+            <c:if test="${not empty preview}">
+              <div class="tab-pane active" id="preview-area">
+                <div class="well">
+                  <div class="panel panel-default">
+                    <div id="wiki-rendering">${preview}</div>
+                  </div>
+                </div>
+              </div>
+            </c:if>
+            <c:if test="${not empty markedUpDiff}">
+              <div id="diff-area" class="tab-pane">
+                <div class="well">
+                  <div class="panel panel-default">
+                    ${markedUpDiff}
+                  </div>
+                </div>
+              </div>
+            </c:if>
+          </div><!--tabcontent-->
+        </div><!--col-->
+      </div><!--row-->
     </c:if>
 
-    <form id="editForm" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" style="clear:left" method="post">
-      <div id="editFormTabs">
-        <noscript><h2>Jump To:</h2></noscript>
-        <ul id="editFormTab-header" class="nav nav-tabs">
-          <li><a id="editFormContent-link" href="#editFormContent-area">Content</a></li>
-          <li><a id="editFormAttributes-link" href="#editFormAttributes-area">Attributes</a></li>
-        </ul>
-        <noscript>
-          <h2 class="tab-title">Content</h2>
-        </noscript>
-        <div id="editFormContent-area" class="tab-content nojs">
-          <textarea rows="25" cols="80" id="content" name="content"><c:out value="${pageInfo.content}"/></textarea>
+    <form class="form" role="form" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" method="post">
+      <div class="form-group row">
+        <div class="col-sm-9">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#content" data-toggle="tab">Content</a></li>
+            <li><a href="#attributes" data-toggle="tab">Attributes</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="content">
+              <div class="well">
+                <textarea style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
+              </div><!--well-->
+            </div>
+            <div class="tab-pane" id="attributes">
+              <div class="well">
+                <textarea style="resize: none;" name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
+              </div><!--well-->
+            </div>
+          </div>
         </div>
-        <noscript>
-          <h2 class="tab-title">Attributes</h2>
-        </noscript>
-        <div id="editFormAttributes-area" class="tab-content nojs">
-          <textarea rows="10" cols="80" id="attributes" name="attributes"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea><br />
+        <div class="col-sm-2">
+          <div id="sidebar" class="panel">
+            ${renderedSideBar}
+          </div>
         </div>
       </div>
+
+      <div class="form-group row">
+        <div class="col-sm-3 col-md-4">
+          <label class="sr-only" for="description">Describe your change</label>
+          <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change"/>
+        </div>
+        <div class="col-sm-2 col-md-2">
+          <div class="checkbox">
+            <label>
+              <input name="minorEdit" type="checkbox" value=""/>
+              Minor edit
+            </label>
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <div class="btn-group">
+            <button class="btn btn-default" type="submit" name="save">Save</button>
+            <button class="btn btn-default" type="submit" name="preview">Preview</button>
+          </div>
+          <button class="btn btn-default" type="submit" name="unlock">Cancel</button>
+        </div>
+      </div><!--form-group row-->
+
+      <!--hiddendata-->
+      <input type="hidden" name="attributes" value="<c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach>"/>
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
       <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
       <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
@@ -71,14 +102,6 @@
         <c:set var="attrs" value="${attrs} ${entry.key} &#10;"/>
       </c:forEach>
       <input type="hidden" name="originalAttrs" value="${attrs}" />
-      <hr/>
-      <label for="description">Describe your change</label><input style="width:19em;margin-left:0.2em;margin-right:0.2em;" id="description" name="description" type="text" value="<c:out value="${param.description}"/>"/>
-      <input style="width:5em;" class="btn btn-default btn-success" name="save" type="submit" value="Save" id="save"/>
-      <input style="width:5em;" name="unlock" class="btn btn-default btn-warning" type="submit" value="Cancel" id="cancel"/>
-      <input style="width:5em;" name="preview" class="btn btn-default btn-primary" type="submit" value="Preview" id="preview"/>
-      <br />
-      <label for="minorEdit">Minor edit?</label>
-      <input type="checkbox" id="minorEdit" name="minorEdit" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if> />
     </form>
     <c:if test="${empty preview}">
       <script type='text/javascript'>
@@ -88,5 +111,6 @@
       </script>
     </c:if>
     <jsp:include page="cheatsheet.html"></jsp:include>
+  </div>
   </tiles:putAttribute>
 </tiles:insertTemplate>

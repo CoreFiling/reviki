@@ -41,9 +41,15 @@
     </c:if>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
+    <div id="sidebar" style="float:right">
+      ${renderedSideBar}
+    </div>
+
     <div id="wiki-rendering">
     ${renderedContents}
     </div>
+  </tiles:putAttribute>
+  <tiles:putAttribute name="content-controls">
     <div class="auxillary clear-both">
 	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
@@ -52,7 +58,6 @@
 	    </form>
 	    </div>
 	    </c:if>
-	    <hr />
 	    <p id="backlinks">
 	    <c:if test="${not empty backlinks}">
 	      Referenced on:
@@ -84,14 +89,15 @@
 	      </c:when>
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-	          <input class="btn btn-default" name="editButton" type="submit" value="Edit"/>
+            <input name="editButton" type="submit">Edit</input>
 	        </form><a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
 	      </c:otherwise>
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
-		    <p>
-		      <a name="lastChanged" href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a> <a name="history" href="<c:url value="${encodedPageName}?history"/>">[History]</a>
-		    </p>
+        <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
+        <p>
+          <a name="lastChanged"  href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a>
+        </p>
 		  </c:if>
 		</div>
   </tiles:putAttribute>
