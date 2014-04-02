@@ -78,6 +78,7 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
   private void validate(final String caseName, final String actual) {
     // Put the content in a <body> tag first.
     final String content = HTML_PREFIX + actual + HTML_SUFFIX;
+    _validator.setTrackErrors(1);
     _validator.parseInput(content, "http://example.com");
     for (ParseError error : _validator.getErrors()) {
       fail(caseName + ": " + error.getErrorMessage());
