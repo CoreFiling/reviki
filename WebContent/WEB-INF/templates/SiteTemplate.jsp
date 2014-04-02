@@ -49,51 +49,56 @@
   <nav class="navbar navbar-default navbar-static-top" role="navigation">
     <c:if test="${wikiIsValid != null and wikiIsValid}">
       <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
+        <div class="row col-md-12">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><sw:wikiPage page="FrontPage"/></li>
+              <li><sw:wikiPage page="RecentChanges"/></li>
+              <li><sw:wikiPage page="AllPages"/></li>
+            </ul>
+            <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
+              <div class="form-group">
+                <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>"/>
+                <input class="btn btn-default btn-sm" value="Go" type="submit"/>
+              </div>
+            </form>
+          </div><!--navbar-collapse-->
         </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li><sw:wikiPage page="FrontPage"/></li>
-            <li><sw:wikiPage page="RecentChanges"/></li>
-            <li><sw:wikiPage page="AllPages"/></li>
-          </ul>
-          <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
-            <div class="form-group">
-              <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>"/>
-              <input class="btn btn-default btn-sm" value="Go" type="submit"/>
-            </div>
-          </form>
-        </div><!--navbar-collapse-->
       </div><!--container-->
     </c:if>
   </nav><!--nav-->
   <div class="container-fluid">
-    <div id="header" class="auxillary">
-    ${renderedHeader}
-    </div>
-    <div id="content-area" class="panel panel-default">
-      <div class="panel-heading">
-        <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
-        <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
-        <c:out value="${menuItems}" escapeXml="false"/>
-      </div>
-      <div class="panel-body">
-        <tiles:insertAttribute name="content"/>
-      </div>
-      <div class="panel-footer">
-        <tiles:insertAttribute name="content-controls"/>
-        <div id="footer" class="auxillary clear-both">
-        ${renderedFooter}
-          <p id="build-details">Version $Version$.</p>
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="header" class="auxillary">
+        ${renderedHeader}
         </div>
-      </div>
+        <div id="content-area" class="panel panel-default">
+          <div class="panel-heading">
+            <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
+            <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
+            <c:out value="${menuItems}" escapeXml="false"/>
+          </div>
+          <div class="panel-body">
+            <tiles:insertAttribute name="content"/>
+          </div>
+          <div class="panel-footer">
+            <tiles:insertAttribute name="content-controls"/>
+            <div id="footer" class="auxillary clear-both">
+            ${renderedFooter}
+              <p id="build-details">Version $Version$.</p>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
   <tiles:insertAttribute name="body-level" ignore="true" />
