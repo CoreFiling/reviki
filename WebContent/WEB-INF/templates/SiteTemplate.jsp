@@ -46,7 +46,7 @@
       </p>
     </div>
   </c:if>
-  <nav id="topnav" class="navbar navbar-default navbar-static-top" role="navigation">
+  <nav class="navbar navbar-default navbar-static-top" role="navigation">
     <c:if test="${wikiIsValid != null and wikiIsValid}">
       <div class="container-fluid">
         <div class="navbar-header">
