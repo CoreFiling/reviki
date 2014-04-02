@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -91,7 +92,7 @@ public class TestEditing extends WebTestSupport {
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     HtmlTextArea contentArea = form.getTextAreaByName("content");
     contentArea.setText(newContent);
-    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    editPage = (HtmlPage) form.getButtonByName("preview").click();
     
     form = editPage.getFormByName(ID_EDIT_FORM);
     contentArea = form.getTextAreaByName("content");
@@ -114,7 +115,7 @@ public class TestEditing extends WebTestSupport {
 
     // Now if we preview we should get the previewed text rendered, and in
     // the edit area.  The other options should be preserved too.
-    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    editPage = (HtmlPage) form.getButtonByName("preview").click();
     form = editPage.getFormByName(ID_EDIT_FORM);
     minorEdit = form.getInputByName("minorEdit");
     description = form.getInputByName("description");
@@ -140,7 +141,7 @@ public class TestEditing extends WebTestSupport {
 
     // Now if we preview we should get the previewed text rendered, and in
     // the edit area.
-    editPage = (HtmlPage) form.getInputByValue("Preview").click();
+    editPage = (HtmlPage) form.getButtonByName("preview").click();
     editPage.asText().contains(expectedContent);
     form = editPage.getFormByName(ID_EDIT_FORM);
     attributes = form.getTextAreaByName("attributes");
@@ -154,7 +155,7 @@ public class TestEditing extends WebTestSupport {
     HtmlPage editPage = clickEditLink(getWikiPage(name));
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     form.getTextAreaByName("content").setText(flagText);
-    HtmlPage viewPage = (HtmlPage) form.getInputByValue("Cancel").click();
+    HtmlPage viewPage = (HtmlPage) form.getButtonByName("unlock").click();
     assertFalse(viewPage.asText().contains(flagText));
     try {
       viewPage.getFormByName(ID_EDIT_FORM);
@@ -166,70 +167,70 @@ public class TestEditing extends WebTestSupport {
   }
 
   public void testLoseLockSave() throws Exception {
-    HtmlPage pageUser1 = loseLockHelper("Save");
+    HtmlPage pageUser1 = loseLockHelper("save");
     // User 1 Save (again)
-    pageUser1 = (HtmlPage) ((HtmlSubmitInput) pageUser1.getByXPath("//input[@value='Save']").iterator().next()).click();
+    pageUser1 = (HtmlPage) ((HtmlButton) pageUser1.getByXPath("//button[@name='save']").iterator().next()).click();
     // Should be a Save button (content has changed error)
-    assertEquals(1, pageUser1.getByXPath("//input[@value='Save']").size());
+    assertEquals(1, pageUser1.getByXPath("//button[@name='save']").size());
     // User 1 Save (again)
-    pageUser1 = (HtmlPage) ((HtmlSubmitInput) pageUser1.getByXPath("//input[@value='Save']").iterator().next()).click();
+    pageUser1 = (HtmlPage) ((HtmlButton) pageUser1.getByXPath("//button[@name='save']").iterator().next()).click();
     // Should NOT be a Save button (allowed user to merge changes)
-    assertEquals(0, pageUser1.getByXPath("//input[@value='Save']").size());
+    assertEquals(0, pageUser1.getByXPath("//button[@name='save']").size());
     assertTrue(pageUser1.asText().contains(USER1_EDIT_CONTENT));
   }
 
   public void testLoseLockPreview() throws Exception {
-    loseLockHelper("Preview");
+    loseLockHelper("preview");
   }
 
-  private HtmlPage loseLockHelper(final String buttonValue) throws Exception, IOException, JaxenException {
+  private HtmlPage loseLockHelper(final String buttonName) throws Exception, IOException, JaxenException {
     final String name = uniqueWikiPageName("LoseLockPreviewTest");
     // User 1 make page
     editWikiPage(name, "content", "", "", true);
     // User 1 edit
     HtmlPage pageUser1 = clickEditLink(getWikiPage(name));
     // Set the content to "user1"
-    ((HtmlTextArea) pageUser1.getByXPath("id('content')").iterator().next()).setText(USER1_EDIT_CONTENT);
+    ((HtmlTextArea) pageUser1.getByXPath("id('contentArea')").iterator().next()).setText(USER1_EDIT_CONTENT);
     // User 2 unlock and edit
     switchUser();
     HtmlPage pageUser2 = getWikiPage(name);
     pageUser2 = (HtmlPage) ((HtmlSubmitInput) pageUser2.getByXPath("//input[@value='Unlock']").iterator().next()).click();
     pageUser2 = clickEditLink(pageUser2);
     // Set the content to "user2"
-    ((HtmlTextArea) pageUser2.getByXPath("id('content')").iterator().next()).setText(USER2_EDIT_CONTENT);
+    ((HtmlTextArea) pageUser2.getByXPath("id('contentArea')").iterator().next()).setText(USER2_EDIT_CONTENT);
     // User 1 Save/Preview
     switchUser();
-    pageUser1 = (HtmlPage) ((HtmlSubmitInput) pageUser1.getByXPath("//input[@value='" + buttonValue + "']").iterator().next()).click();
+    pageUser1 = (HtmlPage) ((HtmlButton) pageUser1.getByXPath("//button[@name='" + buttonName + "']").iterator().next()).click();
     // Should be a Save button
-    assertEquals(1, pageUser1.getByXPath("//input[@value='Save']").size());
+    assertEquals(1, pageUser1.getByXPath("//button[@name='save']").size());
     // Should be a flash with "lock" in the message
     assertTrue(getErrorMessage(pageUser1).contains("lock"));
     // Should be a diff
     assertTrue(pageUser1.getByXPath("//*[@class='diff']").size() > 0);
     // User 2 Save
     switchUser();
-    pageUser2 = (HtmlPage) ((HtmlSubmitInput) pageUser2.getByXPath("//input[@value='Save']").iterator().next()).click();
+    pageUser2 = (HtmlPage) ((HtmlButton) pageUser2.getByXPath("//button[@name='save']").iterator().next()).click();
     // Should NOT be a Save button
-    assertEquals(0, pageUser2.getByXPath("//input[@value='Save']").size());
+    assertEquals(0, pageUser2.getByXPath("//button[@name='save']").size());
     // Return User 1 page
     switchUser();
     return pageUser1;
   }
 
   public void testPreviewInvalidSessionId() throws Exception {
-    testInvalidSessionIdHelper("Preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", false);
+    testInvalidSessionIdHelper("preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", false);
   }
 
   public void testSaveInvalidSessionId() throws Exception {
-    testInvalidSessionIdHelper("Save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", false);
+    testInvalidSessionIdHelper("save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", false);
   }
 
   public void testPreviewInvalidSessionIdFakeAppended() throws Exception {
-    testInvalidSessionIdHelper("Preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", true);
+    testInvalidSessionIdHelper("preview", uniqueWikiPageName("PreviewInvalidSessionIdTest"), "Preview with invalid session id should not show content", true);
   }
 
   public void testSaveInvalidSessionIdFakeAppended() throws Exception {
-    testInvalidSessionIdHelper("Save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", true);
+    testInvalidSessionIdHelper("save", uniqueWikiPageName("SaveInvalidSessionIdTest"), "Save with invalid session id should not show content", true);
   }
 
   private void testInvalidSessionIdHelper(final String button, final String name, final String failMsg, final boolean fakeAppendedSessionId) throws IOException, JaxenException {
@@ -244,7 +245,7 @@ public class TestEditing extends WebTestSupport {
     final String expectedContent = "http://www.example.com";
     content.setText(expectedContent);
 
-    editPage = (HtmlPage) form.getInputByValue(button).click();
+    editPage = (HtmlPage) form.getButtonByName(button).click();
 
     try {
       getAnchorByHrefContains(editPage, expectedContent);

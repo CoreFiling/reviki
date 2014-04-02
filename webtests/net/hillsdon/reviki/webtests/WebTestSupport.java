@@ -60,7 +60,6 @@ public abstract class WebTestSupport extends TestCase {
     client.setCredentialsProvider(credentials);
     client.setRedirectEnabled(true);
     client.setThrowExceptionOnFailingStatusCode(true);
-    client.setThrowExceptionOnScriptError(true);
     client.addWebWindowListener(new ValidateOnContentChange());
     client.getCookieManager().setCookiesEnabled(false);
 
@@ -71,6 +70,9 @@ public abstract class WebTestSupport extends TestCase {
     // cope with IE specific ` filter: Alpha(Opacity = 0)  `
     client.setCssErrorHandler(new SilentCssErrorHandler());
 
+    // Don't throw exceptions for JS script parsing error
+    // HTMLUnit 3.12 is not able to process JQuery1.11
+    client.setThrowExceptionOnScriptError(false);
     return client;
   }
 
@@ -166,7 +168,7 @@ public abstract class WebTestSupport extends TestCase {
     final HtmlForm form = page.getFormByName("renameForm");
     final HtmlInput input = form.getInputByName("toPage");
     input.setValueAttribute(pageTo);
-    page = (HtmlPage) ((HtmlSubmitInput) form.getInputByName("rename")).click();
+    page = (HtmlPage) (form.getButtonByName("rename")).click();
     assertEquals(1, page.getByXPath("id('wiki-rendering')").size());
     return page;
   }
@@ -202,7 +204,7 @@ public abstract class WebTestSupport extends TestCase {
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getTextAreaByName("attributes").setText(attributes == null ? "" : attributes);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);
-    page = (HtmlPage) editForm.getInputByValue("Save").click();
+    page = (HtmlPage) editForm.getButtonByName("save").click();
 
     @SuppressWarnings("unchecked")
     final List<HtmlInput> saveButtons = (List<HtmlInput>) page.getByXPath("//input[@type='submit' and @value='Save']");

@@ -44,7 +44,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlDeletedText;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-
 public class TestAttachments extends WebTestSupport {
 
   public static final String ATTACHMENT_UPLOAD_FILE_1 = "webtests/file1.txt";

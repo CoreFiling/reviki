@@ -87,13 +87,22 @@
 
       <div class="form-group row">
         <div class="col-sm-3 col-md-4">
+          <c:choose>
+            <c:when test="${not empty param.description}">
+              <c:set var="descriptionVal" value="${param.description}"/>
+            </c:when>
+            <c:otherwise>
+              <c:set var="descriptionVal" value=""/>
+            </c:otherwise>
+          </c:choose>
+
           <label class="sr-only" for="description">Describe your change</label>
-          <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change"/>
+          <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change" value="${descriptionVal}"/>
         </div>
         <div class="col-sm-2 col-md-2">
           <div class="checkbox">
             <label>
-              <input name="minorEdit" type="checkbox" value=""/>
+              <input name="minorEdit" type="checkbox" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if>/>
               Minor edit
             </label>
           </div>

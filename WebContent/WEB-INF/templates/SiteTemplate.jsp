@@ -56,7 +56,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><c:out value="${titlePrefix}"/></a>
+          <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -64,7 +64,7 @@
             <li><sw:wikiPage page="RecentChanges"/></li>
             <li><sw:wikiPage page="AllPages"/></li>
           </ul>
-          <form id="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
+          <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
             <div class="form-group">
               <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>"/>
               <input class="btn btn-default btn-sm" value="Go" type="submit"/>
