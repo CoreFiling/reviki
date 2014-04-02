@@ -19,8 +19,8 @@ h3 {
 body {
   font-size: 11pt;
   font-family: Verdana, Arial, sans-serif;
-  overflow-x: hidden;
   color: #000;
+  min-width: 500px;
 }
 a {
   color: #3A75C4;
