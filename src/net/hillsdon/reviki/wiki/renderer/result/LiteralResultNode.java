@@ -25,7 +25,7 @@ public class LiteralResultNode extends LeafResultNode {
     _xhtml = xhtml;
   }
 
-  public String toXHTML() {
+  public String toHTML() {
     return _xhtml;
   }
 

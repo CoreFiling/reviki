@@ -17,7 +17,7 @@
 	        <th class="history" style="white-space: nowrap;">Page</th>
 	        <th class="history">User</th>
 	        <th class="history">Description</th>
-	        <th class="history" colspan="2"><input class="btn btn-default" type="submit" value="Compare" name="compare" /></th>
+	        <th class="history" colspan="2"><input class="btn btn-default" type="submit" value="Compare" name="compare" ></th>
 	      </tr>
 	      <tr class="history">
 	        <td class="history" style="white-space: nowrap;"></td>
@@ -65,20 +65,20 @@
 	          <td class="history">
 	          	<c:choose>
 	          	  <c:when test="${status.index == 1 || status.index == 0 && fn:length(changes) == 1}">
-	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}" checked="checked"/>
+	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}" checked="checked">
 	          	  </c:when>
 	          	  <c:otherwise>
-	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}"/>
+	          	    <input type="radio" name="diff" value="${change.name}.${change.revision}">
 	          	  </c:otherwise>
 	          	</c:choose>
 	          </td>
 	          <td class="history">
 	          <c:choose>
 	            <c:when test="${status.index == 0}">
-	              <input type="radio" name="revision" value="${change.name}.${change.revision}" checked="checked"/>
+	              <input type="radio" name="revision" value="${change.name}.${change.revision}" checked="checked">
 	            </c:when>
 	          	<c:otherwise>
-	          	  <input type="radio" name="revision" value="${change.name}.${change.revision}"/>
+	          	  <input type="radio" name="revision" value="${change.name}.${change.revision}">
 	          	</c:otherwise>
 	          </c:choose>
 	          </td>

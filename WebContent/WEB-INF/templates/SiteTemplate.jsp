@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
   <c:set var="titlePrefix">
     <c:choose>
@@ -13,17 +13,17 @@
   </c:set>
   <%-- Prevent indexing of 'unusual' pages. --%>
   <% if (!request.getParameterMap().isEmpty()) { %>
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="noindex, nofollow">
   <% } %>
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
-  <link rel="shortcut icon" href="<sw:iconUrl name="favicon.ico"/>" />
+  <link rel="shortcut icon" href="<sw:iconUrl name="favicon.ico"/>" >
   <c:if test="${wikiIsValid != null and wikiIsValid}">
-    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"/>" />
-    <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
+    <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"/>" >
+    <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" >
   </c:if>
-  <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
-  <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
-  <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" >
+  <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" >
+  <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" >
   <script type="text/javascript" src="<sw:resourceUrl path="jquery-1.11.0.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery-ui.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.html.js"/>"></script>
@@ -67,8 +67,8 @@
             </ul>
             <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
               <div class="form-group">
-                <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>"/>
-                <input class="btn btn-default btn-sm" value="Go" type="submit"/>
+                <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>">
+                <input class="btn btn-default btn-sm" value="Go" type="submit">
               </div>
             </form>
           </div><!--navbar-collapse-->

@@ -17,27 +17,24 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.wiki.renderer.result.TagResultNode;
-import net.hillsdon.xhtmlvalidator.XHTMLValidator;
-
+import org.jsoup.parser.ParseError;
+import org.jsoup.parser.Parser;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JavaTypeMapper;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 public abstract class JsonDrivenRenderingTest extends TestCase {
 
-  private static final String XHTML_PREFIX = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-                                           + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>XHTML prefix</title></head><body>";
-  private static final String XHTML_SUFFIX = "</body></html>";
-  private final XHTMLValidator _validator = new XHTMLValidator();
+  private static final String HTML_PREFIX = "<!DOCTYPE html>"
+                                           + "<html><head><title>HTML prefix</title></head><body>";
+  private static final String HTML_SUFFIX = "</body></html>";
+  private final Parser _validator = Parser.htmlParser();
   private final List<Map<String, String>> _tests;
 
   @SuppressWarnings("unchecked")
@@ -80,15 +77,10 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
 
   private void validate(final String caseName, final String actual) {
     // Put the content in a <body> tag first.
-    final String content = XHTML_PREFIX + actual + XHTML_SUFFIX;
-    try {
-      _validator.validate(new InputSource(new StringReader(content)));
-    }
-    catch (SAXException e) {
-      fail(caseName + ": " + e.getMessage());
-    }
-    catch (IOException e) {
-      throw new RuntimeException(e);
+    final String content = HTML_PREFIX + actual + HTML_SUFFIX;
+    _validator.parseInput(content, "http://example.com");
+    for (ParseError error : _validator.getErrors()) {
+      fail(caseName + ": " + error.getErrorMessage());
     }
   }
 

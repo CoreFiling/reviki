@@ -121,7 +121,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
     expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "new content" + Strings.CRLF, Collections.<String, String>emptyMap())), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
-    expect(_resultNode.toXHTML()).andReturn("rendered preview");
+    expect(_resultNode.toHTML()).andReturn("rendered preview");
     expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();
     replay();

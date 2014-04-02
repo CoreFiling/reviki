@@ -50,7 +50,7 @@ public class DiffGeneratorImpl implements DiffGenerator {
     for (Diff diff : diffs) {
       String text = diff.text;
       text = Escape.html(text);
-      text = text.replaceAll("\n", "<br />");
+      text = text.replaceAll("\n", "<br>");
       xhtml += tag(diff.operation, text);
     }
     return xhtml;

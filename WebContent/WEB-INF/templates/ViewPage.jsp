@@ -19,7 +19,7 @@
     <c:if test="${not pageInfo.locked or pageInfo.lockedBy == username}">
       <li class="menu">
         <form id="editTop" name="editTop" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-          <input class="btn btn-default" type="submit" value="Edit"/>
+          <input class="btn btn-default" type="submit" value="Edit">
         </form>
       </li>
       <li class="menu">
@@ -54,7 +54,7 @@
 	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
 	    <form id="editContent" name="editContent" action="<c:url value="${encodedPageName}"/>" method="post">
-	      <input class="btn btn-default" type="submit" value="Edit this new page" />
+	      <input class="btn btn-default" type="submit" value="Edit this new page" >
 	    </form>
 	    </div>
 	    </c:if>
@@ -74,7 +74,7 @@
 	        <c:choose>
 	          <c:when test="${pageInfo.lockedBy == username}">
 	            <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post">
-	              <input class="btn btn-default" type="submit" value="Edit"/>
+	              <input class="btn btn-default" type="submit" value="Edit">
 	            </form> 
 	            <p id="lockedInfo">You have locked this page.</p>
 	          </c:when>
@@ -83,13 +83,13 @@
 	          </c:otherwise>
 	        </c:choose>
           <form id="unlock" name="unlock" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-            <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
-            <input class="btn btn-default btn-warning" name="unlock" type="submit" value="Unlock"/>
+            <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>">
+            <input class="btn btn-default btn-warning" name="unlock" type="submit" value="Unlock">
           </form>
 	      </c:when>
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-            <input name="editButton" type="submit">Edit</input>
+            <button name="editButton" type="submit">Edit</button>
 	        </form><a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
 	      </c:otherwise>
 	    </c:choose>

@@ -31,6 +31,6 @@ public interface ResultNode {
 
   List<ResultNode> getChildren();
   
-  String toXHTML();
+  String toHTML();
 
 }

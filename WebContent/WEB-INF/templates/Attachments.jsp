@@ -24,14 +24,14 @@
                   <table class="table table-striped table-condensed">
                     <tr>
                       <td class="text-align-right"><label for="file_${ncName}">File:</label></td>
-                      <td><input type="file" name="file" id="file_${ncName}"/> 
-                          <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>" />
-                          <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>" /></td>
-                      <td><input class="btn btn-default" type="submit" value="Upload New Version" /></td>
+                      <td><input type="file" name="file" id="file_${ncName}"> 
+                          <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>">
+                          <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"></td>
+                      <td><input class="btn btn-default" type="submit" value="Upload New Version"></td>
                     </tr>
                     <tr>
                       <td class="text-align-right"><label for="message_${ncName}">Message:</label></td>
-                      <td><input type="text" name="attachmentMessage" id="message_${ncName}"/></td>
+                      <td><input type="text" name="attachmentMessage" id="message_${ncName}"></td>
                     </tr>
                   </table>
                 </form>
@@ -52,7 +52,7 @@
             <tr>
               <td>
                 <form name="deleteAttachment" action="<c:url value="${encodedName}"/>" method="post" style="display: inline">
-                  <input type="submit" name="delete" value="Delete Attachment" />
+                  <input type="submit" name="delete" value="Delete Attachment">
                 </form>
               </td>
             </tr>
@@ -96,19 +96,19 @@
     <form name="attachmentUpload" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
       <table class="table table-striped table-condensed">
         <tr><th class="text-align-right"><label for="file">File to upload</label></th>
-          <td><input id="file" type="file" name="file" /></td>
+          <td><input id="file" type="file" name="file"></td>
         </tr>
         <tr>
           <th class="text-align-right"><label for="attachmentName">Attachment name (optional)</label></th>
-          <td><input id="attachmentName" type="text" name="attachmentName" /></td>
+          <td><input id="attachmentName" type="text" name="attachmentName"></td>
         </tr>
         <tr>
           <th class="text-align-right"><label for="attachmentMessage">Message (optional)</label></th>
-          <td><input id="attachmentMessage" type="text" name="attachmentMessage" /></td>
+          <td><input id="attachmentMessage" type="text" name="attachmentMessage"></td>
         </tr>
         <tr>
           <td></td>
-          <td><input type="submit" value="Upload" /></td>
+          <td><input type="submit" value="Upload"></td>
         </tr>
       </table>
     </form>

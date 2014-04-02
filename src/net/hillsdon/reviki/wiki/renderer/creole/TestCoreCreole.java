@@ -31,7 +31,7 @@ public class TestCoreCreole extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) {
-    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
+    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toHTML();
   }
 
 }

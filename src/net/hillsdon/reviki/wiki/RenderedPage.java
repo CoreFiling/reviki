@@ -39,7 +39,7 @@ public class RenderedPage {
 
   public RenderedPage(final String pageName, final ResultNode resultNode) {
     _pageName = pageName;
-    _rendered = resultNode.toXHTML();
+    _rendered = resultNode.toHTML();
   }
 
   public String getPage() {
