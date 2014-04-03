@@ -81,6 +81,10 @@ ul.menu {
   float: left;
 }
 
+.attachdelete {
+  margin-left: 1em;
+}
+
 #flash {
   text-align: center;
   background-color: yellow;

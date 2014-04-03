@@ -267,7 +267,7 @@ public abstract class WebTestSupport extends TestCase {
     form.getInputByName("file").setValueAttribute(fileName);
     form.getInputByName("attachmentName").setValueAttribute(uploadFileName);
     form.getInputByName("attachmentMessage").setValueAttribute(message);
-    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+    attachments = (HtmlPage) form.getButtonByName("upload").click();
     return attachments;
   }
 
