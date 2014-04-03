@@ -76,7 +76,7 @@
       </div><!--container-->
     </c:if>
   </nav><!--nav-->
-  <div class="container-fluid content-container">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12">
         <div id="header" class="auxillary">
