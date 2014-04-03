@@ -77,6 +77,10 @@ ul.menu {
   margin: 0;
 }
 
+.navbar-toggle {
+  float: left;
+}
+
 #flash {
   text-align: center;
   background-color: yellow;

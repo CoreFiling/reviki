@@ -51,13 +51,13 @@
       <div class="container-fluid">
         <div class="row col-md-12">
           <div class="navbar-header">
+            <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
