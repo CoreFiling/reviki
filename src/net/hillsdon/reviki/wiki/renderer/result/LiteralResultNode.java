@@ -19,14 +19,14 @@ package net.hillsdon.reviki.wiki.renderer.result;
 
 public class LiteralResultNode extends LeafResultNode {
 
-  private final String _xhtml;
+  private final String _html;
 
-  public LiteralResultNode(final String xhtml) {
-    _xhtml = xhtml;
+  public LiteralResultNode(final String html) {
+    _html = html;
   }
 
   public String toHTML() {
-    return _xhtml;
+    return _html;
   }
 
 }
