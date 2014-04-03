@@ -77,9 +77,10 @@ ul.menu {
   margin: 0;
 }
 
-#wiki-rendering {
-  width: 55em;
+.content-container {
+  min-width: 60em;
 }
+
 #flash {
   text-align: center;
   background-color: yellow;
