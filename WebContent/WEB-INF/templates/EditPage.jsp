@@ -47,8 +47,8 @@
         <div class="row">
           <div class="col-sm-9">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#content" data-toggle="tab">Content</a></li>
-              <li><a href="#attributes" data-toggle="tab">Attributes</a></li>
+              <li class="active"><a id="editFormContent-link" href="#content" data-toggle="tab">Content</a></li>
+              <li><a id="editFormAttributes-link" href="#attributes" data-toggle="tab">Attributes</a></li>
             </ul>
           </div><!--col-->
         </div><!--row-->
@@ -109,10 +109,10 @@
         </div>
         <div class="col-sm-4 col-md-3">
           <div class="btn-group">
-            <button class="btn btn-default" type="submit" name="save">Save</button>
-            <button class="btn btn-default" type="submit" name="preview">Preview</button>
+            <button id="save" class="btn btn-default" type="submit" name="save">Save</button>
+            <button id="preview" class="btn btn-default" type="submit" name="preview">Preview</button>
           </div>
-          <button class="btn btn-default" type="submit" name="unlock">Cancel</button>
+          <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
         </div>
       </div><!--form-group row-->
 
