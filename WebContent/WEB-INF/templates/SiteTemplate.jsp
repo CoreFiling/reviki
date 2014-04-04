@@ -101,6 +101,7 @@
             </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
   <tiles:insertAttribute name="body-level" ignore="true" />
