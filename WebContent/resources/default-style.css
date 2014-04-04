@@ -20,7 +20,6 @@ body {
   font-size: 11pt;
   font-family: Verdana, Arial, sans-serif;
   color: #000;
-  min-width: 60em;
 }
 a {
   color: #3A75C4;
@@ -32,6 +31,10 @@ a:focus {
 
 a:visited {
   color: #002649;
+}
+
+#content-area {
+  min-width: 60em;
 }
 
 #query {
