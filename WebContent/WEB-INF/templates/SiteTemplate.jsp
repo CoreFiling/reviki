@@ -46,36 +46,38 @@
       </p>
     </div>
   </c:if>
-  <nav class="navbar navbar-default navbar-static-top" role="navigation">
-    <c:if test="${wikiIsValid != null and wikiIsValid}">
-      <div class="container-fluid">
-        <div class="row col-md-12">
-          <div class="navbar-header">
-            <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
+  <c:if test="${not empty wikiName}">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <c:if test="${wikiIsValid != null and wikiIsValid}">
+        <div class="container-fluid">
+          <div class="row col-md-12">
+            <div class="navbar-header">
+              <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+            </div>
+            <div class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li><sw:wikiPage page="FrontPage"/></li>
+                <li><sw:wikiPage page="RecentChanges"/></li>
+                <li><sw:wikiPage page="AllPages"/></li>
+              </ul>
+              <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                  <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>">
+                  <input class="btn btn-default btn-sm" value="Go" type="submit">
+                </div>
+              </form>
+            </div><!--navbar-collapse-->
           </div>
-          <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-              <li><sw:wikiPage page="FrontPage"/></li>
-              <li><sw:wikiPage page="RecentChanges"/></li>
-              <li><sw:wikiPage page="AllPages"/></li>
-            </ul>
-            <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
-              <div class="form-group">
-                <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>">
-                <input class="btn btn-default btn-sm" value="Go" type="submit">
-              </div>
-            </form>
-          </div><!--navbar-collapse-->
-        </div>
-      </div><!--container-->
-    </c:if>
-  </nav><!--nav-->
+        </div><!--container-->
+      </c:if>
+    </nav><!--nav-->
+  </c:if>
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
