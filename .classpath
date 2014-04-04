@@ -30,7 +30,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-core-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-jsp-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xmlParserAPIs-2.6.2.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.9.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/xpathcontext.jar"/>
 	<classpathentry kind="lib" path="lib/js-1.6R5.jar"/>
@@ -46,7 +45,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-io-2.0.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/guava-12.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/nekohtml-1.9.15.jar"/>
 	<classpathentry kind="lib" path="lib/cssparser-0.9.9.jar"/>
 	<classpathentry kind="lib" path="lib/htmlunit-2.12.jar"/>
 	<classpathentry kind="lib" path="lib/htmlunit-core-js-2.12.jar"/>
@@ -66,5 +64,7 @@
 	<classpathentry kind="lib" path="lib/jetty-websocket-8.1.9.v20130131.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-4.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.7.3.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/nekohtml-1.9.18.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.10.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
