@@ -22,8 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
-import net.hillsdon.fij.text.Escape;
-
 import org.apache.commons.httpclient.util.URIUtil;
 import org.jaxen.JaxenException;
 
@@ -32,12 +30,12 @@ import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebClientOptions;
 import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 
 /**
  * Superclass for writing HtmlUnit tests for the wiki.
@@ -54,25 +52,20 @@ public abstract class WebTestSupport extends TestCase {
   private WebClient _altclient = null;
 
   private WebClient setupClient(final String username, final String password) {
-    final WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
+    final WebClient client = new WebClient(BrowserVersion.FIREFOX_24);
+    final WebClientOptions options = client.getOptions();
     DefaultCredentialsProvider credentials = new DefaultCredentialsProvider();
     credentials.addCredentials(username, password);
     client.setCredentialsProvider(credentials);
-    client.setRedirectEnabled(true);
-    client.setThrowExceptionOnFailingStatusCode(true);
+    options.setRedirectEnabled(true);
+    options.setThrowExceptionOnFailingStatusCode(true);
     client.addWebWindowListener(new ValidateOnContentChange());
     client.getCookieManager().setCookiesEnabled(false);
 
     // Try to log only "interesting" things:
     // Don't log errors we can't fix due to browser bugs etc.
     client.setIncorrectnessListener(new SuppressingIncorrectnessListener());
-    // Don't log CSS errors as currently (2012-05-22) the CSS parser does not
-    // cope with IE specific ` filter: Alpha(Opacity = 0)  `
-    client.setCssErrorHandler(new SilentCssErrorHandler());
 
-    // Don't throw exceptions for JS script parsing error
-    // HTMLUnit 3.12 is not able to process JQuery1.11
-    client.setThrowExceptionOnScriptError(false);
     return client;
   }
 
@@ -82,7 +75,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected void ignoreStatusCodeErrors() {
-    _client.setThrowExceptionOnFailingStatusCode(false);
+    _client.getOptions().setThrowExceptionOnFailingStatusCode(false);
   }
 
   protected void switchUser() {
