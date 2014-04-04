@@ -5,10 +5,9 @@
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
-  <div class="container">
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
-        <div class="col-sm-9">
+        <div class="col-sm-10 col-sm-offset-1">
           <ul class="nav nav-tabs">
             <c:if test="${not empty preview}">
               <li class="active"><a href="#preview-area" data-toggle="tab">Preview</a></li>
@@ -45,7 +44,7 @@
     <form class="form" role="form" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" method="post">
       <div class="form-group">
         <div class="row">
-          <div class="col-sm-9">
+          <div class="col-sm-10 col-sm-offset-1">
             <ul class="nav nav-tabs">
               <li class="active"><a id="editFormContent-link" href="#content" data-toggle="tab">Content</a></li>
               <li><a id="editFormAttributes-link" href="#attributes" data-toggle="tab">Attributes</a></li>
@@ -56,65 +55,57 @@
         <div class="tab-content">
           <div class="tab-pane active" id="content">
             <div class="row">
-              <div class="col-sm-9">
+              <div class="col-sm-10 col-sm-offset-1">
                 <div class="well">
                   <textarea id="contentArea" style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
                 </div><!--well-->
-              </div><!--col-->
-              <div class="col-sm-2">
-                <div id="sidebar" class="panel">
-                  ${renderedSideBar}
-                </div>
               </div><!--col-->
             </div><!--row-->
           </div>
           <div class="tab-pane" id="attributes">
             <div class="row">
-              <div class="col-sm-9">
+              <div class="col-sm-10 col-sm-offset-1">
                 <div class="well">
                   <textarea style="resize: none;" name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
                 </div><!--well-->
-              </div><!--col-->
-              <div class="col-sm-2">
-                <div id="sidebar" class="panel">
-                  ${renderedSideBar}
-                </div>
               </div><!--col-->
             </div><!--row-->
           </div>
         </div><!--tabcontent-->
       </div><!--form-group-->
 
-      <div class="form-group row">
-        <div class="col-sm-3 col-md-4">
-          <c:choose>
-            <c:when test="${not empty param.description}">
-              <c:set var="descriptionVal" value="${param.description}"/>
-            </c:when>
-            <c:otherwise>
-              <c:set var="descriptionVal" value=""/>
-            </c:otherwise>
-          </c:choose>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-1 col-md-4 col-md-offset-1">
+            <c:choose>
+              <c:when test="${not empty param.description}">
+                <c:set var="descriptionVal" value="${param.description}"/>
+              </c:when>
+              <c:otherwise>
+                <c:set var="descriptionVal" value=""/>
+              </c:otherwise>
+            </c:choose>
 
-          <label class="sr-only" for="description">Describe your change</label>
-          <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change" value="${descriptionVal}">
-        </div>
-        <div class="col-sm-2 col-md-2">
-          <div class="checkbox">
-            <label>
-              <input name="minorEdit" type="checkbox" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if>>
-              Minor edit
-            </label>
+            <label class="sr-only" for="description">Describe your change</label>
+            <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change" value="${descriptionVal}">
+          </div>
+          <div class="col-sm-2 col-md-2">
+            <div class="checkbox">
+              <label>
+                <input name="minorEdit" type="checkbox" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if>>
+                Minor edit
+              </label>
+            </div>
+          </div>
+          <div class="col-sm-4 col-md-4 col-sm-offset-1 col-md-offset-1">
+            <div class="btn-group">
+              <button id="save" class="btn btn-default" type="submit" name="save">Save</button>
+              <button id="preview" class="btn btn-default" type="submit" name="preview">Preview</button>
+            </div>
+            <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
           </div>
         </div>
-        <div class="col-sm-4 col-md-3">
-          <div class="btn-group">
-            <button id="save" class="btn btn-default" type="submit" name="save">Save</button>
-            <button id="preview" class="btn btn-default" type="submit" name="preview">Preview</button>
-          </div>
-          <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
-        </div>
-      </div><!--form-group row-->
+      </div>
 
       <!--hiddendata-->
       <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>">
@@ -133,7 +124,11 @@
       });
       </script>
     </c:if>
-    <jsp:include page="cheatsheet.html"></jsp:include>
+    <div class="row">
+      <div class="col-sm-6 col-sm-offset-1">
+        <jsp:include page="cheatsheet.html"></jsp:include>
+      </div><!--col-->
+    </div><!--row-->
   </div>
   </tiles:putAttribute>
 </tiles:insertTemplate>
