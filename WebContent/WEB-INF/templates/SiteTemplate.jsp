@@ -30,7 +30,7 @@
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.hotkeys.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.textchange.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="bootstrap.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="bootstrap.min.js"/>"></script>
   <script type="text/javascript">
     reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>";
     $(function() {
