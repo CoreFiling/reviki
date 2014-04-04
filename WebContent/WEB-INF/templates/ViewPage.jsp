@@ -76,25 +76,28 @@
 	            <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post">
 	              <input class="btn btn-default" type="submit" value="Edit">
 	            </form> 
+              <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	            <p id="lockedInfo">You have locked this page.</p>
 	          </c:when>
 	          <c:otherwise>
+              <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
 	          </c:otherwise>
 	        </c:choose>
-          <form id="unlock" name="unlock" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
+          <form id="unlock" name="unlock" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline">
             <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>">
-            <input class="btn btn-default btn-warning" name="unlock" type="submit" value="Unlock">
+            <input class="btn btn-warning" name="unlock" type="submit" value="Unlock">
           </form>
 	      </c:when>
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
             <button name="editButton" type="submit">Edit</button>
-	        </form><a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
+	        </form>
+          <a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
+          <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	      </c:otherwise>
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
-        <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
         <p>
           <a name="lastChanged"  href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a>
         </p>
