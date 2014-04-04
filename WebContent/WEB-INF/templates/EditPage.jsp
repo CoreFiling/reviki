@@ -129,6 +129,5 @@
         <jsp:include page="cheatsheet.html"></jsp:include>
       </div><!--col-->
     </div><!--row-->
-  </div>
   </tiles:putAttribute>
 </tiles:insertTemplate>

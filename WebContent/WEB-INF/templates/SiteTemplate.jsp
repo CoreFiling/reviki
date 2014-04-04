@@ -100,10 +100,10 @@
               <p id="build-details">Version $Version$.</p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </div><!--panel-->
+      </div><!--column-->
+    </div><!--row-->
+  </div><!--container-->
   <tiles:insertAttribute name="body-level" ignore="true" />
 </body>
 </html>
