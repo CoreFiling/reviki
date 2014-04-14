@@ -174,6 +174,14 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     String user = entry.getAuthor();
     Date date = entry.getDate();
     SVNLogEntryPath logForPath = (SVNLogEntryPath) entry.getChangedPaths().get(path);
+    
+    PageReference renamedTo = null;
+    for (Object entryPath : entry.getChangedPaths().values()) {
+      SVNLogEntryPath logEntryPath = (SVNLogEntryPath) entryPath;
+      if (ChangeType.forCode(logEntryPath.getType()).equals(ChangeType.ADDED) && path.equals(logEntryPath.getCopyPath())) {
+        renamedTo = new PageReferenceImpl(logEntryPath.getPath());
+      }
+    }
     String copiedFrom = logForPath.getCopyPath();
     long copiedFromRevision = -1;
     if (SVNPathUtil.isAncestor(rootPath, copiedFrom)) {
@@ -183,7 +191,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     else {
       copiedFrom = null;
     }
-    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind, ChangeType.forCode(logForPath.getType()), copiedFrom, copiedFromRevision);
+    return new ChangeInfo(page, name, user, date, entry.getRevision(), entry.getMessage(), kind, ChangeType.forCode(logForPath.getType()), copiedFrom, copiedFromRevision, renamedTo);
   }
 
   public void unlock(final PageReference ref, final String lockToken) throws PageStoreAuthenticationException, PageStoreException {

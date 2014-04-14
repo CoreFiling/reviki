@@ -54,5 +54,20 @@ public class TestRename extends WebTestSupport {
     assertSearchDoesNotFindPage(page, fromPageName);
     editWikiPage(fromPageName, "This checks old page is new.", "", "Whatever", true);
   }
-
+  
+  public void testRenamedPageContainsNotification() throws Exception {
+    String fromPageName = uniqueWikiPageName("RenameTestFrom");
+    String toPageName = uniqueWikiPageName("RenameTestTo");
+    editWikiPage(fromPageName, "Catchy tunes", "", "Whatever", true);
+    
+    renamePage(fromPageName, toPageName);
+    HtmlPage fromPage = getWikiPage(fromPageName);
+    
+    assertTrue(fromPage.asText().contains(toPageName));
+    
+    // If fromPage is subsequently edited then we no longer show the notification
+    fromPage = editWikiPage(fromPageName, "another edit", "", "Whatever", false);
+    assertFalse(fromPage.asText().contains(toPageName));
+  }
+ 
 }

@@ -41,8 +41,13 @@ public class ChangeInfo {
   private final ChangeType _changeType;
   private final String _copiedFrom;
   private final long _copiedFromRevision;
+  private final PageReference _renamedTo;
   
   public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision) {
+    this(page, name, user, date, revision, commitMessage, kind, changeType, copiedFrom, copiedFromRevision, null);
+  }
+
+  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision, PageReference renamedTo) {
     _page = page;
     _name = name;
     _user = user;
@@ -53,6 +58,7 @@ public class ChangeInfo {
     _copiedFrom = copiedFrom;
     _copiedFromRevision = copiedFromRevision;
     _commitMessage = commitMessage == null ? null : commitMessage.trim();
+    _renamedTo = renamedTo;
   }
   
   public ChangeType getChangeType() {
@@ -132,6 +138,10 @@ public class ChangeInfo {
 
   public long getCopiedFromRevision() {
     return _copiedFromRevision;
+  }
+  
+  public PageReference getRenamedTo() {
+    return _renamedTo;
   }
   
 }

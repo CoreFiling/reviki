@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 
 /**
@@ -30,6 +31,7 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
 
   public static final long UNCOMMITTED = -2;
   public static final long DELETED = -3;
+  public static final long RENAMED = -4;
 
   private final long _revision;
   private final long _lastChangedRevision;
@@ -39,9 +41,15 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
   private final String _lockedBy;
   private final String _lockToken;
   private final Date _lockedSince;
+  private PageReference _renamed;
 
   public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
     this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince, new LinkedHashMap<String, String>());
+  }
+
+  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, PageReference renamed) {
+    this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince);
+    _renamed = renamed;
   }
 
   public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, Map<String, String> attributes) {
@@ -105,11 +113,11 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
   }
 
   public boolean isNewPage() {
-    return _revision == UNCOMMITTED || _revision == DELETED;
+    return _revision == UNCOMMITTED || _revision == DELETED || _revision == RENAMED;
   }
 
   public boolean isDeleted() {
-    return _revision == DELETED;
+    return _revision == DELETED || _revision == RENAMED;
   }
 
   public boolean isNewOrLockedByUser(final String user) {
@@ -153,5 +161,13 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
       _lockedBy,
       "",
       _lockedSince);
+  }
+  
+  public boolean isRenamed() {
+    return _revision == RENAMED;
+  }
+  
+  public String getRenamedPageName() {
+    return _renamed.getName();
   }
 }
