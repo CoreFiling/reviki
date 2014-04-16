@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.vc;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 
 public class TestPageInfo extends TestCase {
@@ -27,6 +28,14 @@ public class TestPageInfo extends TestCase {
     VersionedPageInfo committed = new VersionedPageInfoImpl("wiki", "name", "content", 5, 2, null, null, null, null, null);
     assertEquals("r2", committed.getRevisionName());
     assertFalse(committed.isNewPage());
+    assertFalse(committed.isRenamed());
+  }
+  
+  public void testRenamedPageNameIsRenamed() {
+    VersionedPageInfo renamed = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.RENAMED, 6, null, null, null, null, null, new PageReferenceImpl("/wiki/renamed"));
+    assertEquals(renamed.getRenamedPageName(), "renamed");
+    assertTrue(renamed.isNewPage());
+    assertTrue(renamed.isRenamed());
   }
   
 }

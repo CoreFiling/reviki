@@ -160,6 +160,8 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final int MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY = 15;
 
+  private static final String ATTR_FROM_PAGE = "fromPage";
+
   private final CachingPageStore _store;
 
   private final MarkupRenderer _renderer;
@@ -490,6 +492,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (hasRenameParam) {
       final PageReference toPage = new PageReferenceImpl(getRequiredString(request, PARAM_TO_PAGE));
+      request.setAttribute(ATTR_FROM_PAGE, page.getName());
       try {
         _store.rename(page, toPage, -1, createLinkingCommitMessage(toPage, request));
       }
@@ -602,9 +605,14 @@ public class DefaultPageImpl implements DefaultPage {
   String createLinkingCommitMessage(final PageReference page, final HttpServletRequest request) {
     boolean minorEdit = request.getParameter(PARAM_MINOR_EDIT) != null;
     String commitMessage = request.getParameter(PARAM_COMMIT_MESSAGE);
-    if (commitMessage == null || commitMessage.trim().length() == 0) {
+    if (request.getParameter(SUBMIT_RENAME) != null) {
+      commitMessage = String.format("%s renamed to %s", request.getAttribute(ATTR_FROM_PAGE), page.getName());
+    }
+    else if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
+    
+
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName());
   }
 
