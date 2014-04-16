@@ -47,6 +47,10 @@
     </div>
 
     <div id="wiki-rendering">
+      <c:if test="${pageInfo.renamed}">
+        <c:set var="encodedRenamedPageName" value="${sw:urlEncode(pageInfo.renamedPageName)}"/>
+        <a name="renamedTo" href="<c:url value="${encodedRenamedPageName}"/>">Renamed to ${encodedRenamedPageName}</a>
+      </c:if>
     ${renderedContents}
     </div>
   </tiles:putAttribute>
@@ -101,10 +105,6 @@
 	    <c:if test="${not empty lastEditAction}">
         <p>
           <a name="lastChanged"  href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a>
-          <c:if test="${pageInfo.renamed}">
-            <c:set var="encodedRenamedPageName" value="${sw:urlEncode(pageInfo.renamedPageName)}"/>
-            <a name="renamedTo" href="<c:url value="${encodedRenamedPageName}"/>">[Renamed to ${encodedRenamedPageName}]</a>
-          </c:if>
         </p>
 		  </c:if>
 		</div>
