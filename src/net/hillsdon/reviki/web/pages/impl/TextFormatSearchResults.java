@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Currently used by the JavaScript to display the autocomplete search box.
@@ -37,16 +39,33 @@ public class TextFormatSearchResults implements View {
   public TextFormatSearchResults(final Iterable<SearchMatch> results) {
     _results = results;
   }
+  
+  private static String getUrlForPage(final HttpServletRequest request, final String wiki, final String page) throws Exception {
+    LinkResolutionContext resolver = (LinkResolutionContext) request.getAttribute("linkResolutionContext");
+    return resolver.resolve(wiki, page).toString();
+  }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    String wiki;
+    String page;
     response.setContentType("text/plain");
     PrintWriter writer = response.getWriter();
     for (SearchMatch matcher : _results) {
+      wiki = matcher.getWiki();
+      page = matcher.getPage();
+      
       if (matcher.isSameWiki()) {
         writer.println(matcher.getPage());
       }
       else {
-        writer.println(matcher.getWiki() + ":" + matcher.getPage());
+        StringBuilder s = new StringBuilder(wiki + ";" + page);
+        try {
+          s.append(";" + getUrlForPage(request, wiki, page));
+        }
+        catch (UnknownWikiException e) {
+          // Do not respond with URL component
+        }
+        writer.println(s.toString());
       }
     }
   }
