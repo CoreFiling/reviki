@@ -45,6 +45,11 @@ a:visited {
   min-width: 60em;
 }
 
+.preview-content {
+  height: 400px;
+  overflow-y: scroll;
+}
+
 #query {
   border-color: #CCC;
 }

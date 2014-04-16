@@ -21,7 +21,7 @@
             <c:if test="${not empty preview}">
               <div class="tab-pane active" id="preview-area">
                 <div class="well">
-                  <div class="panel panel-default">
+                  <div class="panel panel-default preview-content">
                     <div id="wiki-rendering">${preview}</div>
                   </div>
                 </div>
@@ -30,7 +30,7 @@
             <c:if test="${not empty markedUpDiff}">
               <div id="diff-area" class="tab-pane">
                 <div class="well">
-                  <div class="panel panel-default">
+                  <div class="panel panel-default preview-content">
                     ${markedUpDiff}
                   </div>
                 </div>
