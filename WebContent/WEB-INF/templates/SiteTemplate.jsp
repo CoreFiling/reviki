@@ -47,12 +47,20 @@
     </div>
   </c:if>
   <c:if test="${not empty wikiName}">
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <c:if test="${wikiIsValid != null and wikiIsValid}">
         <div class="container-fluid">
           <div class="row col-md-12">
             <div class="navbar-header">
-              <div class="navbar-brand"><c:out value="${titlePrefix}"/></div>
+              <div class="navbar-brand">
+                <c:set var="brandTitle">
+                  <c:choose>
+                    <c:when test="${not empty renderedHeader}">${renderedHeader}</c:when>
+                    <c:otherwise>${renderedHeader}</c:otherwise>
+                  </c:choose>
+                </c:set>
+                ${brandTitle}
+              </div>
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
@@ -66,7 +74,7 @@
                 <li><sw:wikiPage page="RecentChanges"/></li>
                 <li><sw:wikiPage page="AllPages"/></li>
               </ul>
-              <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-left" role="search">
+              <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-right" role="search">
                 <div class="form-group">
                   <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>">
                   <input class="btn btn-default btn-sm" value="Go" type="submit">
@@ -78,17 +86,22 @@
       </c:if>
     </nav><!--nav-->
   </c:if>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12">
-        <div id="header" class="auxillary">
-        ${renderedHeader}
-        </div>
         <div id="content-area" class="panel panel-default">
           <div class="panel-heading">
-            <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
-            <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
-            <c:out value="${menuItems}" escapeXml="false"/>
+            <div class="row">
+              <div class="col-xs-6">
+                <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
+              </div>
+              <div class="col-xs-6">
+                <div class="pull-right">
+                  <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
+                  <c:out value="${menuItems}" escapeXml="false"/>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="panel-body">
             <tiles:insertAttribute name="content"/>
