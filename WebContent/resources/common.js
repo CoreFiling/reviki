@@ -41,15 +41,25 @@ function parseTxtResults(txt, q, options) {
   
   var items = [];
   var tokens = txt.split(options.delimiter);
-  
+
   // parse returned data for non-empty items and prepare them for the autocomplete
   for (var i = 0; i < tokens.length; i++) {
     var tokenValue = $.trim(tokens[i]);
+    var tokenUrl = null;
+
     if (tokenValue) {
-      colonIndex = tokenValue.indexOf(':');
-      if (colonIndex > -1) {
-        tokenCategory = tokenValue.substring(0, colonIndex + 1);
-        tokenValue = tokenValue.substring(colonIndex + 1);
+      sepIndex = tokenValue.indexOf(';');
+      if (sepIndex > -1) {
+        tokenCategory = tokenValue.substring(0, sepIndex) + ":";
+        tokenPageUrl = tokenValue.substring(sepIndex + 1);
+        sepIndex = tokenPageUrl.indexOf(';');
+        if (sepIndex > -1) {
+            tokenValue = tokenPageUrl.substring(0, sepIndex);
+            tokenUrl = tokenPageUrl.substring(sepIndex + 1);
+        }
+        else {
+            tokenValue = tokenPageUrl;
+        }
       }
       else {
         tokenCategory = "";
@@ -58,7 +68,7 @@ function parseTxtResults(txt, q, options) {
           new RegExp(q, 'ig'), 
           function(q) { return '<span class="' + options.matchClass + '">' + q + '</span>' }
           );
-      items[items.length] = {label:tokenLabel, value:tokenValue, category:tokenCategory};
+      items[items.length] = {label:tokenLabel, value:tokenValue, category:tokenCategory, url:tokenUrl};
     }
   }
   return items;
@@ -104,6 +114,10 @@ reviki.configureAutoSuggest = function() {
     minLength: options.minchars,
     delay: options.delay,
     select: function(event, ui) {
+      if (ui.item.url != null) {
+          window.location.href = ui.item.url;
+          return false;
+      }
       searchBox.val(ui.item.value);
       searchForm.submit();
       return false;

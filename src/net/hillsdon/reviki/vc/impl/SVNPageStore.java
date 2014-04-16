@@ -208,13 +208,18 @@ public class SVNPageStore extends AbstractPageStore {
       String lastChangedAuthor = null;
       Date lastChangedDate = null;
       final ChangeInfo deletingChange = getChangeThatDeleted(ref);
+      PageReference renamedTo = null;
       if (deletingChange != null) {
         pseudoRevision = VersionedPageInfo.DELETED;
         lastChangedRevision = deletingChange.getRevision();
         lastChangedAuthor = deletingChange.getUser();
         lastChangedDate = deletingChange.getDate();
+        renamedTo = deletingChange.getRenamedTo();
+        if (renamedTo != null) {
+          pseudoRevision = VersionedPageInfo.RENAMED;
+        }
       }
-      return new VersionedPageInfoImpl(_wiki, ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null);
+      return new VersionedPageInfoImpl(_wiki, ref.getPath(), "", pseudoRevision, lastChangedRevision, lastChangedAuthor, lastChangedDate, null, null, null, renamedTo);
     }
     else {
       throw new PageStoreException(format("Unexpected node kind '%s' at '%s'", kind, ref));
