@@ -4,18 +4,6 @@ h1.title {
   display: block;
   font-size: 150%;
 }
-h1 {
-  font-size: 150%;
-  line-height: 30px;
-}
-h2 {
-  font-size: 130%;
-  line-height: 30px;
-}
-h3 {
-  font-size: 120%;
-  line-height: 30px;
-}
 body {
   font-size: 11pt;
   font-family: Verdana, Arial, sans-serif;
