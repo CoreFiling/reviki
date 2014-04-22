@@ -97,8 +97,10 @@
               </div>
               <div class="col-xs-6">
                 <div class="pull-right">
-                  <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
-                  <c:out value="${menuItems}" escapeXml="false"/>
+                  <ul>
+                    <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
+                    <c:out value="${menuItems}" escapeXml="false"/>
+                  </ul>
                 </div>
               </div>
             </div>
