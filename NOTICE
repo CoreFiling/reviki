@@ -24,4 +24,4 @@ testing (i.e. not part of the WAR file):
 HTMLUnit http://htmlunit.sourceforge.net
 EasyMock http://www.easymock.org
 Jackson JSON Processor http://www.cowtowncoder.com/hatchery/jackson/index.html
-jsoup HTML5 Parser jsoup.org
+Validator.nu project https://github.com/validator/
