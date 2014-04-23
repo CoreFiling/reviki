@@ -12,6 +12,16 @@
   <p>
     <c:out value="${exception.message}"/>
   </p>
-  <p><a href="javascript:history.go(-1)">Go back</a></p>
+  <p><a id="goBack" href="#">Go back</a></p>
+  <script type="text/javascript">
+    // XHTML5 validator fails when inline JS is used.
+    $(document).ready(function() {
+        $('#goBack').click(function(evt) {
+          evt.preventDefault();
+          history.go(-1);
+          });
+        });
+  </script>
+    
   </tiles:putAttribute>
 </tiles:insertTemplate>

@@ -15,11 +15,19 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import java.io.IOException;
 import java.util.List;
 
+import nu.validator.validation.SimpleDocumentValidator;
+import nu.validator.validation.SimpleDocumentValidator.SchemaReadException;
+import nu.validator.xml.SystemErrErrorHandler;
+
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import junit.framework.AssertionFailedError;
-import org.jsoup.parser.ParseError;
-import org.jsoup.parser.Parser;
 
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebResponse;
@@ -30,14 +38,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
- * Performs XHTML validation of the content.
+ * Performs XHTML5 validation of the content.
  *
  * @author mth
  */
 class ValidateOnContentChange extends WebWindowAdapter {
-
-  private final Parser _validator = Parser.htmlParser();
-
+  private XHTML5Validator _validator = new XHTML5Validator();
 
   public void webWindowContentChanged(final WebWindowEvent event) {
     WebResponse response = event.getNewPage().getWebResponse();
@@ -45,12 +51,11 @@ class ValidateOnContentChange extends WebWindowAdapter {
     // We leave documents without a doctype alone for now.  These include
     // tomcat's default error pages.
     if (content.indexOf("<!DOCTYPE") != -1) {
-      _validator.setTrackErrors(1);
-      _validator.parseInput(content, "http://example.com");
-      for (ParseError e : _validator.getErrors()) {
-        System.err.println("\n HTML validation error: " + e.getErrorMessage() + "\n at: " + e.getPosition() + "\n\n");
-        System.err.println(content);
-        throw new AssertionFailedError("HTML validation error, see console output.");
+      try {
+        _validator.validate(new InputSource(response.getContentAsStream()));
+      }
+      catch (IOException e) {
+        throw new RuntimeException(String.format("Failed to read XHTML5 page content: %s", e.getMessage()));
       }
     }
     if (!event.getWebWindow().getWebClient().getCookieManager().isCookiesEnabled()) {

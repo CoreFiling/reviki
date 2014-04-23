@@ -95,7 +95,7 @@ public class CreoleRenderer {
     RenderNode unorderedList = new ListNode("\\*", "ul");
     RenderNode orderedList = new ListNode("#", "ol");
     RenderNode rawUrl = new RawUrlNode();
-    RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "tt", 1);
+    RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "code", 1);
     RenderNode[] defaultInline = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
     RenderNode[] inline = concat(customInline, defaultInline);
 

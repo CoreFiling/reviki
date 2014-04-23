@@ -17,24 +17,26 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.webtests.XHTML5Validator;
 import net.hillsdon.reviki.wiki.renderer.result.TagResultNode;
-import org.jsoup.parser.ParseError;
-import org.jsoup.parser.Parser;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JavaTypeMapper;
+import org.xml.sax.InputSource;
 
 public abstract class JsonDrivenRenderingTest extends TestCase {
 
   private static final String HTML_PREFIX = "<!DOCTYPE html>"
-                                           + "<html><head><title>HTML prefix</title></head><body>";
+                                           + "<html xmlns='http://www.w3.org/1999/xhtml'><head><title>HTML prefix</title></head><body>";
   private static final String HTML_SUFFIX = "</body></html>";
-  private final Parser _validator = Parser.htmlParser();
+  private final XHTML5Validator _validator = new XHTML5Validator();
   private final List<Map<String, String>> _tests;
 
   @SuppressWarnings("unchecked")
@@ -78,10 +80,11 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
   private void validate(final String caseName, final String actual) {
     // Put the content in a <body> tag first.
     final String content = HTML_PREFIX + actual + HTML_SUFFIX;
-    _validator.setTrackErrors(1);
-    _validator.parseInput(content, "http://example.com");
-    for (ParseError error : _validator.getErrors()) {
-      fail(caseName + ": " + error.getErrorMessage());
+    try {
+      _validator.validate(new InputSource(new StringReader(content)));
+    }
+    catch (IOException e) {
+      throw new RuntimeException(String.format("Failed to read: %s", content));
     }
   }
 

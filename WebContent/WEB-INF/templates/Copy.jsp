@@ -11,7 +11,7 @@
       <div class="form-group">
         <label for="toPage" class="col-sm-2 control-label">New page name </label>
         <div class="col-sm-5">
-          <input id="toPage" class="form-control" name="toPage" type="text" value="">
+          <input id="toPage" class="form-control" name="toPage" type="text" value=""/>
         </div>
       </div>
       <div class="form-group">

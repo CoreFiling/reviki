@@ -42,7 +42,7 @@
   {
     "name":   "Horizontal rule",
     "input":  "Some text\n----\nSome more text",
-    "output": "<p>Some text</p><hr><p>Some more text</p>"
+    "output": "<p>Some text</p><hr /><p>Some more text</p>"
   },
   {
     "name":   "Preformatted block",
@@ -127,7 +127,7 @@
   {
     "name":   "Tables",
     "input":  "| A | B |\n| //C// | **D** \\\\ E |",
-    "output": "<table><tr><td> A </td><td> B </td></tr><tr><td> <em>C</em> </td><td> <strong>D</strong> <br> E </td></tr></table>"
+    "output": "<table><tr><td> A </td><td> B </td></tr><tr><td> <em>C</em> </td><td> <strong>D</strong> <br /> E </td></tr></table>"
   },
   {
     "name":   "Raw URL",
@@ -141,9 +141,9 @@
     "output": "<p><img src='image.gif' alt='my image'/></p>"
   },
   {
-    "name":   "Inline tt",
+    "name":   "Inline noWiki",
     "input":  "Inline {{{tt}}} example {{{here}}}!",
-    "output": "<p>Inline <tt>tt</tt> example <tt>here</tt>!</p>"
+    "output": "<p>Inline <code>tt</code> example <code>here</code>!</p>"
   },
   {
     "name":   "Strong",

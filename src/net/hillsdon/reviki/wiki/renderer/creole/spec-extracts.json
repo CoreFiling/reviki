@@ -62,7 +62,7 @@
   {
     "name":   "horizontal rule",
     "input":  "----",
-    "output": "<hr>"
+    "output": "<hr />"
   },
   {
     "bug":    "unimplemented",
@@ -84,7 +84,7 @@
   {
     "name":   "inline no wiki",
     "input":  "Some examples of markup are: {{{** <i>this</i> ** }}}",
-    "output": "<p>Some examples of markup are: <tt>** &lt;i&gt;this&lt;/i&gt; ** </tt></p>"
+    "output": "<p>Some examples of markup are: <code>** &lt;i&gt;this&lt;/i&gt; ** </code></p>"
   },
   {
     "bug":    "we don't yet cope with code braces as per the spec",

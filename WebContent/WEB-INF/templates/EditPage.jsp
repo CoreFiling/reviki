@@ -87,12 +87,12 @@
             </c:choose>
 
             <label class="sr-only" for="description">Describe your change</label>
-            <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change" value="${descriptionVal}">
+            <input id="description" name="description" type="text" class="form-control" placeholder="Describe your change" value="${descriptionVal}"/>
           </div>
           <div class="col-sm-2 col-md-2">
             <div class="checkbox">
               <label>
-                <input name="minorEdit" type="checkbox" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if>>
+                <input name="minorEdit" type="checkbox" <c:if test="${not empty param.minorEdit}">checked="checked"</c:if>/>
                 Minor edit
               </label>
             </div>
@@ -108,14 +108,14 @@
       </div>
 
       <!--hiddendata-->
-      <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>">
-      <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>">
-      <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>">
+      <input type="hidden" name="baseRevision" value="<c:out value="${pageInfo.revision}"/>"/>
+      <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
+      <input type="hidden" name="sessionId" value="<c:out value="${sessionId}"/>"/>
       <c:set var="attrs" value=""/>
       <c:forEach var="entry" items="${originalAttributes}">
         <c:set var="attrs" value="${attrs} ${entry.key} &#10;"/>
       </c:forEach>
-      <input type="hidden" name="originalAttrs" value="${attrs}" >
+      <input type="hidden" name="originalAttrs" value="${attrs}" />
     </form>
     <c:if test="${empty preview}">
       <script type='text/javascript'>

@@ -174,6 +174,15 @@ div#MarkupHelp p {
   font-size: 70%;
 }
 
+#MarkupHelp td {
+  padding: 0;
+}
+
+#MarkupHelp table {
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
 @media print {
 	body {
 	  float: none !important;

@@ -11,7 +11,7 @@
       <div class="form-group">
         <label for="toPage" class="col-sm-2 control-label">New page name</label>
         <div class="col-sm-3">
-          <input class="form-control" id="toPage" name="toPage" type="text" value="<c:url value="${sw:urlEncode(page.name)}"/>">
+          <input class="form-control" id="toPage" name="toPage" type="text" value="<c:url value="${sw:urlEncode(page.name)}"/>"/>
         </div>
       </div>
 

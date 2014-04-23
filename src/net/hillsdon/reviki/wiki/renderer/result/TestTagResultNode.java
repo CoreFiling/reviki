@@ -8,7 +8,7 @@ public class TestTagResultNode extends TestCase {
 
   public void testAddsCssClassNoChildren() {
     TagResultNode hr = new TagResultNode("hr");
-    assertEquals("<hr class='wiki-content'>", hr.toHTML());
+    assertEquals("<hr class='wiki-content' />", hr.toHTML());
   }
   
   public void testAddsCssClassWithChildren() {

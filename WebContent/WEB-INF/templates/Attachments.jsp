@@ -19,18 +19,18 @@
               <div class="form-group">
                 <label for="attachmentName" class="col-sm-4 control-label">Attachment name</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" name="attachmentName" id="attachmentName" placeholder="optional">
+                  <input type="text" class="form-control" name="attachmentName" id="attachmentName" placeholder="optional"/>
                 </div>
               </div>
               <div class="form-group">
                 <label for="attachmentMessage" class="col-sm-4 control-label">Message</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" name="attachmentMessage" id="attachmentMessage" placeholder="optional">
+                  <input type="text" class="form-control" name="attachmentMessage" id="attachmentMessage" placeholder="optional"/>
                 </div>
               </div>
               <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-8">
-                  <input type="file" id="file" name="file">
+                  <input type="file" id="file" name="file"/>
                 </div>
               </div>
               <div class="form-group">
@@ -61,12 +61,12 @@
                   <div class="row">
                     <div class="col-sm-6 col-sm-offset-1">
                       <div class="row">
-                        <h3><a href="${encodedName}"><c:out value="${attachment.name}" /></a>
-                            <c:if test="${not empty attachment.previousVersions}">(latest)</c:if>
-                            <form role="form" class="form-inline" name="deleteAttachment" action="<c:url value="${encodedName}"/>" method="post" style="display: inline">
-                              <button class="btn btn-xs btn-danger attachdelete" name="delete">Delete</button>
-                            </form>
-                        </h3>
+                        <form role="form" class="form-inline" name="deleteAttachment" action="<c:url value="${encodedName}"/>" method="post" style="display: inline">
+                          <h3><a href="${encodedName}"><c:out value="${attachment.name}" /></a>
+                              <c:if test="${not empty attachment.previousVersions}">(latest)</c:if>
+                                <button class="btn btn-xs btn-danger attachdelete" name="delete">Delete</button>
+                          </h3>
+                        </form>
                         <p><c:out value="${attachment.versions[0].commitMessage}"/></p>
                       </div><!--row-->
                       <c:if test="${not empty attachment.previousVersions}"> 
@@ -74,7 +74,7 @@
                           <ul>
                             <c:forEach var="version" items="${attachment.previousVersions}">
                               <li>
-                                <a href="<c:url value="${encodedName}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a><br>
+                                <a href="<c:url value="${encodedName}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a><br/>
                                 <c:out value="${version.commitMessage}"/>
                               </li>
                             </c:forEach>
@@ -92,17 +92,17 @@
                             <div class="col-sm-10 col-sm-offset-1">
                               <form name="replaceAttachmentUpload" class="form-horizontal" role="form" action="<c:url value=""/>" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
-                                  <input id="message_${ncName}" type="text" name="attachmentMessage" class="form-control input-xs" placeholder="Message">
+                                  <input id="message_${ncName}" type="text" name="attachmentMessage" class="form-control input-xs" placeholder="Message"/>
                                 </div><!--formgroup-->
                                 <div class="form-group">
-                                  <input type="file" name="file" id="file_${ncName}">
+                                  <input type="file" name="file" id="file_${ncName}"/>
                                 </div><!--formgroup-->
                                 <div class="form-group">
-                                  <input type="submit" class="btn btn-default" value="Upload">
+                                  <input type="submit" class="btn btn-default" value="Upload"/>
                                 </div><!--formgroup-->
                                 <!--hiddenparams-->
-                                <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>">
-                                <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>">
+                                <input type="hidden" name="attachmentName" value="<c:out value="${attachment.name}"/>"/>
+                                <input type="hidden" name="baseRevision" value="<c:out value="${attachment.revision}"/>"/>
                               </form>
                             </div>
                           </div>
@@ -141,13 +141,13 @@
                           <c:forEach var="version" items="${attachment.versions}">
                             <c:if test="${version.isDeletion}">
                               <li>
-                                <span style="text-decoration: line-through"><c:out value="${attachment.name} (r${version.revision})" /></span><br>
+                                <span style="text-decoration: line-through"><c:out value="${attachment.name} (r${version.revision})" /></span><br/>
                                 <c:out value="${version.commitMessage}"/>
                               </li>
                             </c:if>
                             <c:if test="${not version.isDeletion}">
                               <li>
-                                <a href="<c:url value="${encodedName}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a><br>
+                                <a href="<c:url value="${encodedName}?revision=${version.revision}"/>"><c:out value="${attachment.name} (r${version.revision})" /></a><br/>
                                 <c:out value="${version.commitMessage}"/>
                               </li>
                             </c:if>
