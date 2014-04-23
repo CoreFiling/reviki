@@ -54,7 +54,6 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
       final String expected = test.get("output");
       final String input = test.get("input");
       final String actual = render(input);
-      validate(caseName, actual);
       
       // We ignore the CSS class we add to save cluttering the expectations.
       String tidiedActual = actual.replaceAll(" " + TagResultNode.CSS_CLASS_ATTR, "");
@@ -71,6 +70,7 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
         err.println("Actual (tidied):\n" + tidiedActual);
         err.println();
       }
+      validate(caseName, actual);
     }
     if (errors > 0) {
       fail("Rendering errors, please see stderr.");
