@@ -78,7 +78,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   }
 
   public String handle(final PageInfo page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
-    final String xhtmlContent = new CompositeResultNode(renderer.render(page, link.getText(), null, urlOutputFilter)).toHTML();
+    final String xhtmlContent = new CompositeResultNode(renderer.render(page, link.getText(), null, urlOutputFilter)).toXHTML();
     return handle(page, xhtmlContent, link, urlOutputFilter);
   }
 

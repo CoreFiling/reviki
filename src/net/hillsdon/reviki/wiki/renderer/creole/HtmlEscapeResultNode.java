@@ -26,7 +26,7 @@ public class HtmlEscapeResultNode extends LeafResultNode {
     _text = text;
   }
   
-  public String toHTML() {
+  public String toXHTML() {
     return Escape.html(_text);
   }
 

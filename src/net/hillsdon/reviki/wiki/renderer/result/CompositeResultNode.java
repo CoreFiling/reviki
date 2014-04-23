@@ -27,10 +27,10 @@ public class CompositeResultNode implements ResultNode {
     _children = children;
   }
 
-  public String toHTML() {
+  public String toXHTML() {
     String result = "";
     for (ResultNode t : _children) {
-      result += t.toHTML();
+      result += t.toXHTML();
     }
     return result;
   }

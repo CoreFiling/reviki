@@ -366,7 +366,7 @@ public class DefaultPageImpl implements DefaultPage {
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
           ResultNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
-          request.setAttribute(ATTR_PREVIEW, rendered.toHTML());
+          request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
@@ -401,7 +401,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else {
       ResultNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
-      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toHTML());
+      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }
   }

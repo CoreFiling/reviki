@@ -26,7 +26,7 @@ public class TestAbstractRegexNode extends TestCase {
     node1.addChildren(node2);
     List<ResultNode> result = node1.render(new PageInfoImpl("SomePage"), WIKI_CONTENT, null, null);
     CompositeResultNode composite = new CompositeResultNode(result);
-    assertEquals("sometext processed1 processed2", composite.toHTML());
+    assertEquals("sometext processed1 processed2", composite.toXHTML());
   }
 
   public void testRenderingWithException() {
@@ -38,7 +38,7 @@ public class TestAbstractRegexNode extends TestCase {
     node1.addChildren(node2);
     List<ResultNode> result = node1.render(new PageInfoImpl("SomePage"), WIKI_CONTENT, null, null);
     CompositeResultNode composite = new CompositeResultNode(result);
-    assertEquals("sometext some:wiki processed2", composite.toHTML());
+    assertEquals("sometext some:wiki processed2", composite.toXHTML());
   }
 
   private static class AbstractRegexNodeStub extends AbstractRegexNode {

@@ -43,11 +43,11 @@ public class TagResultNode extends CompositeResultNode {
     return _tag;
   }
   
-  public String toHTML() {
+  public String toXHTML() {
     if (getChildren().isEmpty()) {
       return "<" + _tag + " " + CSS_CLASS_ATTR + " />";
     }
-    return "<" + _tag + " " + CSS_CLASS_ATTR + ">" +  super.toHTML() + "</" + _tag + ">";
+    return "<" + _tag + " " + CSS_CLASS_ATTR + ">" +  super.toXHTML() + "</" + _tag + ">";
   }
 
 }

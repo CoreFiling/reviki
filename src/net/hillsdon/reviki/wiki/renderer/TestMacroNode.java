@@ -52,7 +52,7 @@ public class TestMacroNode extends TestCase {
     MacroNode macroNode = new MacroNode(Suppliers.ofInstance(asList(npes)), false);
     Matcher matcher = Pattern.compile("([a-z]+) ([a-z]+)").matcher("npes remainder");
     matcher.matches();
-    String result = macroNode.handle(new PageInfoImpl("SomeWiki", "WhatEver", "SomeContent", Collections.<String, String>emptyMap()), matcher, null, URLOutputFilter.NULL).toHTML();
+    String result = macroNode.handle(new PageInfoImpl("SomeWiki", "WhatEver", "SomeContent", Collections.<String, String>emptyMap()), matcher, null, URLOutputFilter.NULL).toXHTML();
     assertTrue(result.contains("Simulated &amp; escape me please."));
   }
 
