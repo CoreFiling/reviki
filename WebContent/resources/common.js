@@ -313,8 +313,19 @@ reviki.removeUnlockOnUnload = function() {
   reviki.unlockOnUnload = false;
 }
 
+reviki.displayEditRestore = function() {
+  if (this.hasStoredData() && $("#preview-area").length != 1) {
+    $("#restore").removeClass("hidden");
+    }
+  return false;
+}
+
 reviki.setupLeaveConfirm = function() {
-  if ($("#editForm").length == 1) {
+  if ($("[name='editForm']").length == 1) {
+    var storedForm = $("[name='editForm']").sisyphus({autoRelease: false,
+                                             onBeforeRestore: reviki.displayEditRestore,
+                                             excludeFields: $("[type='hidden']")});
+
     if ($("#preview-area").length == 1) {
       reviki.addConfirm();
     }
@@ -327,6 +338,9 @@ reviki.setupLeaveConfirm = function() {
     $("#editForm").bind("submit", reviki.removeUnlockOnUnload);
     $("#cancel").bind("click", reviki.removeUnlockOnUnload);
     $("#save").bind("click", reviki.removeUnlockOnUnload);
+    $("#save").bind("click", function(){storedForm.manuallyReleaseData();});
+    $("#restore").bind("click", function(evt){evt.preventDefault();
+                                             storedForm.restoreAllData();});
     window.onunload = reviki.leaving;
     window.onbeforeunload = reviki.confirmLeaveFunc;
   }
