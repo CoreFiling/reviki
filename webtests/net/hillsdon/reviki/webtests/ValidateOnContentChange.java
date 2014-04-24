@@ -18,15 +18,7 @@ package net.hillsdon.reviki.webtests;
 import java.io.IOException;
 import java.util.List;
 
-import nu.validator.validation.SimpleDocumentValidator;
-import nu.validator.validation.SimpleDocumentValidator.SchemaReadException;
-import nu.validator.xml.SystemErrErrorHandler;
-
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import junit.framework.AssertionFailedError;
 
 import com.gargoylesoftware.htmlunit.Page;
