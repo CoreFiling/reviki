@@ -53,9 +53,14 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     // Link target can be PageName, wiki:PageName or a URL.
     URI uri = null;
     try {
-      URL url = new URL(target);
-      
-      uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+      try {
+        uri = new URI(target);
+      }
+      catch (URISyntaxException e) {
+        // The URI class is a bit stricter at parsing than we'd really like to be
+        URL url = new URL(target);
+        uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+      }
       if (uri.getPath()==null || !uri.isAbsolute()) {
         uri = null;
       }
@@ -63,9 +68,9 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     catch (URISyntaxException e) {
       // uri remains null
     }
-    catch (MalformedURLException e) {
-      // uri remains null
-    }
+	catch (MalformedURLException e) {
+ 	   // uri remains null
+ 	}
 
     if (uri != null) {
       return new LinkParts(text, uri);

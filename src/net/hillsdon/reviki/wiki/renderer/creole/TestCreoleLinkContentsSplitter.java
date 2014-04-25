@@ -33,6 +33,9 @@ public class TestCreoleLinkContentsSplitter extends TestCase {
   public void testExpectedInputsURI() {
     assertEquals(new LinkParts(EXAMPLE_URI_STRING, EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING));
     assertEquals(new LinkParts("Some text", EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING + "|" + "Some text"));
+  }
+
+  public void testReservedCharsBug13502() {
     assertEquals(new LinkParts("Some text", EXAMPLE_UNESCAPED_URI), _splitter.split(EXAMPLE_URI_STRING_RESERVED + "|" + "Some text"));
   }
     
