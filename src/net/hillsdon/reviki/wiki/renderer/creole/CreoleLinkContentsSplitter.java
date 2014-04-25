@@ -15,8 +15,10 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.regex.MatchResult;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,7 +34,9 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
    * Splits links of the form target or text|target where target is
    * 
    * PageName wiki:PageName PageName#fragment wiki:PageName#fragment
-   * scheme://valid/absolute/uri
+   * A String representing an absolute URI scheme://valid/absolute/uri
+   * Any character not in the `unreserved`, `punct`, `escaped`, or `other` categories (RFC 2396),
+   * and not equal '/' or '@', is %-encoded. 
    * 
    * @param in The String to split
    * @return The split LinkParts
@@ -49,7 +53,14 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     // Link target can be PageName, wiki:PageName or a URL.
     URI uri = null;
     try {
-      uri = new URI(target);
+      try {
+        uri = new URI(target);
+      }
+      catch (URISyntaxException e) {
+        // The URI class is a bit stricter at parsing than we'd really like to be
+        URL url = new URL(target);
+        uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+      }
       if (uri.getPath()==null || !uri.isAbsolute()) {
         uri = null;
       }
@@ -57,6 +68,9 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     catch (URISyntaxException e) {
       // uri remains null
     }
+	catch (MalformedURLException e) {
+ 	   // uri remains null
+ 	}
 
     if (uri != null) {
       return new LinkParts(text, uri);
