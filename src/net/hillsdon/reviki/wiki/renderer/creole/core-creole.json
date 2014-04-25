@@ -141,9 +141,9 @@
     "output": "<p><img src='image.gif' alt='my image'/></p>"
   },
   {
-    "name":   "Inline tt",
+    "name":   "Inline noWiki",
     "input":  "Inline {{{tt}}} example {{{here}}}!",
-    "output": "<p>Inline <tt>tt</tt> example <tt>here</tt>!</p>"
+    "output": "<p>Inline <code>tt</code> example <code>here</code>!</p>"
   },
   {
     "name":   "Strong",

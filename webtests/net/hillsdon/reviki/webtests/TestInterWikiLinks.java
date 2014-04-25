@@ -27,7 +27,7 @@ public class TestInterWikiLinks extends WebTestSupport {
    * Add an interwiki link mapping, create a link, make sure it points where we expect.
    */
   public void testLink() throws Exception {
-    editWikiPage("ConfigInterWikiLinks", "foo http://www.example.com/Wiki?%s", "", "Link mapping.", null);
+    editWikiPage("ConfigInterWikiLinks", "foo http://www.example.com/Wiki?%25s", "", "Link mapping.", null);
     HtmlPage page = editWikiPage(uniqueWikiPageName("InterWikiLinkTest"), "foo:1234", "", "Add inter-wiki links.", true);
     HtmlAnchor link = page.getAnchorByHref("http://www.example.com/Wiki?1234");
     assertEquals("foo:1234", link.asText());
@@ -37,7 +37,7 @@ public class TestInterWikiLinks extends WebTestSupport {
    * Add many interiki links to a page and test the render time.
    */
   public void testRenderTiming() throws Exception {
-    editWikiPage("ConfigInterWikiLinksTiming", "foo http://www.example.com/Wiki?%s", "", "Link mapping.", null);
+    editWikiPage("ConfigInterWikiLinksTiming", "foo http://www.example.com/Wiki?%25s", "", "Link mapping.", null);
     String content = "";
     for (int i=0; i<100; i++) {
       content += "foo:" + i + " ";

@@ -21,7 +21,8 @@
     <div id="wiki-rendering">
     ${markedUpDiff}
     </div>
-    <hr/>
+  </tiles:putAttribute>
+  <tiles:putAttribute name="content-controls">
     <p>
       Change from ${diffStartRev} to ${diffEndRev} <a href="<c:url value="${encodedPageName}?history"/>">[History]</a>
     </p>
