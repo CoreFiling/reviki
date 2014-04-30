@@ -29,31 +29,43 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-api-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-core-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-jsp-2.0.4.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xmlParserAPIs-2.6.2.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.9.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/xpathcontext.jar"/>
 	<classpathentry kind="lib" path="lib/js-1.6R5.jar"/>
 	<classpathentry kind="lib" path="lib/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/cssparser-0.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/jaxen-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/resolver.jar"/>
 	<classpathentry kind="lib" path="lib/sac-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/serializer-2.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/xalan-2.7.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/xhtmlvalidate"/>
-	<classpathentry kind="lib" path="lib/htmlunit-2.9.jar"/>
-	<classpathentry kind="lib" path="lib/htmlunit-core-js-2.9.jar"/>
-	<classpathentry kind="lib" path="lib/xhtmlvalidate.jar"/>
-	<classpathentry kind="lib" path="lib/httpclient-4.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpmime-4.1.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-io-2.0.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/guava-12.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/nekohtml-1.9.15.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xalan-2.7.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/cssparser-0.9.13.jar"/>
+	<classpathentry kind="lib" path="lib/htmlunit-2.14.jar"/>
+	<classpathentry kind="lib" path="lib/htmlunit-core-js-2.14.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-websocket-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="lib/nekohtml-1.9.20.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/httpmime-4.3.2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/nekohtml-1.9.20.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="lib/vnu.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

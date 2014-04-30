@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <c:set var="titlePrefix">
@@ -13,7 +13,7 @@
   </c:set>
   <%-- Prevent indexing of 'unusual' pages. --%>
   <% if (!request.getParameterMap().isEmpty()) { %>
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="noindex, nofollow"/>
   <% } %>
   <title><c:out value="${titlePrefix}"/> - <tiles:insertAttribute name="title"/></title>
   <link rel="shortcut icon" href="<sw:iconUrl name="favicon.ico"/>" />
@@ -21,18 +21,16 @@
     <link rel="alternate" type="application/atom+xml" title="RecentChanges feed" href="<sw:wikiUrl page="RecentChanges" query="ctype=atom"/>" />
     <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
+  <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.core.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.widget.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.tabs.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.position.js"/>"></script>
-  <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery-1.11.0.min.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="jquery-ui.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.html.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.hotkeys.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.textchange.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="bootstrap.min.js"/>"></script>
   <script type="text/javascript">
     reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>";
     $(function() {
@@ -48,40 +46,77 @@
       </p>
     </div>
   </c:if>
-  <div id="topbar" class="auxillary">
-    <c:if test="${wikiIsValid != null and wikiIsValid}">
-      <ul class="menu">
-        <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
-        <c:out value="${menuItems}" escapeXml="false"/>
-        <c:if test="${not empty menuItems}">
-          <li class="menu menu-separator"></li>
-        </c:if>
-        <li class="menu"><sw:wikiPage page="FrontPage"/></li>
-        <li class="menu"><sw:wikiPage page="RecentChanges"/></li>
-        <li class="menu"><sw:wikiPage page="AllPages"/></li>
-        <li class="menu">
-          <form id="searchForm" name="searchForm" style="display: inline; margin-top:0.2em;" action="<sw:wikiUrl page="FindPage"/>" method="get">
-            <input id="query" name="query" type="text" value="<c:out value="${param.query}"/>"/>
-            <input value="Go" type="submit"/>
-          </form>
-        </li>
-      </ul>
-    </c:if>
-  </div>
-  <div id="header" class="auxillary">
-  ${renderedHeader}
-  </div>
-  <div id="content-area">
-    <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
-    <div id="sidebar" class="auxillary" style="float:right">
-    ${renderedSideBar}
-    </div>
-    <tiles:insertAttribute name="content"/>
-  </div>
-  <div id="footer" class="auxillary clear-both">
-  ${renderedFooter}
-    <p id="build-details">Version $Version$.</p>
-  </div>
+  <c:if test="${wikiIsValid != null and wikiIsValid}">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="row col-md-12">
+          <div class="navbar-header">
+            <div class="navbar-brand">
+              <c:set var="brandTitle">
+                <c:choose>
+                  <c:when test="${not empty renderedHeader}">${renderedHeader}</c:when>
+                  <c:otherwise>${renderedHeader}</c:otherwise>
+                </c:choose>
+              </c:set>
+              ${brandTitle}
+            </div>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><sw:wikiPage page="FrontPage"/></li>
+              <li><sw:wikiPage page="RecentChanges"/></li>
+              <li><sw:wikiPage page="AllPages"/></li>
+            </ul>
+            <form id="searchForm" name="searchForm" action="<sw:wikiUrl page="FindPage"/>" method="get" class="navbar-form navbar-right" role="search">
+              <div class="form-group">
+                <input id="query" class="form-control input-sm" name="query" type="text" value="<c:out value="${param.query}"/>"/>
+                <input class="btn btn-default btn-sm" value="Go" type="submit"/>
+              </div>
+            </form>
+          </div><!--navbar-collapse-->
+        </div>
+      </div><!--container-->
+    </nav><!--nav-->
+  </c:if>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="content-area" class="panel panel-default">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-xs-6">
+                <h1 class="title"><tiles:insertAttribute name="heading"/></h1>
+              </div>
+              <div class="col-xs-6">
+                <div class="pull-right">
+                  <ul>
+                    <c:set var="menuItems"><tiles:getAsString name="menuItems" ignore="true"/></c:set>
+                    <c:out value="${menuItems}" escapeXml="false"/>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <tiles:insertAttribute name="content"/>
+          </div>
+          <div class="panel-footer">
+            <tiles:insertAttribute name="content-controls" ignore="true"/>
+            <div id="footer" class="auxillary clear-both">
+            ${renderedFooter}
+              <p id="build-details">Version $Version$.</p>
+            </div>
+          </div>
+        </div><!--panel-->
+      </div><!--column-->
+    </div><!--row-->
+  </div><!--container-->
   <tiles:insertAttribute name="body-level" ignore="true" />
 </body>
 </html>

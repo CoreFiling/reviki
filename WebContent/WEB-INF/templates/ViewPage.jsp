@@ -20,7 +20,7 @@
     <c:if test="${not pageInfo.locked or pageInfo.lockedBy == username}">
       <li class="menu">
         <form id="editTop" name="editTop" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-          <input type="submit" value="Edit"/>
+          <input class="btn btn-default" type="submit" value="Edit"/>
         </form>
       </li>
       <li class="menu">
@@ -42,18 +42,33 @@
     </c:if>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
+    <div id="sidebar" style="float:right">
+      ${renderedSideBar}
+    </div>
+
     <div id="wiki-rendering">
+      <c:if test="${pageInfo.renamed}">
+        <c:set var="encodedRenamedPageName" value="${sw:urlEncode(pageInfo.renamedPageName)}"/>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="well">
+              <a name="renamedTo" href="<c:url value="${encodedRenamedPageName}"/>">Renamed to ${encodedRenamedPageName}</a>
+            </div>
+          </div>
+        </div>
+      </c:if>
     ${renderedContents}
     </div>
+  </tiles:putAttribute>
+  <tiles:putAttribute name="content-controls">
     <div class="auxillary clear-both">
 	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
 	    <form id="editContent" name="editContent" action="<c:url value="${encodedPageName}"/>" method="post">
-	      <input type="submit" value="Edit this new page" />
+	      <input class="btn btn-default" type="submit" value="Edit this new page" />
 	    </form>
 	    </div>
 	    </c:if>
-	    <hr />
 	    <p id="backlinks">
 	    <c:if test="${not empty backlinks}">
 	      Referenced on:
@@ -70,34 +85,33 @@
 	        <c:choose>
 	          <c:when test="${pageInfo.lockedBy == username}">
 	            <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post">
-	              <input type="submit" value="Edit"/>
+	              <input class="btn btn-default" type="submit" value="Edit"/>
 	            </form> 
+              <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	            <p id="lockedInfo">You have locked this page.</p>
 	          </c:when>
 	          <c:otherwise>
+              <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	            <p id="lockedInfo">Locked for editing by <c:out value="${pageInfo.lockedBy}"/> since <f:formatDate type="both" value="${pageInfo.lockedSince}"/>.</p>
 	          </c:otherwise>
 	        </c:choose>
-          <form id="unlock" name="unlock" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
+          <form id="unlock" name="unlock" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline">
             <input type="hidden" name="lockToken" value="<c:out value="${pageInfo.lockToken}"/>"/>
-            <input name="unlock" type="submit" value="Unlock"/>
+            <input class="btn btn-warning" name="unlock" type="submit" value="Unlock"/>
           </form>
 	      </c:when>
 	      <c:otherwise>
 	        <form id="editBottom" name="editBottom" action="<c:url value="${encodedPageName}"/>" method="post" style="display:inline;">
-	          <input name="editButton" type="submit" value="Edit"/>
-	        </form><a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
+            <button name="editButton" type="submit">Edit</button>
+	        </form>
+          <a name="attachments" href="<c:url value="${encodedPageName}/attachments/"/>">Attachments</a>
+          <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	      </c:otherwise>
 	    </c:choose>
 	    <c:if test="${not empty lastEditAction}">
-		    <p>
-		      <a name="lastChanged" href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a>
-          <c:if test="${pageInfo.renamed}">
-            <c:set var="encodedRenamedPageName" value="${sw:urlEncode(pageInfo.renamedPageName)}"/>
-            <a name="renamedTo" href="<c:url value="${encodedRenamedPageName}"/>">[Renamed to ${encodedRenamedPageName}]</a>
-          </c:if>
-          <a name="history" href="<c:url value="${encodedPageName}?history"/>">[History]</a>
-		    </p>
+        <p>
+          <a name="lastChanged"  href="<c:url value="${encodedPageName}?revision=${pageInfo.lastChangedRevision}&amp;diff=${pageInfo.lastChangedRevision - 1}"/>">${lastEditAction} by <c:out value="${pageInfo.lastChangedUser}"/> on <f:formatDate type="both" value="${pageInfo.lastChangedDate}"/></a>
+        </p>
 		  </c:if>
 		</div>
   </tiles:putAttribute>

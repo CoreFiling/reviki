@@ -44,7 +44,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlDeletedText;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-
 public class TestAttachments extends WebTestSupport {
 
   public static final String ATTACHMENT_UPLOAD_FILE_1 = "webtests/file1.txt";
@@ -86,7 +85,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlPage page = editWikiPage(name, "content", "", "", true);
     HtmlPage attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("attachmentUpload");
-    attachments = (HtmlPage) form.getInputByValue("Upload").click();
+    attachments = (HtmlPage) form.getButtonByName("upload").click();
     assertEquals(ERROR_NO_FILE, getErrorMessage(attachments));
   }
 
@@ -103,7 +102,7 @@ public class TestAttachments extends WebTestSupport {
     attachments = clickAttachmentsLink(page, name);
     HtmlForm form = attachments.getFormByName("replaceAttachmentUpload");
     form.getInputByName("file").setValueAttribute(ATTACHMENT_UPLOAD_FILE_2);
-    attachments = (HtmlPage) form.getInputByValue("Upload New Version").click();
+    attachments = (HtmlPage) form.getInputByValue("Upload").click();
     assertEquals("File 2.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
 
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
@@ -152,7 +151,7 @@ public class TestAttachments extends WebTestSupport {
     page = getWikiPage(name);
     attachments = clickAttachmentsLink(page, name);
     HtmlForm deleteForm = attachments.getFormByName("deleteAttachment");
-    attachments = deleteForm.getInputByValue("Delete Attachment").click();
+    attachments = deleteForm.getButtonByName("delete").click();
 
     // There shouldn't be any link directly to the attachment
     for(Object o: attachments.getByXPath("//a[contains(@href, 'file.txt')]")) {
@@ -182,7 +181,7 @@ public class TestAttachments extends WebTestSupport {
     attachments = clickAttachmentsLink(page, newName);
 
     HtmlForm deleteForm = attachments.getFormByName("deleteAttachment");
-    attachments = deleteForm.getInputByValue("Delete Attachment").click();
+    attachments = deleteForm.getButtonByName("delete").click();
 
     assertFalse("Page should not be completely empty!", attachments.asText().isEmpty());
 

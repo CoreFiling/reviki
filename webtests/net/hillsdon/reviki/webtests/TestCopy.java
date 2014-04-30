@@ -45,7 +45,7 @@ public class TestCopy extends WebTestSupport {
     page = (HtmlPage) page.getAnchorByName("copy").click();
     HtmlForm form = page.getFormByName("copyForm");
     form.getInputByName("toPage").setValueAttribute(toPageName);
-    page = (HtmlPage) form.getInputByName("copy").click();
+    page = (HtmlPage) form.getButtonByName("copy").click();
     assertTrue(page.getWebResponse().getWebRequest().getUrl().toURI().getPath().contains(toPageName));
     assertTrue(page.asText().contains("Catchy tunes"));
     page = getWikiPage(fromPageName);
