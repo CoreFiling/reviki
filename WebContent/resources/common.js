@@ -122,6 +122,7 @@ reviki.configureAutoSuggest = function() {
       searchForm.submit();
       return false;
     },
+    appendTo: searchBox.parent(),
     html: true
   });
   
