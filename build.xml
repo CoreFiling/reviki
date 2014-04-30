@@ -28,8 +28,12 @@
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat.version" value="6.0.35"/>
+  <property name="tomcat.version" value="6.0.39"/>
   <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
+
+  <!-- The VNU jar at this URL is repackaged with jarjar to avoid contributing conflicting versions of embedded libraries to other parts of the build. -->
+  <property name="vnu-url" value="https://github.com/paulcadman/build/releases/download/20140424/vnu-20140424-jarjar.jar"/>
+
   <!-- For now, to run the functional tests you need to set up SVN and reviki.properties manually.
        The wiki should be called 'test' (with no base URL set).
        
@@ -51,6 +55,8 @@
   </path>    
 
   <target name="init">
+     <get src="${vnu-url}" dest="lib/vnu.jar" usetimestamp="true" />
+
      <mkdir dir="${build-classes}" />
      <mkdir dir="${build-web}" />
      <mkdir dir="${build-webtests}" />

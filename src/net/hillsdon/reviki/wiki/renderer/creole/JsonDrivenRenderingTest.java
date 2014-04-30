@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.webtests.XHTML5Validator;
+import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
 import net.hillsdon.reviki.wiki.renderer.result.TagResultNode;
 
 import org.codehaus.jackson.JsonFactory;

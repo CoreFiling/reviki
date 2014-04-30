@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.webtests;
+package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.IOException;
 

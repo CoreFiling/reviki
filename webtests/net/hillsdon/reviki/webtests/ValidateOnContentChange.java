@@ -29,6 +29,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
+
 /**
  * Performs XHTML5 validation of the content.
  *
