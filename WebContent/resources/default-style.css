@@ -152,6 +152,14 @@ code {
   color: rgb(147,147,147); background-color: rgb(247,247,247); font-style: italic; font-weight: bold;
 }
 
+code.wiki-content {
+  font-size: 90%;
+  color: inherit;
+  background-color: inherit;
+  white-space: nowrap;
+  font-family: monospace;
+}
+
 div#MarkupHelp {
   background-color: white; color: #333;
   font-family: Verdana, Arial, Helvetica, sans-serif; line-height: 1.3em;
