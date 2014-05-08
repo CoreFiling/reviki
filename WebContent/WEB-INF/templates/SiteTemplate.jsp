@@ -107,11 +107,11 @@
             <tiles:insertAttribute name="content"/>
           </div>
           <div class="panel-footer">
-            <tiles:insertAttribute name="content-controls" ignore="true"/>
-            <div id="footer" class="auxillary clear-both">
-            ${renderedFooter}
+            <div id="footer" class="auxillary">
+              ${renderedFooter}
               <p id="build-details">Version $Version$.</p>
             </div>
+            <tiles:insertAttribute name="content-controls" ignore="true"/>
           </div>
         </div><!--panel-->
       </div><!--column-->

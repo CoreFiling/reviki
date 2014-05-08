@@ -61,7 +61,7 @@
     </div>
   </tiles:putAttribute>
   <tiles:putAttribute name="content-controls">
-    <div class="auxillary clear-both">
+    <div class="auxillary">
 	    <c:if test="${pageInfo.newPage and empty pageInfo.content}">
 	    <div style="margin-top: 1em">
 	    <form id="editContent" name="editContent" action="<c:url value="${encodedPageName}"/>" method="post">
