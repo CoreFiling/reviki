@@ -83,8 +83,8 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
     getDelegate().getFile(path, revision, properties, out);
   }
   
-  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
-    return getDelegate().getFiles(paths, revision);
+  public void getFiles(final long revision, final Map<String, Map<String, String>> properties, final Map<String, ? extends OutputStream> outputStreams) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+    getDelegate().getFiles(revision, properties, outputStreams);
   }
 
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {

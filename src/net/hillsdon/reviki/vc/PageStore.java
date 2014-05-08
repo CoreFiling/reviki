@@ -87,7 +87,6 @@ public interface PageStore {
   
   /**
    * Batch fetch a collection of pages.
-   * The returned PageInfo instances do not contain SVN attribute information.
    * NB: The ordering of the returned PageInfo Collection is not determined by the
    * ordering of the passed PageReference Collection.
    *

@@ -18,12 +18,10 @@ package net.hillsdon.reviki.vc.impl;
 import static java.util.Collections.singletonMap;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -248,36 +246,37 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     });
 
   }
-  
-  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
-    final Map<String, ByteArrayOutputStream> outputStreams = new LinkedHashMap<String, ByteArrayOutputStream>();
+
+  public void getFiles(final long revision, final Map<String, Map<String, String>> properties, final Map<String, ? extends OutputStream> outputStreams) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+    final long effectiveRevision = revision >= 0 ? revision : getLatestRevision();
     execute(new SVNAction<Void>() {
       public Void perform(final BasicSVNOperations operation, final SVNRepository repository) throws SVNException, PageStoreException {
+        ISVNFileCheckoutTarget coTarget = new ISVNFileCheckoutTarget() {
+          public OutputStream getOutputStream(final String path) throws SVNException {
+            // filePropertyChange doesn't give us this one.
+            filePropertyChanged(path, "svn:entry:revision", SVNPropertyValue.create(Long.toString(effectiveRevision)));
+            return outputStreams.get(path);
+          }
+
+          public void filePropertyChanged(final String path, final String key, final SVNPropertyValue value) throws SVNException {
+            if (properties != null) {
+              Map<String, String> propsForPath = properties.get(path);
+              if (propsForPath != null) {
+                propsForPath.put(key, value.getString());
+              }
+            }
+          }
+        };
         try {
-          repository.checkoutFiles(revision, paths.toArray(new String[paths.size()]), new ISVNFileCheckoutTarget() {
-            
-            public OutputStream getOutputStream(String path) throws SVNException {
-              ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-              outputStreams.put(path, outputStream);
-              return outputStream;
-            }
-            
-            public void filePropertyChanged(String arg0, String arg1, SVNPropertyValue arg2) throws SVNException {
-              // Not implemented
-            }
-          });
+          getSVNReposForRevision(repository, revision).checkoutFiles(revision, outputStreams.keySet().toArray(new String[outputStreams.size()]), coTarget);
         }
         catch (SVNException ex) {
-          // FIXME: Presumably this code would be different for non-http repositories.
-          if (SVNErrorCode.FS_NOT_FOUND.equals(ex.getErrorMessage().getErrorCode())) {
-            throw new NotFoundException(ex);
-          }
-          throw ex;
+          // FIXME: This used to check the code, but checkoutFiles gives much more random codes than getFile
+          throw new NotFoundException(ex);
         }
         return null;
       }
     });
-    return outputStreams;
   }
 
   private SVNRepository getSVNReposForRevision(final SVNRepository repository, final long revision) throws SVNException {
@@ -291,6 +290,8 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+    // Not quite all the tests pass if we implement getFile in terms of getFiles, and it would be less efficient
+    // getFiles(revision, Collections.singletonMap(path, properties), Collections.singletonMap(path, out));
     execute(new SVNAction<Void>() {
       @SuppressWarnings("unchecked")
       public Void perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {

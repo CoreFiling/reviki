@@ -171,13 +171,16 @@ public class SVNPageStore extends AbstractPageStore {
   
   public Collection<PageInfo> getPages(final Collection<PageReference> pages, final long revision) throws PageStoreException {
     List<PageInfo> outputPages = new LinkedList<PageInfo>();
-    List<String> paths = new LinkedList<String>();
+    Map<String, ByteArrayOutputStream> contents = new LinkedHashMap<String, ByteArrayOutputStream>();
+    Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
     for (PageReference p : pages) {
-      paths.add(p.getPath());
+      contents.put(p.getPath(), new ByteArrayOutputStream());
+      properties.put(p.getPath(), new HashMap<String, String>());
     }
-    
-    for (Map.Entry<String, ByteArrayOutputStream> entry : _operations.getFiles(paths, revision).entrySet()) {
-      outputPages.add(new PageInfoImpl(_wiki, entry.getKey(), Strings.toUTF8(entry.getValue().toByteArray()), null));
+
+    _operations.getFiles(revision, properties, contents);
+    for (Map.Entry<String, ByteArrayOutputStream> entry : contents.entrySet()) {
+      outputPages.add(new PageInfoImpl(_wiki, entry.getKey(), Strings.toUTF8(entry.getValue().toByteArray()), properties.get(entry.getKey())));
     }
     return outputPages;
   }

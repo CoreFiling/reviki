@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -215,8 +216,8 @@ public class TestSVNPageStore extends TestCase {
     verify();
   }
   
-  public void testGetFiles() throws PageStoreException, IOException {
-    Map<String, ByteArrayOutputStream> pathsOutput = new LinkedHashMap<String, ByteArrayOutputStream>();
+  public void testGetPages() throws PageStoreException, IOException {
+    final Map<String, ByteArrayOutputStream> pathsOutput = new LinkedHashMap<String, ByteArrayOutputStream>();
     List<String> paths = new LinkedList<String>();
     List<PageReference> pages = new LinkedList<PageReference>();
     int NUM = 10;
@@ -229,7 +230,16 @@ public class TestSVNPageStore extends TestCase {
       paths.add(pathName);
       pages.add(new PageReferenceImpl(pathName));
     }
-    expect(_operations.getFiles(eq(paths), eq(-1L))).andReturn(pathsOutput);
+    _operations.getFiles(eq(-1L), (Map<String, Map<String, String>>) anyObject(), (Map<String, OutputStream>) anyObject());
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+      public Object answer() throws Throwable {
+        Map<String, OutputStream> outputStreams = (Map<String, OutputStream>) getCurrentArguments()[2];
+        for (Map.Entry<String, OutputStream> e: outputStreams.entrySet()) {
+          e.getValue().write(pathsOutput.get(e.getKey()).toByteArray());
+        }
+        return null;
+      }
+    });
     replay();
     
     Collection<PageInfo> returnValue = _store.getPages(pages, -1);
@@ -237,7 +247,6 @@ public class TestSVNPageStore extends TestCase {
     for (PageInfo p : returnValue) {
       assertEquals(p.getPath(), String.format("Path%d", j));
       assertEquals(p.getContent(), String.format("Content%d", j));
-      assertNull(p.getAttributes());
       j++;
     }
     assertEquals(j, NUM );

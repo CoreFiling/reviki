@@ -59,7 +59,7 @@ public interface BasicSVNOperations {
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
   SVNNodeKind checkPath(String path, long revision) throws PageStoreAuthenticationException, PageStoreException;
 
-  Map<String, ByteArrayOutputStream> getFiles(Collection<String> paths, long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
+  void getFiles(long revision, final Map<String, Map<String, String>> properties, final Map<String, ? extends OutputStream> outputStreams) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
   void getFile(String path, long revision, Map<String, String> properties, OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException;
 
 
