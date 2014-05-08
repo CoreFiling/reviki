@@ -315,16 +315,22 @@ reviki.removeUnlockOnUnload = function() {
 }
 
 reviki.displayEditRestore = function() {
-  if (this.hasStoredData() && $("#preview-area").length != 1) {
+  if (this.hasStoredData() && this.browserStorage.get("reviki.restore.url") == document.URL && $("#preview-area").length != 1) {
     $("#restore").removeClass("hidden");
     }
   return false;
+}
+
+reviki.onSaveFormData = function() {
+  this.browserStorage.set("reviki.restore.url", document.URL);
+  $("#restore").addClass("hidden");
 }
 
 reviki.setupLeaveConfirm = function() {
   if ($("[name='editForm']").length == 1) {
     var storedForm = $("[name='editForm']").sisyphus({autoRelease: false,
                                              onBeforeRestore: reviki.displayEditRestore,
+                                             onSave: reviki.onSaveFormData,
                                              excludeFields: $("[type='hidden']")});
 
     if ($("#preview-area").length == 1) {
