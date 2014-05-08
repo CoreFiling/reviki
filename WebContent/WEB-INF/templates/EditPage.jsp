@@ -58,7 +58,7 @@
             <div class="row">
               <div class="col-sm-10 col-sm-offset-1">
                 <div class="well">
-                  <textarea id="contentArea" style="resize: none;" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
+                  <textarea id="contentArea" name="content" class="form-control" rows="20" cols="80"><c:out value="${pageInfo.content}"/></textarea>
                 </div><!--well-->
               </div><!--col-->
             </div><!--row-->
@@ -67,7 +67,7 @@
             <div class="row">
               <div class="col-sm-10 col-sm-offset-1">
                 <div class="well">
-                  <textarea style="resize: none;" name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
+                  <textarea name="attributes" class="form-control" rows="20" cols="80"><c:forEach var="entry" items="${pageInfo.attributes}">"${entry.key}" = "${entry.value}"&#10;</c:forEach></textarea>
                 </div><!--well-->
               </div><!--col-->
             </div><!--row-->
