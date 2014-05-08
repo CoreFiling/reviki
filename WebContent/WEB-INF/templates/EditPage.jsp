@@ -5,6 +5,7 @@
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
+    <script type="text/javascript" src="<sw:resourceUrl path="sisyphus.min.js"/>"></script>
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
@@ -97,12 +98,15 @@
               </label>
             </div>
           </div>
-          <div class="col-sm-4 col-md-4 col-sm-offset-1 col-md-offset-1">
+          <div class="col-sm-5 col-md-5">
             <div class="btn-group">
               <button id="save" class="btn btn-default" type="submit" name="save">Save</button>
               <button id="preview" class="btn btn-default" type="submit" name="preview">Preview</button>
             </div>
-            <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
+            <div class="btn-group">
+              <button id="restore" class="btn btn-default hidden">Restore</button>
+              <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
+            </div>
           </div>
         </div>
       </div>
