@@ -146,7 +146,7 @@ public class SVNPageStore extends AbstractPageStore {
     long lastRevision = deletedIn == null ? -1 : deletedIn.getRevision() - 1;
     // We follow all the previous locations.
     String path = ref.getPath();
-    while (path != null && changes.addAll(_operations.log(path, -1, LogEntryFilter.PATH_ONLY, true, 0, lastRevision))) {
+    while (path != null && changes.addAll(_operations.log(path, -1, LogEntryFilter.PATH_ONLY, false, 0, lastRevision))) {
       if (!changes.isEmpty()) {
         ChangeInfo last = changes.get(changes.size() - 1);
         path = last.getCopiedFrom();

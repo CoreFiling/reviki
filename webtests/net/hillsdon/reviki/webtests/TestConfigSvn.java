@@ -21,47 +21,11 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
  *
  * @author pjt
  */
-public class TestConfigSvn extends WebTestSupport {
-
-  private static final String DIRECTORY = "doesNotExist";
-  private SVNRepository _repository;
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    DAVRepositoryFactory.setup();
-    _repository = SVNRepositoryFactory.create(SVNURL.parseURIEncoded(getSvnLocation()));
-    ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(getUsername(), getPassword());
-    _repository.setAuthenticationManager(authManager);
-  }
-
-  private void removeDir(final ISVNEditor editor) {
-    try {
-      editor.openRoot(-1);
-      editor.deleteEntry(DIRECTORY, -1);
-      editor.closeDir();
-      editor.closeEdit();
-    }
-    catch (SVNException e) {
-      abortEditAndFail(editor, e);
-    }
-  }
-
-  private void createOurDirectory(final ISVNEditor editor) {
-    try {
-      editor.openRoot(-1);
-      editor.addDir(DIRECTORY, null, 0);
-      editor.closeDir();
-      editor.closeEdit();
-    }
-    catch (SVNException e) {
-      abortEditAndFail(editor, e);
-    }
-  }
+public class TestConfigSvn extends AddWikiWebTestSupport {
 
   private void removeOurDirectoryIfExists(final SVNRepository repository) throws SVNException {
     if (SVNNodeKind.DIR.equals(repository.checkPath(DIRECTORY, -1))) {
-      removeDir(repository.getCommitEditor("Removing test directory", null));
+      removeDir(repository.getCommitEditor("Removing test directory", null), DIRECTORY);
     }
   }
 
@@ -69,18 +33,7 @@ public class TestConfigSvn extends WebTestSupport {
     final String wikiName = "uniqueWiki" + uniqueName();
     removeOurDirectoryIfExists(_repository);
     createOurDirectory(_repository.getCommitEditor("Creating test directory", null));
-    final HtmlPage confSvnPage = getWebPage("pages/" + wikiName);
-    // Enter svn url + DIRECTORY
-    HtmlInput input = (HtmlInput) confSvnPage.getByXPath("//input[@name='url']").iterator().next();
-    input.setValueAttribute(getSvnLocation() + DIRECTORY);
-    // Enter svn username and password
-    input = (HtmlInput) confSvnPage.getByXPath("//input[@name='user']").iterator().next();
-    input.setValueAttribute(getUsername());
-    input = (HtmlInput) confSvnPage.getByXPath("//input[@name='pass']").iterator().next();
-    input.setValueAttribute(getPassword());
-    // Click Save and hopefully get FrontPage
-    HtmlPage frontPage = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
-    assertTrue(frontPage.getTitleText().contains("Front Page"));
+    HtmlPage frontPage = addWiki(wikiName, DIRECTORY);
 
     // Perform an edit to make sure
     final String text = "Some text";
@@ -99,17 +52,6 @@ public class TestConfigSvn extends WebTestSupport {
     final HtmlPage confPageWithFlash = (HtmlPage) ((HtmlSubmitInput) confSvnPage.getByXPath("//input[@type='submit' and @value='Save']").iterator().next()).click();
     assertTrue(confPageWithFlash.getTitleText().contains("Config Svn"));
     assertTrue(hasErrorMessage(confPageWithFlash));
-  }
-
-  private void abortEditAndFail(final ISVNEditor editor, final SVNException originalError) {
-    try {
-      editor.abortEdit();
-    }
-    catch (SVNException e) {
-    }
-    AssertionFailedError fail = new AssertionFailedError();
-    fail.initCause(originalError);
-    throw fail;
   }
 
 }

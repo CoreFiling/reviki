@@ -56,7 +56,13 @@ import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNInfo;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNWCClient;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 /**
  * The real impl, using an {@link SVNRepository}.
@@ -78,12 +84,19 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   public List<ChangeInfo> log(final String path, final long limit, final LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
-        final String rootPath = getRoot();
+        final String[] rootPath = {getRoot()};
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
         _repository.log(new String[] { path }, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
           public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-            entries.addAll(logEntryToChangeInfos(rootPath, path, logEntry, logEntryFilter));
+            // Has the wiki root been renamed?  If so then follow the rename.
+            if (logEntry.getChangedPaths().containsKey(rootPath[0])) {
+              SVNLogEntryPath changedPath = (SVNLogEntryPath) logEntry.getChangedPaths().get(rootPath[0]);
+              if (changedPath.getCopyPath() != null) {
+                rootPath[0] = changedPath.getCopyPath();
+              }
+            }
+            entries.addAll(logEntryToChangeInfos(rootPath[0], path, logEntry, logEntryFilter));
           }
         });
         return entries;
@@ -233,13 +246,30 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   }
 
+  private SVNRepository getSVNReposForRevision(final SVNRepository repository, final long revision) throws SVNException {
+    SVNWCClient client = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), repository.getAuthenticationManager()).getWCClient();
+    SVNInfo info1 = client.doInfo(repository.getLocation(), SVNRevision.HEAD, SVNRevision.create(revision));
+
+    SVNRepository reposForRev = SVNRepositoryFactory.create(info1.getURL());
+    reposForRev.setAuthenticationManager(repository.getAuthenticationManager());
+
+    return reposForRev;
+  }
+
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     execute(new SVNAction<Void>() {
       @SuppressWarnings("unchecked")
       public Void perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
         final SVNProperties props1 = properties == null ? null : new SVNProperties();
         try {
-          repository.getFile(path, revision, props1, out);
+          try {
+            repository.getFile(path, revision, props1, out);
+          }
+          catch (SVNException ex) {
+            // Try again using the location of the wiki root as it was in the given revision
+            getSVNReposForRevision(repository, revision).getFile(path, revision, props1, out);
+          }
+
           if(properties != null) {
             final Map<String, SVNPropertyValue> props2= props1.asMap();
             for(Map.Entry<String, SVNPropertyValue> entry : props2.entrySet()) {
@@ -274,7 +304,11 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   public SVNNodeKind checkPath(final String path, final long revision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<SVNNodeKind>() {
       public SVNNodeKind perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
-        return repository.checkPath(path, revision);
+        SVNNodeKind kind = repository.checkPath(path, revision);
+        if (SVNNodeKind.NONE.equals(kind)) {
+          kind = getSVNReposForRevision(repository, revision).checkPath(path, revision);
+        }
+        return kind;
       }
     });
   }
