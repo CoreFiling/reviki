@@ -15,9 +15,11 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +81,10 @@ public abstract class DelegatingBasicSVNOperations implements BasicSVNOperations
 
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
     getDelegate().getFile(path, revision, properties, out);
+  }
+  
+  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+    return getDelegate().getFiles(paths, revision);
   }
 
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {

@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -166,6 +167,19 @@ public class SVNPageStore extends AbstractPageStore {
       names.add(new PageReferenceImpl(page));
     }
     return names;
+  }
+  
+  public Collection<PageInfo> getPages(final Collection<PageReference> pages, final long revision) throws PageStoreException {
+    List<PageInfo> outputPages = new LinkedList<PageInfo>();
+    List<String> paths = new LinkedList<String>();
+    for (PageReference p : pages) {
+      paths.add(p.getPath());
+    }
+    
+    for (Map.Entry<String, ByteArrayOutputStream> entry : _operations.getFiles(paths, revision).entrySet()) {
+      outputPages.add(new PageInfoImpl(_wiki, entry.getKey(), Strings.toUTF8(entry.getValue().toByteArray()), null));
+    }
+    return outputPages;
   }
 
   public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
