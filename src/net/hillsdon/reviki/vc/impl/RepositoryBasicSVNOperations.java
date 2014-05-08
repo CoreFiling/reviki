@@ -18,10 +18,12 @@ package net.hillsdon.reviki.vc.impl;
 import static java.util.Collections.singletonMap;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -55,6 +57,7 @@ import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
+import org.tmatesoft.svn.core.io.ISVNFileCheckoutTarget;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
@@ -244,6 +247,37 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
       }
     });
 
+  }
+  
+  public Map<String, ByteArrayOutputStream> getFiles(final Collection<String> paths, final long revision) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
+    final Map<String, ByteArrayOutputStream> outputStreams = new LinkedHashMap<String, ByteArrayOutputStream>();
+    execute(new SVNAction<Void>() {
+      public Void perform(final BasicSVNOperations operation, final SVNRepository repository) throws SVNException, PageStoreException {
+        try {
+          repository.checkoutFiles(revision, paths.toArray(new String[paths.size()]), new ISVNFileCheckoutTarget() {
+            
+            public OutputStream getOutputStream(String path) throws SVNException {
+              ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+              outputStreams.put(path, outputStream);
+              return outputStream;
+            }
+            
+            public void filePropertyChanged(String arg0, String arg1, SVNPropertyValue arg2) throws SVNException {
+              // Not implemented
+            }
+          });
+        }
+        catch (SVNException ex) {
+          // FIXME: Presumably this code would be different for non-http repositories.
+          if (SVNErrorCode.FS_NOT_FOUND.equals(ex.getErrorMessage().getErrorCode())) {
+            throw new NotFoundException(ex);
+          }
+          throw ex;
+        }
+        return null;
+      }
+    });
+    return outputStreams;
   }
 
   private SVNRepository getSVNReposForRevision(final SVNRepository repository, final long revision) throws SVNException {

@@ -23,15 +23,20 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.getCurrentArguments;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -208,6 +213,34 @@ public class TestSVNPageStore extends TestCase {
     assertEquals(content, returnValue.getContent());
     assertEquals(MapUtils.EMPTY_MAP, returnValue.getAttributes());
     verify();
+  }
+  
+  public void testGetFiles() throws PageStoreException, IOException {
+    Map<String, ByteArrayOutputStream> pathsOutput = new LinkedHashMap<String, ByteArrayOutputStream>();
+    List<String> paths = new LinkedList<String>();
+    List<PageReference> pages = new LinkedList<PageReference>();
+    int NUM = 10;
+    
+    for (int i=0; i < NUM; i++) {
+      ByteArrayOutputStream content = new ByteArrayOutputStream();
+      String pathName = String.format("Path%d", i);
+      content.write(String.format("Content%d", i).getBytes());
+      pathsOutput.put(pathName, content);
+      paths.add(pathName);
+      pages.add(new PageReferenceImpl(pathName));
+    }
+    expect(_operations.getFiles(eq(paths), eq(-1L))).andReturn(pathsOutput);
+    replay();
+    
+    Collection<PageInfo> returnValue = _store.getPages(pages, -1);
+    int j = 0;
+    for (PageInfo p : returnValue) {
+      assertEquals(p.getPath(), String.format("Path%d", j));
+      assertEquals(p.getContent(), String.format("Content%d", j));
+      assertNull(p.getAttributes());
+      j++;
+    }
+    assertEquals(j, NUM );
   }
 
   @SuppressWarnings("unchecked")
