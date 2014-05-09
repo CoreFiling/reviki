@@ -328,6 +328,9 @@ reviki.onSaveFormData = function() {
 
 reviki.setupLeaveConfirm = function() {
   if ($("[name='editForm']").length == 1) {
+    // container: 'body' prevents the tooltip from causing unwanted
+    // side effects in the button group
+    $("#restore").tooltip({container: "body"})
     var storedForm = $("[name='editForm']").sisyphus({autoRelease: false,
                                              onBeforeRestore: reviki.displayEditRestore,
                                              onSave: reviki.onSaveFormData,

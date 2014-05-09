@@ -104,7 +104,7 @@
               <button id="preview" class="btn btn-default" type="submit" name="preview">Preview</button>
             </div>
             <div class="btn-group">
-              <button id="restore" class="btn btn-default hidden">Restore</button>
+              <button id="restore" data-toggle="tooltip" data-placement="bottom" title="Restore last unsaved edit" class="btn btn-default hidden">Restore</button>
               <button id="cancel" class="btn btn-default" type="submit" name="unlock">Cancel</button>
             </div>
           </div>
