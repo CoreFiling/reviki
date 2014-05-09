@@ -14,6 +14,10 @@ by Chris Purcell, which is open source software.
 The original software and related information is available at
 http://www.meatballsociety.org/Creole/0.4/
 
+The web interface is build on Twitter's Bootstrap, which is open source
+software.  The original software and related information is available at
+http://getbootstrap.com/
+
 The SVN integration uses svnkit, which is open source software.
 The original software and related information is available at
 http://svnkit.com/
