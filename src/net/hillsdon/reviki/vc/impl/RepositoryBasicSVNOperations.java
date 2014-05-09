@@ -85,10 +85,11 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   public List<ChangeInfo> log(final String path, final long limit, final LogEntryFilter logEntryFilter, final boolean stopOnCopy, final long startRevision, final long endRevision) throws PageStoreAuthenticationException, PageStoreException {
     return execute(new SVNAction<List<ChangeInfo>>() {
       public List<ChangeInfo> perform(final BasicSVNOperations operations, final SVNRepository repository) throws SVNException, PageStoreException {
-        final String[] rootPath = {getRoot()};
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
-        _repository.log(new String[] { path }, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
+        SVNRepository repos = getSVNReposForRevision(_repository, endRevision);
+        final String[] rootPath = {repos.getRepositoryPath("")};
+        repos.log(new String[] { path }, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
           public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
             // Has the wiki root been renamed?  If so then follow the rename.
             if (logEntry.getChangedPaths().containsKey(rootPath[0])) {

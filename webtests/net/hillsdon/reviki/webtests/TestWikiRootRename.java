@@ -43,6 +43,10 @@ public class TestWikiRootRename extends AddWikiWebTestSupport {
     frontPage = editWikiPage(frontPage, text2, "", "Some change 2", null);
     assertTrue(frontPage.asText().contains(text2));
 
+    final String otherPageText = "This is another page";
+    HtmlPage otherPage = getWebPage("pages/" + wikiName + "/OtherPage");
+    frontPage = editWikiPage(otherPage, otherPageText, "", "Create other page", null);
+
     // Now rename the Wiki's SVN location
     ISVNEditor editor = _repository.getCommitEditor("Rename wiki root", null);
     try {
@@ -62,6 +66,12 @@ public class TestWikiRootRename extends AddWikiWebTestSupport {
 
     // Check we've got the same front page still
     assertTrue(frontPage.asText().contains(text2));
+
+    // Check that the OtherPage appears in the AllPages list even though it hasn't been updated since the copy
+    HtmlPage allPages = getWebPage("pages/" + wikiName2 +  "/AllPages");
+    assertTrue(allPages.getTitleText().endsWith("All Pages"));
+    HtmlAnchor link = getAnchorByHrefContains(allPages, BASE_URL + "/pages/" + wikiName2 + "/OtherPage");
+    assertEquals("OtherPage", link.asText());
 
     // Now edit it again
     final String text3 = "Some more stuff";

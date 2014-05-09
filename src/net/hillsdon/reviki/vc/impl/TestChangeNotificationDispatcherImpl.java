@@ -55,7 +55,7 @@ public class TestChangeNotificationDispatcherImpl extends TestCase {
     expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
     expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
     expect(_operations.getLatestRevision()).andReturn(5L).once();
-    expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
+    expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, false, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
     expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
     _syncedUptoThreeSubscriber.handleChanges(5, asList(REVISION_FOUR_CHANGE, REVISION_FIVE_CHANGE));
     expectLastCall();
@@ -81,7 +81,7 @@ public class TestChangeNotificationDispatcherImpl extends TestCase {
     expect(_syncedUptoFourSubscriber.getHighestSyncedRevision()).andReturn(4L);
     expect(_syncedUptoFiveSubscriber.getHighestSyncedRevision()).andReturn(5L);
     expect(_operations.getLatestRevision()).andReturn(5L).once();
-    expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, true, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
+    expect(_operations.log("", -1, LogEntryFilter.DESCENDANTS, false, 4, 5)).andReturn(asList(REVISION_FIVE_CHANGE, REVISION_FOUR_CHANGE));
     expect(_syncedUptoThreeSubscriber.getHighestSyncedRevision()).andReturn(3L);
     _syncedUptoThreeSubscriber.handleChanges(5, asList(REVISION_FOUR_CHANGE, REVISION_FIVE_CHANGE));
     expectLastCall();

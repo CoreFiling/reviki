@@ -56,7 +56,7 @@ public class ChangeNotificationDispatcherImpl implements ChangeNotificationDispa
   public synchronized void sync() throws PageStoreAuthenticationException, PageStoreException, IOException {
     long latest = _operations.getLatestRevision();
     if (latest > _lastSynced) {
-      List<ChangeInfo> logs = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, _lastSynced + 1, latest);
+      List<ChangeInfo> logs = _operations.log("", -1, LogEntryFilter.DESCENDANTS, false, _lastSynced + 1, latest);
       if (!logs.isEmpty()) {
         notifyListeners(latest, ImmutableList.copyOf(logs).reverse());
       }
