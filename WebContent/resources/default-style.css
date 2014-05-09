@@ -273,6 +273,10 @@ h2.results-wiki {
   padding: 1em 0;
 }
 
+#bottomNav {
+  padding-left: 0px;
+}
+
 #sidebar {
   float: right;
   padding: 10px;
