@@ -336,18 +336,14 @@ reviki.setupLeaveConfirm = function() {
                                              onSave: reviki.onSaveFormData,
                                              excludeFields: $("[type='hidden']")});
 
-    if ($("#preview-area").length == 1) {
-      reviki.addConfirm();
-    }
-    else {
-      $("#content").bind("textchange", reviki.addConfirm);
-    }
+    $("#content").bind("textchange", reviki.addConfirm);
     $("#editForm").bind("submit", reviki.removeConfirm);
     $("#cancel").bind("click", reviki.removeConfirm);
     $("#save").bind("click", reviki.removeConfirm);
     $("#editForm").bind("submit", reviki.removeUnlockOnUnload);
     $("#cancel").bind("click", reviki.removeUnlockOnUnload);
     $("#save").bind("click", reviki.removeUnlockOnUnload);
+    $("#preview").bind("click", reviki.removeUnlockOnUnload);
     $("#save").bind("click", function(){storedForm.manuallyReleaseData();});
     $("#restore").bind("click", function(evt){evt.preventDefault();
                                              storedForm.restoreAllData();});
