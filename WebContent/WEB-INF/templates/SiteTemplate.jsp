@@ -24,6 +24,9 @@
   <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="<sw:resourceUrl path="respond.min.js"/>"></script>
+  <![endif]-->
   <script type="text/javascript" src="<sw:resourceUrl path="jquery-1.11.0.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery-ui.min.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.ui.autocomplete.html.js"/>"></script>
