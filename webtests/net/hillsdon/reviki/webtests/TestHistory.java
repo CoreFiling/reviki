@@ -27,6 +27,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
+import com.gargoylesoftware.htmlunit.xml.XmlPage;
 
 public class TestHistory extends WebTestSupport {
 
@@ -61,6 +62,15 @@ public class TestHistory extends WebTestSupport {
     divs = (List<HtmlDivision>) diff.getByXPath("//div[@id='flash']/.");
     assertEquals(1, divs.size());
 
+  }
+  
+  public void testAtom() throws Exception {
+    // https://bugs.corefiling.com/show_bug.cgi?id=44456
+    String pageName = uniqueWikiPageName("HistoryAtomTest");
+    editWikiPage(pageName, "Initial content", "", "", true);
+    editWikiPage(pageName, "Altered content", "", "s/Initial/Altered", false);
+    XmlPage atomFeed = getHistoryAtomFeed(pageName);
+    assertTrue(atomFeed.asText().contains("s/Initial/Altered"));
   }
 
   public void testCompare() throws Exception {
