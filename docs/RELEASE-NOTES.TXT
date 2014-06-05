@@ -1,6 +1,15 @@
 Reviki
 
                               Version History
+
+0.3.1 (2014-06-05)
+------------------
+
+* Fixed an issue introduced in 0.3.0 that prevented the atom view of a page's
+  history from working.
+  [bug 44456]
+
+
 0.3.0 (2014-05-09)
 ------------------
 
@@ -30,7 +39,6 @@ Reviki
   the wiki without losing history information has been added.  Note that you
   must move the directory itself, not a parent of it.
   [bug 5912]
-
 
 
 0.2.1 (2013-04-05)
