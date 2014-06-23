@@ -11,8 +11,8 @@
     </javac>
   </presetdef>
 
-  <property name="buildNumber" value="dev" />   
-  <property name="version" value="0.3.1" />   
+  <property name="buildNumber" value="dev" />
+  <property name="version" value="0.3.2" />
   <property name="build-details" value="${version} r${buildNumber}" />
   <property name="source" value="src" />   
   <property name="web" value="WebContent" />   
