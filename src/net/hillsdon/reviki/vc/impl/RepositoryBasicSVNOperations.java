@@ -88,20 +88,25 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
         final List<ChangeInfo> entries = new LinkedList<ChangeInfo>();
         // Start and end reversed to get newest changes first.
         SVNRepository repos = getSVNReposForRevision(_repository, endRevision);
-        final String[] rootPath = {repos.getRepositoryPath("")};
-        repos.log(new String[] { path }, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
-          public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
-            // Has the wiki root been renamed?  If so then follow the rename.
-            if (logEntry.getChangedPaths().containsKey(rootPath[0])) {
-              SVNLogEntryPath changedPath = (SVNLogEntryPath) logEntry.getChangedPaths().get(rootPath[0]);
-              if (changedPath.getCopyPath() != null) {
-                rootPath[0] = changedPath.getCopyPath();
+        try {
+          final String[] rootPath = {repos.getRepositoryPath("")};
+          repos.log(new String[] { path }, endRevision, startRevision, true, stopOnCopy, limit, new ISVNLogEntryHandler() {
+            public void handleLogEntry(final SVNLogEntry logEntry) throws SVNException {
+              // Has the wiki root been renamed?  If so then follow the rename.
+              if (logEntry.getChangedPaths().containsKey(rootPath[0])) {
+                SVNLogEntryPath changedPath = (SVNLogEntryPath) logEntry.getChangedPaths().get(rootPath[0]);
+                if (changedPath.getCopyPath() != null) {
+                  rootPath[0] = changedPath.getCopyPath();
+                }
               }
+              entries.addAll(logEntryToChangeInfos(rootPath[0], path, logEntry, logEntryFilter));
             }
-            entries.addAll(logEntryToChangeInfos(rootPath[0], path, logEntry, logEntryFilter));
-          }
-        });
-        return entries;
+          });
+          return entries;
+        }
+        finally {
+          repos.closeSession();
+        }
       }
     });
   }
@@ -189,7 +194,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     String user = entry.getAuthor();
     Date date = entry.getDate();
     SVNLogEntryPath logForPath = (SVNLogEntryPath) entry.getChangedPaths().get(path);
-    
+
     PageReference renamedTo = null;
     for (Object entryPath : entry.getChangedPaths().values()) {
       SVNLogEntryPath logEntryPath = (SVNLogEntryPath) entryPath;
@@ -281,13 +286,19 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   private SVNRepository getSVNReposForRevision(final SVNRepository repository, final long revision) throws SVNException {
-    SVNWCClient client = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), repository.getAuthenticationManager()).getWCClient();
-    SVNInfo info1 = client.doInfo(repository.getLocation(), SVNRevision.HEAD, SVNRevision.create(revision));
+    SVNClientManager manager = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), repository.getAuthenticationManager());
+    try {
+      SVNWCClient client = manager.getWCClient();
+      SVNInfo info1 = client.doInfo(repository.getLocation(), SVNRevision.HEAD, SVNRevision.create(revision));
 
-    SVNRepository reposForRev = SVNRepositoryFactory.create(info1.getURL());
-    reposForRev.setAuthenticationManager(repository.getAuthenticationManager());
+      SVNRepository reposForRev = SVNRepositoryFactory.create(info1.getURL());
+      reposForRev.setAuthenticationManager(repository.getAuthenticationManager());
 
-    return reposForRev;
+      return reposForRev;
+    }
+    finally {
+      manager.dispose();
+    }
   }
 
   public void getFile(final String path, final long revision, final Map<String, String> properties, final OutputStream out) throws NotFoundException, PageStoreAuthenticationException, PageStoreException {
