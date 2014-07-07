@@ -104,5 +104,12 @@ public interface SearchEngine {
    * @return A quoted version that escapes any characters that have special significance in the search syntax.
    */
   String escape(String in);
-
+  
+  /**
+   * 
+   * @param page Page to check
+   * @return Boolean indicating whether the page contents are indexed 
+   * @throws IOException On error reading from the search index
+   */
+  boolean isIndexUpToDate(PageInfo page) throws IOException, PageStoreException;
 }

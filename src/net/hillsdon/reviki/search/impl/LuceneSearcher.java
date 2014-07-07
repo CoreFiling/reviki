@@ -53,7 +53,6 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
@@ -109,6 +108,8 @@ public class LuceneSearcher implements SearchEngine {
 
   private static final String[] ALL_SEARCH_FIELDS = new String[] {FIELD_PATH, FIELD_PATH_LOWER, FIELD_TITLE_TOKENIZED, FIELD_CONTENT, FIELD_ATTRIBUTES};
 
+  private final Map<String, Integer> _contentHashCodes = new LinkedHashMap<String, Integer>();
+  private final Map<String, Integer> _attrHashCodes = new LinkedHashMap<String, Integer>();
   private final String _wikiName;
   private final File _dir;
   private final List<File> _otherDirs;
@@ -162,8 +163,7 @@ public class LuceneSearcher implements SearchEngine {
     return perField;
   }
 
-  private Document createWikiPageDocument(final PageInfo page) throws IOException, PageStoreException {
-    RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+  private Document createWikiPageDocument(final PageInfo page, final RenderedPage renderedPage) throws IOException, PageStoreException {
     final String path = page.getPath();
     final String wiki = page.getWiki();
     final String content = page.getContent();
@@ -226,6 +226,28 @@ public class LuceneSearcher implements SearchEngine {
       writer.close();
     }
   }
+  
+  private Integer getPageContentHashCode(final PageInfo page) {
+    return _contentHashCodes.get(uidFor(page.getWiki(), page.getPath()));
+  }
+  
+  private void setPageContentHashCode(final PageInfo page, final Integer hashCode) {
+    _contentHashCodes.put(uidFor(page.getWiki(), page.getPath()), hashCode);
+  }
+  
+  private Integer computePageAttrHashCode(final PageInfo page) {
+    List<String> attrs = attributesToStringList(page.getAttributes());
+    Collections.sort(attrs);
+    return attrs.hashCode();
+  }
+  
+  private Integer getPageAttrHashCode(final PageInfo page) {
+    return _attrHashCodes.get(uidFor(page.getWiki(), page.getPath()));
+  }
+  
+  private void setPageAttrHashCode(final PageInfo page, final Integer hashCode) {
+    _attrHashCodes.put(uidFor(page.getWiki(), page.getPath()), hashCode);
+  }
 
   // Lucene allows multiple non-deleting readers and at most one writer at a time.
   // It maintains a lock file but we never want it to fail to take the lock, so serialize writes.
@@ -235,7 +257,10 @@ public class LuceneSearcher implements SearchEngine {
     }
     if (!isIndexBeingBuilt() || buildingIndex) {
       createIndexIfNecessary();
-      replaceWikiDocument(createWikiPageDocument(page));
+      RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+      replaceWikiDocument(createWikiPageDocument(page, renderedPage));
+      setPageContentHashCode(page, renderedPage.getPageHashCode());
+      setPageAttrHashCode(page, computePageAttrHashCode(page));
     }
   }
 
@@ -519,5 +544,13 @@ public class LuceneSearcher implements SearchEngine {
 
   public String escape(final String in) {
     return QueryParser.escape(in);
+  }
+  
+  public boolean isIndexUpToDate(final PageInfo page) throws IOException, PageStoreException {
+    RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+    Integer hashForContent = getPageContentHashCode(page);
+    Integer hashForAttrs = getPageAttrHashCode(page);
+   
+    return hashForContent != null && hashForAttrs != null && hashForContent.equals(renderedPage.getPageHashCode()) && hashForAttrs.equals(computePageAttrHashCode(page));
   }
 }
