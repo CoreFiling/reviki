@@ -264,6 +264,26 @@
     "name":   "List breaks on blank line",
     "input":  "* One\n* Two\n\n* Three",
     "output": "<ul><li> One</li>\n<li> Two</li>\n</ul><ul>\n<li> Three</li></ul>"
+  },
+  {
+    "name":   "':' as last character in italics (bug:8784)",
+    "input":  "//test://",
+    "output": "<em>test:</em>"
+  },
+  {
+    "name":   "Inline preformatted text at start of line (bug:7228)",
+    "input":  "{{{foo}}} bar baz",
+    "output": "<pre>foo</pre> bar baz"
+  },
+  {
+    "name":   "Preformatted block inside bulleted list (bug:7144)",
+    "input":  "* Level 1 point\n** Level 2 point\n{{{UNFORNATTED STUFF}}}\n** Another level 2 point",
+    "output": "<ul><li> Level 1 point<ul>\n<li> Level 2 point\n<pre>UNFORMATTED STUFF</pre></li>\n<li> Another level 2 point</li></ul>"
+  },
+  {
+    "name":   "Preformatted | in table cells (bug:10978)",
+    "input":  "|=|\n|{{{|}}}|",
+    "output": "<table><tr><th/></tr><tr><td><pre>|</pre></td></tr></table>"
   }
 ]
 
