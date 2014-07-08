@@ -67,5 +67,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/nekohtml-1.9.20.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/vnu.jar"/>
+	<classpathentry kind="lib" path="lib/antlr4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
