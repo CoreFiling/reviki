@@ -11,7 +11,7 @@ options { tokenVocab=CreoleTokens; }
 
 /* ***** Top level elements ***** */
 
-creole    : (block ParBreak?)* EOF;
+creole    : (block ParBreak+)* EOF | block ParBreak* EOF;
 
 block     : heading
           | ulist | olist
@@ -37,18 +37,18 @@ heading6  : H6 inline HEnd? ;
 paragraph : inline ;
 
 ulist      : ulist1+ ;
-ulist1     : U1 paragraph ulist2* ;
-ulist2     : U2 paragraph ulist3* ;
-ulist3     : U3 paragraph ulist4* ;
-ulist4     : U4 paragraph ulist5* ;
-ulist5     : U5 paragraph ;
+ulist1     : U1 inline ulist2* ;
+ulist2     : U2 inline ulist3* ;
+ulist3     : U3 inline ulist4* ;
+ulist4     : U4 inline ulist5* ;
+ulist5     : U5 inline ;
 
 olist      : olist1+ ;
-olist1     : O1 paragraph olist2* ;
-olist2     : O2 paragraph olist3* ;
-olist3     : O3 paragraph olist4* ;
-olist4     : O4 paragraph olist5* ;
-olist5     : O5 paragraph ;
+olist1     : O1 inline olist2* ;
+olist2     : O2 inline olist3* ;
+olist3     : O3 inline olist4* ;
+olist4     : O4 inline olist5* ;
+olist5     : O5 inline ;
 
 hrule      : Rule ;
 
