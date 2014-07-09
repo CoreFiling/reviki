@@ -98,7 +98,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   @Override
   public ResultNode visitPreformat(PreformatContext ctx) {
     String nowiki = ctx.EndNoWikiInline().getText();
-    return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
+    return new InlineNoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
   @Override
