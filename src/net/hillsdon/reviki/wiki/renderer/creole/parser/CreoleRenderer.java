@@ -61,7 +61,12 @@ public class CreoleRenderer {
         "inline {{{PRE}}}",
         "Line\\\\\nBreak",
         "\\\\\nBreak",
-        "Break\\\\\n"};
+        "Break\\\\\n",
+        "----", "  ----  ", "Not a ---- hrule",
+        "= Heading 1", "  == Heading 2",
+        "# Numbered\n#List", "#Numbered **List** with some {{{formatting}}} and ExcitingStuff",
+        "#Numbered\n##List\n###With\n###Children\n##Exciting\n##Isn't\n#It?",
+        "#Line\n\n\n\n#Breaks"};
 
     for (String test : tests) {
       System.out.println("TEST: " + test);

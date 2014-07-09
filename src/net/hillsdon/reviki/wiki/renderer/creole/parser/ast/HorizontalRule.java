@@ -10,33 +10,19 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.result.RenderedPage;
+import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.result.RenderedHorizontalRule;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
-public class Page extends ImmutableRenderNode {
+public class HorizontalRule extends ImmutableRenderNode {
 
-  protected List<RenderNode> blocks;
-  
-  public Page(List<RenderNode> blocks) {
-    this.blocks = blocks;
-  }
-  
   public List<RenderNode> getChildren() {
-    return Collections.unmodifiableList(blocks);
+    List<RenderNode> out = new ArrayList<RenderNode>();
+    return Collections.unmodifiableList(out);
   }
 
   public List<ResultNode> render(PageInfo page, String text, RenderNode parent, URLOutputFilter urlOutputFilter) {
-    List<ResultNode> blocks = new ArrayList<ResultNode>();
-    
-    for(RenderNode node : this.blocks) {
-      List<ResultNode> res = node.render(page, text, this, urlOutputFilter);
-      assert(res.size() == 1);
-      blocks.add(res.get(0));
-    }
-    
     List<ResultNode> out = new ArrayList<ResultNode>();
-    out.add(new RenderedPage(blocks));
-    
+    out.add(new RenderedHorizontalRule());
     return out;
   }
 
@@ -49,5 +35,4 @@ public class Page extends ImmutableRenderNode {
     // TODO Auto-generated method stub
     return null;
   }
-
 }

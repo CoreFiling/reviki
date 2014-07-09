@@ -123,4 +123,129 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   public RenderNode visitLinebreak(LinebreakContext ctx) {
     return new Linebreak();
   }
+
+  @Override
+  public RenderNode visitHrule(HruleContext ctx) {
+    return new HorizontalRule();
+  }
+
+  @Override
+  public RenderNode visitOlist(OlistContext ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Olist1Context otx : ctx.olist1()) {
+      children.add(visit(otx));
+    }
+
+    return new OrderedList(children);
+  }
+
+  @Override
+  public RenderNode visitOlist1(Olist1Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Olist2Context otx : ctx.olist2()) {
+      children.add(visit(otx));
+    }
+
+    return new OrderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitOlist2(Olist2Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Olist3Context otx : ctx.olist3()) {
+      children.add(visit(otx));
+    }
+
+    return new OrderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitOlist3(Olist3Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Olist4Context otx : ctx.olist4()) {
+      children.add(visit(otx));
+    }
+
+    return new OrderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitOlist4(Olist4Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Olist5Context otx : ctx.olist5()) {
+      children.add(visit(otx));
+    }
+
+    return new OrderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitOlist5(Olist5Context ctx) {
+    return new OrderedList(visit(ctx.inline()));
+  }
+
+  @Override
+  public RenderNode visitUlist(UlistContext ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Ulist1Context otx : ctx.ulist1()) {
+      children.add(visit(otx));
+    }
+
+    return new UnorderedList(children);
+  }
+
+  @Override
+  public RenderNode visitUlist1(Ulist1Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Ulist2Context utx : ctx.ulist2()) {
+      children.add(visit(utx));
+    }
+
+    return new UnorderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitUlist2(Ulist2Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Ulist3Context utx : ctx.ulist3()) {
+      children.add(visit(utx));
+    }
+
+    return new UnorderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitUlist3(Ulist3Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Ulist4Context utx : ctx.ulist4()) {
+      children.add(visit(utx));
+    }
+
+    return new UnorderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitUlist4(Ulist4Context ctx) {
+    List<RenderNode> children = new ArrayList<RenderNode>();
+
+    for (Ulist5Context utx : ctx.ulist5()) {
+      children.add(visit(utx));
+    }
+
+    return new UnorderedList(visit(ctx.inline()), children);
+  }
+
+  @Override
+  public RenderNode visitUlist5(Ulist5Context ctx) {
+    return new UnorderedList(visit(ctx.inline()));
+  }
 }

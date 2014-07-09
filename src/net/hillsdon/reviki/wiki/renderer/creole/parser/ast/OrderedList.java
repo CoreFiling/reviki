@@ -10,33 +10,49 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.result.RenderedPage;
+import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.result.RenderedOrderedList;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
-public class Page extends ImmutableRenderNode {
+public class OrderedList extends ImmutableRenderNode {
 
-  protected List<RenderNode> blocks;
-  
-  public Page(List<RenderNode> blocks) {
-    this.blocks = blocks;
+  protected RenderNode body;
+
+  protected List<RenderNode> children;
+
+  public OrderedList(RenderNode body, List<RenderNode> children) {
+    this.body = body;
+    this.children = children;
   }
-  
+
+  public OrderedList(RenderNode body) {
+    this(body, new ArrayList<RenderNode>());
+  }
+
+  public OrderedList(List<RenderNode> children) {
+    this(new Plaintext(""), children);
+  }
+
   public List<RenderNode> getChildren() {
-    return Collections.unmodifiableList(blocks);
+    List<RenderNode> out = new ArrayList<RenderNode>();
+    out.add(body);
+    out.addAll(children);
+    return Collections.unmodifiableList(out);
   }
 
   public List<ResultNode> render(PageInfo page, String text, RenderNode parent, URLOutputFilter urlOutputFilter) {
-    List<ResultNode> blocks = new ArrayList<ResultNode>();
-    
-    for(RenderNode node : this.blocks) {
+    List<ResultNode> body = this.body.render(page, text, this, urlOutputFilter);
+    assert (body.size() == 1);
+
+    List<ResultNode> children = new ArrayList<ResultNode>();
+
+    for (RenderNode node : this.children) {
       List<ResultNode> res = node.render(page, text, this, urlOutputFilter);
-      assert(res.size() == 1);
-      blocks.add(res.get(0));
+      assert (res.size() == 1);
+      children.add(res.get(0));
     }
-    
+
     List<ResultNode> out = new ArrayList<ResultNode>();
-    out.add(new RenderedPage(blocks));
-    
+    out.add(new RenderedOrderedList(body.get(0), children));
     return out;
   }
 
@@ -49,5 +65,4 @@ public class Page extends ImmutableRenderNode {
     // TODO Auto-generated method stub
     return null;
   }
-
 }
