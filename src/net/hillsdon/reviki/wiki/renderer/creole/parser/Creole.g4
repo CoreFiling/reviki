@@ -21,7 +21,6 @@ block     : heading
           | paragraph
           ;
 
-
 /* ***** Block Elements ***** */
 
 heading   : heading1 | heading2 | heading3
@@ -62,7 +61,7 @@ nowiki     : NoWiki AnyText EndNoWiki ;
 
 /* ***** Inline Elements ***** */
 
-inline     : (inlinestep WS?)+ ;
+inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | imglink | wikiwlink
