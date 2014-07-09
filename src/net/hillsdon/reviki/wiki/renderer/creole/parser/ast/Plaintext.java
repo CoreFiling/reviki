@@ -1,5 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser.ast;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.result.LeafResultNode;
 
 public class Plaintext extends LeafResultNode {
@@ -11,8 +12,7 @@ public class Plaintext extends LeafResultNode {
   }
 
   public String toXHTML() {
-    // TODO Escape entities
-    return contents;
+    return Escape.html(contents);
   }
 
 }
