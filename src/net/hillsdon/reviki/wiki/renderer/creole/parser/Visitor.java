@@ -12,7 +12,9 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class Visitor extends CreoleBaseVisitor<ResultNode> {
   private LinkPartsHandler handler;
+
   private PageInfo page;
+
   private URLOutputFilter urlOutputFilter;
 
   public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
@@ -256,16 +258,25 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       cells.add(visit(rtx));
     }
 
+    // If the last cell is empty, it's a trailing separator - not actually a new
+    // cell.
+    if (cells.size() != 0) {
+      ResultNode last = cells.get(cells.size() - 1);
+      if (last instanceof TableCell && last.getChildren().get(0).toXHTML().equals("")) {
+        cells.remove(last);
+      }
+    }
+
     return new TableRow(cells);
   }
 
   @Override
   public ResultNode visitTh(ThContext ctx) {
-    return new TableHeaderCell(visit(ctx.inline()));
+    return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
   @Override
   public ResultNode visitTd(TdContext ctx) {
-    return new TableCell(visit(ctx.inline()));
+    return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 }

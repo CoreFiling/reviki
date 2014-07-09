@@ -8,11 +8,11 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class TableCell implements ResultNode {
   protected ResultNode body;
-  
+
   public TableCell(ResultNode body) {
     this.body = body;
   }
-  
+
   public List<ResultNode> getChildren() {
     List<ResultNode> out = new ArrayList<ResultNode>();
     out.add(body);
@@ -20,6 +20,12 @@ public class TableCell implements ResultNode {
   }
 
   public String toXHTML() {
-    return "<td>" + body.toXHTML() + "</td>"; 
+    String content = body.toXHTML();
+
+    if (content.equals("")) {
+      return "<td/>";
+    }
+
+    return "<td>" + content + "</td>";
   }
 }

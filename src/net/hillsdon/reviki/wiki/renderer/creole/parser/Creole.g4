@@ -45,8 +45,8 @@ hrule      : Rule ;
 table      : (trow LineBreak)* trow (LineBreak | EOF) ;
 trow       : tcell+ CellSep?;
 tcell      : th | td ;
-th         : ThStart inline ;
-td         : CellSep inline ;
+th         : ThStart inline? ;
+td         : CellSep inline? ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
 
