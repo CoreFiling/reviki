@@ -51,11 +51,11 @@ olist5     : O5 inline ;
 
 hrule      : Rule ;
 
-table      : trow+ ;
-trow       : (tcell+ CellSep)? LineBreak ;
+table      : (trow LineBreak)* trow (LineBreak | EOF) ;
+trow       : tcell+ CellSep?;
 tcell      : th | td ;
 th         : ThStart inline ;
-td         : TdStart inline ;
+td         : CellSep inline ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
 

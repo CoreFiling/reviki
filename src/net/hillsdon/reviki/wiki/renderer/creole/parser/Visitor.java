@@ -255,4 +255,36 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
     String nowiki = ctx.EndNoWikiBlock().getText();
     return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
+
+  @Override
+  public RenderNode visitTable(TableContext ctx) {
+    List<RenderNode> rows = new ArrayList<RenderNode>();
+
+    for (TrowContext rtx : ctx.trow()) {
+      rows.add(visit(rtx));
+    }
+
+    return new Table(rows);
+  }
+
+  @Override
+  public RenderNode visitTrow(TrowContext ctx) {
+    List<RenderNode> cells = new ArrayList<RenderNode>();
+
+    for (TcellContext rtx : ctx.tcell()) {
+      cells.add(visit(rtx));
+    }
+
+    return new TableRow(cells);
+  }
+
+  @Override
+  public RenderNode visitTh(ThContext ctx) {
+    return new TableHeaderCell(visit(ctx.inline()));
+  }
+
+  @Override
+  public RenderNode visitTd(TdContext ctx) {
+    return new TableCell(visit(ctx.inline()));
+  }
 }

@@ -69,7 +69,8 @@ public class CreoleRenderer {
         "#Numbered\n##List\n###With\n###Children\n##Exciting\n##Isn't\n#It?",
         "#Line\n\n\n\n#Breaks",
         "{{{Preformatted\nBlock}}}",
-        "Long {{{preformated inline}}}}}}"};
+        "Long {{{preformated inline}}}}}}",
+        "|=th", "|td", "|=th|td|\n|cell 1|**bold //italic//**"};
 
     for (String test : tests) {
       System.out.println("TEST: " + test);
