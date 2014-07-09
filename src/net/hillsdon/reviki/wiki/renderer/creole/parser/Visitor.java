@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.*;
