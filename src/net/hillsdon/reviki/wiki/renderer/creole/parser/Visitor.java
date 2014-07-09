@@ -29,33 +29,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitHeading1(Heading1Context ctx) {
-    return new Heading(1, visit(ctx.inline()));
-  }
-
-  @Override
-  public RenderNode visitHeading2(Heading2Context ctx) {
-    return new Heading(2, visit(ctx.inline()));
-  }
-
-  @Override
-  public RenderNode visitHeading3(Heading3Context ctx) {
-    return new Heading(3, visit(ctx.inline()));
-  }
-
-  @Override
-  public RenderNode visitHeading4(Heading4Context ctx) {
-    return new Heading(4, visit(ctx.inline()));
-  }
-
-  @Override
-  public RenderNode visitHeading5(Heading5Context ctx) {
-    return new Heading(5, visit(ctx.inline()));
-  }
-
-  @Override
-  public RenderNode visitHeading6(Heading6Context ctx) {
-    return new Heading(6, visit(ctx.inline()));
+  public RenderNode visitHeading(HeadingContext ctx) {
+    return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
   }
 
   @Override

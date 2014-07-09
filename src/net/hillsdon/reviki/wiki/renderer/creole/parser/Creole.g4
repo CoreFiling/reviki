@@ -1,7 +1,6 @@
 /* Todo:
  *  - Inline html [<html>]foo[</html>]
  *  - Comments justifying and explaining every rule.
- *  - Tidy up heading matching (see semantic predicates)
  *  - Allow arbitrarily-nested lists (see actions/attributes)
  */
 
@@ -23,15 +22,7 @@ block     : heading
 
 /* ***** Block Elements ***** */
 
-heading   : heading1 | heading2 | heading3
-          | heading4 | heading5 | heading6
-          ;
-heading1  : H1 inline HEnd? ;
-heading2  : H2 inline HEnd? ;
-heading3  : H3 inline HEnd? ;
-heading4  : H4 inline HEnd? ;
-heading5  : H5 inline HEnd? ;
-heading6  : H6 inline HEnd? ;
+heading   : HSt inline HEnd? ;
 
 paragraph : inline ;
 
