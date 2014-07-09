@@ -13,6 +13,6 @@ public class HorizontalRule implements ResultNode {
   }
 
   public String toXHTML() {
-    return "<hr>"; 
+    return "<hr />"; 
   }
 }
