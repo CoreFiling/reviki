@@ -273,7 +273,7 @@
   {
     "name":   "Inline preformatted text at start of line (bug:7228)",
     "input":  "{{{foo}}} bar baz",
-    "output": "<pre>foo</pre> bar baz"
+    "output": "<p><code>foo</code> bar baz</p>"
   },
   {
     "name":   "Preformatted block inside bulleted list (bug:7144)",
