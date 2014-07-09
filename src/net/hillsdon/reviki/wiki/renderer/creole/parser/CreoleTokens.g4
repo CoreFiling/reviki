@@ -6,7 +6,7 @@ lexer grammar CreoleTokens;
 
 /* ***** Headings ***** */
 
-HSt  : LINE '='+ WS? {getText().trim().length() <= 6}? {setText(getText().trim());} ;
+HSt  : LINE '='+ (' '|'\t')* {getText().trim().length() <= 6}? {setText(getText().trim());} ;
 HEnd : ' '* '='+? ;
 
 /* ***** Lists ***** */
