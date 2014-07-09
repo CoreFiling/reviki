@@ -6,31 +6,31 @@ lexer grammar CreoleTokens;
 
 /* ***** Headings ***** */
 
-H1   : '=' ;
-H2   : '==' ;
-H3   : '===' ;
-H4   : '====' ;
-H5   : '=====' ;
-H6   : '======' ;
+H1   : LINE '=' ;
+H2   : LINE '==' ;
+H3   : LINE '===' ;
+H4   : LINE '====' ;
+H5   : LINE '=====' ;
+H6   : LINE '======' ;
 HEnd : ' '* '='+? ;
 
 /* ***** Lists ***** */
 
-U1 : '@';
-U2 : '@@' ;
-U3 : '@@@' ;
-U4 : '@@@@' ;
-U5 : '@@@@@' ;
+U1 : LINE '@';
+U2 : LINE '@@' ;
+U3 : LINE '@@@' ;
+U4 : LINE '@@@@' ;
+U5 : LINE '@@@@@' ;
 
-O1 : '#' ;
-O2 : '##' ;
-O3 : '###' ;
-O4 : '####' ;
-O5 : '#####' ;
+O1 : LINE '#' ;
+O2 : LINE '##' ;
+O3 : LINE '###' ;
+O4 : LINE '####' ;
+O5 : LINE '#####' ;
 
 /* ***** Horizontal Rules ***** */
 
-Rule : '---' '-'+? ;
+Rule : LINE '---' '-'+?;
 
 /* ***** Tables ***** */
 
@@ -71,8 +71,9 @@ NoWiki    : '{{{' -> pushMode(PREFORMATTED);
 /* ***** Miscellaneous ***** */
 
 Any : . ;
-WS  : (' '|'\t'|'\r'|'\n')+ ;
+WS  : (' '|'\t'|'\r'|'\n')+ -> skip ;
 
+fragment LINE  : ({getCharPositionInLine()==0}? WS? | LineBreak WS?);
 fragment ALNUM : (ALPHA | DIGIT) ;
 fragment ALPHA : (UPPER | LOWER) ;
 fragment UPPER : ('A'..'Z') ;
