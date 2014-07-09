@@ -31,7 +31,17 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
   }
 
   /**
-   * Splits links of the form target or text|target where target is
+   * Splits links of the form target or text|target
+   */
+  public LinkParts split(final String in) {
+    String target = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
+    String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
+    
+    return split(target, text);
+  }
+
+  /**
+   * Splits links where target is
    * 
    * PageName wiki:PageName PageName#fragment wiki:PageName#fragment
    * A String representing an absolute URI scheme://valid/absolute/uri
@@ -41,9 +51,7 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
    * @param in The String to split
    * @return The split LinkParts
    */
-  LinkParts split(final String in) {
-    String target = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
-    String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
+  public LinkParts split(String target, String text) {
     if (target == null) {
       target = "";
     }
@@ -68,9 +76,9 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     catch (URISyntaxException e) {
       // uri remains null
     }
-	catch (MalformedURLException e) {
- 	   // uri remains null
- 	}
+  catch (MalformedURLException e) {
+     // uri remains null
+  }
 
     if (uri != null) {
       return new LinkParts(text, uri);

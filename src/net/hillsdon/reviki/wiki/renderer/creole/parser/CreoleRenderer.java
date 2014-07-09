@@ -1,23 +1,21 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser;
 
-import java.util.List;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class CreoleRenderer {
-  public static ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
+  public static ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     ANTLRInputStream in = new ANTLRInputStream(page.getContent());
-    return renderInternal(in, page, urlOutputFilter);
+    return renderInternal(in, page, urlOutputFilter, handler);
   }
 
   // TODO: Merge back into render when main() is gone
-  private static ResultNode renderInternal(ANTLRInputStream in, final PageInfo page, final URLOutputFilter urlOutputFilter) {
+  private static ResultNode renderInternal(ANTLRInputStream in, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -31,19 +29,9 @@ public class CreoleRenderer {
     System.out.println(tree.toStringTree(parser));
 
     // TODO: Pass in the link thingy properly
-    ParseTreeVisitor<RenderNode> visitor = new Visitor(null);
-    List<ResultNode> res;
+    ParseTreeVisitor<ResultNode> visitor = new Visitor(page, urlOutputFilter, handler);
 
-    if (page == null) {
-      // TODO: Remove this branch entirely
-      res = visitor.visit(tree).render(null, null, null, null);
-    }
-    else {
-      res = visitor.visit(tree).render(page, page.getContent(), null, urlOutputFilter);
-    }
-
-    assert (res.size() == 0);
-    return res.get(0);
+    return visitor.visit(tree);
   }
 
   // TODO: Remove
@@ -74,7 +62,7 @@ public class CreoleRenderer {
 
     for (String test : tests) {
       System.out.println("TEST: " + test);
-      ResultNode res = renderInternal(new ANTLRInputStream(test), null, null);
+      ResultNode res = renderInternal(new ANTLRInputStream(test), null, null, null);
       System.out.println(res.toXHTML());
       System.out.println();
     }

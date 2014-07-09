@@ -1,58 +1,31 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser.ast;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 
-import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.web.urls.UnknownWikiException;
-import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.result.RenderedTableRow;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
-public class TableRow extends ImmutableRenderNode {
-  protected List<RenderNode> cells;
+public class TableRow implements ResultNode {
 
-  public TableRow(RenderNode body, List<RenderNode> cells) {
-    this.cells = cells;
+  protected List<ResultNode> rows;
+
+  public TableRow(List<ResultNode> rows) {
+    this.rows = rows;
   }
 
-  public TableRow(RenderNode body) {
-    this(body, new ArrayList<RenderNode>());
+  public List<ResultNode> getChildren() {
+    return Collections.unmodifiableList(rows);
   }
 
-  public TableRow(List<RenderNode> children) {
-    this(new Plaintext(""), children);
-  }
+  public String toXHTML() {
+    String out = "<tr>";
 
-  public List<RenderNode> getChildren() {
-    return Collections.unmodifiableList(cells);
-  }
-
-  public List<ResultNode> render(PageInfo page, String text, RenderNode parent, URLOutputFilter urlOutputFilter) {
-    List<ResultNode> cells = new ArrayList<ResultNode>();
-
-    for (RenderNode node : this.cells) {
-      List<ResultNode> res = node.render(page, text, this, urlOutputFilter);
-      assert (res.size() == 1);
-      cells.add(res.get(0));
+    for (ResultNode node : rows) {
+      out += node.toXHTML();
     }
 
-    List<ResultNode> out = new ArrayList<ResultNode>();
-    out.add(new RenderedTableRow(cells));
+    out += "</tr>";
+
     return out;
-  }
-
-  public Matcher find(String text) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public ResultNode handle(PageInfo page, Matcher matcher, RenderNode parent, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

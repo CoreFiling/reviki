@@ -3,23 +3,30 @@ package net.hillsdon.reviki.wiki.renderer.creole.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.Creole.*;
+import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.*;
+import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
-public class Visitor extends CreoleBaseVisitor<RenderNode> {
+public class Visitor extends CreoleBaseVisitor<ResultNode> {
   private LinkPartsHandler handler;
+  private PageInfo page;
+  private URLOutputFilter urlOutputFilter;
 
-  public Visitor(final LinkPartsHandler handler) {
+  public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+    this.page = page;
+    this.urlOutputFilter = urlOutputFilter;
     this.handler = handler;
   }
 
-  public RenderNode visitCreole(CreoleContext ctx) {
-    List<RenderNode> blocks = new ArrayList<RenderNode>();
+  public ResultNode visitCreole(CreoleContext ctx) {
+    List<ResultNode> blocks = new ArrayList<ResultNode>();
 
     for (BlockContext btx : ctx.block()) {
-      RenderNode ren = visit(btx);
+      ResultNode ren = visit(btx);
       if (ren != null) {
         blocks.add(ren);
       }
@@ -29,18 +36,18 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitHeading(HeadingContext ctx) {
+  public ResultNode visitHeading(HeadingContext ctx) {
     return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
   }
 
   @Override
-  public RenderNode visitParagraph(ParagraphContext ctx) {
+  public ResultNode visitParagraph(ParagraphContext ctx) {
     return new Paragraph(visit(ctx.inline()));
   }
 
   @Override
-  public RenderNode visitInline(InlineContext ctx) {
-    List<RenderNode> chunks = new ArrayList<RenderNode>();
+  public ResultNode visitInline(InlineContext ctx) {
+    List<ResultNode> chunks = new ArrayList<ResultNode>();
 
     for (InlinestepContext itx : ctx.inlinestep()) {
       chunks.add(visit(itx));
@@ -50,75 +57,75 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitAny(AnyContext ctx) {
+  public ResultNode visitAny(AnyContext ctx) {
     return new Plaintext(ctx.getText());
   }
 
   @Override
-  public RenderNode visitWikiwlink(WikiwlinkContext ctx) {
-    return new Link(ctx.getText(), handler);
+  public ResultNode visitWikiwlink(WikiwlinkContext ctx) {
+    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
   @Override
-  public RenderNode visitBold(BoldContext ctx) {
+  public ResultNode visitBold(BoldContext ctx) {
     return new Bold((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
   @Override
-  public RenderNode visitItalic(ItalicContext ctx) {
+  public ResultNode visitItalic(ItalicContext ctx) {
     return new Italic((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
   @Override
-  public RenderNode visitSthrough(SthroughContext ctx) {
+  public ResultNode visitSthrough(SthroughContext ctx) {
     return new Strikethrough((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
   @Override
-  public RenderNode visitLink(LinkContext ctx) {
-    return new Link(ctx.InLink().getText(), handler);
+  public ResultNode visitLink(LinkContext ctx) {
+    return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page, urlOutputFilter, handler);
   }
 
   @Override
-  public RenderNode visitTitlelink(TitlelinkContext ctx) {
-    return new Link(ctx.InLink(0).getText(), ctx.InLink(1).getText(), handler);
+  public ResultNode visitTitlelink(TitlelinkContext ctx) {
+    return new Link(ctx.InLink(0).getText(), ctx.InLink(1).getText(), page, urlOutputFilter, handler);
   }
 
   @Override
-  public RenderNode visitImglink(ImglinkContext ctx) {
-    return new Image(ctx.InLink(0).getText(), ctx.InLink(1).getText(), handler);
+  public ResultNode visitImglink(ImglinkContext ctx) {
+    return new Image(ctx.InLink(0).getText(), ctx.InLink(1).getText(), page, urlOutputFilter, handler);
   }
 
   @Override
-  public RenderNode visitPreformat(PreformatContext ctx) {
+  public ResultNode visitPreformat(PreformatContext ctx) {
     String nowiki = ctx.EndNoWikiInline().getText();
     return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
   @Override
-  public RenderNode visitLinebreak(LinebreakContext ctx) {
+  public ResultNode visitLinebreak(LinebreakContext ctx) {
     return new Linebreak();
   }
 
   @Override
-  public RenderNode visitHrule(HruleContext ctx) {
+  public ResultNode visitHrule(HruleContext ctx) {
     return new HorizontalRule();
   }
 
   @Override
-  public RenderNode visitOlist(OlistContext ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitOlist(OlistContext ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Olist1Context otx : ctx.olist1()) {
       children.add(visit(otx));
     }
 
-    return new OrderedList(children);
+    return new OrderedList(new Plaintext(""), children);
   }
 
   @Override
-  public RenderNode visitOlist1(Olist1Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitOlist1(Olist1Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Olist2Context otx : ctx.olist2()) {
       children.add(visit(otx));
@@ -128,8 +135,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitOlist2(Olist2Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitOlist2(Olist2Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Olist3Context otx : ctx.olist3()) {
       children.add(visit(otx));
@@ -139,8 +146,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitOlist3(Olist3Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitOlist3(Olist3Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Olist4Context otx : ctx.olist4()) {
       children.add(visit(otx));
@@ -150,8 +157,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitOlist4(Olist4Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitOlist4(Olist4Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Olist5Context otx : ctx.olist5()) {
       children.add(visit(otx));
@@ -161,24 +168,24 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitOlist5(Olist5Context ctx) {
-    return new OrderedList(visit(ctx.inline()));
+  public ResultNode visitOlist5(Olist5Context ctx) {
+    return new OrderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 
   @Override
-  public RenderNode visitUlist(UlistContext ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitUlist(UlistContext ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Ulist1Context otx : ctx.ulist1()) {
       children.add(visit(otx));
     }
 
-    return new UnorderedList(children);
+    return new UnorderedList(new Plaintext(""), children);
   }
 
   @Override
-  public RenderNode visitUlist1(Ulist1Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitUlist1(Ulist1Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Ulist2Context utx : ctx.ulist2()) {
       children.add(visit(utx));
@@ -188,8 +195,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitUlist2(Ulist2Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitUlist2(Ulist2Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Ulist3Context utx : ctx.ulist3()) {
       children.add(visit(utx));
@@ -199,8 +206,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitUlist3(Ulist3Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitUlist3(Ulist3Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Ulist4Context utx : ctx.ulist4()) {
       children.add(visit(utx));
@@ -210,8 +217,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitUlist4(Ulist4Context ctx) {
-    List<RenderNode> children = new ArrayList<RenderNode>();
+  public ResultNode visitUlist4(Ulist4Context ctx) {
+    List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (Ulist5Context utx : ctx.ulist5()) {
       children.add(visit(utx));
@@ -221,19 +228,19 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitUlist5(Ulist5Context ctx) {
-    return new UnorderedList(visit(ctx.inline()));
+  public ResultNode visitUlist5(Ulist5Context ctx) {
+    return new UnorderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 
   @Override
-  public RenderNode visitNowiki(NowikiContext ctx) {
+  public ResultNode visitNowiki(NowikiContext ctx) {
     String nowiki = ctx.EndNoWikiBlock().getText();
     return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
   @Override
-  public RenderNode visitTable(TableContext ctx) {
-    List<RenderNode> rows = new ArrayList<RenderNode>();
+  public ResultNode visitTable(TableContext ctx) {
+    List<ResultNode> rows = new ArrayList<ResultNode>();
 
     for (TrowContext rtx : ctx.trow()) {
       rows.add(visit(rtx));
@@ -243,8 +250,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitTrow(TrowContext ctx) {
-    List<RenderNode> cells = new ArrayList<RenderNode>();
+  public ResultNode visitTrow(TrowContext ctx) {
+    List<ResultNode> cells = new ArrayList<ResultNode>();
 
     for (TcellContext rtx : ctx.tcell()) {
       cells.add(visit(rtx));
@@ -254,12 +261,12 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   }
 
   @Override
-  public RenderNode visitTh(ThContext ctx) {
+  public ResultNode visitTh(ThContext ctx) {
     return new TableHeaderCell(visit(ctx.inline()));
   }
 
   @Override
-  public RenderNode visitTd(TdContext ctx) {
+  public ResultNode visitTd(TdContext ctx) {
     return new TableCell(visit(ctx.inline()));
   }
 }
