@@ -40,15 +40,15 @@ ThStart : '|=' ;
 
 /* ***** Inline Formatting ***** */
 
-Bold         : '**' ;
-Italic       : '//' ;
-Sthrough     : '--' ;
-NoWikiInline : '{{{' -> pushMode(PREFORMATTED_INLINE) ;
+Bold     : '**' ;
+Italic   : '//' ;
+Sthrough : '--' ;
+NoWiki   : '{{{' -> mode(PREFORMATTED_INLINE) ;
 
 /* ***** Links ***** */
 
-LiSt  : '[[' -> pushMode(LINK);
-ImSt  : '{{' -> pushMode(LINK);
+LiSt  : '[[' -> mode(LINK) ;
+ImSt  : '{{' -> mode(LINK) ;
 
 /* ***** Breaks ***** */
 
@@ -63,10 +63,6 @@ LineBreak : '\r'? '\n'+? ;
 RawUrl    : ALNUM+ ':' ~('['|']'|'"'|'\''|'('|')')+ ~(' '|'['|']'|'"'|'\''|'('|')'|','|'.')+?;
 
 WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALNUM)*)+;
-
-/* ***** Plain Text ***** */
-
-NoWiki    : '{{{' -> pushMode(PREFORMATTED);
 
 /* ***** Miscellaneous ***** */
 
@@ -85,8 +81,8 @@ fragment DIGIT : ('0'..'9') ;
 
 mode LINK;
 
-LiEnd : ']]' -> popMode ;
-ImEnd : '}}' -> popMode ;
+LiEnd : ']]' -> mode(DEFAULT_MODE) ;
+ImEnd : '}}' -> mode(DEFAULT_MODE) ;
 
 Sep : '|' ;
 
@@ -94,14 +90,14 @@ InLink : ~(']'|'}'|'|')+ ;
 
 mode PREFORMATTED_INLINE;
 
-AnyInlineText : (~('\r'|'\n'|'}')* '}'? ~('\r'|'\n'|'}'))*;
+AnyInlineText : ~('\r'|'\n') -> more;
 
-EndNoWikiInline : '}}}' -> popMode ;
+AnyBlockText : AnyInlineText '\n' -> mode(PREFORMATTED_BLOCK), more ;
 
-mode PREFORMATTED;
+EndNoWikiInline : '}}}' (~'}' {_input.seek(_input.index()-1);} | EOF) -> mode(DEFAULT_MODE) ;
 
-AnyText   : ' }}}'
-          | .
-          ; 
+mode PREFORMATTED_BLOCK;
 
-EndNoWiki : '}}}' -> popMode ;
+AnyText   : (' }}}' | . ) -> more ;
+
+EndNoWikiBlock : '}}}' -> mode(DEFAULT_MODE) ;

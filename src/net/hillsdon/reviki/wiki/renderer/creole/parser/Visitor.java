@@ -116,7 +116,8 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
 
   @Override
   public RenderNode visitPreformat(PreformatContext ctx) {
-    return new InlineNoWiki(ctx.AnyInlineText().getText());
+    String nowiki = ctx.EndNoWikiInline().getText();
+    return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
   @Override
@@ -247,5 +248,11 @@ public class Visitor extends CreoleBaseVisitor<RenderNode> {
   @Override
   public RenderNode visitUlist5(Ulist5Context ctx) {
     return new UnorderedList(visit(ctx.inline()));
+  }
+
+  @Override
+  public RenderNode visitNowiki(NowikiContext ctx) {
+    String nowiki = ctx.EndNoWikiBlock().getText();
+    return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 }

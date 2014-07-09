@@ -48,7 +48,8 @@ public class CreoleRenderer {
 
   // TODO: Remove
   public static void main(String args[]) {
-    String tests[] = { "Plaintext", "WikiWords",
+    String tests[] = {
+        "Plaintext", "WikiWords",
         "**BoldNoSpaces**", "** Bold Spaces **",
         "//ItalicNoSpaces//", "// Italic Spaces //",
         "--StrikethroughNoSpaces--", "-- Strikethrough Spaces --",
@@ -66,7 +67,9 @@ public class CreoleRenderer {
         "= Heading 1", "  == Heading 2",
         "# Numbered\n#List", "#Numbered **List** with some {{{formatting}}} and ExcitingStuff",
         "#Numbered\n##List\n###With\n###Children\n##Exciting\n##Isn't\n#It?",
-        "#Line\n\n\n\n#Breaks"};
+        "#Line\n\n\n\n#Breaks",
+        "{{{Preformatted\nBlock}}}",
+        "Long {{{preformated inline}}}}}}"};
 
     for (String test : tests) {
       System.out.println("TEST: " + test);

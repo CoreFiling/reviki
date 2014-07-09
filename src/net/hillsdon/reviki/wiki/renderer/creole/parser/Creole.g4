@@ -57,7 +57,7 @@ tcell      : th | td ;
 th         : ThStart inline ;
 td         : TdStart inline ;
 
-nowiki     : NoWiki AnyText EndNoWiki ;
+nowiki     : NoWiki EndNoWikiBlock ;
 
 /* ***** Inline Elements ***** */
 
@@ -84,7 +84,7 @@ imglink    : ImSt InLink Sep InLink ImEnd ;
 
 wikiwlink  : WikiWords ;
 
-preformat  : NoWikiInline AnyInlineText EndNoWikiInline ;
+preformat  : NoWiki EndNoWikiInline ;
 
 linebreak  : InlineBrk LineBreak ;
 
