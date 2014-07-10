@@ -4,10 +4,35 @@
 
 lexer grammar CreoleTokens;
 
+@members {
+  public boolean inHeader = false;
+
+  public void doHdr() {
+    String prefix = getText().trim();
+    boolean seekback = false;
+
+    if(!prefix.substring(prefix.length() - 1).equals("=")) {
+      prefix = prefix.substring(0, prefix.length() - 1);
+      seekback = true;
+    }
+
+    if(prefix.length() <= 6) {
+      if(seekback) {
+        _input.seek(_input.index() - 1);
+      }
+
+      setText(prefix);
+      inHeader = true;
+    } else {
+      setType(Any);
+    }
+  }
+}
+
 /* ***** Headings ***** */
 
-HSt  : LINE '='+ (' '|'\t')* {getText().trim().length() <= 6}? {setText(getText().trim());} ;
-HEnd : ' '* '='+? ;
+HSt  : LINE '='+ ~'=' {doHdr();} ;
+HEnd : ' '* '='+ {inHeader}? {inHeader = false;} ;
 
 /* ***** Lists ***** */
 
