@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class InlineNoWiki implements ResultNode {
@@ -23,6 +24,6 @@ public class InlineNoWiki implements ResultNode {
   }
 
   public String toXHTML() {
-    return "<code>" + body + "</code>"; 
+    return "<code>" + Escape.html(body) + "</code>"; 
   }
 }
