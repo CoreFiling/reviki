@@ -87,12 +87,12 @@ mode PREFORMATTED_INLINE;
 
 AnyInlineText : ~('\r'|'\n') -> more;
 
-AnyBlockText : AnyInlineText '\n' -> mode(PREFORMATTED_BLOCK), more ;
+AnyBlockText : AnyInlineText* LineBreak -> mode(PREFORMATTED_BLOCK), more ;
 
 EndNoWikiInline : '}}}' (~'}' {_input.seek(_input.index()-1);} | EOF) -> mode(DEFAULT_MODE) ;
 
 mode PREFORMATTED_BLOCK;
 
-AnyText   : (' }}}' | . ) -> more ;
+AnyText   : . -> more ;
 
-EndNoWikiBlock : '}}}' -> mode(DEFAULT_MODE) ;
+EndNoWikiBlock : LINE '}}}' -> mode(DEFAULT_MODE) ;

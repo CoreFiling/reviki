@@ -43,7 +43,21 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
 
   @Override
   public ResultNode visitParagraph(ParagraphContext ctx) {
-    return new Paragraph(visit(ctx.inline()));
+    ResultNode body = visit(ctx.inline());
+
+    // If a paragraph contains nothing but an inline nowiki element, render that
+    // as a block nowiki element. Not quite to spec, but replicates old
+    // behaviour.
+    ResultNode inner = body;
+    if (body instanceof Inline && body.getChildren().size() == 1) {
+      inner = body.getChildren().get(0);
+    }
+
+    if (inner instanceof InlineNoWiki) {
+      return new NoWiki(((InlineNoWiki) inner).getPreformatted());
+    }
+
+    return new Paragraph(body);
   }
 
   @Override

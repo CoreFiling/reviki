@@ -12,6 +12,10 @@ public class InlineNoWiki implements ResultNode {
   public InlineNoWiki(String contents) {
     this.body = contents;
   }
+
+  public String getPreformatted() {
+    return body;
+  }
   
   public List<ResultNode> getChildren() {
     List<ResultNode> out = new ArrayList<ResultNode>();
