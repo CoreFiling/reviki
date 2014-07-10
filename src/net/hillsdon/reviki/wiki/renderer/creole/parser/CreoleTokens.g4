@@ -74,8 +74,8 @@ lexer grammar CreoleTokens;
 
 /* ***** Headings ***** */
 
-HSt  : LINE '='+ ~'=' {doHdr();} ;
-HEnd : ' '* '='+ {inHeader}? {inHeader = false; resetFormatting();} ;
+HSt  : LINE '='+ ~'=' WS? {doHdr();} ;
+HEnd : ' '* '='* ('\r'? '\n' {_input.seek(_input.index()-1);} | EOF) {inHeader}? {inHeader = false; resetFormatting();} ;
 
 /* ***** Lists ***** */
 
