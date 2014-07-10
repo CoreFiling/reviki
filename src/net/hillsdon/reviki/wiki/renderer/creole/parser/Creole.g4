@@ -14,7 +14,7 @@ options { tokenVocab=CreoleTokens; }
 
 /* ***** Top level elements ***** */
 
-creole    : (block ParBreak*)* EOF ;
+creole    : (block (LineBreak | ParBreak)*)* EOF ;
 
 block     : heading
           | ulist | olist
