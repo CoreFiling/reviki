@@ -8,6 +8,10 @@ parser grammar Creole;
 
 options { tokenVocab=CreoleTokens; }
 
+@members {
+  public boolean nobreaks = false;
+}
+
 /* ***** Top level elements ***** */
 
 creole    : (block ParBreak*)* EOF ;
@@ -42,7 +46,7 @@ olist5     : O5 (WS olist | ulist | inline) ;
 
 hrule      : Rule ;
 
-table      : (trow LineBreak)* trow (LineBreak | EOF) ;
+table      : {nobreaks=true;} (trow LineBreak)* trow (LineBreak | EOF) {nobreaks=false;};
 trow       : tcell+ CellSep?;
 tcell      : th | td ;
 th         : ThStart inline? ;
@@ -77,6 +81,6 @@ wikiwlink  : WikiWords ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
-linebreak  : InlineBrk LineBreak ;
+linebreak  : InlineBrk ({!nobreaks}? LineBreak)? ;
 
-any        : Any | WS | LineBreak ;
+any        : Any | WS | {!nobreaks}? LineBreak ;
