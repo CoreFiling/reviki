@@ -37,7 +37,7 @@
   { "comment": "Test an unordered list with an ordered sublist",
     "name":   "Unordered item with ordered sublist",
     "input":  "* Item\n*# Subitem",
-    "output": "<ul><li> Item<ol>\n<li> Subitem</li></ol></li></ul>"
+    "output": "<ul><li> Item</li><li><ol>\n<li> Subitem</li></ol></li></ul>"
   },
   {
     "name":   "Horizontal rule",
