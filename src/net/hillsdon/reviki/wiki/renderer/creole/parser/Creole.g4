@@ -27,18 +27,18 @@ heading   : HSt WS? inline HEnd? ;
 paragraph : inline ;
 
 ulist      : ulist1+ ;
-ulist1     : U1 inline ulist2* ;
-ulist2     : U2 inline ulist3* ;
-ulist3     : U3 inline ulist4* ;
-ulist4     : U4 inline ulist5* ;
-ulist5     : U5 inline ;
+ulist1     : U1 (WS ulist | olist | inline) ulist2* ;
+ulist2     : U2 (WS ulist | olist | inline) ulist3* ;
+ulist3     : U3 (WS ulist | olist | inline) ulist4* ;
+ulist4     : U4 (WS ulist | olist | inline) ulist5* ;
+ulist5     : U5 (WS ulist | olist | inline) ;
 
 olist      : olist1+ ;
-olist1     : O1 inline olist2* ;
-olist2     : O2 inline olist3* ;
-olist3     : O3 inline olist4* ;
-olist4     : O4 inline olist5* ;
-olist5     : O5 inline ;
+olist1     : O1 (WS olist | ulist | inline) olist2* ;
+olist2     : O2 (WS olist | ulist | inline) olist3* ;
+olist3     : O3 (WS olist | ulist | inline) olist4* ;
+olist4     : O4 (WS olist | ulist | inline) olist5* ;
+olist5     : O5 (WS olist | ulist | inline) ;
 
 hrule      : Rule ;
 

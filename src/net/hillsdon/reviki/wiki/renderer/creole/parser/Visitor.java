@@ -146,6 +146,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(otx));
     }
 
+    if (ctx.olist() != null)
+      return new OrderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new OrderedList(visit(ctx.ulist()), children);
+
     return new OrderedList(visit(ctx.inline()), children);
   }
 
@@ -156,6 +162,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     for (Olist3Context otx : ctx.olist3()) {
       children.add(visit(otx));
     }
+
+    if (ctx.olist() != null)
+      return new OrderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new OrderedList(visit(ctx.ulist()), children);
 
     return new OrderedList(visit(ctx.inline()), children);
   }
@@ -168,6 +180,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(otx));
     }
 
+    if (ctx.olist() != null)
+      return new OrderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new OrderedList(visit(ctx.ulist()), children);
+
     return new OrderedList(visit(ctx.inline()), children);
   }
 
@@ -179,11 +197,24 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(otx));
     }
 
+    if (ctx.olist() != null)
+      return new OrderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new OrderedList(visit(ctx.ulist()), children);
+
     return new OrderedList(visit(ctx.inline()), children);
   }
 
   @Override
   public ResultNode visitOlist5(Olist5Context ctx) {
+
+    if (ctx.olist() != null)
+      return new OrderedList(visit(ctx.olist()), new ArrayList<ResultNode>());
+
+    if (ctx.ulist() != null)
+      return new OrderedList(visit(ctx.ulist()), new ArrayList<ResultNode>());
+
     return new OrderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 
@@ -206,6 +237,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(utx));
     }
 
+    if (ctx.olist() != null)
+      return new UnorderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new UnorderedList(visit(ctx.ulist()), children);
+
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
@@ -216,6 +253,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     for (Ulist3Context utx : ctx.ulist3()) {
       children.add(visit(utx));
     }
+
+    if (ctx.olist() != null)
+      return new UnorderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new UnorderedList(visit(ctx.ulist()), children);
 
     return new UnorderedList(visit(ctx.inline()), children);
   }
@@ -228,6 +271,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(utx));
     }
 
+    if (ctx.olist() != null)
+      return new UnorderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new UnorderedList(visit(ctx.ulist()), children);
+
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
@@ -239,11 +288,23 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       children.add(visit(utx));
     }
 
+    if (ctx.olist() != null)
+      return new UnorderedList(visit(ctx.olist()), children);
+
+    if (ctx.ulist() != null)
+      return new UnorderedList(visit(ctx.ulist()), children);
+
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
   @Override
   public ResultNode visitUlist5(Ulist5Context ctx) {
+    if (ctx.olist() != null)
+      return new UnorderedList(visit(ctx.olist()), new ArrayList<ResultNode>());
+
+    if (ctx.ulist() != null)
+      return new UnorderedList(visit(ctx.ulist()), new ArrayList<ResultNode>());
+
     return new UnorderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 

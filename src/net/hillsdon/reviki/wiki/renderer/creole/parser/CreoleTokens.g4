@@ -6,6 +6,9 @@ lexer grammar CreoleTokens;
 
 @members {
   public boolean inHeader = false;
+  public boolean start = false;
+  public int olistLevel = 0;
+  public int ulistLevel = 0;
 
   public void doHdr() {
     String prefix = getText().trim();
@@ -27,6 +30,22 @@ lexer grammar CreoleTokens;
       setType(Any);
     }
   }
+
+  public void doUlist(int level) {
+    ulistLevel = level;
+
+    String next1 = _input.getText(new Interval(_input.index(), _input.index()));
+    String next2 = _input.getText(new Interval(_input.index() + 1, _input.index() + 1));
+    start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
+  }
+
+  public void doOlist(int level) {
+    olistLevel = level;
+
+    String next1 = _input.getText(new Interval(_input.index(), _input.index()));
+    String next2 = _input.getText(new Interval(_input.index() + 1, _input.index() + 1));
+    start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
+  }
 }
 
 /* ***** Headings ***** */
@@ -36,17 +55,17 @@ HEnd : ' '* '='+ {inHeader}? {inHeader = false;} ;
 
 /* ***** Lists ***** */
 
-U1 : LINE '@';
-U2 : LINE '@@' ;
-U3 : LINE '@@@' ;
-U4 : LINE '@@@@' ;
-U5 : LINE '@@@@@' ;
+U1 : START '*'                        {doUlist(1);} ;
+U2 : START '**'    {ulistLevel >= 1}? {doUlist(2);} ;
+U3 : START '***'   {ulistLevel >= 2}? {doUlist(3);} ;
+U4 : START '****'  {ulistLevel >= 3}? {doUlist(4);} ;
+U5 : START '*****' {ulistLevel >= 4}? {doUlist(5);} ;
 
-O1 : LINE '#' ;
-O2 : LINE '##' ;
-O3 : LINE '###' ;
-O4 : LINE '####' ;
-O5 : LINE '#####' ;
+O1 : START '#'                        {doOlist(1);} ;
+O2 : START '##'    {olistLevel >= 1}? {doOlist(2);} ;
+O3 : START '###'   {olistLevel >= 2}? {doOlist(3);} ;
+O4 : START '####'  {olistLevel >= 3}? {doOlist(4);} ;
+O5 : START '#####' {olistLevel >= 4}? {doOlist(5);} ;
 
 /* ***** Horizontal Rules ***** */
 
@@ -89,6 +108,7 @@ WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALN
 Any : . ;
 WS  : (' '|'\t'|'\r'|'\n')+ -> skip ;
 
+fragment START : {start}? | LINE ;
 fragment LINE  : ({getCharPositionInLine()==0}? WS? | LineBreak WS?);
 fragment ALNUM : (ALPHA | DIGIT) ;
 fragment ALPHA : (UPPER | LOWER) ;
