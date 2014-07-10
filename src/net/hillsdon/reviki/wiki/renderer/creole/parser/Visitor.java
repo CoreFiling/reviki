@@ -99,6 +99,11 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
+  @Override
+  public ResultNode visitRawlink(RawlinkContext ctx) {
+    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
+  }
+
   protected ResultNode visitInlineMarkup(String symbol, String sname, Class<? extends ResultNode> type, TerminalNode end, InlineContext inline) {
     ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
 
