@@ -147,7 +147,6 @@ fragment DIGIT : ('0'..'9') ;
 
 /* ***** Contextual stuff ***** */
 
-
 mode LINK;
 
 LiEnd : ']]' -> mode(DEFAULT_MODE) ;
@@ -161,7 +160,7 @@ mode PREFORMATTED_INLINE;
 
 AnyInlineText : ~('\r'|'\n') -> more;
 
-AnyBlockText : AnyInlineText* LineBreak -> mode(PREFORMATTED_BLOCK), more ;
+OopsItsABlock : ('\r'|'\n') -> mode(PREFORMATTED_BLOCK), more ;
 
 EndNoWikiInline : '}}}' (~'}' {_input.seek(_input.index()-1);} | EOF) -> mode(DEFAULT_MODE) ;
 
