@@ -283,7 +283,7 @@
   {
     "name":   "Preformatted | in table cells (bug:10978)",
     "input":  "|=|\n|{{{|}}}|",
-    "output": "<table><tr><th/></tr><tr><td><pre>|</pre></td></tr></table>"
+    "output": "<table><tr><th/></tr><tr><td><code>|</code></td></tr></table>"
   }
 ]
 
