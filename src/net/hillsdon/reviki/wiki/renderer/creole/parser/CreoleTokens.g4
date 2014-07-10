@@ -59,6 +59,17 @@ lexer grammar CreoleTokens;
     italic = false;
     strike = false;
   }
+
+  public void doUrl() {
+    String url = getText();
+    String last = url.substring(url.length()-1);
+    String next = _input.getText(new Interval(_input.index(), _input.index()));
+
+    if((last + next).equals("//")) {
+      _input.seek(_input.index() - 1);
+      setText(url.substring(0, url.length() - 1));
+    }
+  }
 }
 
 /* ***** Headings ***** */
@@ -117,7 +128,7 @@ LineBreak : '\r'? '\n'+? ;
 
 /* ***** Links ***** */
 
-RawUrl    : ('http' | 'ftp') '://' ~(' '|'\t'|'\r'|'\n')+;
+RawUrl    : ('http' | 'ftp') '://' (~(' '|'\t'|'\r'|'\n'|'/')+ '/'?)+ {doUrl();};
 
 WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALNUM)*)+;
 
