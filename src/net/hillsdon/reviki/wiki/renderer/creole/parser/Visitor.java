@@ -1,7 +1,11 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -81,19 +85,41 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
+  protected ResultNode visitInlineMarkup(String symbol, Class<? extends ResultNode> type, List<TerminalNode> tags, InlineContext inline) {
+    ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
+
+    // If the end tag is missing, undo the error recovery
+    if (tags.size() < 2 || ("<missing '" + symbol + "'>").equals(tags.get(1).getText())) {
+      List<ResultNode> chunks = new ArrayList<ResultNode>();
+      chunks.add(new Plaintext(symbol));
+      chunks.add(inner);
+      return new Inline(chunks);
+    }
+
+    try {
+      @SuppressWarnings("unchecked")
+      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
+      return constructor.newInstance(inner);
+    }
+    catch (Throwable e) {
+      // Never reached if you pass in correct params
+      return null;
+    }
+  }
+
   @Override
   public ResultNode visitBold(BoldContext ctx) {
-    return new Bold((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    return visitInlineMarkup("**", Bold.class, ctx.Bold(), ctx.inline());
   }
 
   @Override
   public ResultNode visitItalic(ItalicContext ctx) {
-    return new Italic((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    return visitInlineMarkup("//", Italic.class, ctx.Italic(), ctx.inline());
   }
 
   @Override
   public ResultNode visitSthrough(SthroughContext ctx) {
-    return new Strikethrough((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    return visitInlineMarkup("--", Strikethrough.class, ctx.Sthrough(), ctx.inline());
   }
 
   @Override
