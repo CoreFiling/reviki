@@ -13,6 +13,6 @@ public class Linebreak implements ResultNode {
   }
 
   public String toXHTML() {
-    return "<br>"; 
+    return "<br />";
   }
 }
