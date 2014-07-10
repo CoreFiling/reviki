@@ -268,7 +268,7 @@
   {
     "name":   "':' as last character in italics (bug:8784)",
     "input":  "//test://",
-    "output": "<em>test:</em>"
+    "output": "<p><em>test:</em></p>"
   },
   {
     "name":   "Inline preformatted text at start of line (bug:7228)",
