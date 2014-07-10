@@ -10,7 +10,14 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 public class CreoleRenderer {
   public static ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
-    ANTLRInputStream in = new ANTLRInputStream(page.getContent());
+    String contents = page.getContent();
+
+    // The grammar and lexer assume they'll not hit an EOF after various things,
+    // so add a newline in if there's not one already there.
+    if(!contents.substring(contents.length() - 1).equals("\n"))
+      contents += "\n";
+
+    ANTLRInputStream in = new ANTLRInputStream(contents);
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
