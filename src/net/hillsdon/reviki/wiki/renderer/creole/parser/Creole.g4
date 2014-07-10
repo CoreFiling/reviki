@@ -61,11 +61,11 @@ inlinestep : bold | italic | sthrough
            | any
            ;
 
-bold       : Bold inline? Bold ;
+bold       : BSt inline? BEnd ;
 
-italic     : Italic inline? Italic ;
+italic     : ISt inline? IEnd ;
 
-sthrough   : Sthrough inline? Sthrough ;
+sthrough   : SSt inline? SEnd ;
 
 link       : LiSt InLink LiEnd ;
 
@@ -79,4 +79,4 @@ preformat  : NoWiki EndNoWikiInline ;
 
 linebreak  : InlineBrk LineBreak ;
 
-any        : Any ;
+any        : Any | WS | LineBreak ;

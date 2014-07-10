@@ -7,6 +7,9 @@ lexer grammar CreoleTokens;
 @members {
   public boolean inHeader = false;
   public boolean start = false;
+  public boolean bold = false;
+  public boolean italic = false;
+  public boolean strike = false;
   public int olistLevel = 0;
   public int ulistLevel = 0;
 
@@ -50,43 +53,54 @@ lexer grammar CreoleTokens;
     _input.seek(_input.index() - 1);
     setStart();
   }
+
+  public void resetFormatting() {
+    bold   = false;
+    italic = false;
+    strike = false;
+  }
 }
 
 /* ***** Headings ***** */
 
 HSt  : LINE '='+ ~'=' {doHdr();} ;
-HEnd : ' '* '='+ {inHeader}? {inHeader = false;} ;
+HEnd : ' '* '='+ {inHeader}? {inHeader = false; resetFormatting();} ;
 
 /* ***** Lists ***** */
 
-U1 : START '*' ~'*'                        {doUlist(1);} ;
-U2 : START '**' ~'*'    {ulistLevel >= 1}? {doUlist(2);} ;
-U3 : START '***' ~'*'   {ulistLevel >= 2}? {doUlist(3);} ;
-U4 : START '****' ~'*'  {ulistLevel >= 3}? {doUlist(4);} ;
-U5 : START '*****' ~'*' {ulistLevel >= 4}? {doUlist(5);} ;
+U1 : START '*' ~'*'                        {doUlist(1); resetFormatting();} ;
+U2 : START '**' ~'*'    {ulistLevel >= 1}? {doUlist(2); resetFormatting();} ;
+U3 : START '***' ~'*'   {ulistLevel >= 2}? {doUlist(3); resetFormatting();} ;
+U4 : START '****' ~'*'  {ulistLevel >= 3}? {doUlist(4); resetFormatting();} ;
+U5 : START '*****' ~'*' {ulistLevel >= 4}? {doUlist(5); resetFormatting();} ;
 
-O1 : START '#' ~'#'                        {doOlist(1);} ;
-O2 : START '##' ~'#'    {olistLevel >= 1}? {doOlist(2);} ;
-O3 : START '###' ~'#'   {olistLevel >= 2}? {doOlist(3);} ;
-O4 : START '####' ~'#'  {olistLevel >= 3}? {doOlist(4);} ;
-O5 : START '#####' ~'#' {olistLevel >= 4}? {doOlist(5);} ;
+O1 : START '#' ~'#'                        {doOlist(1); resetFormatting();} ;
+O2 : START '##' ~'#'    {olistLevel >= 1}? {doOlist(2); resetFormatting();} ;
+O3 : START '###' ~'#'   {olistLevel >= 2}? {doOlist(3); resetFormatting();} ;
+O4 : START '####' ~'#'  {olistLevel >= 3}? {doOlist(4); resetFormatting();} ;
+O5 : START '#####' ~'#' {olistLevel >= 4}? {doOlist(5); resetFormatting();} ;
 
 /* ***** Horizontal Rules ***** */
 
-Rule : LINE '---' '-'+?;
+Rule : LINE '---' '-'+? {resetFormatting();} ;
 
 /* ***** Tables ***** */
 
-CellSep : '|' ;
-TdStart : '|' ;
-ThStart : '|=' ;
+CellSep : '|'  {resetFormatting();} ;
+TdStart : '|'  {resetFormatting();} ;
+ThStart : '|=' {resetFormatting();} ;
 
 /* ***** Inline Formatting ***** */
 
-Bold     : '**' ;
-Italic   : '//' ;
-Sthrough : '--' ;
-NoWiki   : '{{{' -> mode(PREFORMATTED_INLINE) ;
+BSt : '**' {!bold}?   {bold=true;} ;
+ISt : '//' {!italic}? {italic=true;} ;
+SSt : '--' {!strike}? {strike=true;} ;
+
+BEnd : '**' {bold}?   {bold=false;} ;
+IEnd : '//' {italic}? {italic=false;} ;
+SEnd : '--' {strike}? {strike=false;} ;
+
+NoWiki : '{{{' -> mode(PREFORMATTED_INLINE) ;
 
 /* ***** Links ***** */
 
@@ -97,7 +111,7 @@ ImSt  : '{{' -> mode(LINK) ;
 
 InlineBrk : '\\\\' ;
 
-ParBreak  : LineBreak LineBreak+ ;
+ParBreak  : LineBreak LineBreak+ {resetFormatting();} ;
 
 LineBreak : '\r'? '\n'+? ;
 

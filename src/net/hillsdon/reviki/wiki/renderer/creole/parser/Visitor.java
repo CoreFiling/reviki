@@ -1,7 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +48,25 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   public ResultNode visitParagraph(ParagraphContext ctx) {
     ResultNode body = visit(ctx.inline());
 
+    ResultNode inner = body;
+
+    // Drop leading and trailing newlines (TODO: Figure out how to do this in
+    // the grammar, along with all the other stuff)
+    if (body instanceof Inline) {
+      int children = body.getChildren().size();
+      if (children > 0 && body.getChildren().get(0).toXHTML().equals("\n")) {
+        body = new Inline(body.getChildren().subList(1, children));
+        children--;
+      }
+
+      if (children > 0 && body.getChildren().get(children - 1).toXHTML().equals("\n")) {
+        body = new Inline(body.getChildren().subList(0, children - 1));
+      }
+    }
+
     // If a paragraph contains nothing but an inline nowiki element, render that
     // as a block nowiki element. Not quite to spec, but replicates old
     // behaviour.
-    ResultNode inner = body;
     if (body instanceof Inline && body.getChildren().size() == 1) {
       inner = body.getChildren().get(0);
     }
@@ -85,11 +99,11 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
-  protected ResultNode visitInlineMarkup(String symbol, Class<? extends ResultNode> type, List<TerminalNode> tags, InlineContext inline) {
+  protected ResultNode visitInlineMarkup(String symbol, String sname, Class<? extends ResultNode> type, TerminalNode end, InlineContext inline) {
     ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
 
     // If the end tag is missing, undo the error recovery
-    if (tags.size() < 2 || ("<missing '" + symbol + "'>").equals(tags.get(1).getText())) {
+    if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
       List<ResultNode> chunks = new ArrayList<ResultNode>();
       chunks.add(new Plaintext(symbol));
       chunks.add(inner);
@@ -109,17 +123,17 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
 
   @Override
   public ResultNode visitBold(BoldContext ctx) {
-    return visitInlineMarkup("**", Bold.class, ctx.Bold(), ctx.inline());
+    return visitInlineMarkup("**", "BEnd", Bold.class, ctx.BEnd(), ctx.inline());
   }
 
   @Override
   public ResultNode visitItalic(ItalicContext ctx) {
-    return visitInlineMarkup("//", Italic.class, ctx.Italic(), ctx.inline());
+    return visitInlineMarkup("//", "IEnd", Italic.class, ctx.IEnd(), ctx.inline());
   }
 
   @Override
   public ResultNode visitSthrough(SthroughContext ctx) {
-    return visitInlineMarkup("--", Strikethrough.class, ctx.Sthrough(), ctx.inline());
+    return visitInlineMarkup("--", "SEnd", Strikethrough.class, ctx.SEnd(), ctx.inline());
   }
 
   @Override
