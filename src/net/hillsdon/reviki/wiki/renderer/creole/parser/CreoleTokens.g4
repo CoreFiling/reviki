@@ -103,7 +103,7 @@ LineBreak : '\r'? '\n'+? ;
 
 /* ***** Links ***** */
 
-RawUrl    : ALNUM+ ':' ~('['|']'|'"'|'\''|'('|')')+ ~(' '|'['|']'|'"'|'\''|'('|')'|','|'.')+?;
+RawUrl    : ('http' | 'ftp') '://' ~(' '|'\t'|'\r'|'\n')+;
 
 WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALNUM)*)+;
 
