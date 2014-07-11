@@ -135,10 +135,10 @@
     "output": "<p><a href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
   },
   {
-    "bug":    "unimplemented",
+    "bug":    "Should produce: <p><img class='attachment' src='/pages/test/attachments/image.gif' alt='my image' /></p>",
     "name":   "Image",
     "input":  "{{image.gif|my image}}",
-    "output": "<p><img src='image.gif' alt='my image'/></p>"
+    "output": "<p><img class='attachment' src='/pages/test//attachments/image.gif' alt='my image' /></p>"
   },
   {
     "name":   "Inline noWiki",
@@ -161,10 +161,10 @@
     "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
   },
   {
-    "bug":    "Just not worth the effort.",
+    "bug":    "Should produce: <p>This is an <em>italic</em> text. This is a url: <a href='http://www.wikicreole.org'>http://www.wikicreole.org</a>. This is what can go <a href='wrong://this'>wrong://this</a> should be an italic text//.",
     "name":   "URL/emphasis ambiguity",
     "input":  "This is an //italic// text. This is a url: http://www.wikicreole.org. This is what can go wrong://this should be an italic text//.",
-    "output": "<p>This is an <em>italic</em> text. This is a url: <a href='http://www.wikicreole.org'>http://www.wikicreole.org</a>. This is what can go wrong:<em>this should be an italic text</em>.</p>"
+    "output": "<p>This is an <em>italic</em> text. This is a url: <a href='http://www.wikicreole.org'>http://www.wikicreole.org</a>. This is what can go <a href='wrong://this'>wrong://this</a> should be an italic text//.</p>"
   },
 
   {
@@ -194,11 +194,11 @@
     "output": "<p>// <a href='http://a'>http://a</a></p>"
   },
   {
-    "bug":     "not so good...",
+    "bug":     "Should produce: <p><em>http:</em></p>",
     "comment": "a variation on #5",
     "name":   "Difficult emphasis #5.1",
     "input":  "//http:// ",
-    "output": "<p><em>http:</em></p>"
+    "output": "<p>//http:// </p>"
   },
   {
     "comment": "'a' added to make realistic",
