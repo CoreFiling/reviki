@@ -58,13 +58,15 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
       // We ignore the CSS class we add to save cluttering the expectations.
       String tidiedActual = actual.replaceAll(" " + TagResultNode.CSS_CLASS_ATTR, "");
       final boolean match = expected.equals(tidiedActual);
-      if (bugExplanation != null) {
-        assertFalse("You fixed " + caseName, match);
-        continue;
-      }
+
       if (!match) {
         errors++;
         err.println("Creole case: " + caseName);
+
+        if(bugExplanation != null) {
+          err.println("Explanation: " + bugExplanation);
+        }
+
         err.println("Input:\n" + input);
         err.println("Expected:\n" + expected);
         err.println("Actual (tidied):\n" + tidiedActual);
