@@ -4,12 +4,25 @@
 
 lexer grammar CreoleTokens;
 
+options { superClass=ContextSensitiveLexer; }
+
 @members {
+  Formatting bold;
+  Formatting italic;
+  Formatting strike;
+
+  public void setupFormatting() {
+    bold   = new Formatting("**");
+    italic = new Formatting("//");
+    strike = new Formatting("--");
+
+    inlineFormatting.add(bold);
+    inlineFormatting.add(italic);
+    inlineFormatting.add(strike);
+  }
+
   public boolean inHeader = false;
   public boolean start = false;
-  public boolean bold = false;
-  public boolean italic = false;
-  public boolean strike = false;
   public int olistLevel = 0;
   public int ulistLevel = 0;
 
@@ -24,7 +37,7 @@ lexer grammar CreoleTokens;
 
     if(prefix.length() <= 6) {
       if(seekback) {
-        _input.seek(_input.index() - 1);
+        seek(-1);
       }
 
       setText(prefix);
@@ -32,22 +45,6 @@ lexer grammar CreoleTokens;
     } else {
       setType(Any);
     }
-  }
-
-  public String get(int offset, int len) {
-    return _input.getText(new Interval(_input.index() + offset, _input.index() + offset + len - 1));
-  }
-
-  public String get(int offset) {
-    return get(offset, 1);
-  }
-
-  public String next(int len) {
-    return get(0, len);
-  }
-
-  public String next() {
-    return next(1);
   }
 
   public void setStart() {
@@ -59,21 +56,15 @@ lexer grammar CreoleTokens;
   public void doUlist(int level) {
     ulistLevel = level;
 
-    _input.seek(_input.index() - 1);
+    seek(-1);
     setStart();
   }
 
   public void doOlist(int level) {
     olistLevel = level;
 
-    _input.seek(_input.index() - 1);
+    seek(-1);
     setStart();
-  }
-
-  public void resetFormatting() {
-    bold   = false;
-    italic = false;
-    strike = false;
   }
 
   public void doUrl() {
@@ -82,61 +73,16 @@ lexer grammar CreoleTokens;
     String next = next();
 
     if((last + next).equals("//")) {
-      _input.seek(_input.index() - 1);
+      seek(-1);
       setText(url.substring(0, url.length() - 1));
     }
-  }
-
-  public boolean findBefore(String target, String limit) {
-    int ilen = _input.size() - _input.index();
-    int tlen = target.length();
-    int llen = limit.length();
-
-    for(int i = 0; i < ilen - tlen; i++) {
-      if(target.equals(get(i, tlen))) {
-        return true;
-      } else if(limit.equals(get(i, llen))) {
-        return false;
-      }
-    }
-
-    return false;
-  }
-
-  public boolean checkInline(boolean flag, String target, String limit) {
-    if(flag && !findBefore(target, limit)) {
-      setType(Any);
-      return false;
-    }
-    return true;
-  }
-
-  public void doBold() {
-    if(checkInline(italic, "**", "//") &&
-       checkInline(strike, "**", "--"))
-
-      bold = true;
-  }
-
-  public void doItalic() {
-    if(checkInline(bold,   "//", "**") &&
-       checkInline(strike, "//", "--"))
-
-      italic = true;
-  }
-
-  public void doStrike() {
-    if(checkInline(bold,   "--", "**") &&
-       checkInline(italic, "--", "**"))
-
-      strike = true;
   }
 }
 
 /* ***** Headings ***** */
 
 HSt  : LINE '='+ ~'=' WS? {doHdr();} ;
-HEnd : ' '* '='* ('\r'? '\n' {_input.seek(_input.index()-1);} | EOF) {inHeader}? {inHeader = false; resetFormatting();} ;
+HEnd : ' '* '='* ('\r'? '\n' {seek(-1);} | EOF) {inHeader}? {inHeader = false; resetFormatting();} ;
 
 /* ***** Lists ***** */
 
@@ -164,13 +110,13 @@ ThStart : '|=' {resetFormatting();} ;
 
 /* ***** Inline Formatting ***** */
 
-BSt : '**' {!bold}?   {doBold();} ;
-ISt : '//' {!italic}? {doItalic();} ;
-SSt : '--' {!strike}? {doStrike();} ;
+BSt : '**' {!bold.active}?   {setFormatting(bold,   Any);} ;
+ISt : '//' {!italic.active}? {setFormatting(italic, Any);} ;
+SSt : '--' {!strike.active}? {setFormatting(strike, Any);} ;
 
-BEnd : '**' {bold}?   {bold=false;} ;
-IEnd : '//' {italic}? {italic=false;} ;
-SEnd : '--' {strike}? {strike=false;} ;
+BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
+IEnd : '//' {italic.active}? {unsetFormatting(italic);} ;
+SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
 NoWiki : '{{{' -> mode(PREFORMATTED_INLINE) ;
 
@@ -223,7 +169,7 @@ AnyInlineText : ~('\r'|'\n') -> more;
 
 OopsItsABlock : ('\r'|'\n') -> mode(PREFORMATTED_BLOCK), more ;
 
-EndNoWikiInline : '}}}' (~'}' {_input.seek(_input.index()-1);} | EOF) -> mode(DEFAULT_MODE) ;
+EndNoWikiInline : '}}}' (~'}' {seek(-1);} | EOF) -> mode(DEFAULT_MODE) ;
 
 mode PREFORMATTED_BLOCK;
 
