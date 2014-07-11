@@ -1,13 +1,10 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.uwyn.jhighlight.renderer.Renderer;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.PageInfo;
@@ -24,27 +21,9 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
  *
  * @author msw
  */
-public class Visitor extends CreoleBaseVisitor<ResultNode> {
-  /** The page being rendered */
-  private PageInfo page;
-
-  /** The URL renderer */
-  private LinkPartsHandler handler;
-
-  /** A final pass over URLs to apply any last-minute changes */
-  private URLOutputFilter urlOutputFilter;
-
-  /**
-   * Construct a new parse tree visitor.
-   *
-   * @param page The page being rendered.
-   * @param urlOutputFilter The URL post-render processor.
-   * @param handler The URL renderer
-   */
-  public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
-    this.page = page;
-    this.urlOutputFilter = urlOutputFilter;
-    this.handler = handler;
+public class Visitor extends CreoleASTBuilder {
+  public Visitor(PageInfo page, URLOutputFilter urlOutputFilter, LinkPartsHandler handler) {
+    super(page, urlOutputFilter, handler);
   }
 
   /**
@@ -158,67 +137,27 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
-   * Helper function, render some inline markup (like bold, italic, or
-   * strikethrough) by converting the opening symbol into a plaintext AST node
-   * if the closing symbol was missing.
-   *
-   * If italics is "//", this lets us render things like "//foo bar" as
-   * "//foo bar" rather than, as ANTLR's error recovery would produce, "
-   * <em>foo bar</em>".
-   *
-   * @param symbol The opening/closing symbol.
-   * @param sname The name of the ending symbol
-   * @param type The AST node class to use on success
-   * @param end The (possibly missing) ending token.
-   * @param inline The contents of the markup
-   * @return Either an instance of the marked-up node if the ending token is
-   *         present, or an inline node consisting of a plaintext start token
-   *         followed by the rest of the rendered content.
-   */
-  protected ResultNode visitInlineMarkup(String symbol, String sname, Class<? extends ResultNode> type, TerminalNode end, InlineContext inline) {
-    ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
-
-    // If the end tag is missing, undo the error recovery
-    if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
-      List<ResultNode> chunks = new ArrayList<ResultNode>();
-      chunks.add(new Plaintext(symbol));
-      chunks.add(inner);
-      return new Inline(chunks);
-    }
-
-    try {
-      @SuppressWarnings("unchecked")
-      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
-      return constructor.newInstance(inner);
-    }
-    catch (Throwable e) {
-      // Never reached if you pass in correct params
-      return null;
-    }
-  }
-
-  /**
-   * Render bold nodes, with error recovery by {@link #visitInline}.
+   * Render bold nodes, with error recovery by {@link #renderInline}.
    */
   @Override
   public ResultNode visitBold(BoldContext ctx) {
-    return visitInlineMarkup("**", "BEnd", Bold.class, ctx.BEnd(), ctx.inline());
+    return renderInlineMarkup(Bold.class, "**", "BEnd", ctx.BEnd(), ctx.inline());
   }
 
   /**
-   * Render italic nodes, with error recovery by {@link #visitInline}.
+   * Render italic nodes, with error recovery by {@link #renderInline}.
    */
   @Override
   public ResultNode visitItalic(ItalicContext ctx) {
-    return visitInlineMarkup("//", "IEnd", Italic.class, ctx.IEnd(), ctx.inline());
+    return renderInlineMarkup(Italic.class, "//", "IEnd", ctx.IEnd(), ctx.inline());
   }
 
   /**
-   * Render strikethrough nodes, with error recovery by {@link #visitInline}.
+   * Render strikethrough nodes, with error recovery by {@link #renderInline}.
    */
   @Override
   public ResultNode visitSthrough(SthroughContext ctx) {
-    return visitInlineMarkup("--", "SEnd", Strikethrough.class, ctx.SEnd(), ctx.inline());
+    return renderInlineMarkup(Strikethrough.class, "--", "SEnd", ctx.SEnd(), ctx.inline());
   }
 
   /**
@@ -246,18 +185,6 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
-   * Helper function to render an inline piece of code.
-   * @param code The token containing the code
-   * @param end The end marker
-   * @param highlighter The highlighter to use
-   * @return An inline code node with the end token stripped.
-   */
-  protected ResultNode renderInlineCode(TerminalNode node, String end, Renderer highlighter) {
-    String code = node.getText();
-    return new InlineCode(code.substring(0, code.length() - end.length()), highlighter);
-  }
-
-  /**
    * Render an inline nowiki node. Due to how the lexer works, the contents
    * include the ending symbol, which must be chopped off.
    *
@@ -265,7 +192,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    */
   @Override
   public ResultNode visitPreformat(PreformatContext ctx) {
-    return renderInlineCode(ctx.EndNoWikiInline(), "}}}", null);
+    return renderInlineCode(ctx.EndNoWikiInline(), "}}}");
   }
 
   /**
@@ -274,9 +201,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    */
   @Override
   public ResultNode visitInlinecpp(InlinecppContext ctx) {
-    return renderInlineCode(ctx.EndCppInline(),
-        "[</c++>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
+    return renderInlineCode(ctx.EndCppInline(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
   }
 
   /**
@@ -291,25 +216,19 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
   @Override
   public ResultNode visitInlinejava(InlinejavaContext ctx) {
-    return renderInlineCode(ctx.EndJavaInline(),
-        "[</java>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA));
+    return renderInlineCode(ctx.EndJavaInline(), "[</java>]", XhtmlRendererFactory.JAVA);
   }
 
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
   @Override
   public ResultNode visitInlinexhtml(InlinexhtmlContext ctx) {
-    return renderInlineCode(ctx.EndXhtmlInline(),
-        "[</xhtml>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XHTML));
+    return renderInlineCode(ctx.EndXhtmlInline(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
   }
 
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
   @Override
   public ResultNode visitInlinexml(InlinexmlContext ctx) {
-    return renderInlineCode(ctx.EndXmlInline(),
-        "[</xml>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML));
+    return renderInlineCode(ctx.EndXmlInline(), "[</xml>]", XhtmlRendererFactory.XML);
   }
 
   /**
@@ -326,45 +245,6 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   @Override
   public ResultNode visitHrule(HruleContext ctx) {
     return new HorizontalRule();
-  }
-
-  /**
-   * Helper function to render a list.
-   * @param type The type of list to build.
-   * @param childContexts List of child element contexts.
-   * @param innerOlist Possible inner ordered list.
-   * @param innerUlist Possible inner unordered list.
-   * @param inner Possible inner inline.
-   * @return An ordered list node containing the given values.
-   * For inner elements, olist is preferred over ulist, which is
-   * preferred over inner. If all are null, an empty Plaintext is used.
-   */
-  protected ResultNode renderList(Class<? extends ResultNode> type, List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
-    List<ResultNode> children = new ArrayList<ResultNode>();
-
-    for (ParserRuleContext ctx : childContexts) {
-      children.add(visit(ctx));
-    }
-
-    try {
-      @SuppressWarnings("unchecked")
-      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
-
-      if (innerOlist != null)
-        return constructor.newInstance(visit(innerOlist), children);
-
-      if (innerUlist != null)
-        return constructor.newInstance(visit(innerUlist), children);
-
-      if (inner != null)
-        return constructor.newInstance(visit(inner), children);
-
-      return constructor.newInstance(new Plaintext(""), children);
-    }
-    catch (Throwable e) {
-      // Never reached if you pass in correct params
-      return null;
-    }
   }
 
   /**
@@ -458,24 +338,12 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
-   * Helper function to render a block of code. See {@link #renderInlineCode}.
-   * @param code The token containing the code
-   * @param end The end marker
-   * @param highlighter The highlighter to use
-   * @return A block code node with the end token stripped.
-   */
-  protected ResultNode renderBlockCode(TerminalNode node, String end, Renderer highlighter) {
-    String code = node.getText();
-    return new Code(code.substring(0, code.length() - end.length()), highlighter);
-  }
-
-  /**
    * Render a NoWiki block node. This has the same tokenisation problem as
    * mentioned in {@link #visitPreformat}.
    */
   @Override
   public ResultNode visitNowiki(NowikiContext ctx) {
-    return renderBlockCode(ctx.EndNoWikiBlock(), "}}}", null);
+    return renderBlockCode(ctx.EndNoWikiBlock(), "}}}");
   }
 
   /**
@@ -483,9 +351,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    */
   @Override
   public ResultNode visitCpp(CppContext ctx) {
-    return renderBlockCode(ctx.EndCppBlock(),
-        "[</c++>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
+    return renderBlockCode(ctx.EndCppBlock(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
   }
 
   /**
@@ -500,25 +366,19 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   /** See {@link #visitCpp} and {@link #renderBlockCode} */
   @Override
   public ResultNode visitJava(JavaContext ctx) {
-    return renderBlockCode(ctx.EndJavaBlock(),
-        "[</java>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA));
+    return renderBlockCode(ctx.EndJavaBlock(), "[</java>]", XhtmlRendererFactory.JAVA);
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode} */
   @Override
   public ResultNode visitXhtml(XhtmlContext ctx) {
-    return renderBlockCode(ctx.EndXhtmlBlock(),
-        "[</xhtml>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XHTML));
+    return renderBlockCode(ctx.EndXhtmlBlock(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode} */
   @Override
   public ResultNode visitXml(XmlContext ctx) {
-    return renderBlockCode(ctx.EndXmlBlock(),
-        "[</xml>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML));
+    return renderBlockCode(ctx.EndXmlBlock(), "[</xml>]", XhtmlRendererFactory.XML);
   }
 
   /**
