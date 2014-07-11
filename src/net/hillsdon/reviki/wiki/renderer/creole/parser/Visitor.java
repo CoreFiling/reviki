@@ -278,12 +278,13 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
         XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
   }
 
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  /**
+   * Render a block of literal, unescaped, HTML.
+   */
   @Override
   public ResultNode visitInlinehtml(InlinehtmlContext ctx) {
-    return renderInlineCode(ctx.EndHtmlInline(),
-        "[</html>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.HTML));
+    String code = ctx.EndHtmlInline().getText();
+    return new Raw(code.substring(0, code.length() - "[</html>]".length()));
   }
 
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
@@ -569,12 +570,13 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
         XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
   }
 
-  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  /**
+   * Render a block of literal, unescaped, HTML.
+   */
   @Override
   public ResultNode visitHtml(HtmlContext ctx) {
-    return renderBlockCode(ctx.EndHtmlBlock(),
-        "[</html>]",
-        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.HTML));
+    String code = ctx.EndHtmlBlock().getText();
+    return new Raw(code.substring(0, code.length() - "[</html>]".length()));
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode} */
