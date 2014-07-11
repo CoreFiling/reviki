@@ -1,5 +1,4 @@
 /* Todo:
- *  - Inline html [<html>]foo[</html>]
  *  - Comments justifying and explaining every rule.
  *  - Allow arbitrarily-nested lists (see actions/attributes)
  */
@@ -20,7 +19,7 @@ block     : heading
           | ulist | olist
           | hrule
           | table
-          | nowiki
+          | code | nowiki
           | paragraph
           ;
 
@@ -60,7 +59,7 @@ inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | imglink | wikiwlink | rawlink
-           | preformat
+           | inlinecode | preformat
            | linebreak
            | any
            ;
@@ -86,3 +85,23 @@ preformat  : NoWiki EndNoWikiInline ;
 linebreak  : InlineBrk ({!nobreaks}? LineBreak)? ;
 
 any        : Any | WS | {!nobreaks}? LineBreak ;
+
+/* ***** Syntax Highlighting ***** */
+
+code        : cpp       | html       | java       | xhtml       | xml ;
+inlinecode  : inlinecpp | inlinehtml | inlinejava | inlinexhtml | inlinexml ;
+
+cpp         : StartCpp EndCppBlock ;
+inlinecpp   : StartCpp EndCppInline ;
+
+html        : StartHtml EndHtmlBlock ;
+inlinehtml  : StartHtml EndHtmlInline ;
+
+java        : StartJava EndJavaBlock ;
+inlinejava  : StartJava EndJavaInline ;
+
+xhtml       : StartXhtml EndXhtmlBlock ;
+inlinexhtml : StartXhtml EndXhtmlInline ;
+
+xml         : StartXml EndXmlBlock ;
+inlinexml   : StartXml EndXmlInline ;

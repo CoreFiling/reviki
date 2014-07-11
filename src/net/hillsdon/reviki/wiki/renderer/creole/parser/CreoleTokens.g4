@@ -25,6 +25,11 @@ options { superClass=ContextSensitiveLexer; }
   public boolean start = false;
   public int olistLevel = 0;
   public int ulistLevel = 0;
+  boolean cpp = false;
+  boolean html = false;
+  boolean java = false;
+  boolean xhtml = false;
+  boolean xml = false;
 
   public void doHdr() {
     String prefix = getText().trim();
@@ -118,7 +123,12 @@ BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
 IEnd : '//' {italic.active}? {unsetFormatting(italic);} ;
 SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
-NoWiki : '{{{' -> mode(PREFORMATTED_INLINE) ;
+NoWiki     : '{{{'       -> mode(PREFORMATTED_INLINE) ;
+StartCpp   : '[<c++>]'   {cpp=true;}   -> mode(CODE_INLINE) ;
+StartHtml  : '[<html>]'  {html=true;}  -> mode(CODE_INLINE) ;
+StartJava  : '[<java>]'  {java=true;}  -> mode(CODE_INLINE) ;
+StartXhtml : '[<xhtml>]' {xhtml=true;} -> mode(CODE_INLINE) ;
+StartXml   : '[<xml>]'   {xml=true;}   -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
 
@@ -176,3 +186,25 @@ mode PREFORMATTED_BLOCK;
 AnyText   : . -> more ;
 
 EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}' -> mode(DEFAULT_MODE) ;
+
+mode CODE_INLINE;
+
+AnyInlineCode : ~('\r'|'\n') -> more;
+
+OopsItsACodeBlock : ('\r'|'\n') -> mode(CODE_BLOCK), more ;
+
+EndCppInline   : '[</c++>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
+EndHtmlInline  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
+EndJavaInline  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
+EndXhtmlInline : '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
+EndXmlInline   : '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
+
+mode CODE_BLOCK;
+
+AnyCode   : . -> more ;
+
+EndCppBlock   : '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
+EndHtmlBlock  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
+EndJavaBlock  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
+EndXhtmlBlock : '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
+EndXmlBlock   : '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;

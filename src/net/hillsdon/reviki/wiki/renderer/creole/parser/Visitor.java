@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import com.uwyn.jhighlight.renderer.Renderer;
+import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
+
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -106,8 +109,8 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
       inner = body.getChildren().get(0);
     }
 
-    if (inner instanceof InlineNoWiki) {
-      return new NoWiki(((InlineNoWiki) inner).getPreformatted());
+    if (inner instanceof InlineCode) {
+      return ((InlineCode) inner).toBlock();
     }
 
     return new Paragraph(body);
@@ -242,6 +245,18 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
+   * Helper function to render an inline piece of code.
+   * @param code The token containing the code
+   * @param end The end marker
+   * @param highlighter The highlighter to use
+   * @return An inline code node with the end token stripped.
+   */
+  protected ResultNode renderInlineCode(TerminalNode node, String end, Renderer highlighter) {
+    String code = node.getText();
+    return new InlineCode(code.substring(0, code.length() - end.length()), highlighter);
+  }
+
+  /**
    * Render an inline nowiki node. Due to how the lexer works, the contents
    * include the ending symbol, which must be chopped off.
    *
@@ -249,8 +264,50 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    */
   @Override
   public ResultNode visitPreformat(PreformatContext ctx) {
-    String nowiki = ctx.EndNoWikiInline().getText();
-    return new InlineNoWiki(nowiki.substring(0, nowiki.length() - 3));
+    return renderInlineCode(ctx.EndNoWikiInline(), "}}}", null);
+  }
+
+  /**
+   * Render a syntax-highlighted CPP block. This has the same tokenisation
+   * problem as mentioned in {@link #visitPreformat}.
+   */
+  @Override
+  public ResultNode visitInlinecpp(InlinecppContext ctx) {
+    return renderInlineCode(ctx.EndCppInline(),
+        "[</c++>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
+  }
+
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  @Override
+  public ResultNode visitInlinehtml(InlinehtmlContext ctx) {
+    return renderInlineCode(ctx.EndHtmlInline(),
+        "[</html>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.HTML));
+  }
+
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  @Override
+  public ResultNode visitInlinejava(InlinejavaContext ctx) {
+    return renderInlineCode(ctx.EndJavaInline(),
+        "[</java>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA));
+  }
+
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  @Override
+  public ResultNode visitInlinexhtml(InlinexhtmlContext ctx) {
+    return renderInlineCode(ctx.EndXhtmlInline(),
+        "[</xhtml>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XHTML));
+  }
+
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  @Override
+  public ResultNode visitInlinexml(InlinexmlContext ctx) {
+    return renderInlineCode(ctx.EndXmlInline(),
+        "[</xml>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML));
   }
 
   /**
@@ -482,13 +539,66 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
+   * Helper function to render a block of code. See {@link #renderInlineCode}.
+   * @param code The token containing the code
+   * @param end The end marker
+   * @param highlighter The highlighter to use
+   * @return A block code node with the end token stripped.
+   */
+  protected ResultNode renderBlockCode(TerminalNode node, String end, Renderer highlighter) {
+    String code = node.getText();
+    return new Code(code.substring(0, code.length() - end.length()), highlighter);
+  }
+
+  /**
    * Render a NoWiki block node. This has the same tokenisation problem as
    * mentioned in {@link #visitPreformat}.
    */
   @Override
   public ResultNode visitNowiki(NowikiContext ctx) {
-    String nowiki = ctx.EndNoWikiBlock().getText();
-    return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
+    return renderBlockCode(ctx.EndNoWikiBlock(), "}}}", null);
+  }
+
+  /**
+   * Like {@link #visitInlinecpp}, but for blocks.
+   */
+  @Override
+  public ResultNode visitCpp(CppContext ctx) {
+    return renderBlockCode(ctx.EndCppBlock(),
+        "[</c++>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.CPLUSPLUS));
+  }
+
+  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  @Override
+  public ResultNode visitHtml(HtmlContext ctx) {
+    return renderBlockCode(ctx.EndHtmlBlock(),
+        "[</html>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.HTML));
+  }
+
+  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  @Override
+  public ResultNode visitJava(JavaContext ctx) {
+    return renderBlockCode(ctx.EndJavaBlock(),
+        "[</java>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.JAVA));
+  }
+
+  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  @Override
+  public ResultNode visitXhtml(XhtmlContext ctx) {
+    return renderBlockCode(ctx.EndXhtmlBlock(),
+        "[</xhtml>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XHTML));
+  }
+
+  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  @Override
+  public ResultNode visitXml(XmlContext ctx) {
+    return renderBlockCode(ctx.EndXmlBlock(),
+        "[</xml>]",
+        XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML));
   }
 
   /**
