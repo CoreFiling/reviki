@@ -13,19 +13,44 @@ import net.hillsdon.reviki.wiki.renderer.creole.parser.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.*;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
+/**
+ * Visitor which walks the parse tree to build a more programmer-friendly AST.
+ * This also performs some non-standard rearrangement in order to replicate
+ * functionality from the old renderer.
+ *
+ * @author msw
+ */
 public class Visitor extends CreoleBaseVisitor<ResultNode> {
-  private LinkPartsHandler handler;
-
+  /** The page being rendered */
   private PageInfo page;
 
+  /** The URL renderer */
+  private LinkPartsHandler handler;
+
+  /** A final pass over URLs to apply any last-minute changes */
   private URLOutputFilter urlOutputFilter;
 
+  /**
+   * Construct a new parse tree visitor.
+   *
+   * @param page The page being rendered.
+   * @param urlOutputFilter The URL post-render processor.
+   * @param handler The URL renderer
+   */
   public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
     this.handler = handler;
   }
 
+  /**
+   * Render the root node, creole. creole contains zero or more block elements
+   * separated by linebreaks and paragraph breaks.
+   *
+   * The rendering behaviour is to render each block individually, and then
+   * display them sequentially in order.
+   */
+  @Override
   public ResultNode visitCreole(CreoleContext ctx) {
     List<ResultNode> blocks = new ArrayList<ResultNode>();
 
@@ -39,11 +64,21 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Page(blocks);
   }
 
+  /**
+   * Render a heading node. This consists of a prefix, the length of which will
+   * tell us the heading level, and some content.
+   */
   @Override
   public ResultNode visitHeading(HeadingContext ctx) {
     return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
   }
 
+  /**
+   * Render a paragraph node. This consists of a single inline element. Leading
+   * and trailing newlines are stripped, and if the paragraph consists solely of
+   * an inline nowiki line, it is instead rendered as a nowiki block, to
+   * replicate old behaviour.
+   */
   @Override
   public ResultNode visitParagraph(ParagraphContext ctx) {
     ResultNode body = visit(ctx.inline());
@@ -78,6 +113,10 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Paragraph(body);
   }
 
+  /**
+   * Render an inline node. This consists of a list of chunks of smaller markup
+   * units, which are displayed in order.
+   */
   @Override
   public ResultNode visitInline(InlineContext ctx) {
     List<ResultNode> chunks = new ArrayList<ResultNode>();
@@ -89,21 +128,49 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Inline(chunks);
   }
 
+  /**
+   * Render an any node. This consists of some plaintext, which is escaped and
+   * displayed with no further processing.
+   */
   @Override
   public ResultNode visitAny(AnyContext ctx) {
     return new Plaintext(ctx.getText());
   }
 
+  /**
+   * Render a WikiWords link.
+   */
   @Override
   public ResultNode visitWikiwlink(WikiwlinkContext ctx) {
     return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
+  /**
+   * Render a raw URL link.
+   */
   @Override
   public ResultNode visitRawlink(RawlinkContext ctx) {
     return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, handler);
   }
 
+  /**
+   * Helper function, render some inline markup (like bold, italic, or
+   * strikethrough) by converting the opening symbol into a plaintext AST node
+   * if the closing symbol was missing.
+   *
+   * If italics is "//", this lets us render things like "//foo bar" as
+   * "//foo bar" rather than, as ANTLR's error recovery would produce, "
+   * <em>foo bar</em>".
+   *
+   * @param symbol The opening/closing symbol.
+   * @param sname The name of the ending symbol
+   * @param type The AST node class to use on success
+   * @param end The (possibly missing) ending token.
+   * @param inline The contents of the markup
+   * @return Either an instance of the marked-up node if the ending token is
+   *         present, or an inline node consisting of a plaintext start token
+   *         followed by the rest of the rendered content.
+   */
   protected ResultNode visitInlineMarkup(String symbol, String sname, Class<? extends ResultNode> type, TerminalNode end, InlineContext inline) {
     ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
 
@@ -126,52 +193,102 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     }
   }
 
+  /**
+   * Render bold nodes, with error recovery by {@link #visitInline}.
+   */
   @Override
   public ResultNode visitBold(BoldContext ctx) {
     return visitInlineMarkup("**", "BEnd", Bold.class, ctx.BEnd(), ctx.inline());
   }
 
+  /**
+   * Render italic nodes, with error recovery by {@link #visitInline}.
+   */
   @Override
   public ResultNode visitItalic(ItalicContext ctx) {
     return visitInlineMarkup("//", "IEnd", Italic.class, ctx.IEnd(), ctx.inline());
   }
 
+  /**
+   * Render strikethrough nodes, with error recovery by {@link #visitInline}.
+   */
   @Override
   public ResultNode visitSthrough(SthroughContext ctx) {
     return visitInlineMarkup("--", "SEnd", Strikethrough.class, ctx.SEnd(), ctx.inline());
   }
 
+  /**
+   * Render a link node with no title.
+   */
   @Override
   public ResultNode visitLink(LinkContext ctx) {
     return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page, urlOutputFilter, handler);
   }
 
+  /**
+   * Render a link node with a title.
+   */
   @Override
   public ResultNode visitTitlelink(TitlelinkContext ctx) {
     return new Link(ctx.InLink(0).getText(), ctx.InLink(1).getText(), page, urlOutputFilter, handler);
   }
 
+  /**
+   * Render an image node.
+   */
   @Override
   public ResultNode visitImglink(ImglinkContext ctx) {
     return new Image(ctx.InLink(0).getText(), ctx.InLink(1).getText(), page, urlOutputFilter, handler);
   }
 
+  /**
+   * Render an inline nowiki node. Due to how the lexer works, the contents
+   * include the ending symbol, which must be chopped off.
+   *
+   * TODO: Improve the tokensiation of this.
+   */
   @Override
   public ResultNode visitPreformat(PreformatContext ctx) {
     String nowiki = ctx.EndNoWikiInline().getText();
     return new InlineNoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
+  /**
+   * Render a literal linebreak node
+   */
   @Override
   public ResultNode visitLinebreak(LinebreakContext ctx) {
     return new Linebreak();
   }
 
+  /**
+   * Render a horizontal rule node.
+   */
   @Override
   public ResultNode visitHrule(HruleContext ctx) {
     return new HorizontalRule();
   }
 
+  /**
+   * Render an ordered list. List rendering is a bit of a mess at the moment,
+   * but it basically works like this:
+   *
+   * - Lists have a root node, which contains level 1 elements.
+   *
+   * - There are levels 1 through 5.
+   *
+   * - Each level (other than 5) may have child list elements.
+   *
+   * - Each level (other than root) may also have some content, which can be a
+   * new list (ordered or unordered), or inline text.
+   *
+   * The root list node is rendered by displaying all level 1 entities in
+   * sequence, where level n entities are rendered by displaying their content
+   * and then any children they have.
+   *
+   * TODO: Figure out how to have arbitrarily-nested lists, and reduce the
+   * number of functions here.
+   */
   @Override
   public ResultNode visitOlist(OlistContext ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -183,6 +300,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(new Plaintext(""), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist1(Olist1Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -200,6 +318,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist2(Olist2Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -217,6 +336,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist3(Olist3Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -234,6 +354,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist4(Olist4Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -251,6 +372,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist5(Olist5Context ctx) {
 
@@ -263,6 +385,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new OrderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist(UlistContext ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -274,6 +397,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(new Plaintext(""), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist1(Ulist1Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -291,6 +415,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist2(Ulist2Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -308,6 +433,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist3(Ulist3Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -325,6 +451,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist4(Ulist4Context ctx) {
     List<ResultNode> children = new ArrayList<ResultNode>();
@@ -342,6 +469,7 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(visit(ctx.inline()), children);
   }
 
+  /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist5(Ulist5Context ctx) {
     if (ctx.olist() != null)
@@ -353,12 +481,19 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new UnorderedList(visit(ctx.inline()), new ArrayList<ResultNode>());
   }
 
+  /**
+   * Render a NoWiki block node. This has the same tokenisation problem as
+   * mentioned in {@link #visitPreformat}.
+   */
   @Override
   public ResultNode visitNowiki(NowikiContext ctx) {
     String nowiki = ctx.EndNoWikiBlock().getText();
     return new NoWiki(nowiki.substring(0, nowiki.length() - 3));
   }
 
+  /**
+   * Render a table node. This consists of rendering all rows in sequence.
+   */
   @Override
   public ResultNode visitTable(TableContext ctx) {
     List<ResultNode> rows = new ArrayList<ResultNode>();
@@ -370,6 +505,14 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new Table(rows);
   }
 
+  /**
+   * Render a table row. A table row consists of a number of cells, and a
+   * possible trailing separator. At the moment, the trailing separator is
+   * handled explicitly here, rather than nicely in the grammar.
+   *
+   * TODO: Handle the trailing separator in the grammar, and remove the check
+   * here.
+   */
   @Override
   public ResultNode visitTrow(TrowContext ctx) {
     List<ResultNode> cells = new ArrayList<ResultNode>();
@@ -390,11 +533,17 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
     return new TableRow(cells);
   }
 
+  /**
+   * Render a table heading cell.
+   */
   @Override
   public ResultNode visitTh(ThContext ctx) {
     return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
+  /**
+   * Render a table cell.
+   */
   @Override
   public ResultNode visitTd(TdContext ctx) {
     return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
