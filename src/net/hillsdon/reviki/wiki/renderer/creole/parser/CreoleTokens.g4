@@ -175,4 +175,4 @@ mode PREFORMATTED_BLOCK;
 
 AnyText   : . -> more ;
 
-EndNoWikiBlock : LINE '}}}' -> mode(DEFAULT_MODE) ;
+EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}' -> mode(DEFAULT_MODE) ;
