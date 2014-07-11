@@ -36,7 +36,7 @@
     "bug":    "unimplemented",
     "name":   "linking",
     "input":  "[[link]]\n[[MyBigPage|Go to my page]]\n\n[[http://www.wikicreole.org/]]\nhttp://www.rawlink.org/, http://www.another.rawlink.org\n[[http://www.wikicreole.org/|Visit the WikiCreole website]]\n[[Weird Stuff|**Weird** //Stuff//]]\n[[Ohana:WikiFamily]]",
-    "output": "<a href='http://www.examplewiki.com/link'>link</a>\n<a href='http://www.examplewiki.com/MyBigPage'>Go to my page</a>\n<a href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org//a, a href='http://www.another.rawlink.org'http://www.another.rawlink.org</a>\n<a href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a href='http://www.examplewiki.com/Weird_Stuff'>**Weird** //Stuff//</a>\n<a href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a>"
+    "output": "<p><a rel='nofollow' class='new-page' href='/pages/test/link'>link</a>\n<a rel='nofollow' class='new-page' href='/pages/test/MyBigPage'>Go to my page</a>\n</p><p>\n<a class='external' href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org/</a>, <a href='http://www.another.rawlink.org'>http://www.another.rawlink.org</a>\n<a class='external' href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a rel='nofollow' class='new-page' href='/pages/test/Weird%20Stuff'>**Weird** //Stuff//</a>\n<a class='inter-wiki' href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a></p>"
   },
   {
     "name":   "paragraphs",
@@ -44,10 +44,10 @@
     "output": "<p>This is my text.\n</p><p>\nThis is more text.</p>"
   },
   {
-    "bug":    "we don't handle line breaks within paragraphs for some reason",
+    "bug":    "Should produce: <p>This is the first line,<br>and this is the second.</p>",
     "name":   "line breaks",
     "input":  "This is the first line,\\and this is the second.",
-    "output": "<p>This is the first line,<br>and this is the second.</p>"
+    "output": "<p>This is the first line,&#092;and this is the second.</p>"
   },
   {
     "name":   "bulleted list",
@@ -68,13 +68,13 @@
     "bug":    "unimplemented",
     "name":   "image link",
     "input":  "{{myimage.png|this is my image}}",
-    "output": "<img src='myimage.png' alt='this is my image' />"
+    "output": "<p><img class='attachment' src='/pages/test//attachments/myimage.png' alt='this is my image' /></p>"
   },
   {
     "bug":    "similar to line breaks bug",
     "name":   "table",
     "input":  "|=Heading Col 1 |=Heading Col 2         |\n|Cell 1.1       |Two lines\\in Cell 1.2 |\n|Cell 2.1       |Cell 2.2               |",
-    "output": "<table><tr><th>Heading Col 1 </th><th>Heading Col 2         </th></tr><tr><td>Cell 1.1       </td><td>Two lines<br>in Cell 1.2 </td></tr><tr><td>Cell 2.1       </td><td>Cell 2.2               </td></tr></table>"
+    "output": "<table><tr><th>Heading Col 1 </th><th>Heading Col 2         </th></tr><tr><td>Cell 1.1       </td><td>Two lines&#092;in Cell 1.2 </td></tr><tr><td>Cell 2.1       </td><td>Cell 2.2               </td></tr></table>"
   },
   {
     "name":   "block no wiki",
@@ -90,7 +90,7 @@
     "bug":    "we don't yet cope with code braces as per the spec",
     "name":   "no wiki code with closing braces",
     "input":  "{{{\nif (x != NULL) {\n  for (i = 0; i  size; i++) {\n    if (x[i]  0) {\n      x[i]--;\n  }}}\n}}}",
-    "output": "<pre>\nif (x != NULL) {\n  for (i = 0; i  size; i++) {\n    if (x[i]  0) {\n      x[i]--;\n  }}}\n</pre>"
+    "output": "<pre>\nif (x != NULL) {\n  for (i = 0; i  size; i++) {\n    if (x[i]  0) {\n      x[i]--;\n  </pre><p>}}}</p>"
   }
 ]
 
