@@ -25,6 +25,7 @@ options { superClass=ContextSensitiveLexer; }
   public boolean start = false;
   public int olistLevel = 0;
   public int ulistLevel = 0;
+  boolean nowiki = false;
   boolean cpp = false;
   boolean html = false;
   boolean java = false;
@@ -123,7 +124,7 @@ BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
 IEnd : '//' {italic.active}? {unsetFormatting(italic);} ;
 SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
-NoWiki     : '{{{'       -> mode(PREFORMATTED_INLINE) ;
+NoWiki     : '{{{'      {nowiki=true;} -> mode(CODE_INLINE) ;
 StartCpp   : '[<c++>]'   {cpp=true;}   -> mode(CODE_INLINE) ;
 StartHtml  : '[<html>]'  {html=true;}  -> mode(CODE_INLINE) ;
 StartJava  : '[<java>]'  {java=true;}  -> mode(CODE_INLINE) ;
@@ -173,26 +174,13 @@ Sep : '|' ;
 
 InLink : ~(']'|'}'|'|')+ ;
 
-mode PREFORMATTED_INLINE;
-
-AnyInlineText : ~('\r'|'\n') -> more;
-
-OopsItsABlock : ('\r'|'\n') -> mode(PREFORMATTED_BLOCK), more ;
-
-EndNoWikiInline : '}}}' (~'}' {seek(-1);} | EOF) -> mode(DEFAULT_MODE) ;
-
-mode PREFORMATTED_BLOCK;
-
-AnyText   : . -> more ;
-
-EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}' -> mode(DEFAULT_MODE) ;
-
 mode CODE_INLINE;
 
-AnyInlineCode : ~('\r'|'\n') -> more;
+AnyInline : ~('\r'|'\n') -> more;
 
-OopsItsACodeBlock : ('\r'|'\n') -> mode(CODE_BLOCK), more ;
+OopsItsABlock : ('\r'|'\n') -> mode(CODE_BLOCK), more ;
 
+EndNoWikiInline : '}}}' (~'}' {seek(-1);} | EOF) {nowiki}? -> mode(DEFAULT_MODE) ;
 EndCppInline   : '[</c++>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
 EndHtmlInline  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
 EndJavaInline  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
@@ -201,8 +189,9 @@ EndXmlInline   : '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
 
 mode CODE_BLOCK;
 
-AnyCode   : . -> more ;
+AnyText   : . -> more ;
 
+EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}' {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
 EndCppBlock   : '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
 EndHtmlBlock  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
 EndJavaBlock  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
