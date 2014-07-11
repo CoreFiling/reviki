@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.CreoleLinkNode;
 
 import org.codehaus.jackson.JsonParseException;
 
@@ -31,7 +32,12 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) {
-    return new CreoleRenderer(CreoleRenderer.NONE, CreoleRenderer.NONE).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
+    RenderNode[] inlineLinks = new RenderNode[2];
+
+    inlineLinks[0] = new CreoleLinkNode(linkHandler);
+    inlineLinks[1] = new CreoleImageNode(imageHandler);
+
+    return new CreoleRenderer(CreoleRenderer.NONE, inlineLinks).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
   }
 
 }
