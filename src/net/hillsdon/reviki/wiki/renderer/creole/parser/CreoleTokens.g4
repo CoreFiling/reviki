@@ -191,9 +191,9 @@ mode CODE_BLOCK;
 
 AnyText   : . -> more ;
 
-EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}' {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
-EndCppBlock   : '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
-EndHtmlBlock  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
-EndJavaBlock  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
-EndXhtmlBlock : '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
-EndXmlBlock   : '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
+EndNoWikiBlock : {getCharPositionInLine()==0}? '}}}'      {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
+EndCppBlock    : {getCharPositionInLine()==0}? '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
+EndHtmlBlock   : {getCharPositionInLine()==0}? '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
+EndJavaBlock   : {getCharPositionInLine()==0}? '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
+EndXhtmlBlock  : {getCharPositionInLine()==0}? '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
+EndXmlBlock    : {getCharPositionInLine()==0}? '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
