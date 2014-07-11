@@ -329,7 +329,8 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
   }
 
   /**
-   * Helper function to render an ordered list.
+   * Helper function to render a list.
+   * @param type The type of list to build.
    * @param childContexts List of child element contexts.
    * @param innerOlist Possible inner ordered list.
    * @param innerUlist Possible inner unordered list.
@@ -338,23 +339,32 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    * For inner elements, olist is preferred over ulist, which is
    * preferred over inner. If all are null, an empty Plaintext is used.
    */
-  protected ResultNode renderOrderedList(List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
+  protected ResultNode renderList(Class<? extends ResultNode> type, List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
     List<ResultNode> children = new ArrayList<ResultNode>();
 
     for (ParserRuleContext ctx : childContexts) {
       children.add(visit(ctx));
     }
 
-    if (innerOlist != null)
-      return new OrderedList(visit(innerOlist), children);
+    try {
+      @SuppressWarnings("unchecked")
+      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
 
-    if (innerUlist != null)
-      return new OrderedList(visit(innerUlist), children);
+      if (innerOlist != null)
+        return constructor.newInstance(visit(innerOlist), children);
 
-    if (inner != null)
-      return new OrderedList(visit(inner), children);
+      if (innerUlist != null)
+        return constructor.newInstance(visit(innerUlist), children);
 
-    return new OrderedList(new Plaintext(""), children);
+      if (inner != null)
+        return constructor.newInstance(visit(inner), children);
+
+      return constructor.newInstance(new Plaintext(""), children);
+    }
+    catch (Throwable e) {
+      // Never reached if you pass in correct params
+      return null;
+    }
   }
 
   /**
@@ -378,95 +388,73 @@ public class Visitor extends CreoleBaseVisitor<ResultNode> {
    */
   @Override
   public ResultNode visitOlist(OlistContext ctx) {
-    return renderOrderedList(ctx.olist1(), null, null, null);
+    return renderList(OrderedList.class, ctx.olist1(), null, null, null);
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist1(Olist1Context ctx) {
-    return renderOrderedList(ctx.olist2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(OrderedList.class, ctx.olist2(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist2(Olist2Context ctx) {
-    return renderOrderedList(ctx.olist3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(OrderedList.class, ctx.olist3(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist3(Olist3Context ctx) {
-    return renderOrderedList(ctx.olist4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(OrderedList.class, ctx.olist4(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist4(Olist4Context ctx) {
-    return renderOrderedList(ctx.olist5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(OrderedList.class, ctx.olist5(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitOlist5(Olist5Context ctx) {
-    return renderOrderedList(new ArrayList<ParserRuleContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
-  }
-
-  /**
-   * See {@link #renderOrderedList}.
-   */
-  protected ResultNode renderUnorderedList(List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
-    List<ResultNode> children = new ArrayList<ResultNode>();
-
-    for (ParserRuleContext ctx : childContexts) {
-      children.add(visit(ctx));
-    }
-
-    if (innerOlist != null)
-      return new UnorderedList(visit(innerOlist), children);
-
-    if (innerUlist != null)
-      return new UnorderedList(visit(innerUlist), children);
-
-    if (inner != null)
-      return new UnorderedList(visit(inner), children);
-
-    return new UnorderedList(new Plaintext(""), children);
+    return renderList(OrderedList.class, new ArrayList<ParserRuleContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist(UlistContext ctx) {
-    return renderUnorderedList(ctx.ulist1(), null, null, null);
+    return renderList(UnorderedList.class, ctx.ulist1(), null, null, null);
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist1(Ulist1Context ctx) {
-    return renderUnorderedList(ctx.ulist2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(UnorderedList.class, ctx.ulist2(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist2(Ulist2Context ctx) {
-    return renderUnorderedList(ctx.ulist3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(UnorderedList.class, ctx.ulist3(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist3(Ulist3Context ctx) {
-    return renderUnorderedList(ctx.ulist4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(UnorderedList.class, ctx.ulist4(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist4(Ulist4Context ctx) {
-    return renderUnorderedList(ctx.ulist5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(UnorderedList.class, ctx.ulist5(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ResultNode visitUlist5(Ulist5Context ctx) {
-    return renderUnorderedList(new ArrayList<ParserRuleContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return renderList(UnorderedList.class, new ArrayList<ParserRuleContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /**
