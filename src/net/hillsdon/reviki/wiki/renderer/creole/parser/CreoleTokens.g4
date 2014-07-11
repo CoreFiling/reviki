@@ -34,9 +34,25 @@ lexer grammar CreoleTokens;
     }
   }
 
+  public String get(int offset, int len) {
+    return _input.getText(new Interval(_input.index() + offset, _input.index() + offset + len - 1));
+  }
+
+  public String get(int offset) {
+    return get(offset, 1);
+  }
+
+  public String next(int len) {
+    return get(0, len);
+  }
+
+  public String next() {
+    return next(1);
+  }
+
   public void setStart() {
-    String next1 = _input.getText(new Interval(_input.index(), _input.index()));
-    String next2 = _input.getText(new Interval(_input.index() + 1, _input.index() + 1));
+    String next1 = next();
+    String next2 = get(1);
     start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
   }
 
@@ -63,12 +79,57 @@ lexer grammar CreoleTokens;
   public void doUrl() {
     String url = getText();
     String last = url.substring(url.length()-1);
-    String next = _input.getText(new Interval(_input.index(), _input.index()));
+    String next = next();
 
     if((last + next).equals("//")) {
       _input.seek(_input.index() - 1);
       setText(url.substring(0, url.length() - 1));
     }
+  }
+
+  public boolean findBefore(String target, String limit) {
+    int ilen = _input.size() - _input.index();
+    int tlen = target.length();
+    int llen = limit.length();
+
+    for(int i = 0; i < ilen - tlen; i++) {
+      if(target.equals(get(i, tlen))) {
+        return true;
+      } else if(limit.equals(get(i, llen))) {
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  public boolean checkInline(boolean flag, String target, String limit) {
+    if(flag && !findBefore(target, limit)) {
+      setType(Any);
+      return false;
+    }
+    return true;
+  }
+
+  public void doBold() {
+    if(checkInline(italic, "**", "//") &&
+       checkInline(strike, "**", "--"))
+
+      bold = true;
+  }
+
+  public void doItalic() {
+    if(checkInline(bold,   "//", "**") &&
+       checkInline(strike, "//", "--"))
+
+      italic = true;
+  }
+
+  public void doStrike() {
+    if(checkInline(bold,   "--", "**") &&
+       checkInline(italic, "--", "**"))
+
+      strike = true;
   }
 }
 
@@ -103,9 +164,9 @@ ThStart : '|=' {resetFormatting();} ;
 
 /* ***** Inline Formatting ***** */
 
-BSt : '**' {!bold}?   {bold=true;} ;
-ISt : '//' {!italic}? {italic=true;} ;
-SSt : '--' {!strike}? {strike=true;} ;
+BSt : '**' {!bold}?   {doBold();} ;
+ISt : '//' {!italic}? {doItalic();} ;
+SSt : '--' {!strike}? {doStrike();} ;
 
 BEnd : '**' {bold}?   {bold=false;} ;
 IEnd : '//' {italic}? {italic=false;} ;
