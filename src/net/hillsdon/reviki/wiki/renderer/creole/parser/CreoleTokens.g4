@@ -156,7 +156,7 @@ Any : . ;
 WS  : (' '|'\t'|'\r'|'\n')+ -> skip ;
 
 fragment START : {start}? | LINE ;
-fragment LINE  : ({getCharPositionInLine()==0}? WS? | LineBreak WS?);
+fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 fragment ALNUM : (ALPHA | DIGIT) ;
 fragment ALPHA : (UPPER | LOWER) ;
 fragment UPPER : ('A'..'Z') ;
