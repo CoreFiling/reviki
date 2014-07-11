@@ -33,10 +33,9 @@
     "output": "<h1>Level 1 (largest)</h1><h2>Level 2</h2><h3>Level 3</h3><h4>Level 4</h4><h5>Level 5</h5><h6>Level 6</h6><h3>Also level 3</h3><h3>Also level 3</h3><h3>Also level 3</h3><h3><strong>not</strong> <em>parsed</em></h3>"
   },
   {
-    "bug":    "unimplemented",
     "name":   "linking",
     "input":  "[[link]]\n[[MyBigPage|Go to my page]]\n\n[[http://www.wikicreole.org/]]\nhttp://www.rawlink.org/, http://www.another.rawlink.org\n[[http://www.wikicreole.org/|Visit the WikiCreole website]]\n[[Weird Stuff|**Weird** //Stuff//]]\n[[Ohana:WikiFamily]]",
-    "output": "<a href='http://www.examplewiki.com/link'>link</a>\n<a href='http://www.examplewiki.com/MyBigPage'>Go to my page</a>\n<a href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org//a, a href='http://www.another.rawlink.org'http://www.another.rawlink.org</a>\n<a href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a href='http://www.examplewiki.com/Weird_Stuff'>**Weird** //Stuff//</a>\n<a href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a>"
+    "output": "<p><a rel='nofollow' class='new-page' href='/pages/test/link'>link</a>\n<a rel='nofollow' class='new-page' href='/pages/test/MyBigPage'>Go to my page</a>\n</p><p>\n<a class='external' href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org/</a>, <a href='http://www.another.rawlink.org'>http://www.another.rawlink.org</a>\n<a class='external' href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a rel='nofollow' class='new-page' href='/pages/test/Weird%20Stuff'>**Weird** //Stuff//</a>\n<a class='inter-wiki' href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a></p>"
   },
   {
     "name":   "paragraphs",
@@ -65,10 +64,9 @@
     "output": "<hr />"
   },
   {
-    "bug":    "unimplemented",
     "name":   "image link",
     "input":  "{{myimage.png|this is my image}}",
-    "output": "<img src='myimage.png' alt='this is my image' />"
+    "output": "<p><img class='attachment' src='/pages/test//attachments/myimage.png' alt='this is my image' /></p>"
   },
   {
     "bug":    "similar to line breaks bug",
