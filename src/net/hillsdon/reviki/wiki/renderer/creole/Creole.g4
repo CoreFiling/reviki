@@ -46,7 +46,7 @@ olist5     : O5 (WS olist | ulist | inline) ;
 hrule      : Rule ;
 
 table      : {nobreaks=true;} trow+ {nobreaks=false;};
-trow       : tcell+ (RowEnd | LineBreak) { System.out.println(_localctx.getText());};
+trow       : tcell+ (RowEnd | LineBreak) ;
 tcell      : th | td ;
 th         : ThStart inline? ;
 td         : TdStart inline? ;
