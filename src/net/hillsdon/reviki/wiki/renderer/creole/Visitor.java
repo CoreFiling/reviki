@@ -189,6 +189,14 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render an image without a title.
+   */
+  @Override
+  public ASTNode visitSimpleimg(SimpleimgContext ctx) {
+    return new Image(ctx.InLink().getText(), ctx.InLink().getText(), page, urlOutputFilter, imageHandler);
+  }
+
+  /**
    * Render an inline nowiki node. Due to how the lexer works, the contents
    * include the ending symbol, which must be chopped off.
    *
