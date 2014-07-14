@@ -31,6 +31,7 @@ options { superClass=ContextSensitiveLexer; }
   boolean java = false;
   boolean xhtml = false;
   boolean xml = false;
+  boolean intr = false;
 
   public void doHdr() {
     String prefix = getText().trim();
@@ -110,9 +111,9 @@ Rule : LINE '---' '-'+? {resetFormatting();} ;
 
 /* ***** Tables ***** */
 
-CellSep : '|'  {resetFormatting();} ;
-TdStart : '|'  {resetFormatting();} ;
-ThStart : '|=' {resetFormatting();} ;
+RowEnd  : '|' LineBreak {intr}? {intr=false;} ;
+TdStart : '|'  {resetFormatting(); intr=true;} ;
+ThStart : '|=' {resetFormatting(); intr=true;} ;
 
 /* ***** Inline Formatting ***** */
 
@@ -142,7 +143,7 @@ InlineBrk : '\\\\' ;
 
 ParBreak  : LineBreak LineBreak+ {resetFormatting();} ;
 
-LineBreak : '\r'? '\n'+? ;
+LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
@@ -157,7 +158,7 @@ MacroSt : '<<' -> mode(MACRO) ;
 /* ***** Miscellaneous ***** */
 
 Any : . ;
-WS  : (' '|'\t'|'\r'|'\n')+ -> skip ;
+WS  : (' '|'\t'|'\r'|'\n')+ ;
 
 fragment START : {start}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
