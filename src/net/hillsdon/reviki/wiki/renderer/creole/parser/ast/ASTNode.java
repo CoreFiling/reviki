@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 /**
@@ -105,5 +106,30 @@ public abstract class ASTNode implements ResultNode {
     out += "</" + tag + ">";
 
     return out;
+  }
+
+  /**
+   * Expand macros contained within this node and its children, returning the
+   * modified node.
+   * 
+   * @param macro The list of macros
+   * @return The possibly modified node. If the node was not a macro, `this`
+   *         will be returned, however if `this` is returned it cannot be
+   *         assumed that none of the node's children contained macros.
+   */
+  public ASTNode expandMacros(List<Macro> macros) {
+    if (body != null) {
+      body = body.expandMacros(macros);
+    }
+
+    List<ASTNode> adoptees = new ArrayList<ASTNode>();
+
+    for (ASTNode child : children) {
+      adoptees.add(child.expandMacros(macros));
+    }
+
+    children = adoptees;
+
+    return this;
   }
 }

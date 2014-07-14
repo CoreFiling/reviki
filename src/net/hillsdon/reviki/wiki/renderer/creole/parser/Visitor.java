@@ -92,6 +92,12 @@ public class Visitor extends CreoleASTBuilder {
       return ((InlineCode) inner).toBlock();
     }
 
+    // If a paragraph contains only a macro node, remove the enclosing
+    // paragraph.
+    if (inner instanceof MacroNode) {
+      return inner;
+    }
+
     return new Paragraph(body);
   }
 
@@ -436,5 +442,13 @@ public class Visitor extends CreoleASTBuilder {
   @Override
   public ASTNode visitTd(TdContext ctx) {
     return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+  }
+
+  /**
+   * Render a macro.
+   */
+  @Override
+  public ASTNode visitMacro(MacroContext ctx) {
+    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, urlOutputFilter, linkHandler, imageHandler);
   }
 }

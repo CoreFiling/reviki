@@ -61,6 +61,7 @@ inlinestep : bold | italic | sthrough
            | link | titlelink | imglink | wikiwlink | rawlink
            | inlinecode | preformat
            | linebreak
+           | macro
            | any
            ;
 
@@ -83,6 +84,8 @@ rawlink    : RawUrl ;
 preformat  : NoWiki EndNoWikiInline ;
 
 linebreak  : InlineBrk ({!nobreaks}? LineBreak)? ;
+
+macro      : MacroSt MacroName MacroSep MacroEnd ;
 
 any        : Any | WS | {!nobreaks}? LineBreak ;
 

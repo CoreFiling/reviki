@@ -150,6 +150,10 @@ RawUrl    : ('http://' | 'ftp://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/')+ '/'?)
 
 WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALNUM)*)+;
 
+/* ***** Macros ***** */
+
+MacroSt : '<<' -> mode(MACRO) ;
+
 /* ***** Miscellaneous ***** */
 
 Any : . ;
@@ -173,6 +177,18 @@ ImEnd : '}}' -> mode(DEFAULT_MODE) ;
 Sep : '|' ;
 
 InLink : ~(']'|'}'|'|')+ ;
+
+mode MACRO;
+
+MacroName : ~(':'|'>')+ ;
+
+MacroSep  : ':' -> mode(MACRO_ARGS) ;
+
+mode MACRO_ARGS;
+
+MacroArgs : . -> more ;
+
+MacroEnd  : '>>' -> mode(DEFAULT_MODE) ;
 
 mode CODE_INLINE;
 
