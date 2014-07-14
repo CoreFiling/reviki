@@ -147,7 +147,7 @@ LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
-RawUrl    : ('http://' | 'ftp://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|')+ '/'?)+ {doUrl();};
+RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|')+ '/'?)+ {doUrl();};
 
 WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) (UPPER ((ALNUM|'.')* ALNUM)*)+;
 
