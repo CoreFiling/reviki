@@ -5,9 +5,8 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.result.LeafResultNode;
 
-public class Image extends LeafResultNode {
+public class Image extends ASTNode {
   private LinkPartsHandler handler;
 
   private URLOutputFilter urlOutputFilter;
@@ -17,6 +16,8 @@ public class Image extends LeafResultNode {
   private LinkParts parts;
 
   public Image(String target, String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+    super("img");
+
     this.parts = (new CreoleLinkContentsSplitter()).split(target, title);
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
@@ -32,5 +33,4 @@ public class Image extends LeafResultNode {
       return "<img src=\"#\" alt=\"Bad Link\">";
     }
   }
-
 }

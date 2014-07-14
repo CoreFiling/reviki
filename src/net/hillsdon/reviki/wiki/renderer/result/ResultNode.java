@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface ResultNode {
 
-  List<ResultNode> getChildren();
+  List<? extends ResultNode> getChildren();
   
   String toXHTML();
 

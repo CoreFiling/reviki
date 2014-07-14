@@ -1,52 +1,41 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
 
 import com.uwyn.jhighlight.renderer.Renderer;
 
 import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
-public class InlineCode implements ResultNode {
-  protected String body;
+public class InlineCode extends ASTNode {
+  private String contents;
 
   private Renderer highlighter;
 
   public InlineCode(String contents) {
-    this(contents, null);
+    super("code", new Raw(Escape.html(contents)));
+
+    this.contents = contents;
+    this.highlighter = null;
   }
 
-  public InlineCode(String contents, Renderer highlighter) {
-    this.body = contents;
+  public InlineCode(String contents, Renderer highlighter) throws IOException {
+    super("code", new Raw(highlighter.highlight("", contents, "UTF-8", true).replace("&nbsp;", " ").replace("<br />", "")));
+
+    this.contents = contents;
     this.highlighter = highlighter;
   }
 
-  public List<ResultNode> getChildren() {
-    List<ResultNode> out = new ArrayList<ResultNode>();
-    return Collections.unmodifiableList(out);
-  }
-
-  public String toXHTML() {
-    String out;
-
+  public Code toBlock() {
     if (highlighter == null) {
-      out = Escape.html(body);
+      return new Code(contents);
     }
     else {
       try {
-        out = highlighter.highlight("", body, "UTF-8", true).replace("&bnsp;", " ");
+        return new Code(contents, highlighter);
       }
-      catch (Exception e) {
-        out = Escape.html(body);
+      catch (IOException e) {
+        return new Code(contents);
       }
     }
-
-    return "<code>" + out + "</code>";
-  }
-
-  public Code toBlock() {
-    return new Code(body, highlighter);
   }
 }

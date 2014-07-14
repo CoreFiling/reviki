@@ -1,5 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,6 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.*;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 /**
  * Helper class providing some useful functions for walking through the Creole
@@ -23,12 +23,15 @@ import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
  *
  * @author msw
  */
-public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
+public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /** The page being rendered */
   protected PageInfo page;
 
-  /** The URL renderer */
-  protected LinkPartsHandler handler;
+  /** The URL handler for links */
+  protected LinkPartsHandler linkHandler;
+
+  /** The URL handler for images */
+  protected LinkPartsHandler imageHandler;
 
   /** A final pass over URLs to apply any last-minute changes */
   protected URLOutputFilter urlOutputFilter;
@@ -40,10 +43,11 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
-    this.handler = handler;
+    this.linkHandler = linkHandler;
+    this.imageHandler = imageHandler;
   }
 
   /**
@@ -64,12 +68,12 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    *         present, or an inline node consisting of a plaintext start token
    *         followed by the rest of the rendered content.
    */
-  protected ResultNode renderInlineMarkup(Class<? extends ResultNode> type, String symbol, String sname, TerminalNode end, InlineContext inline) {
-    ResultNode inner = (inline != null) ? visit(inline) : new Plaintext("");
+  protected ASTNode renderInlineMarkup(Class<? extends ASTNode> type, String symbol, String sname, TerminalNode end, InlineContext inline) {
+    ASTNode inner = (inline != null) ? visit(inline) : new Plaintext("");
 
     // If the end tag is missing, undo the error recovery
     if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
-      List<ResultNode> chunks = new ArrayList<ResultNode>();
+      List<ASTNode> chunks = new ArrayList<ASTNode>();
       chunks.add(new Plaintext(symbol));
       chunks.add(inner);
       return new Inline(chunks);
@@ -77,13 +81,18 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
 
     try {
       @SuppressWarnings("unchecked")
-      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
+      Constructor<ASTNode> constructor = (Constructor<ASTNode>) type.getConstructors()[0];
       return constructor.newInstance(inner);
     }
     catch (Throwable e) {
       // Never reached if you pass in correct params
       return null;
     }
+  }
+
+  protected String cutOffEndTag(TerminalNode node, String end) {
+    String res = node.getText();
+    return res.substring(0, res.length() - end.length());
   }
 
   /**
@@ -94,9 +103,15 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    * @param renderer The renderer to use
    * @return An inline code node with the end token stripped.
    */
-  protected ResultNode renderInlineCode(TerminalNode node, String end, Renderer renderer) {
-    String code = node.getText();
-    return new InlineCode(code.substring(0, code.length() - end.length()), renderer);
+  protected ASTNode renderInlineCode(TerminalNode node, String end, Renderer renderer) {
+    String code = cutOffEndTag(node, end);
+
+    try {
+      return new InlineCode(code, renderer);
+    }
+    catch (IOException e) {
+      return new InlineCode(code);
+    }
   }
 
   /**
@@ -105,16 +120,15 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    * 
    * @param language The language to use
    */
-  protected ResultNode renderInlineCode(TerminalNode node, String end, String language) {
+  protected ASTNode renderInlineCode(TerminalNode node, String end, String language) {
     return renderInlineCode(node, end, XhtmlRendererFactory.getRenderer(language));
   }
 
   /**
-   * Render some inline code without syntax highlighting. See
-   * {@link #renderInlineCode}.
+   * Render some inline code without syntax highlighting.
    */
-  protected ResultNode renderInlineCode(TerminalNode node, String end) {
-    return renderInlineCode(node, end, (Renderer) null);
+  protected ASTNode renderInlineCode(TerminalNode node, String end) {
+    return new InlineCode(cutOffEndTag(node, end));
   }
 
   /**
@@ -126,9 +140,16 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    * @param renderer The renderer to use
    * @return A block code node with the end token stripped.
    */
-  protected ResultNode renderBlockCode(TerminalNode node, String end, Renderer renderer) {
+  protected ASTNode renderBlockCode(TerminalNode node, String end, Renderer renderer) {
     String code = node.getText();
-    return new Code(code.substring(0, code.length() - end.length()), renderer);
+    code = code.substring(0, code.length() - end.length());
+
+    try {
+      return new Code(code, renderer);
+    }
+    catch (IOException e) {
+      return new Code(code);
+    }
   }
 
   /**
@@ -137,55 +158,75 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ResultNode> {
    * 
    * @param language The language to use
    */
-  protected ResultNode renderBlockCode(TerminalNode node, String end, String language) {
+  protected ASTNode renderBlockCode(TerminalNode node, String end, String language) {
     return renderBlockCode(node, end, XhtmlRendererFactory.getRenderer(language));
   }
 
   /**
-   * Render a block of code without syntax highlighting. See
-   * {@link #renderBlockCode}.
+   * Render a block of code without syntax highlighting.
    */
-  protected ResultNode renderBlockCode(TerminalNode node, String end) {
-    return renderBlockCode(node, end, (Renderer) null);
+  protected ASTNode renderBlockCode(TerminalNode node, String end) {
+    return new Code(cutOffEndTag(node, end));
   }
+
+  /**
+   * Types of lists which can be constructed by renderList.
+   */
+  protected enum ListType {
+    Ordered, Unordered
+  };
 
   /**
    * Render a list.
    * 
    * @param type The type of list to build.
-   * @param childContexts List of child element contexts.
-   * @param innerOlist Possible inner ordered list.
-   * @param innerUlist Possible inner unordered list.
-   * @param inner Possible inner inline.
-   * @return An ordered list node containing the given values. For inner
-   *         elements, olist is preferred over ulist, which is preferred over
-   *         inner. If all are null, an empty Plaintext is used.
+   * @param childContexts the children of the list.
+   * @return A list node containing the given elements
    */
-  protected ResultNode renderList(Class<? extends ResultNode> type, List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
-    List<ResultNode> children = new ArrayList<ResultNode>();
+  protected ASTNode renderList(ListType type, List<? extends ParserRuleContext> childContexts) {
+    List<ASTNode> children = new ArrayList<ASTNode>();
 
     for (ParserRuleContext ctx : childContexts) {
       children.add(visit(ctx));
     }
 
-    try {
-      @SuppressWarnings("unchecked")
-      Constructor<ResultNode> constructor = (Constructor<ResultNode>) type.getConstructors()[0];
-
-      if (innerOlist != null)
-        return constructor.newInstance(visit(innerOlist), children);
-
-      if (innerUlist != null)
-        return constructor.newInstance(visit(innerUlist), children);
-
-      if (inner != null)
-        return constructor.newInstance(visit(inner), children);
-
-      return constructor.newInstance(new Plaintext(""), children);
+    if (type == ListType.Ordered) {
+      return new OrderedList(children);
     }
-    catch (Throwable e) {
-      // Never reached if you pass in correct params
-      return null;
+    else {
+      return new UnorderedList(children);
+    }
+  }
+
+  /**
+   * Render a list item
+   *
+   * @param type The type of the list
+   * @param childContexts List of child elements
+   * @param innerOlist Possible inner ordered list
+   * @param innerUlist Possible inner unordered list
+   * @param inner Possible inner inline
+   * @return A list item containing with the given child list elements. For
+   *         inner elements, olist is preferred over ulist, which is preferred
+   *         over inline; if none are given, an empty Plaintext is used.
+   */
+  protected ASTNode renderListItem(ListType type, List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
+    ASTNode body = new Plaintext("");
+
+    if (inner != null)
+      body = visit(inner);
+
+    if (innerUlist != null)
+      body = visit(innerUlist);
+
+    if (innerOlist != null)
+      body = visit(innerOlist);
+
+    if (childContexts == null || childContexts.isEmpty()) {
+      return new ListItem(body);
+    }
+    else {
+      return new ListItem(body, renderList(type, childContexts));
     }
   }
 }

@@ -29,7 +29,8 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
     return CreoleRenderer.render(
         new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()),
         URLOutputFilter.NULL,
-        new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration())
+        new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration()),
+        new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration())
         ).toXHTML();
   }
 }

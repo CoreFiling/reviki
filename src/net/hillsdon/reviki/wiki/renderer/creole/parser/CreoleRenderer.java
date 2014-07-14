@@ -6,10 +6,10 @@ import org.antlr.v4.runtime.tree.*;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.parser.ast.ASTNode;
 
 public class CreoleRenderer {
-  public static ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     String contents = page.getContent();
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
@@ -24,7 +24,7 @@ public class CreoleRenderer {
 
     ParseTree tree = parser.creole();
 
-    ParseTreeVisitor<ResultNode> visitor = new Visitor(page, urlOutputFilter, handler);
+    ParseTreeVisitor<ASTNode> visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
 
     return visitor.visit(tree);
   }

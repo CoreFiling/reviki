@@ -1,31 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.parser.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
-
-public class TableCell implements ResultNode {
-  protected ResultNode body;
-
-  public TableCell(ResultNode body) {
-    this.body = body;
-  }
-
-  public List<ResultNode> getChildren() {
-    List<ResultNode> out = new ArrayList<ResultNode>();
-    out.add(body);
-    return Collections.unmodifiableList(out);
-  }
-
-  public String toXHTML() {
-    String content = body.toXHTML();
-
-    if (content.equals("")) {
-      return "<td/>";
-    }
-
-    return "<td>" + content + "</td>";
+public class TableCell extends ASTNode {
+  public TableCell(ASTNode body) {
+    super("td", body);
   }
 }

@@ -5,9 +5,8 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.result.LeafResultNode;
 
-public class Link extends LeafResultNode {
+public class Link extends ASTNode {
   private LinkPartsHandler handler;
 
   private URLOutputFilter urlOutputFilter;
@@ -17,6 +16,8 @@ public class Link extends LeafResultNode {
   private LinkParts parts;
 
   public Link(String target, String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+    super("a");
+
     this.parts = (new CreoleLinkContentsSplitter()).split(target, title);
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
