@@ -1,160 +1,118 @@
-/**
- * Copyright 2008 Matthew Hillsdon
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
-import java.lang.reflect.Array;
-import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.hillsdon.fij.text.Escape;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
-import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-// Adapted from the Creole 0.4 implementation in JavaScript available here
-// http://www.meatballsociety.org/Creole/0.4/
-// Original copyright notice follows:
-
-// Copyright (c) 2007 Chris Purcell.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-//
-
-/**
- * An incomplete Creole 1.0 renderer.
- *
- * @see <a href="http://www.wikicreole.org/wiki/Creole1.0">The 1.0 specification.</a>
- * @author mth
- */
 public class CreoleRenderer {
 
-  public static final RenderNode[] NONE = new RenderNode[0];
+  /**
+   * Macro expansion depth limit. This gets reset when rendering a page, but not
+   * when rendering a partial page. If it hits zero, no macros are expanded.
+   */
+  private static int expansionLimit;
 
-  public static class RawUrlNode extends AbstractRegexNode {
-    public RawUrlNode() {
-      super("\\b\\p{Alnum}{2,}:[^\\s\\[\\]\"'\\(\\)]{2,}[^\\s\\[\\]\"'\\(\\)\\,\\.]");
+  /**
+   * Render a stream of text. See
+   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)} and
+   * {@link #renderPart(PageInfo, String, URLOutputFilter, LinkPartsHandler, LinkPartsHandler, List)}
+   * for explanation of most arguments.
+   *
+   * @param in The input stream to render.
+   * @return The AST of the page, after macro application.
+   */
+  private static ASTNode renderInternal(ANTLRInputStream in, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
+    CreoleTokens lexer = new CreoleTokens(in);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    Creole parser = new Creole(tokens);
+
+    ParseTree tree = parser.creole();
+
+    ParseTreeVisitor<ASTNode> visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
+
+    ASTNode rendered = visitor.visit(tree);
+
+    // Decrement the expansion limit
+    expansionLimit--;
+
+    if (expansionLimit >= 0) {
+      return rendered.expandMacros(macros);
     }
-    public ResultNode handle(final PageInfo page, final Matcher matcher, RenderNode parent, final URLOutputFilter urlOutputFilter) {
-      String escaped = Escape.html(matcher.group(0));
-      String escapedFiltered = Escape.html(urlOutputFilter.filterURL(matcher.group(0)));
-      return new LiteralResultNode(String.format("<a href='%s'>%s</a>", escapedFiltered, escaped));
-    }
-  }
-  private static class Heading extends RegexMatchToTag {
-    public Heading(final int number) {
-      super(String.format("(^|\\n)[ \\t]*={%d}[ \\t]*([^=].*?)[ \\t]*=*\\s*(\\n|$)", number), "h" + number, 2);
-    }
-  }
-  public static class ListNode extends RegexMatchToTag {
-    public ListNode(final String match, final String tag) {
-      super("(^|\\n)([ ]*?" + match + "[^*#].*(\\n|$)([ ]*[*#]{2}.*(\\n|$))*)+", tag, 0, "(^|\\n)[ ]*?[*#]", "$1");
+    else {
+      // Depth limit has been hit, there is probably a macro loop happening.
+      return rendered;
     }
   }
 
-  private final RenderNode _root;
+  /**
+   * Render a wiki page.
+   *
+   * @param page The page to render.
+   * @param urlOutputFilter Filter to apply to URLs (handling jsessionid values
+   *          etc).
+   * @param linkHandler Handler for resolving and rendering links
+   * @param imageHandler Handler for resolving and rendering images
+   * @param macros List of macros to reply
+   * @return The AST of the page, after macro application.
+   */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
+    String contents = page.getContent();
 
-  public CreoleRenderer(final RenderNode[] customBlock, final RenderNode[] customInline) {
-    RegexMatchToTag root = new RegexMatchToTag("", "", 0);
-    RenderNode noWiki = new RegexMatchToTag("(?s)(^|\\n)\\{\\{\\{(.*?)\\}\\}\\}(\\n|$)", "pre", 2);
-    RenderNode paragraph = new RegexMatchToTag("(^|\\n)([ \\t]*[^\\s].*(\\n|$))+", "p", 0);
-    RenderNode italic = new RegexMatchToTag("(?s)//(.*?)(?<=[^:])//", "em", 1);
-    RenderNode strikethrough = new RegexMatchToTag("--(.+?)--", "del", 1);
-    RenderNode bold = new RegexMatchToTag("(?s)[*][*](.*?)[*][*]", "strong", 1);
-    RenderNode lineBreak = new RegexMatchToTag("\\\\\\\\", "br", null);
-    RenderNode horizontalRule = new RegexMatchToTag("(^|\\n)\\s*----\\s*(\\n|$)", "hr", null);
-    RenderNode unorderedList = new ListNode("\\*", "ul");
-    RenderNode orderedList = new ListNode("#", "ol");
-    RenderNode rawUrl = new RawUrlNode();
-    RenderNode inlineNoWiki = new RegexMatchToTag("\\{\\{\\{(.*?(?:\\n.*?)*?)\\}\\}\\}", "code", 1);
-    RenderNode[] defaultInline = {bold, italic, lineBreak, strikethrough, rawUrl, inlineNoWiki};
-    RenderNode[] inline = concat(customInline, defaultInline);
+    // The grammar and lexer assume they'll not hit an EOF after various things,
+    // so add a newline in if there's not one already there.
+    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n"))
+      contents += "\n";
 
-    // These are used when matching table headings and cells
-    final String notPipeNorDoubleOpenOpt = "([^\\[|]*(\\[(?!\\[))?[^\\[|]*)*";
-    final String pairOfDoubleOpenOpt = "((\\[\\[)(.*?)(\\]\\]))*";
+    // Reset the expansion limit.
+    expansionLimit = 100;
 
-    RenderNode table = new RegexMatchToTag("(^|\\n)(\\|.*\\|[ \\t]*(\\n|$))+", "table", 0);
-    RenderNode tableRow = new RegexMatchToTag("(^|\\n)(\\|.*)\\|[ \\t]*(\\n|$)", "tr", 2);
-
-    // These assume the link format is similar to [[aaa|bbb]] - they will break
-    // if the link format is changed
-    RenderNode tableHeading = new RegexMatchToTag("[|]+=((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "th", 1);
-    RenderNode tableCell = new RegexMatchToTag("[|]+((" + notPipeNorDoubleOpenOpt + pairOfDoubleOpenOpt + ")*)", "td", 1);
-
-    table.addChildren(tableRow);
-    tableRow.addChildren(tableHeading, tableCell);
-    tableHeading.addChildren(concat(inline, noWiki));
-    tableCell.addChildren(concat(inline, noWiki));
-
-    italic.addChildren(inline);
-    bold.addChildren(inline);
-    strikethrough.addChildren(inline);
-
-    paragraph.addChildren(inline);
-    RenderNode fallback = new RegexMatchToTag("", "", 0);
-    fallback.addChildren(paragraph);
-
-    RenderNode listItem = new RegexMatchToTag(".+(\\n[*#].+)*", "li", 0)
-                              .addChildren(unorderedList, orderedList).addChildren(inline);
-    root.addChildren(customBlock);
-    root.addChildren(orderedList, unorderedList, noWiki, table, horizontalRule);
-    root.setFallback(fallback);
-    root.addChildren(
-        noWiki,
-        horizontalRule,
-        table,
-        orderedList.addChildren(listItem),
-        unorderedList.addChildren(listItem),
-        new Heading(6).addChildren(inline),
-        new Heading(5).addChildren(inline),
-        new Heading(4).addChildren(inline),
-        new Heading(3).addChildren(inline),
-        new Heading(2).addChildren(inline),
-        new Heading(1).addChildren(inline)
-     );
-    _root = root;
+    return renderInternal(new ANTLRInputStream(contents), page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 
-  public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
-    return new CompositeResultNode(_root.render(page, page.getContent().replaceAll("\r", ""), null, urlOutputFilter));
+  /**
+   * Render a page with no macros. See
+   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
+   */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    return render(page, urlOutputFilter, linkHandler, imageHandler, new ArrayList<Macro>());
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> T[] concat(final T[] some, final T... more) {
-    T[] all = (T[]) Array.newInstance(some.getClass().getComponentType(), some.length + more.length);
-    System.arraycopy(some, 0, all, 0, some.length);
-    System.arraycopy(more, 0, all, some.length, more.length);
-    return all;
+  /**
+   * Render a page with images rendered as links to their source. See
+   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
+   */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final List<Macro> macros) {
+    return render(page, urlOutputFilter, linkHandler, linkHandler, macros);
   }
 
+  /**
+   * Render a page with no macros, and images rendered as links to their source.
+   * See {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
+   */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler) {
+    return render(page, urlOutputFilter, linkHandler);
+  }
+
+  /**
+   * Render only a part of a page.
+   *
+   * @param page The containing page.
+   * @param content The content to render.
+   * @param urlOutputFilter Filter to apply to URLs (handling jsessionid values
+   *          etc).
+   * @param linkHandler Handler for resolving and rendering links
+   * @param imageHandler Handler for resolving and rendering images
+   * @param macros List of macros to reply
+   * @return The AST of the page, after macro application.
+   */
+  public static ASTNode renderPart(PageInfo page, String content, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, List<Macro> macros) {
+    return renderInternal(new ANTLRInputStream(content), page, urlOutputFilter, imageHandler, imageHandler, macros);
+  }
 }

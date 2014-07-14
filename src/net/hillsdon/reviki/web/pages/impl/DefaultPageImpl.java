@@ -72,7 +72,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -365,7 +365,7 @@ public class DefaultPageImpl implements DefaultPage {
             }
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ResultNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
+          ASTNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
           request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
@@ -400,7 +400,7 @@ public class DefaultPageImpl implements DefaultPage {
       return new RawPageView(main);
     }
     else {
-      ResultNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
+      ASTNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
       return new JspView("ViewPage");
     }

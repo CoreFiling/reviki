@@ -50,7 +50,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 
 import org.easymock.EasyMock;
 
@@ -188,7 +188,7 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   private void expectRenderContent() throws Exception  {
-    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())), isA(URLOutputFilter.class))).andReturn(new LiteralResultNode("Content")).once();
+    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())), isA(URLOutputFilter.class))).andReturn(new Raw("Content")).once();
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {

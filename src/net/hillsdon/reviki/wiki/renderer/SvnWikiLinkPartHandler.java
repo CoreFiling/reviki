@@ -18,7 +18,6 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.net.URISyntaxException;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
-import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -30,8 +29,6 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
-import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
-import net.hillsdon.reviki.wiki.renderer.result.CompositeResultNode;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
@@ -75,11 +72,6 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _linkResolutionContext = null;
 
     _interWikiLinker = interWikiLinker;
-  }
-
-  public String handle(final PageInfo page, final RenderNode renderer, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
-    final String xhtmlContent = new CompositeResultNode(renderer.render(page, link.getText(), null, urlOutputFilter)).toXHTML();
-    return handle(page, xhtmlContent, link, urlOutputFilter);
   }
 
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {

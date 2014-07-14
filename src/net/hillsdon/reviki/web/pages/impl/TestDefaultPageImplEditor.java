@@ -31,7 +31,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.easymock.EasyMock;
 
@@ -52,7 +52,7 @@ public class TestDefaultPageImplEditor extends TestCase {
   private WikiGraph _graph;
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
-  private ResultNode _resultNode;
+  private ASTNode _resultNode;
 
   private FeedWriter _feedWriter;
   private VersionedPageInfoImpl _pageInfo;
@@ -72,7 +72,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
     _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
-    _resultNode = createMock(ResultNode.class);
+    _resultNode = createMock(ASTNode.class);
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
   }
 

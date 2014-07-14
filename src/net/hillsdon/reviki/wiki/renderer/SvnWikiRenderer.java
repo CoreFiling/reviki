@@ -25,42 +25,29 @@ import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleImageNode;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.RenderNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 import com.google.common.base.Supplier;
 
 public class SvnWikiRenderer implements MarkupRenderer {
 
-  private final Configuration _configuration;
-  private final InternalLinker _internalLinker;
-  private final CreoleRenderer _creole;
+  private final Configuration configuration;
+  private final InternalLinker internalLinker;
+  private final SvnWikiLinkPartHandler linkHandler;
+  private final SvnWikiLinkPartHandler imageHandler;
+  private final List<Macro> macros;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
-    _configuration = configuration;
-    _internalLinker = internalLinker;
-    final SvnWikiLinkPartHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, _internalLinker, _configuration);
-    _creole = new CreoleRenderer(
-        new RenderNode[] {
-            new UnescapedHtmlNode(true),
-            new JavaSyntaxHighlightedNode(true),
-            new MacroNode(macros, true),
-        },
-        new RenderNode[] {
-            new JavaSyntaxHighlightedNode(false),
-            new UnescapedHtmlNode(false),
-            new CreoleImageNode(new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, _internalLinker, _configuration)),
-            new CreoleLinkNode(linkHandler),
-            new CustomWikiLinkNode(linkHandler),
-            new MacroNode(macros, false),
-        });
+    this.configuration = configuration;
+    this.internalLinker = internalLinker;
+    this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
+    this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
+    this.macros = macros.get();
   }
 
-  public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return _creole.render(page, urlOutputFilter);
+  public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return CreoleRenderer.render(page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
-
 }

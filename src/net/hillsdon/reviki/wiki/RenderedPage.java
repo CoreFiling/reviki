@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.cyberneko.html.parsers.SAXParser;
 import org.xml.sax.Attributes;
@@ -37,7 +37,7 @@ public class RenderedPage {
   private final String _pageName;
   private final String _rendered; 
 
-  public RenderedPage(final String pageName, final ResultNode resultNode) {
+  public RenderedPage(final String pageName, final ASTNode resultNode) {
     _pageName = pageName;
     _rendered = resultNode.toXHTML();
   }
