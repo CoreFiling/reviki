@@ -30,13 +30,6 @@ public class CreoleRenderer {
    * @return The AST of the page, after macro application.
    */
   private static ASTNode renderInternal(ANTLRInputStream in, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
-    String contents = page.getContent();
-
-    // The grammar and lexer assume they'll not hit an EOF after various things,
-    // so add a newline in if there's not one already there.
-    if (!contents.substring(contents.length() - 1).equals("\n"))
-      contents += "\n";
-
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -75,7 +68,7 @@ public class CreoleRenderer {
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
     // so add a newline in if there's not one already there.
-    if (!contents.substring(contents.length() - 1).equals("\n"))
+    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n"))
       contents += "\n";
 
     // Reset the expansion limit.
