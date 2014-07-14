@@ -108,8 +108,27 @@ public class Visitor extends CreoleASTBuilder {
   public ASTNode visitInline(InlineContext ctx) {
     List<ASTNode> chunks = new ArrayList<ASTNode>();
 
+    // Merge adjacent Any nodes into long Plaintext nodes, to give a more useful
+    // AST.
+    ASTNode last = null;
     for (InlinestepContext itx : ctx.inlinestep()) {
-      chunks.add(visit(itx));
+      ASTNode rendered = visit(itx);
+      if (last == null) {
+        last = rendered;
+      }
+      else {
+        if (last instanceof Plaintext && rendered instanceof Plaintext) {
+          last = new Plaintext(((Plaintext)last).getText() + ((Plaintext)rendered).getText());
+        }
+        else {
+          chunks.add(last);
+          last = rendered;
+        }
+      }
+    }
+
+    if (last != null) {
+      chunks.add(last);
     }
 
     return new Inline(chunks);

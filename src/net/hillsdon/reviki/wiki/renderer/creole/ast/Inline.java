@@ -10,8 +10,14 @@ public class Inline extends ASTNode {
   public String toXHTML() {
     String out = "";
 
+    boolean first = true;
     for (ASTNode node : getChildren()) {
+      if (!first) {
+        out += " ";
+      }
+
       out += node.toXHTML();
+      first = false;
     }
 
     return out;

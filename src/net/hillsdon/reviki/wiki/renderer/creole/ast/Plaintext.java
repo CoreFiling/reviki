@@ -13,4 +13,8 @@ public class Plaintext extends ASTNode {
   public String toXHTML() {
     return Escape.html(contents);
   }
+
+  public String getText() {
+    return contents;
+  }
 }
