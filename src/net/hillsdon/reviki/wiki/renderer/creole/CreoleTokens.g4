@@ -89,7 +89,7 @@ options { superClass=ContextSensitiveLexer; }
 /* ***** Headings ***** */
 
 HSt  : LINE '='+ ~'=' WS? {doHdr();} ;
-HEnd : ' '* '='* ('\r'? '\n' {seek(-1);} | EOF) {inHeader}? {inHeader = false; resetFormatting();} ;
+HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {inHeader = false; resetFormatting();} ;
 
 /* ***** Lists ***** */
 
