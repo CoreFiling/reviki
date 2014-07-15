@@ -167,9 +167,6 @@ StartXml   : '[<xml>]'   {xml=true;}   -> mode(CODE_INLINE) ;
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
 
-IBLSt : 'ibug:' -> mode(BUG_LINK) ;
-EBLSt : 'bug:'  -> mode(BUG_LINK) ;
-
 /* ***** Breaks ***** */
 
 InlineBrk : '\\\\' ;
@@ -182,7 +179,7 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
 
-WikiWords : (ALNUM+ ':')? UPPER ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+;
+WikiWords : (ALNUM+ ':')? UPNUM ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+;
 
 /* ***** Macros ***** */
 
@@ -213,10 +210,6 @@ ImEnd : '}}' -> mode(DEFAULT_MODE) ;
 Sep : '|' ;
 
 InLink : ~(']'|'}'|'|')+ ;
-
-mode BUG_LINK;
-
-BugNum : DIGIT+ -> mode(DEFAULT_MODE) ;
 
 mode MACRO;
 
