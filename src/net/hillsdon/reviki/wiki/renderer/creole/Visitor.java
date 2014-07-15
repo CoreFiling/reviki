@@ -436,11 +436,7 @@ public class Visitor extends CreoleASTBuilder {
 
   /**
    * Render a table row. A table row consists of a number of cells, and a
-   * possible trailing separator. At the moment, the trailing separator is
-   * handled explicitly here, rather than nicely in the grammar.
-   *
-   * TODO: Handle the trailing separator in the grammar, and remove the check
-   * here.
+   * possible trailing separator.
    */
   @Override
   public ASTNode visitTrow(TrowContext ctx) {
@@ -448,15 +444,6 @@ public class Visitor extends CreoleASTBuilder {
 
     for (TcellContext rtx : ctx.tcell()) {
       cells.add(visit(rtx));
-    }
-
-    // If the last cell is empty, it's a trailing separator - not actually a new
-    // cell.
-    if (cells.size() != 0) {
-      ASTNode last = cells.get(cells.size() - 1);
-      if (last instanceof TableCell && last.getChildren().get(0).toXHTML().matches("^\\W*$")) {
-        cells.remove(last);
-      }
     }
 
     return new TableRow(cells);
