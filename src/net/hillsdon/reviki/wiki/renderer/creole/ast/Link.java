@@ -29,8 +29,7 @@ public class Link extends ASTNode {
       return handler.handle(page, parts.getText(), parts, urlOutputFilter);
     }
     catch (Exception e) {
-      // TODO: Come up with a better way to handle this
-      return "<a href=\"#\">Bad Link</a>";
+      return "<strike style='color: red'>" + parts.getText() + "</strike>";
     }
   }
 
