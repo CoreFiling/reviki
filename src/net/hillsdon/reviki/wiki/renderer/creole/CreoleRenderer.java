@@ -130,10 +130,7 @@ public class CreoleRenderer {
     // Reset the expansion limit.
     expansionLimit = 100;
 
-    long startTime = System.nanoTime();
-    ASTNode out = renderInternal(new ANTLRInputStream(contents), page, urlOutputFilter, linkHandler, imageHandler, macros);
-    System.out.println("Rendered " + page.getPath() + " in " + (System.nanoTime() - startTime) / 1000000000.0 + "s");
-    return out;
+    return renderInternal(new ANTLRInputStream(contents), page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 
   /**
