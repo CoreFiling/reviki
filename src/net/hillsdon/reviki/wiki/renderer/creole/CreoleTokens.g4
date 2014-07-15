@@ -182,7 +182,7 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
 
-WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)+) ((UPPER | DIGIT) ((ALNUM|'.')* ALNUM)*)+;
+WikiWords : (ALNUM+ ':')? UPPER ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+;
 
 /* ***** Macros ***** */
 
@@ -195,6 +195,8 @@ WS  : (' '|'\t')+ ;
 
 fragment START : {start}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
+fragment LOWNUM : (LOWER | DIGIT) ;
+fragment UPNUM  : (UPPER | DIGIT) ;
 fragment ALNUM : (ALPHA | DIGIT) ;
 fragment ALPHA : (UPPER | LOWER) ;
 fragment UPPER : ('A'..'Z') ;
