@@ -12,10 +12,6 @@ public class Inline extends ASTNode {
 
     boolean first = true;
     for (ASTNode node : getChildren()) {
-      if (!first) {
-        out += " ";
-      }
-
       out += node.toXHTML();
       first = false;
     }
