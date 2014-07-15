@@ -84,12 +84,26 @@ options { superClass=ContextSensitiveLexer; }
       setText(url.substring(0, url.length() - 1));
     }
   }
+
+  public void breakOut() {
+    resetFormatting();
+    ulistLevel = 0;
+    olistLevel = 0;
+    inHeader = false;
+    intr = false;
+    nowiki = false;
+    cpp = false;
+    html = false;
+    java = false;
+    xhtml = false;
+    xml = false;
+  }
 }
 
 /* ***** Headings ***** */
 
 HSt  : LINE '='+ ~'=' WS? {doHdr();} ;
-HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {inHeader = false; resetFormatting();} ;
+HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */
 
@@ -107,13 +121,13 @@ O5 : START '#####' ~'#' {olistLevel >= 4}? {doOlist(5); resetFormatting();} ;
 
 /* ***** Horizontal Rules ***** */
 
-Rule : LINE '---' '-'+? {resetFormatting();} ;
+Rule : LINE '---' '-'+? {breakOut();} ;
 
 /* ***** Tables ***** */
 
-RowEnd  : '|' LineBreak {intr}? {intr=false;} ;
-TdStart : '|'  {resetFormatting(); intr=true;} ;
-ThStart : '|=' {resetFormatting(); intr=true;} ;
+RowEnd  : '|' LineBreak {intr}? {breakOut();} ;
+TdStart : '|'  {breakOut(); intr=true;} ;
+ThStart : '|=' {breakOut(); intr=true;} ;
 
 /* ***** Inline Formatting ***** */
 
@@ -141,7 +155,7 @@ ImSt  : '{{' -> mode(LINK) ;
 
 InlineBrk : '\\\\' ;
 
-ParBreak  : LineBreak LineBreak+ {resetFormatting();} ;
+ParBreak  : LineBreak LineBreak+ {breakOut();} ;
 
 LineBreak : '\r'? '\n' ;
 
