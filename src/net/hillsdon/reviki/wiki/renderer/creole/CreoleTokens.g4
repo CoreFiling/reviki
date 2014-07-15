@@ -111,6 +111,14 @@ options { superClass=ContextSensitiveLexer; }
 
     return ends;
   }
+
+  public boolean checkWW() {
+    String ww = getText();
+    String prior = get(-ww.length() - 1);
+    String next = next();
+
+    return !(prior.matches("\\w") || next.matches("\\w"));
+  }
 }
 
 /* ***** Headings ***** */
@@ -179,7 +187,8 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
 
-WikiWords : (ALNUM+ ':')? UPNUM ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+;
+WikiWords : (ALNUM+ ':' UPNUM ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+
+            |UPPER ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+) {checkWW()}?;
 
 /* ***** Macros ***** */
 
@@ -190,6 +199,7 @@ MacroSt : '<<' -> mode(MACRO) ;
 Any : . ;
 WS  : (' '|'\t')+ ;
 
+fragment NOTALNUM : ~('A'..'Z'|'a'..'z'|'0'..'9') ;
 fragment START : {start}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 fragment LOWNUM : (LOWER | DIGIT) ;
