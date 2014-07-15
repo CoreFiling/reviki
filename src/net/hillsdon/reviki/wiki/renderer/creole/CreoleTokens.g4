@@ -187,8 +187,11 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
 
-WikiWords : (ALNUM+ ':' UPNUM ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+
-            |UPPER ((LOWNUM|'.')* LOWNUM)+ (UPNUM ((LOWNUM|'.')* LOWNUM)*)+) {checkWW()}?;
+WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkWW()}? ;
+
+fragment INTERWIKI : ALPHA+ ':' ;
+fragment ABBR      : UPPER UPPER+ ;
+fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UPNUM+) ;
 
 /* ***** Macros ***** */
 
