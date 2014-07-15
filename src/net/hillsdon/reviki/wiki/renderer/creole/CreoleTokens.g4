@@ -161,7 +161,7 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
 
-WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)*) ((UPPER | DIGIT) ((ALNUM|'.')* ALNUM)*)+;
+WikiWords : (ALNUM+ ':')? (UPPER ((ALNUM|'.')* ALNUM)+) ((UPPER | DIGIT) ((ALNUM|'.')* ALNUM)*)+;
 
 /* ***** Macros ***** */
 
