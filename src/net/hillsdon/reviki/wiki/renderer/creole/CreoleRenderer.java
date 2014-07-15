@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.*;
 
 import net.hillsdon.reviki.vc.PageInfo;
@@ -33,7 +34,24 @@ public class CreoleRenderer {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
 
-    ParseTree tree = parser.creole();
+    // First try parsing in SLL mode with no error handling. This is really fast
+    // for pages with no parse errors.
+    ParseTree tree;
+
+    try {
+      parser.setErrorHandler(new BailErrorStrategy());
+      parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+      tree = parser.creole();
+    }
+    catch (Exception ex) {
+      // The page contains errors, fall back to the default parsing behaviour
+      // and make them wait.
+      tokens.reset();
+      parser.reset();
+      parser.setErrorHandler(new DefaultErrorStrategy());
+      parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+      tree = parser.creole();
+    }
 
     ParseTreeVisitor<ASTNode> visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
 
