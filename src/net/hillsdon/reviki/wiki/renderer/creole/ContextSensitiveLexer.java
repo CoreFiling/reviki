@@ -24,7 +24,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
 
     /** Whether we're currently inside it or not */
     boolean active;
-    
+
     public Formatting(String symbol) {
       this.symbol = symbol;
       this.active = false;
@@ -75,9 +75,10 @@ public abstract class ContextSensitiveLexer extends Lexer {
   public String next() {
     return next(1);
   }
-  
+
   /**
    * Seek the input stream, relative to the current position.
+   *
    * @param amount The amount to seek by.
    */
   public void seek(int amount) {
@@ -133,6 +134,12 @@ public abstract class ContextSensitiveLexer extends Lexer {
       }
     }
 
+    for (String ender : thisKillsTheFormatting()) {
+      if (ender != null && !findBefore(formatting.symbol, ender)) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -160,7 +167,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
   public void unsetFormatting(Formatting formatting) {
     formatting.active = false;
   }
-  
+
   /**
    * Turn off all formatting.
    */
@@ -169,9 +176,14 @@ public abstract class ContextSensitiveLexer extends Lexer {
       unsetFormatting(fmat);
     }
   }
-  
+
   /**
    * Set up any inline formatting.
    */
   public abstract void setupFormatting();
+
+  /**
+   * Get a list of strings which can end inline formatting at this point.
+   */
+  public abstract String[] thisKillsTheFormatting();
 }

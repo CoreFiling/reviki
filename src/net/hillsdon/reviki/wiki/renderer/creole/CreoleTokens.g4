@@ -90,6 +90,24 @@ options { superClass=ContextSensitiveLexer; }
     xhtml = false;
     xml = false;
   }
+
+  public String[] thisKillsTheFormatting() {
+    String[] ends = new String[2];
+
+    if(inHeader || intr || listLevel > 0) {
+      ends[0] = "\n";
+    } else {
+      ends[0] = null;
+    }
+
+    if(intr) {
+      ends[1] = "|";
+    } else {
+      ends[1] = null;
+    }
+
+    return ends;
+  }
 }
 
 /* ***** Headings ***** */
