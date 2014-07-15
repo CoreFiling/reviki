@@ -158,7 +158,7 @@ MacroSt : '<<' -> mode(MACRO) ;
 /* ***** Miscellaneous ***** */
 
 Any : . ;
-WS  : (' '|'\t'|'\r'|'\n')+ ;
+WS  : (' '|'\t')+ ;
 
 fragment START : {start}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
