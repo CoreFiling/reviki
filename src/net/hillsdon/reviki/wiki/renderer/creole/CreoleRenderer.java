@@ -26,6 +26,54 @@ public class CreoleRenderer {
   private static int expansionLimit;
 
   /**
+   * Try to run a parser, resetting the input on failure.
+   *
+   * @param tokens The token stream. Consumed by the parser, and reset on
+   *          failure.
+   * @param parser The parser. Reset on failure.
+   * @param errors The error recovery strategy.
+   * @param pmode The prediction mode.
+   * @return A parse tree.
+   */
+  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, ANTLRErrorStrategy errors, PredictionMode pmode) {
+    parser.setErrorHandler(errors);
+    parser.getInterpreter().setPredictionMode(pmode);
+    try {
+      return parser.creole();
+    }
+    catch (RuntimeException ex) {
+      tokens.reset();
+      parser.reset();
+      throw ex;
+    }
+  }
+
+  /**
+   * Helper for tryParse using LL(*) prediction. See
+   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
+   */
+  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, ANTLRErrorStrategy errors) {
+    return tryParse(tokens, parser, errors, PredictionMode.LL);
+  }
+
+  /**
+   * Helper for tryParse using the default error strategy. See
+   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
+   */
+  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, PredictionMode pmode) {
+    return tryParse(tokens, parser, new DefaultErrorStrategy(), pmode);
+  }
+
+  /**
+   * Helper for tryParse using the default error strategy and LL(*) prediction.
+   * See
+   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
+   */
+  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser) {
+    return tryParse(tokens, parser, new DefaultErrorStrategy(), PredictionMode.LL);
+  }
+
+  /**
    * Render a stream of text. See
    * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)} and
    * {@link #renderPart(PageInfo, String, URLOutputFilter, LinkPartsHandler, LinkPartsHandler, List)}
@@ -39,23 +87,15 @@ public class CreoleRenderer {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
 
-    // First try parsing in SLL mode with no error handling. This is really fast
-    // for pages with no parse errors.
+    // First try parsing in SLL mode. This is really fast for pages with no
+    // parse errors.
     ParseTree tree;
 
     try {
-      parser.setErrorHandler(new BailErrorStrategy());
-      parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-      tree = parser.creole();
+      tree = tryParse(tokens, parser, PredictionMode.SLL);
     }
-    catch (Exception ex) {
-      // The page contains errors, fall back to the default parsing behaviour
-      // and make them wait.
-      tokens.reset();
-      parser.reset();
-      parser.setErrorHandler(new DefaultErrorStrategy());
-      parser.getInterpreter().setPredictionMode(PredictionMode.LL);
-      tree = parser.creole();
+    catch (Exception e1) {
+      tree = tryParse(tokens, parser);
     }
 
     ParseTreeVisitor<ASTNode> visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
@@ -96,7 +136,10 @@ public class CreoleRenderer {
     // Reset the expansion limit.
     expansionLimit = 100;
 
-    return renderInternal(new ANTLRInputStream(contents), page, urlOutputFilter, linkHandler, imageHandler, macros);
+    long startTime = System.nanoTime();
+    ASTNode out = renderInternal(new ANTLRInputStream(contents), page, urlOutputFilter, linkHandler, imageHandler, macros);
+    System.out.println("Rendered " + page.getPath() + " in " + (System.nanoTime() - startTime) / 1000000000.0 + "s");
+    return out;
   }
 
   /**
