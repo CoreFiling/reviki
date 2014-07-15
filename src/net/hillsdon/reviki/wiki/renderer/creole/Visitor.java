@@ -152,6 +152,15 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render a bugtracker link
+   */
+  @Override
+  public ASTNode visitBuglink(BuglinkContext ctx) {
+    String url = String.format(CreoleRenderer.BUG_LINK_URL, ctx.BugNum().getText());
+    return new Link(url, ctx.getText(), page, urlOutputFilter, linkHandler);
+  }
+
+  /**
    * Render a raw URL link.
    */
   @Override

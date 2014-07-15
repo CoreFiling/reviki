@@ -142,6 +142,7 @@ StartXml   : '[<xml>]'   {xml=true;}   -> mode(CODE_INLINE) ;
 
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
+BLSt  : 'ibug:' -> mode(BUG_LINK) ;
 
 /* ***** Breaks ***** */
 
@@ -184,6 +185,10 @@ ImEnd : '}}' -> mode(DEFAULT_MODE) ;
 Sep : '|' ;
 
 InLink : ~(']'|'}'|'|')+ ;
+
+mode BUG_LINK;
+
+BugNum : DIGIT+ -> mode(DEFAULT_MODE) ;
 
 mode MACRO;
 
