@@ -472,7 +472,7 @@ public class Visitor extends CreoleASTBuilder {
     // cell.
     if (cells.size() != 0) {
       ASTNode last = cells.get(cells.size() - 1);
-      if (last instanceof TableCell && last.getChildren().get(0).toXHTML().equals("")) {
+      if (last instanceof TableCell && last.getChildren().get(0).toXHTML().matches("^\\W*$")) {
         cells.remove(last);
       }
     }
