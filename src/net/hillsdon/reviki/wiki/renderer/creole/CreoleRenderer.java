@@ -15,9 +15,10 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 public class CreoleRenderer {
 
   /**
-   * Format string for rendering bugtracker links.
+   * Format strings for rendering bugtracker links.
    */
-  public final static String BUG_LINK_URL = "https://bugs.int.corefiling.com/show_bug.cgi?id=%s";
+  public final static String EXTERNAL_BUG_URL = "http://bugs.corefiling.com/show_bug.cgi?id=%s";
+  public final static String INTERNAL_BUG_URL = "https://bugs.int.corefiling.com/show_bug.cgi?id=%s";
 
   /**
    * Macro expansion depth limit. This gets reset when rendering a page, but not

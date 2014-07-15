@@ -63,7 +63,7 @@ nowiki     : NoWiki EndNoWikiBlock ;
 inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
-           | link | titlelink | simpleimg | imglink | wikiwlink | buglink | rawlink
+           | link | titlelink | simpleimg | imglink | wikiwlink | ebuglink | ibuglink | rawlink
            | inlinecode | preformat
            | linebreak
            | macro
@@ -86,7 +86,9 @@ simpleimg  : ImSt InLink ImEnd ;
 
 wikiwlink  : WikiWords ;
 
-buglink    : BLSt BugNum ;
+ebuglink    : EBLSt BugNum ;
+
+ibuglink    : IBLSt BugNum ;
 
 rawlink    : RawUrl ;
 

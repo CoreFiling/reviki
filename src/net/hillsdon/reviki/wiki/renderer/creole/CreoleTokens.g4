@@ -117,9 +117,12 @@ Rule : LINE '---' '-'+? {breakOut();} ;
 
 /* ***** Tables ***** */
 
+TdStartLn : LINE '|'  {intr=true; setType(TdStart);} ;
+ThStartLn : LINE '|=' {intr=true; setType(ThStart);} ;
+
 RowEnd  : '|' LineBreak {intr}? {breakOut();} ;
-TdStart : '|'  {breakOut(); intr=true;} ;
-ThStart : '|=' {breakOut(); intr=true;} ;
+TdStart : '|'  {intr}? {breakOut(); intr=true;} ;
+ThStart : '|=' {intr}? {breakOut(); intr=true;} ;
 
 /* ***** Inline Formatting ***** */
 
@@ -142,7 +145,9 @@ StartXml   : '[<xml>]'   {xml=true;}   -> mode(CODE_INLINE) ;
 
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
-BLSt  : 'ibug:' -> mode(BUG_LINK) ;
+
+IBLSt : 'ibug:' -> mode(BUG_LINK) ;
+EBLSt : 'bug:'  -> mode(BUG_LINK) ;
 
 /* ***** Breaks ***** */
 
