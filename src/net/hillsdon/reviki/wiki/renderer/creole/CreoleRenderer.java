@@ -179,6 +179,6 @@ public class CreoleRenderer {
    * @return The AST of the page, after macro application.
    */
   public static ASTNode renderPart(PageInfo page, String content, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, List<Macro> macros) {
-    return renderInternal(new ANTLRInputStream(content), page, urlOutputFilter, imageHandler, imageHandler, macros);
+    return renderInternal(new ANTLRInputStream(content), page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 }
