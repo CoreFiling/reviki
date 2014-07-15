@@ -30,18 +30,23 @@ heading   : HSt inline HEnd? ;
 paragraph : inline ;
 
 ulist      : ulist1+ ;
-ulist1     : U1 (WS ulist | olist | inline) ulist2* ;
-ulist2     : U2 (WS ulist | olist | inline) ulist3* ;
-ulist3     : U3 (WS ulist | olist | inline) ulist4* ;
-ulist4     : U4 (WS ulist | olist | inline) ulist5* ;
+ulist1     : U1 (WS ulist | olist | inline) list2* ;
+ulist2     : U2 (WS ulist | olist | inline) list3* ;
+ulist3     : U3 (WS ulist | olist | inline) list4* ;
+ulist4     : U4 (WS ulist | olist | inline) list5* ;
 ulist5     : U5 (WS ulist | olist | inline) ;
 
 olist      : olist1+ ;
-olist1     : O1 (WS olist | ulist | inline) olist2* ;
-olist2     : O2 (WS olist | ulist | inline) olist3* ;
-olist3     : O3 (WS olist | ulist | inline) olist4* ;
-olist4     : O4 (WS olist | ulist | inline) olist5* ;
+olist1     : O1 (WS olist | ulist | inline) list2* ;
+olist2     : O2 (WS olist | ulist | inline) list3* ;
+olist3     : O3 (WS olist | ulist | inline) list4* ;
+olist4     : O4 (WS olist | ulist | inline) list5* ;
 olist5     : O5 (WS olist | ulist | inline) ;
+
+list2      : olist2 | ulist2 ;
+list3      : olist3 | ulist3 ;
+list4      : olist4 | ulist4 ;
+list5      : olist5 | ulist5 ;
 
 hrule      : Rule ;
 

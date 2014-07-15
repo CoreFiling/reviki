@@ -305,25 +305,29 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist1(Olist1Context ctx) {
-    return renderListItem(ListType.Ordered, ctx.olist2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list2().isEmpty() || ctx.list2().get(0).ulist2() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list2(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist2(Olist2Context ctx) {
-    return renderListItem(ListType.Ordered, ctx.olist3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list3().isEmpty() || ctx.list3().get(0).ulist3() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list3(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist3(Olist3Context ctx) {
-    return renderListItem(ListType.Ordered, ctx.olist4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list4().isEmpty() || ctx.list4().get(0).ulist4() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list4(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist4(Olist4Context ctx) {
-    return renderListItem(ListType.Ordered, ctx.olist5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list5().isEmpty() || ctx.list5().get(0).ulist5() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list5(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
@@ -341,25 +345,29 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist1(Ulist1Context ctx) {
-    return renderListItem(ListType.Unordered, ctx.ulist2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list2().isEmpty() || ctx.list2().get(0).ulist2() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list2(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist2(Ulist2Context ctx) {
-    return renderListItem(ListType.Unordered, ctx.ulist3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list3().isEmpty() || ctx.list3().get(0).ulist3() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list3(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist3(Ulist3Context ctx) {
-    return renderListItem(ListType.Unordered, ctx.ulist4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list4().isEmpty() || ctx.list4().get(0).ulist4() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list4(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist4(Ulist4Context ctx) {
-    return renderListItem(ListType.Unordered, ctx.ulist5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    ListType type = (ctx.list5().isEmpty() || ctx.list5().get(0).ulist5() == null) ? ListType.Ordered : ListType.Unordered;
+    return renderListItem(type, ctx.list5(), ctx.olist(), ctx.ulist(), ctx.inline());
   }
 
   /** See {@link #visitOlist} */

@@ -23,8 +23,7 @@ options { superClass=ContextSensitiveLexer; }
 
   public boolean inHeader = false;
   public boolean start = false;
-  public int olistLevel = 0;
-  public int ulistLevel = 0;
+  public int listLevel = 0;
   boolean nowiki = false;
   boolean cpp = false;
   boolean html = false;
@@ -60,18 +59,12 @@ options { superClass=ContextSensitiveLexer; }
     start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
   }
 
-  public void doUlist(int level) {
-    ulistLevel = level;
+  public void doList(int level) {
+    listLevel = level;
 
     seek(-1);
     setStart();
-  }
-
-  public void doOlist(int level) {
-    olistLevel = level;
-
-    seek(-1);
-    setStart();
+    resetFormatting();
   }
 
   public void doUrl() {
@@ -87,8 +80,7 @@ options { superClass=ContextSensitiveLexer; }
 
   public void breakOut() {
     resetFormatting();
-    ulistLevel = 0;
-    olistLevel = 0;
+    listLevel = 0;
     inHeader = false;
     intr = false;
     nowiki = false;
@@ -107,17 +99,17 @@ HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */
 
-U1 : START '*' ~'*'                        {doUlist(1); resetFormatting();} ;
-U2 : START '**' ~'*'    {ulistLevel >= 1}? {doUlist(2); resetFormatting();} ;
-U3 : START '***' ~'*'   {ulistLevel >= 2}? {doUlist(3); resetFormatting();} ;
-U4 : START '****' ~'*'  {ulistLevel >= 3}? {doUlist(4); resetFormatting();} ;
-U5 : START '*****' ~'*' {ulistLevel >= 4}? {doUlist(5); resetFormatting();} ;
+U1 : START '*' ~'*'                       {doList(1);} ;
+U2 : START '**' ~'*'    {listLevel >= 1}? {doList(2);} ;
+U3 : START '***' ~'*'   {listLevel >= 2}? {doList(3);} ;
+U4 : START '****' ~'*'  {listLevel >= 3}? {doList(4);} ;
+U5 : START '*****' ~'*' {listLevel >= 4}? {doList(5);} ;
 
-O1 : START '#' ~'#'                        {doOlist(1); resetFormatting();} ;
-O2 : START '##' ~'#'    {olistLevel >= 1}? {doOlist(2); resetFormatting();} ;
-O3 : START '###' ~'#'   {olistLevel >= 2}? {doOlist(3); resetFormatting();} ;
-O4 : START '####' ~'#'  {olistLevel >= 3}? {doOlist(4); resetFormatting();} ;
-O5 : START '#####' ~'#' {olistLevel >= 4}? {doOlist(5); resetFormatting();} ;
+O1 : START '#' ~'#'                       {doList(1);} ;
+O2 : START '##' ~'#'    {listLevel >= 1}? {doList(2);} ;
+O3 : START '###' ~'#'   {listLevel >= 2}? {doList(3);} ;
+O4 : START '####' ~'#'  {listLevel >= 3}? {doList(4);} ;
+O5 : START '#####' ~'#' {listLevel >= 4}? {doList(5);} ;
 
 /* ***** Horizontal Rules ***** */
 
