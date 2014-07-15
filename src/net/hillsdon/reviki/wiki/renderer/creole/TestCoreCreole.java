@@ -15,7 +15,7 @@ import org.codehaus.jackson.JsonParseException;
 
 public class TestCoreCreole extends JsonDrivenRenderingTest {
   public TestCoreCreole() throws JsonParseException, IOException {
-    super(TestCoreCreole.class.getResource("../core-creole.json"));
+    super(TestCoreCreole.class.getResource("core-creole.json"));
   }
 
   @Override

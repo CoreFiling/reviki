@@ -16,7 +16,7 @@ import org.codehaus.jackson.JsonParseException;
 public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
 
   public TestCreole1Point0SpecExtracts() throws JsonParseException, IOException {
-    super(TestCreole1Point0SpecExtracts.class.getResource("../spec-extracts.json"));
+    super(TestCreole1Point0SpecExtracts.class.getResource("spec-extracts.json"));
   }
 
   @Override
