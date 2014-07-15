@@ -220,9 +220,9 @@ mode LINK;
 LiEnd : ']]' -> mode(DEFAULT_MODE) ;
 ImEnd : '}}' -> mode(DEFAULT_MODE) ;
 
-Sep : '|' ;
+Sep : ' '* '|' ' '*;
 
-InLink : ~(']'|'}'|'|')+ ;
+InLink : ~(']'|'}'|'|')+ {setText(getText().trim());};
 
 mode MACRO;
 
