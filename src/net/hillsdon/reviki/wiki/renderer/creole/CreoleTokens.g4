@@ -92,7 +92,7 @@ options { superClass=ContextSensitiveLexer; }
   }
 
   public String[] thisKillsTheFormatting() {
-    String[] ends = new String[2];
+    String[] ends = new String[4];
 
     if(inHeader || intr || listLevel > 0) {
       ends[0] = "\n";
@@ -105,6 +105,9 @@ options { superClass=ContextSensitiveLexer; }
     } else {
       ends[1] = null;
     }
+
+    ends[2] = "\n\n";
+    ends[3] = "\r\n\r\n";
 
     return ends;
   }
