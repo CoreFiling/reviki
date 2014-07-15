@@ -79,7 +79,7 @@ options { superClass=ContextSensitiveLexer; }
     String last = url.substring(url.length()-1);
     String next = next();
 
-    if((last + next).equals("//") || (last+next).equals(". ") || (last+next).equals(", ")) {
+    if((last + next).equals("//") || last.equals(".") || last.equals(",")) {
       seek(-1);
       setText(url.substring(0, url.length() - 1));
     }
