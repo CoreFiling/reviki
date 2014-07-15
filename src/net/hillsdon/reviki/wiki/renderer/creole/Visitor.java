@@ -37,6 +37,67 @@ public class Visitor extends CreoleASTBuilder {
 
     for (BlockContext btx : ctx.block()) {
       ASTNode ren = visit(btx);
+
+      // If a paragaph just consists of macros or inline code, separated by
+      // newlines, render them all as blocks - even though there is no parbreak.
+      if (ren instanceof Paragraph) {
+        ASTNode inline = ren.getChildren().get(0);
+        boolean rearrange = true;
+
+        // We can either start with a \n, or an inline.
+        boolean even = inline.getChildren().get(0).toXHTML().matches("^\r?\n$");
+
+        for (int i = 0; i < inline.getChildren().size(); i++) {
+          ASTNode child = inline.getChildren().get(i);
+          boolean isbrk = child.toXHTML().matches("^\r?\n$");
+          boolean iscode = child instanceof InlineCode;
+          boolean ismacro = child instanceof MacroNode;
+
+          // There are four possibilities:
+          // - We're at an even index, and expect even breaks. If so, bail out
+          // if there is no break.
+          // - We're at an even index, and don't expect even breaks. If so, fail
+          // if it's not code or a macro.
+          // Similarly for odd indexes.
+          if (i % 2 == 0) {
+            if (even && !isbrk) {
+              rearrange = false;
+              break;
+            }
+            else if (!even && !(iscode || ismacro)) {
+              rearrange = false;
+              break;
+            }
+          }
+          else {
+            if (!even && !isbrk) {
+              rearrange = false;
+              break;
+            }
+            else if (even && !(iscode || ismacro)) {
+              rearrange = false;
+              break;
+            }
+          }
+        }
+
+        // We got this far, so it's time to rearrange.
+        if (rearrange) {
+          for (ASTNode child : inline.getChildren()) {
+            if (!child.toXHTML().matches("^\r?\n$")) {
+              if (child instanceof InlineCode) {
+                blocks.add(((InlineCode)child).toBlock());
+              }
+              else {
+                blocks.add(child);
+              }
+            }
+          }
+          continue;
+        }
+      }
+
+      // Otherwise, just add the block to the list.
       if (ren != null) {
         blocks.add(ren);
       }
@@ -55,49 +116,11 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * Render a paragraph node. This consists of a single inline element. Leading
-   * and trailing newlines are stripped, and if the paragraph consists solely of
-   * an inline nowiki line, it is instead rendered as a nowiki block, to
-   * replicate old behaviour.
+   * Render a paragraph node. This consists of a single inline element.
    */
   @Override
   public ASTNode visitParagraph(ParagraphContext ctx) {
-    ASTNode body = visit(ctx.inline());
-
-    ASTNode inner = body;
-
-    // Drop leading and trailing newlines (TODO: Figure out how to do this in
-    // the grammar, along with all the other stuff)
-    if (body instanceof Inline) {
-      int children = body.getChildren().size();
-      if (children > 0 && body.getChildren().get(0).toXHTML().equals("\n")) {
-        body = new Inline(body.getChildren().subList(1, children));
-        children--;
-      }
-
-      if (children > 0 && body.getChildren().get(children - 1).toXHTML().equals("\n")) {
-        body = new Inline(body.getChildren().subList(0, children - 1));
-      }
-    }
-
-    // If a paragraph contains nothing but an inline nowiki element, render that
-    // as a block nowiki element. Not quite to spec, but replicates old
-    // behaviour.
-    if (body instanceof Inline && body.getChildren().size() == 1) {
-      inner = body.getChildren().get(0);
-    }
-
-    if (inner instanceof InlineCode) {
-      return ((InlineCode) inner).toBlock();
-    }
-
-    // If a paragraph contains only a macro node, remove the enclosing
-    // paragraph.
-    if (inner instanceof MacroNode) {
-      return inner;
-    }
-
-    return new Paragraph(body);
+    return new Paragraph(visit(ctx.inline()));
   }
 
   /**
@@ -118,7 +141,7 @@ public class Visitor extends CreoleASTBuilder {
       }
       else {
         if (last instanceof Plaintext && rendered instanceof Plaintext) {
-          last = new Plaintext(((Plaintext)last).getText() + ((Plaintext)rendered).getText());
+          last = new Plaintext(((Plaintext) last).getText() + ((Plaintext) rendered).getText());
         }
         else {
           chunks.add(last);
