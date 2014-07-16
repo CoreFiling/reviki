@@ -72,7 +72,7 @@ options { superClass=ContextSensitiveLexer; }
     String last = url.substring(url.length()-1);
     String next = next();
 
-    if((last + next).equals("//") || last.equals(".") || last.equals(",") || last.equals(")")) {
+    if((last + next).equals("//") || last.matches("[\\.,)\"]")) {
       seek(-1);
       setText(url.substring(0, url.length() - 1));
     }
@@ -177,7 +177,7 @@ LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
-RawUrl    : (URL {doUrl();} | ATTACHMENT {checkBounds("[a-zA-Z0-9@\\./]", "[a-zA-Z0-9@/]")}?) ;
+RawUrl    : (URL {doUrl();} | ATTACHMENT {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}?) ;
 
 fragment URL : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ ;
 fragment ATTACHMENT : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ ;
