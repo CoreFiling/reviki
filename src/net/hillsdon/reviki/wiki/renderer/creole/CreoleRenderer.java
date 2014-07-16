@@ -99,7 +99,7 @@ public class CreoleRenderer {
     // Decrement the expansion limit
     expansionLimit--;
 
-    if (expansionLimit >= 0) {
+    if (expansionLimit >= 0 && macros != null) {
       return rendered.expandMacros(macros);
     }
     else {
