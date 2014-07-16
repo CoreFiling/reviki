@@ -77,6 +77,14 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
+   * Helper method for {@link #get(int)}, which gets the character prior to the
+   * token.
+   */
+  public String prior() {
+    return (_input.index() > getText().length()) ? get(-getText().length() - 1) : "";
+  }
+
+  /**
    * Seek the input stream, relative to the current position.
    *
    * @param amount The amount to seek by.
@@ -187,11 +195,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *         character immediately after do not match it.
    */
   public boolean checkBounds(String forbiddenFst, String forbiddenSnd) {
-    String txt = getText();
-    String prior = (_input.index() > txt.length()) ? get(-txt.length() - 1) : "";
-    String next = next();
-
-    return !(prior.matches(forbiddenFst) || next.matches(forbiddenSnd));
+    return !(prior().matches(forbiddenFst) || next().matches(forbiddenSnd));
   }
 
   /** See {@link #checkBounds(String, String)} */

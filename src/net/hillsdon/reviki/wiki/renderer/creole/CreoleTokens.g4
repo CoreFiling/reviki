@@ -97,22 +97,24 @@ options { superClass=ContextSensitiveLexer; }
   }
 
   public String[] thisKillsTheFormatting() {
-    String[] ends = new String[4];
+    String[] ends = new String[5];
 
     if(inHeader || intr || listLevel > 0) {
       ends[0] = "\n";
+      ends[1] = "\r\n";
     } else {
       ends[0] = null;
-    }
-
-    if(intr) {
-      ends[1] = "|";
-    } else {
       ends[1] = null;
     }
 
-    ends[2] = "\n\n";
-    ends[3] = "\r\n\r\n";
+    if(intr) {
+      ends[2] = "|";
+    } else {
+      ends[2] = null;
+    }
+
+    ends[3] = "\n\n";
+    ends[4] = "\r\n\r\n";
 
     return ends;
   }
@@ -163,11 +165,11 @@ ThStart : '|=' {intr}? {breakOut(); intr=true;} ;
 /* ***** Inline Formatting ***** */
 
 BSt : '**' {!bold.active}?   {setFormatting(bold,   Any);} ;
-ISt : '//' {!italic.active}? {setFormatting(italic, Any);} ;
+ISt : '//' {!italic.active && !prior().equals(":")}? {setFormatting(italic, Any);} ;
 SSt : '--' {!strike.active}? {setFormatting(strike, Any);} ;
 
 BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
-IEnd : '//' {italic.active}? {unsetFormatting(italic);} ;
+IEnd : '//' {italic.active && !prior().equals(":")}? {unsetFormatting(italic);} ;
 SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
 NoWiki     : '{{{'      {nowiki=true;} -> mode(CODE_INLINE) ;
@@ -253,7 +255,7 @@ AnyInline : ~('\r'|'\n') -> more;
 
 OopsItsABlock : ('\r'|'\n') -> mode(CODE_BLOCK), more ;
 
-EndNoWikiInline : '}}}' (~'}' {seek(-1);} | EOF) {nowiki}? -> mode(DEFAULT_MODE) ;
+EndNoWikiInline : '}}}' ~'}' {nowiki}? {nowiki=false; seek(-1);} -> mode(DEFAULT_MODE) ;
 EndCppInline   : '[</c++>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
 EndHtmlInline  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
 EndJavaInline  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
