@@ -187,7 +187,9 @@ LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
-RawUrl : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ {doUrl();} ;
+RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ {doUrl();} ;
+
+fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'mailto:' ;
 
 Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}? ;
 
