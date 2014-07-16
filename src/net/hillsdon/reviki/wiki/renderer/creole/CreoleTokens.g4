@@ -114,7 +114,7 @@ options { superClass=ContextSensitiveLexer; }
 
   public boolean checkWW() {
     String ww = getText();
-    String prior = get(-ww.length() - 1);
+    String prior = (_input.index() > ww.length()) ? get(-ww.length() - 1) : "";
     String next = next();
 
     return !(prior.matches("\\w") || next.matches("\\w"));
