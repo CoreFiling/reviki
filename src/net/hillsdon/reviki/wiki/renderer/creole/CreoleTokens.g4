@@ -200,7 +200,7 @@ fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'mailto:' ;
 
 Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}? ;
 
-WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
+WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
 
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
