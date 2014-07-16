@@ -25,6 +25,58 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * If a paragraph starts with a sequence of inline code or macros, separated
+   * by newlines, render them as blocks and the remaining text (if any) as a
+   * paragraph following this.
+   *
+   * @param paragraph The paragraph to expand out.
+   * @return A list of blocks, which may just consist of the original paragraph.
+   */
+  protected List<ASTNode> expandParagraph(Paragraph paragraph) {
+    ASTNode inline = paragraph.getChildren().get(0);
+    List<ASTNode> chunks = inline.getChildren();
+    int numchunks = chunks.size();
+
+    // Drop empty inlines, as that means we've examined an entire paragraph.
+    if (numchunks == 0) {
+      return new ArrayList<ASTNode>();
+    }
+
+    ASTNode head = chunks.get(0);
+    String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
+    List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
+    Paragraph rest = new Paragraph(new Inline(tail));
+
+    // Drop leading whitespace
+    if (head.toXHTML().matches("^\r?\n$")) {
+      return expandParagraph(rest);
+    }
+
+    // Check if we have a valid separator
+    ASTNode block = null;
+    if (sep.startsWith("\r\n") || sep.startsWith("\n")) {
+      if (head instanceof InlineCode) {
+        block = ((InlineCode) head).toBlock();
+      }
+      else if (head instanceof MacroNode) {
+        block = head;
+      }
+    }
+
+    // Check if we have a match, and build the result list.
+    List<ASTNode> out = new ArrayList<ASTNode>();
+    if (block == null) {
+      out.add(paragraph);
+    }
+    else {
+      out.add(block);
+      out.addAll(expandParagraph(rest));
+    }
+
+    return out;
+  }
+
+  /**
    * Render the root node, creole. creole contains zero or more block elements
    * separated by linebreaks and paragraph breaks.
    *
@@ -38,69 +90,14 @@ public class Visitor extends CreoleASTBuilder {
     for (BlockContext btx : ctx.block()) {
       ASTNode ren = visit(btx);
 
-      // If a paragaph just consists of macros or inline code, separated by
-      // newlines, render them all as blocks - even though there is no parbreak.
+      // If we have a paragraph, rip off initial inline code and macros.
       if (ren instanceof Paragraph) {
-        ASTNode inline = ren.getChildren().get(0);
-        boolean rearrange = true;
-
-        // We can either start with a \n, or an inline.
-        boolean even = inline.getChildren().get(0).toXHTML().matches("^\r?\n$");
-
-        for (int i = 0; i < inline.getChildren().size(); i++) {
-          ASTNode child = inline.getChildren().get(i);
-          boolean isbrk = child.toXHTML().matches("^\r?\n$");
-          boolean iscode = child instanceof InlineCode;
-          boolean ismacro = child instanceof MacroNode;
-
-          // There are four possibilities:
-          // - We're at an even index, and expect even breaks. If so, bail out
-          // if there is no break.
-          // - We're at an even index, and don't expect even breaks. If so, fail
-          // if it's not code or a macro.
-          // Similarly for odd indexes.
-          if (i % 2 == 0) {
-            if (even && !isbrk) {
-              rearrange = false;
-              break;
-            }
-            else if (!even && !(iscode || ismacro)) {
-              rearrange = false;
-              break;
-            }
-          }
-          else {
-            if (!even && !isbrk) {
-              rearrange = false;
-              break;
-            }
-            else if (even && !(iscode || ismacro)) {
-              rearrange = false;
-              break;
-            }
-          }
-        }
-
-        // We got this far, so it's time to rearrange.
-        if (rearrange) {
-          for (ASTNode child : inline.getChildren()) {
-            if (!child.toXHTML().matches("^\r?\n$")) {
-              if (child instanceof InlineCode) {
-                blocks.add(((InlineCode)child).toBlock());
-              }
-              else {
-                blocks.add(child);
-              }
-            }
-          }
-          continue;
-        }
+        blocks.addAll(expandParagraph((Paragraph) ren));
+        continue;
       }
 
       // Otherwise, just add the block to the list.
-      if (ren != null) {
-        blocks.add(ren);
-      }
+      blocks.add(ren);
     }
 
     return new Page(blocks);
