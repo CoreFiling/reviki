@@ -184,7 +184,7 @@ fragment ATTACHMENT : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ ;
 
 WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
 
-fragment INTERWIKI : ALPHA+ ':' ;
+fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
 fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UPNUM+) ;
 
