@@ -1,6 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -30,9 +31,12 @@ public class Visitor extends CreoleASTBuilder {
    * paragraph following this.
    *
    * @param paragraph The paragraph to expand out.
+   * @param reversed Whether the paragraph is reversed or not. If so, the final
+   *          trailing paragraph has its chunks reversed, to ease re-ordering
+   *          later.
    * @return A list of blocks, which may just consist of the original paragraph.
    */
-  protected List<ASTNode> expandParagraph(Paragraph paragraph) {
+  protected List<ASTNode> expandParagraph(Paragraph paragraph, boolean reversed) {
     ASTNode inline = paragraph.getChildren().get(0);
     List<ASTNode> chunks = inline.getChildren();
     int numchunks = chunks.size();
@@ -46,33 +50,42 @@ public class Visitor extends CreoleASTBuilder {
     String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
     List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
     Paragraph rest = new Paragraph(new Inline(tail));
+    List<ASTNode> out = new ArrayList<ASTNode>();
 
     // Drop leading whitespace
     if (head.toXHTML().matches("^\r?\n$")) {
-      return expandParagraph(rest);
+      return expandParagraph(rest, reversed);
     }
 
-    // Check if we have a valid separator
-    ASTNode block = null;
-    if (sep.startsWith("\r\n") || sep.startsWith("\n")) {
-      if (head instanceof InlineCode) {
-        block = ((InlineCode) head).toBlock();
+    // Only continue if there is a hope of expanding it
+    if (head instanceof InlineCode || head instanceof MacroNode) {
+      // Check if we have a valid separator
+      ASTNode block = null;
+      if (sep.startsWith("\r\n") || sep.startsWith("\n") || sep.startsWith("<br")) {
+        if (head instanceof InlineCode) {
+          block = ((InlineCode) head).toBlock();
+        }
+        else if (head instanceof MacroNode) {
+          block = head;
+        }
       }
-      else if (head instanceof MacroNode) {
-        block = head;
+
+      // Check if we have a match, and build the result list.
+      if (block != null) {
+        out.add(block);
+        out.addAll(expandParagraph(rest, reversed));
+        return out;
       }
     }
 
-    // Check if we have a match, and build the result list.
-    List<ASTNode> out = new ArrayList<ASTNode>();
-    if (block == null) {
-      out.add(paragraph);
+    if (reversed) {
+      List<ASTNode> rchunks = new ArrayList<ASTNode>(inline.getChildren());
+      Collections.reverse(rchunks);
+      out.add(new Paragraph(new Inline(rchunks)));
     }
     else {
-      out.add(block);
-      out.addAll(expandParagraph(rest));
+      out.add(paragraph);
     }
-
     return out;
   }
 
@@ -90,9 +103,29 @@ public class Visitor extends CreoleASTBuilder {
     for (BlockContext btx : ctx.block()) {
       ASTNode ren = visit(btx);
 
-      // If we have a paragraph, rip off initial inline code and macros.
+      // If we have a paragraph, rip off initial and trailing inline code and
+      // macros.
       if (ren instanceof Paragraph) {
-        blocks.addAll(expandParagraph((Paragraph) ren));
+        List<ASTNode> expandedInit = expandParagraph((Paragraph) ren, false);
+        List<ASTNode> expandedTail = new ArrayList<ASTNode>();
+
+        // Handle trailing things by extracting the chunks of the final
+        // paragraph, reversing, extracting the prefix again, and then reversing
+        // the result.
+        if (expandedInit.size() > 0 && expandedInit.get(expandedInit.size() - 1) instanceof Paragraph) {
+          Paragraph paragraph = (Paragraph) expandedInit.get(expandedInit.size() - 1);
+          expandedInit.remove(paragraph);
+
+          List<ASTNode> chunks = new ArrayList<ASTNode>(paragraph.getChildren().get(0).getChildren());
+          Collections.reverse(chunks);
+
+          expandedTail = expandParagraph(new Paragraph(new Inline(chunks)), true);
+          Collections.reverse(expandedTail);
+        }
+
+        blocks.addAll(expandedInit);
+        blocks.addAll(expandedTail);
+
         continue;
       }
 
