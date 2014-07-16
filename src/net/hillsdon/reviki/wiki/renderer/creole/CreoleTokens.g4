@@ -72,7 +72,7 @@ options { superClass=ContextSensitiveLexer; }
     String last = url.substring(url.length()-1);
     String next = next();
 
-    if((last + next).equals("//") || last.equals(".") || last.equals(",")) {
+    if((last + next).equals("//") || last.equals(".") || last.equals(",") || last.equals(")")) {
       seek(-1);
       setText(url.substring(0, url.length() - 1));
     }
@@ -217,12 +217,12 @@ fragment DIGIT : ('0'..'9') ;
 
 mode LINK;
 
-LiEnd : ']]' -> mode(DEFAULT_MODE) ;
-ImEnd : '}}' -> mode(DEFAULT_MODE) ;
+LiEnd : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+ImEnd : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 Sep : ' '* '|' ' '*;
 
-InLink : ~(']'|'}'|'|')+ {setText(getText().trim());};
+InLink : ~(']'|'}'|'|'|'\r'|'\n')+ {setText(getText().trim());};
 
 mode MACRO;
 
