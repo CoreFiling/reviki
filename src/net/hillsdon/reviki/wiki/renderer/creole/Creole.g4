@@ -30,23 +30,38 @@ heading   : HSt inline HEnd? ;
 paragraph : inline ;
 
 ulist      : (ulist1 LineBreak?)+;
-ulist1     : U1 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
-ulist2     : U2 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
-ulist3     : U3 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
-ulist4     : U4 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
-ulist5     : U5 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) ;
+ulist1     : U1  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
+ulist2     : U2  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
+ulist3     : U3  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
+ulist4     : U4  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
+ulist5     : U5  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list6* ;
+ulist6     : U6  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list7* ;
+ulist7     : U7  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list8* ;
+ulist8     : U8  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list9* ;
+ulist9     : U9  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list10* ;
+ulist10    : U10 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) ;
 
 olist      : (olist1 LineBreak?)+ ;
-olist1     : O1 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
-olist2     : O2 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
-olist3     : O3 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
-olist4     : O4 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
-olist5     : O5 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) ;
+olist1     : O1  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
+olist2     : O2  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
+olist3     : O3  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
+olist4     : O4  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
+olist5     : O5  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list6* ;
+olist6     : O6  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list7* ;
+olist7     : O7  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list8* ;
+olist8     : O8  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list9* ;
+olist9     : O9  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list10* ;
+olist10    : O10 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) ;
 
 list2      : (olist2 | ulist2) LineBreak? ;
 list3      : (olist3 | ulist3) LineBreak? ;
 list4      : (olist4 | ulist4) LineBreak? ;
 list5      : (olist5 | ulist5) LineBreak? ;
+list6      : (olist6 | ulist6) LineBreak? ;
+list7      : (olist7 | ulist7) LineBreak? ;
+list8      : (olist8 | ulist8) LineBreak? ;
+list9      : (olist9 | ulist9) LineBreak? ;
+list10     : (olist10 | ulist10) LineBreak? ;
 
 hrule      : Rule ;
 

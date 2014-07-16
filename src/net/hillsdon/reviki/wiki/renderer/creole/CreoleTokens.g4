@@ -120,17 +120,27 @@ HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */
 
-U1 : START '*' ~'*'                       {doList(1);} ;
-U2 : START '**' ~'*'    {listLevel >= 1}? {doList(2);} ;
-U3 : START '***' ~'*'   {listLevel >= 2}? {doList(3);} ;
-U4 : START '****' ~'*'  {listLevel >= 3}? {doList(4);} ;
-U5 : START '*****' ~'*' {listLevel >= 4}? {doList(5);} ;
+U1  : START '*' ~'*'                            {doList(1);} ;
+U2  : START '**' ~'*'         {listLevel >= 1}? {doList(2);} ;
+U3  : START '***' ~'*'        {listLevel >= 2}? {doList(3);} ;
+U4  : START '****' ~'*'       {listLevel >= 3}? {doList(4);} ;
+U5  : START '*****' ~'*'      {listLevel >= 4}? {doList(5);} ;
+U6  : START '******' ~'*'     {listLevel >= 5}? {doList(6);} ;
+U7  : START '*******' ~'*'    {listLevel >= 6}? {doList(7);} ;
+U8  : START '********' ~'*'   {listLevel >= 7}? {doList(8);} ;
+U9  : START '*********' ~'*'  {listLevel >= 8}? {doList(9);} ;
+U10 : START '**********' ~'*' {listLevel >= 9}? {doList(10);} ;
 
-O1 : START '#' ~'#'                       {doList(1);} ;
-O2 : START '##' ~'#'    {listLevel >= 1}? {doList(2);} ;
-O3 : START '###' ~'#'   {listLevel >= 2}? {doList(3);} ;
-O4 : START '####' ~'#'  {listLevel >= 3}? {doList(4);} ;
-O5 : START '#####' ~'#' {listLevel >= 4}? {doList(5);} ;
+O1  : START '#' ~'#'                            {doList(1);} ;
+O2  : START '##' ~'#'         {listLevel >= 1}? {doList(2);} ;
+O3  : START '###' ~'#'        {listLevel >= 2}? {doList(3);} ;
+O4  : START '####' ~'#'       {listLevel >= 3}? {doList(4);} ;
+O5  : START '#####' ~'#'      {listLevel >= 4}? {doList(5);} ;
+O6  : START '######' ~'#'     {listLevel >= 5}? {doList(6);} ;
+O7  : START '#######' ~'#'    {listLevel >= 6}? {doList(7);} ;
+O8  : START '########' ~'#'   {listLevel >= 7}? {doList(8);} ;
+O9  : START '#########' ~'#'  {listLevel >= 8}? {doList(9);} ;
+O10 : START '##########' ~'#' {listLevel >= 9}? {doList(10);} ;
 
 /* ***** Horizontal Rules ***** */
 
