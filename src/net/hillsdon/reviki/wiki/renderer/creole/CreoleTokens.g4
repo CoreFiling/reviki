@@ -179,7 +179,7 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl    : (URL {doUrl();} | ATTACHMENT {checkBounds("[a-zA-Z0-9@\\./]", "[a-zA-Z0-9@/]")}?) ;
 
-fragment URL : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ ;
+fragment URL : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ ;
 fragment ATTACHMENT : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ ;
 
 WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
