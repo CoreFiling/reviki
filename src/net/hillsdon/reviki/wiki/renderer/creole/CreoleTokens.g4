@@ -72,10 +72,15 @@ options { superClass=ContextSensitiveLexer; }
     String last = url.substring(url.length()-1);
     String next = next();
 
-    if((last + next).equals("//") || last.matches("[\\.,)\"]")) {
+    if(url.endsWith("://") || url.endsWith("mailto:")) { setType(Any); }
+
+    while((last + next).equals("//") || last.matches("[\\.,)\"]")) {
       seek(-1);
-      setText(url.substring(0, url.length() - 1));
+      url = url.substring(0, url.length() - 1);
+      last = url.substring(url.length()-1);
+      next = next();
     }
+    setText(url);
   }
 
   public void breakOut() {
