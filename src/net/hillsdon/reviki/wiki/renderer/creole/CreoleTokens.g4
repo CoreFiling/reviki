@@ -177,10 +177,9 @@ LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
-RawUrl    : (URL {doUrl();} | ATTACHMENT {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}?) ;
+RawUrl : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ {doUrl();} ;
 
-fragment URL : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ ;
-fragment ATTACHMENT : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ ;
+Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}? ;
 
 WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
 

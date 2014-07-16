@@ -205,6 +205,19 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render an attachment link
+   */
+  @Override
+  public ASTNode visitAttachment(AttachmentContext ctx) {
+    // It would be nice to check in here if the attachment exists, and only
+    // render it as a link if so (could also make the tokenisation much more
+    // naive), but that would break backwards compatibility, sadly.
+    // This could be done fairly simply by just passing in a reference to the
+    // PageStore.
+    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+  }
+
+  /**
    * Render a raw URL link.
    */
   @Override

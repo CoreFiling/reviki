@@ -63,7 +63,7 @@ nowiki     : NoWiki EndNoWikiBlock ;
 inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
-           | link | titlelink | simpleimg | imglink | wikiwlink | rawlink
+           | link | titlelink | simpleimg | imglink | wikiwlink | attachment | rawlink
            | inlinecode | preformat
            | linebreak
            | macro
@@ -85,6 +85,8 @@ imglink    : ImSt InLink Sep InLink ImEnd ;
 simpleimg  : ImSt InLink ImEnd ;
 
 wikiwlink  : WikiWords ;
+
+attachment : Attachment ;
 
 rawlink    : RawUrl ;
 
