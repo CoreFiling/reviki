@@ -61,7 +61,7 @@ public class Visitor extends CreoleASTBuilder {
     if (head instanceof InlineCode || head instanceof MacroNode) {
       // Check if we have a valid separator
       ASTNode block = null;
-      if (sep.startsWith("\r\n") || sep.startsWith("\n") || sep.startsWith("<br")) {
+      if (!reversed && (sep.startsWith("\r\n") || sep.startsWith("\n")) || (reversed && sep.endsWith("\n")) || sep.startsWith("<br")) {
         if (head instanceof InlineCode) {
           block = ((InlineCode) head).toBlock();
         }
