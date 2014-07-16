@@ -119,6 +119,16 @@ options { superClass=ContextSensitiveLexer; }
 
     return !(prior.matches("\\w") || next.matches("\\w"));
   }
+
+  public boolean checkAttachment() {
+    String attach = getText();
+    String prior = (_input.index() > attach.length()) ? get(-attach.length() - 1) : "";
+    String next = next();
+
+    String forbidden = "[a-zA-Z0-9@\\./]";
+
+    return !(prior.matches(forbidden) || next.matches(forbidden));
+  }
 }
 
 /* ***** Headings ***** */
@@ -185,7 +195,10 @@ LineBreak : '\r'? '\n' ;
 
 /* ***** Links ***** */
 
-RawUrl    : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ {doUrl();};
+RawUrl    : (URL {doUrl();} | ATTACHMENT {checkAttachment()}?) ;
+
+fragment URL : (('http' 's'? | 'ftp') '://' | 'mailto:') (~(' '|'\t'|'\r'|'\n'|'/'|'|'|'['|']')+ '/'?)+ ;
+fragment ATTACHMENT : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ ;
 
 WikiWords : ((INTERWIKI UPNUM | UPPER) (ABBR | CAMEL) | INTERWIKI UPNUM+) {checkWW()}? ;
 
