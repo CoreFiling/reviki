@@ -36,6 +36,20 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   protected URLOutputFilter urlOutputFilter;
 
   /**
+   * Aggregate results produced by visitChildren. This returns the "right"most
+   * non-null result found.
+   */
+  @Override
+  protected ASTNode aggregateResult(ASTNode aggregate, ASTNode nextResult) {
+    if (nextResult == null) {
+      return aggregate;
+    }
+    else {
+      return nextResult;
+    }
+  }
+
+  /**
    * Construct a new parse tree visitor.
    *
    * @param page The page being rendered.
