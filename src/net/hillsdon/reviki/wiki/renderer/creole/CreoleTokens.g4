@@ -173,11 +173,11 @@ ThStart : '|'+ '=' {intr}? {breakOut(); intr=true;} ;
 /* ***** Inline Formatting ***** */
 
 BSt : '**' {!bold.active}?   {setFormatting(bold,   Any);} ;
-ISt : '//' {!italic.active && !prior().equals(":")}? {setFormatting(italic, Any);} ;
+ISt : '//' {!italic.active && !prior().matches("[a-zA-Z0-9]:")}? {setFormatting(italic, Any);} ;
 SSt : '--' {!strike.active}? {setFormatting(strike, Any);} ;
 
 BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
-IEnd : '//' {italic.active && !prior().equals(":")}? {unsetFormatting(italic);} ;
+IEnd : '//' {italic.active && !prior().matches("[a-zA-Z0-9]:")}? {unsetFormatting(italic);} ;
 SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
 NoWiki     : '{{{'      {nowiki=true;} -> mode(CODE_INLINE) ;

@@ -122,7 +122,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
 
       if (target.equals(get(i, tlen))) {
         // Special case for italics: the "//" in "://" is not an italic symbol.
-        if (target.equals("//") && get(i - 1, 3).equals("://")) {
+        if (target.equals("//") && get(i - 2, 4).matches("[a-zA-Z0-9]://")) {
           continue;
         }
         return true;
