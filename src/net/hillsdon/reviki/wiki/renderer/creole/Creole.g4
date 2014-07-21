@@ -92,9 +92,9 @@ sthrough   : SSt inline? SEnd ;
 
 link       : LiSt InLink LiEnd ;
 
-titlelink  : LiSt InLink Sep InLink LiEnd ;
+titlelink  : LiSt InLink? Sep InLink LiEnd ;
 
-imglink    : ImSt InLink Sep InLink ImEnd ;
+imglink    : ImSt InLink? Sep InLink ImEnd ;
 
 simpleimg  : ImSt InLink ImEnd ;
 
