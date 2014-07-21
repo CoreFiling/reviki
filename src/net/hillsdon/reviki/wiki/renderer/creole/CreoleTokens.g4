@@ -196,7 +196,7 @@ ImSt  : '{{' -> mode(LINK) ;
 
 InlineBrk : '\\\\' ;
 
-ParBreak  : LineBreak LineBreak+ {breakOut();} ;
+ParBreak  : LineBreak WS? LineBreak+ {breakOut();} ;
 
 LineBreak : '\r'? '\n' ;
 
