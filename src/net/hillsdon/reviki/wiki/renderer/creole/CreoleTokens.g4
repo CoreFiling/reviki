@@ -264,7 +264,7 @@ mode CODE_INLINE;
 
 AnyInline : ~('\r'|'\n') -> more;
 
-OopsItsABlock : ('\r'|'\n') -> mode(CODE_BLOCK), more ;
+OopsItsABlock : ('\r'|'\n') {seek(-1);} -> mode(CODE_BLOCK), more ;
 
 EndNoWikiInline : '}}}' ~'}' {nowiki}? {nowiki=false; seek(-1);} -> mode(DEFAULT_MODE) ;
 EndCppInline   : '[</c++>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
