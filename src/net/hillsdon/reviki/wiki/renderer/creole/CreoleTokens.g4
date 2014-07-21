@@ -159,7 +159,7 @@ O10 : START '##########' ~'#' {listLevel >= 9}? {doList(10);} ;
 
 /* ***** Horizontal Rules ***** */
 
-Rule : LINE '---' '-'+? {breakOut();} ;
+Rule : LINE '---' '-'+ {breakOut();} ;
 
 /* ***** Tables ***** */
 
