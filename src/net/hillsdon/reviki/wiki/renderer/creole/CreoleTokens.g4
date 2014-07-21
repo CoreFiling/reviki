@@ -130,7 +130,7 @@ options { superClass=ContextSensitiveLexer; }
 
 /* ***** Headings ***** */
 
-HSt  : LINE '='+ ~'=' WS? {doHdr();} ;
+HSt  : LINE '='+ ~'=' {doHdr();} ;
 HEnd : ' '* '='* (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */

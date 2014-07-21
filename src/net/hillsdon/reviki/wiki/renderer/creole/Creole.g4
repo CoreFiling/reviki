@@ -24,7 +24,7 @@ block     : heading
 
 /* ***** Block Elements ***** */
 
-heading   : HSt inline HEnd? ;
+heading   : HSt WS? inline HEnd? ;
 
 paragraph : inline ;
 
