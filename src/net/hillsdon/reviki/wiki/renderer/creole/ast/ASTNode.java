@@ -50,11 +50,13 @@ public abstract class ASTNode {
     this.tag = tag;
     this.body = body;
 
-    if (children == null) {
-      this.children = new ArrayList<ASTNode>();
-    }
-    else {
-      this.children = children;
+    this.children = new ArrayList<ASTNode>();
+    if (children != null) {
+      for (ASTNode child : children) {
+        if (child != null) {
+          this.children.add(child);
+        }
+      }
     }
   }
 
