@@ -204,7 +204,7 @@ LineBreak : '\r'? '\n' ;
 
 RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ {doUrl();} ;
 
-fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'mailto:' ;
+fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' ;
 
 Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWNUM ALNUM+ {checkBounds("[a-zA-Z0-9@\\./=\\-_]", "[a-zA-Z0-9@/=-_]")}? ;
 
