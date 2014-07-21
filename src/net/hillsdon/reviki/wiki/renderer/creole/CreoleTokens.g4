@@ -166,7 +166,7 @@ Rule : LINE '---' '-'+ {breakOut();} ;
 TdStartLn : LINE '|'+  {intr=true; setType(TdStart);} ;
 ThStartLn : LINE '|'+ '=' {intr=true; setType(ThStart);} ;
 
-RowEnd  : '|'+ WS? LineBreak {intr}? {breakOut();} ;
+RowEnd  : '|' WS? LineBreak {intr}? {breakOut();} ;
 TdStart : '|'+  {intr}? {breakOut(); intr=true;} ;
 ThStart : '|'+ '=' {intr}? {breakOut(); intr=true;} ;
 
