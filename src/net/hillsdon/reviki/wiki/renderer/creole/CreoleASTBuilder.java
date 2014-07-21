@@ -12,6 +12,7 @@ import com.uwyn.jhighlight.renderer.Renderer;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
@@ -23,6 +24,9 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
+  /** The page store (may be null) */
+  protected PageStore store;
+
   /** The page being rendered */
   protected PageInfo page;
 
@@ -52,11 +56,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /**
    * Construct a new parse tree visitor.
    *
+   * @param store The page store (may be null).
    * @param page The page being rendered.
    * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this.store = store;
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
     this.linkHandler = linkHandler;

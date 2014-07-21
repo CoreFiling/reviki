@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
@@ -28,10 +29,13 @@ public class MacroNode extends ASTNode {
 
   private PageInfo page;
 
-  public MacroNode(String name, String args, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  private PageStore store;
+
+  public MacroNode(String name, String args, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super("", null, null);
     this.name = name;
     this.args = args;
+    this.store = store;
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
     this.linkHandler = linkHandler;
@@ -56,7 +60,7 @@ public class MacroNode extends ASTNode {
             case XHTML:
               return new Raw(content);
             case WIKI:
-              return CreoleRenderer.renderPart(page, content, urlOutputFilter, linkHandler, imageHandler, macros);
+              return CreoleRenderer.renderPart(store, page, content, urlOutputFilter, linkHandler, imageHandler, macros);
             default:
               return new Plaintext(content);
           }

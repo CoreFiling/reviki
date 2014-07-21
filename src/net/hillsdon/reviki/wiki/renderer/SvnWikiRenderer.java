@@ -38,6 +38,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
   private final SvnWikiLinkPartHandler linkHandler;
   private final SvnWikiLinkPartHandler imageHandler;
   private final List<Macro> macros;
+  private final PageStore pageStore;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
     this.configuration = configuration;
@@ -45,9 +46,10 @@ public class SvnWikiRenderer implements MarkupRenderer {
     this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
     this.macros = macros.get();
+    this.pageStore = pageStore;
   }
 
   public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return CreoleRenderer.render(page, urlOutputFilter, linkHandler, imageHandler, macros);
+    return CreoleRenderer.render(pageStore, page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 }

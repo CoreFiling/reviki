@@ -8,7 +8,10 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
+import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
@@ -21,8 +24,8 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
-  public Visitor(PageInfo page, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler) {
-    super(page, urlOutputFilter, linkHandler, imageHandler);
+  public Visitor(PageStore store, PageInfo page, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler) {
+    super(store, page, urlOutputFilter, linkHandler, imageHandler);
   }
 
   /**
@@ -214,16 +217,29 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * Render an attachment link
+   * Render an attachment link. If the attachment doesn't exist, it is rendered
+   * in plain text.
    */
   @Override
   public ASTNode visitAttachment(AttachmentContext ctx) {
-    // It would be nice to check in here if the attachment exists, and only
-    // render it as a link if so (could also make the tokenisation much more
-    // naive), but that would break backwards compatibility, sadly.
-    // This could be done fairly simply by just passing in a reference to the
-    // PageStore.
-    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+    if (store != null) {
+      // Check if the attachment exists
+      try {
+        for (AttachmentHistory attachment : store.attachments(page)) {
+          // Skip deleted attachments
+          if (attachment.isAttachmentDeleted())
+            continue;
+
+          // Render the link if the name matches
+          if (attachment.getName().equals(ctx.getText())) {
+            return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+          }
+        }
+      }
+      catch (PageStoreException e) {
+      }
+    }
+    return new Plaintext(ctx.getText());
   }
 
   /**
@@ -619,6 +635,6 @@ public class Visitor extends CreoleASTBuilder {
     if (ctx.MacroEndNoArgs() != null) {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
-    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, urlOutputFilter, linkHandler, imageHandler);
+    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), store, page, urlOutputFilter, linkHandler, imageHandler);
   }
 }
