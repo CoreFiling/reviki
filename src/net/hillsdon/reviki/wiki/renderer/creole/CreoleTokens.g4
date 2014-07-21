@@ -117,8 +117,9 @@ options { superClass=ContextSensitiveLexer; }
     ends[4] = "\r\n\r\n";
 
     if(listLevel > 0) {
-      ends[5] = "\n*";
-      ends[6] = "\n#";
+      // \L (when at the start) matches the start of a line.
+      ends[5] = "\\L*";
+      ends[6] = "\\L#";
     } else {
       ends[5] = null;
       ends[6] = null;

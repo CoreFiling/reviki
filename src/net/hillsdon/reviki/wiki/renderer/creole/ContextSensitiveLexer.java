@@ -109,6 +109,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
     int llen = limit.length();
 
     boolean inlink = false;
+    boolean start = false;
 
     for (int i = 0; i < ilen - tlen; i++) {
       // Keep track of whether we're in a link or not.
@@ -120,6 +121,15 @@ public abstract class ContextSensitiveLexer extends Lexer {
         inlink = false;
       }
 
+      // Keep track of whether we're at the start of a line or not.
+      if (get(i).equals("\n")) {
+        start = true;
+      }
+
+      if (start) {
+        start = get(i).trim().equals("");
+      }
+
       if (target.equals(get(i, tlen))) {
         // Special case for italics: the "//" in "://" is not an italic symbol.
         if (target.equals("//") && get(i - 2, 4).matches("[a-zA-Z0-9]://")) {
@@ -127,13 +137,23 @@ public abstract class ContextSensitiveLexer extends Lexer {
         }
         return true;
       }
-      else if (limit.equals(get(i, llen))) {
-        // Special case for tables and links: '|' doesn't kill formatting in a
-        // link.
-        if (limit.equals("|") && inlink) {
-          continue;
+      else {
+        // \L, at the start of a limit, matches the start of a line.
+        if (limit.startsWith("\\L")) {
+          if (start && limit.substring(2).equals(get(i + 1, llen - 2))) {
+            return false;
+          }
         }
-        return false;
+        else {
+          if (limit.equals(get(i, llen))) {
+            // Special case for tables and links: '|' doesn't kill formatting in
+            // a link.
+            if (limit.equals("|") && inlink) {
+              continue;
+            }
+            return false;
+          }
+        }
       }
     }
 
