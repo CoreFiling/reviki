@@ -64,8 +64,8 @@ list10     : (olist10 | ulist10) LineBreak? ;
 
 hrule      : Rule ;
 
-table      : {noBreak();} trow+ {unsetBreaks();};
-trow       : tcell+ (RowEnd | LineBreak) ;
+table      : {noBreak();} (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? {unsetBreaks();};
+trow       : tcell+ ;
 tcell      : th | td ;
 th         : ThStart inline? ;
 td         : TdStart inline? ;
