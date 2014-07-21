@@ -133,7 +133,16 @@ public class Visitor extends CreoleASTBuilder {
       blocks.add(ren);
     }
 
-    return new Page(blocks);
+    // Remove paragraphs just consisting of whitespace
+    List<ASTNode> blocksNonEmpty = new ArrayList<ASTNode>();
+
+    for (ASTNode block : blocks) {
+      if (!(block instanceof Paragraph && block.getChildren().get(0).toXHTML().trim().equals(""))) {
+        blocksNonEmpty.add(block);
+      }
+    }
+
+    return new Page(blocksNonEmpty);
   }
 
   /**
@@ -607,7 +616,7 @@ public class Visitor extends CreoleASTBuilder {
   @Override
   public ASTNode visitMacro(MacroContext ctx) {
     // If there are no arguments, it's not a macro
-    if(ctx.MacroEndNoArgs() != null) {
+    if (ctx.MacroEndNoArgs() != null) {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
     return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, urlOutputFilter, linkHandler, imageHandler);
