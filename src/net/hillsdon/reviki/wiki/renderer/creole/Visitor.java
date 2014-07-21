@@ -606,6 +606,10 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitMacro(MacroContext ctx) {
+    // If there are no arguments, it's not a macro
+    if(ctx.MacroEndNoArgs() != null) {
+      return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
+    }
     return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, urlOutputFilter, linkHandler, imageHandler);
   }
 }

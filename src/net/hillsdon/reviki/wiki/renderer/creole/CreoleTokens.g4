@@ -249,6 +249,8 @@ mode MACRO;
 
 MacroName : ~(':'|'>')+ ;
 
+MacroEndNoArgs : '>>' -> mode(DEFAULT_MODE) ;
+
 MacroSep  : ':' -> mode(MACRO_ARGS) ;
 
 mode MACRO_ARGS;

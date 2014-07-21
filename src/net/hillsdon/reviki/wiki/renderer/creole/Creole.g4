@@ -108,7 +108,7 @@ preformat  : NoWiki EndNoWikiInline ;
 
 linebreak  : InlineBrk ({canBreak()}? LineBreak)? ;
 
-macro      : MacroSt MacroName MacroSep MacroEnd ;
+macro      : MacroSt MacroName (MacroSep MacroEnd | MacroEndNoArgs) ;
 
 any        : Any | WS | {canBreak()}? LineBreak ;
 
