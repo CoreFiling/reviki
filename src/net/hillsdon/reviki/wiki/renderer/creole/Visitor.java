@@ -154,6 +154,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitHeading(HeadingContext ctx) {
+    if(ctx.inline() == null) return new Plaintext(ctx.HSt().getText());
     return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
   }
 
