@@ -206,7 +206,7 @@ RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']')+ '/'?)+ {doUrl();} ;
 
 fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'mailto:' ;
 
-Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWER LOWNUM+ {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}? ;
+Attachment : UPPER ALNUM* ALPHA ALNUM+ '.' LOWNUM+ {checkBounds("[a-zA-Z0-9@\\./=-]", "[a-zA-Z0-9@/=-]")}? ;
 
 WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) {checkBounds("[\\.\\w]", "\\w")}? ;
 
