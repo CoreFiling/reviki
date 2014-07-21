@@ -108,11 +108,31 @@ public abstract class ContextSensitiveLexer extends Lexer {
     int tlen = target.length();
     int llen = limit.length();
 
+    boolean inlink = false;
+
     for (int i = 0; i < ilen - tlen; i++) {
+      // Keep track of whether we're in a link or not.
+      if (get(i, 2).equals("[[") || get(i, 2).equals("{{")) {
+        inlink = true;
+      }
+
+      if (get(i, 2).equals("]]") || get(i, 2).equals("}}")) {
+        inlink = false;
+      }
+
       if (target.equals(get(i, tlen))) {
+        // Special case for italics: the "//" in "://" is not an italic symbol.
+        if (target.equals("//") && get(i - 1, 3).equals("://")) {
+          continue;
+        }
         return true;
       }
       else if (limit.equals(get(i, llen))) {
+        // Special case for tables and links: '|' doesn't kill formatting in a
+        // link.
+        if (limit.equals("|") && inlink) {
+          continue;
+        }
         return false;
       }
     }
