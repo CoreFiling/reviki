@@ -5,10 +5,9 @@
 
 parser grammar Creole;
 
-options { tokenVocab=CreoleTokens; }
-
-@members {
-  public boolean nobreaks = false;
+options {
+  tokenVocab=CreoleTokens;
+  superClass=ContextSensitiveParser;
 }
 
 /* ***** Top level elements ***** */
@@ -29,29 +28,29 @@ heading   : HSt inline HEnd? ;
 
 paragraph : inline ;
 
-ulist      : (ulist1 LineBreak?)+;
-ulist1     : U1  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
-ulist2     : U2  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
-ulist3     : U3  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
-ulist4     : U4  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
-ulist5     : U5  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list6* ;
-ulist6     : U6  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list7* ;
-ulist7     : U7  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list8* ;
-ulist8     : U8  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list9* ;
-ulist9     : U9  (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list10* ;
-ulist10    : U10 (WS ulist | olist | {nobreaks=true;} inline {nobreaks=false;}) ;
+ulist      : {yesBreak();} (ulist1 LineBreak?)* {unsetBreaks();} {noBreak();} ulist1 LineBreak? {unsetBreaks();};
+ulist1     : U1  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list2* {unsetBreaks();} {noBreak();} list2 {unsetBreaks();})? ;
+ulist2     : U2  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list3* {unsetBreaks();} {noBreak();} list3 {unsetBreaks();})? ;
+ulist3     : U3  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list4* {unsetBreaks();} {noBreak();} list4 {unsetBreaks();})? ;
+ulist4     : U4  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list5* {unsetBreaks();} {noBreak();} list5 {unsetBreaks();})? ;
+ulist5     : U5  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list6* {unsetBreaks();} {noBreak();} list6 {unsetBreaks();})? ;
+ulist6     : U6  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list7* {unsetBreaks();} {noBreak();} list7 {unsetBreaks();})? ;
+ulist7     : U7  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list8* {unsetBreaks();} {noBreak();} list8 {unsetBreaks();})? ;
+ulist8     : U8  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list9* {unsetBreaks();} {noBreak();} list9 {unsetBreaks();})? ;
+ulist9     : U9  (WS ulist | olist | inline) LineBreak? ({yesBreak();} list10* {unsetBreaks();} {noBreak();} list10 {unsetBreaks();})? ;
+ulist10    : U10 (WS ulist | olist | inline) ;
 
-olist      : (olist1 LineBreak?)+ ;
-olist1     : O1  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list2* ;
-olist2     : O2  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list3* ;
-olist3     : O3  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list4* ;
-olist4     : O4  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list5* ;
-olist5     : O5  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list6* ;
-olist6     : O6  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list7* ;
-olist7     : O7  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list8* ;
-olist8     : O8  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list9* ;
-olist9     : O9  (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) LineBreak? list10* ;
-olist10    : O10 (WS olist | ulist | {nobreaks=true;} inline {nobreaks=false;}) ;
+olist      : {yesBreak();} (olist1 LineBreak?)* {unsetBreaks();} {noBreak();} olist1 LineBreak? {unsetBreaks();};
+olist1     : O1  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list2* {unsetBreaks();} {noBreak();} list2 {unsetBreaks();})? ;
+olist2     : O2  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list3* {unsetBreaks();} {noBreak();} list3 {unsetBreaks();})? ;
+olist3     : O3  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list4* {unsetBreaks();} {noBreak();} list4 {unsetBreaks();})? ;
+olist4     : O4  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list5* {unsetBreaks();} {noBreak();} list5 {unsetBreaks();})? ;
+olist5     : O5  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list6* {unsetBreaks();} {noBreak();} list6 {unsetBreaks();})? ;
+olist6     : O6  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list7* {unsetBreaks();} {noBreak();} list7 {unsetBreaks();})? ;
+olist7     : O7  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list8* {unsetBreaks();} {noBreak();} list8 {unsetBreaks();})? ;
+olist8     : O8  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list9* {unsetBreaks();} {noBreak();} list9 {unsetBreaks();})? ;
+olist9     : O9  (WS olist | ulist | inline) LineBreak? ({yesBreak();} list10* {unsetBreaks();} {noBreak();} list10 {unsetBreaks();})? ;
+olist10    : O10 (WS olist | ulist | inline) ;
 
 list2      : (olist2 | ulist2) LineBreak? ;
 list3      : (olist3 | ulist3) LineBreak? ;
@@ -65,7 +64,7 @@ list10     : (olist10 | ulist10) LineBreak? ;
 
 hrule      : Rule ;
 
-table      : {nobreaks=true;} trow+ {nobreaks=false;};
+table      : {noBreak();} trow+ {unsetBreaks();};
 trow       : tcell+ (RowEnd | LineBreak) ;
 tcell      : th | td ;
 th         : ThStart inline? ;
@@ -107,11 +106,11 @@ rawlink    : RawUrl ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
-linebreak  : InlineBrk ({!nobreaks}? LineBreak)? ;
+linebreak  : InlineBrk ({canBreak()}? LineBreak)? ;
 
 macro      : MacroSt MacroName MacroSep MacroEnd ;
 
-any        : Any | WS | {!nobreaks}? LineBreak ;
+any        : Any | WS | {canBreak()}? LineBreak ;
 
 /* ***** Syntax Highlighting ***** */
 
