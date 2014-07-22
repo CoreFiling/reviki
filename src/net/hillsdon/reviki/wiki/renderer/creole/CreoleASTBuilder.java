@@ -204,6 +204,27 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   };
 
   /**
+   * Class to hold the context of a list item to render.
+   */
+  protected class ListItemContext {
+    public ListType type;
+
+    public ParserRuleContext ordered;
+
+    public ParserRuleContext unordered;
+
+    public ListItemContext(ListType type, ParserRuleContext ordered, ParserRuleContext unordered) {
+      this.type = type;
+      this.ordered = ordered;
+      this.unordered = unordered;
+    }
+
+    public ParserRuleContext get() {
+      return (type == ListType.Ordered) ? ordered : unordered;
+    }
+  }
+
+  /**
    * Render a list.
    * 
    * @param type The type of list to build.
@@ -228,7 +249,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /**
    * Render a list item
    *
-   * @param type The type of the list
    * @param childContexts List of child elements
    * @param innerOlist Possible inner ordered list
    * @param innerUlist Possible inner unordered list
@@ -237,7 +257,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *         inner elements, olist is preferred over ulist, which is preferred
    *         over inline; if none are given, an empty Plaintext is used.
    */
-  protected ASTNode renderListItem(ListType type, List<? extends ParserRuleContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
+  protected ASTNode renderListItem(List<ListItemContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
     ASTNode body = new Plaintext("");
 
     if (inner != null)
@@ -253,7 +273,31 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       return new ListItem(body);
     }
     else {
-      return new ListItem(body, renderList(type, childContexts));
+      // In general, a list can contain any arbitrary combination of ordered and
+      // unordered sublists, and we want to preserve the (un)orderedness in the
+      // bullet points, so we have to render them all individually.
+      List<ASTNode> lists = new ArrayList<ASTNode>();
+      ListType type = null;
+      List<ParserRuleContext> contexts = new ArrayList<ParserRuleContext>();
+
+      // Build lists of (un)ordered chunks one at a time, rendering them, and
+      // adding to the list of lists.
+      System.out.println();
+      for (ListItemContext child : childContexts) {
+        if (type != null && child.type != type) {
+          lists.add(renderList(type, contexts));
+          contexts.clear();
+        }
+
+        type = child.type;
+        contexts.add(child.get());
+      }
+
+      if (!contexts.isEmpty()) {
+        lists.add(renderList(type, contexts));
+      }
+
+      return new ListItem(body, lists);
     }
   }
 }
