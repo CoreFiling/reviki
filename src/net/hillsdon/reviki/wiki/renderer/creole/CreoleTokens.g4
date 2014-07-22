@@ -154,7 +154,7 @@ HEnd : WS? '='* WS? (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 /* ***** Lists ***** */
 
 U1  : START '*' ~'*'                            {doList(1);} ;
-U2  : START '**' ~'*'         {listLevel >= 1}? {doList(2);} ;
+U2  : START '**' ~'*'         {listLevel >= 1 && occurrencesBefore("**", "\n") % 2 == 0}? {doList(2);} ;
 U3  : START '***' ~'*'        {listLevel >= 2}? {doList(3);} ;
 U4  : START '****' ~'*'       {listLevel >= 3}? {doList(4);} ;
 U5  : START '*****' ~'*'      {listLevel >= 4}? {doList(5);} ;

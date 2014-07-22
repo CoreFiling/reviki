@@ -94,19 +94,20 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
-   * Reads ahead in the input stream (as far as it needs) to see if the given
-   * target string occurs before the given limit string.
-   * 
+   * Reads ahead in the input stream until the limit string (or EOF, whichever
+   * is sooner), counting the number of occurrences of the target string.
+   *
    * @param target The string being sought out.
-   * @param limit The "failure" string to match.
-   * @return True if and only if the target string occurs before the limit
-   *         string in the rest of the input stream. Hitting EOF counts as a
-   *         failure.
+   * @param limit The end of search string.
+   * @return The number of times the target string occurs before the limit
+   *         string (or EOF).
    */
-  public boolean findBefore(String target, String limit) {
+  public int occurrencesBefore(String target, String limit) {
     int ilen = _input.size() - _input.index();
     int tlen = target.length();
     int llen = limit.length();
+
+    int occurrences = 0;
 
     boolean inlink = false;
     boolean start = false;
@@ -135,13 +136,13 @@ public abstract class ContextSensitiveLexer extends Lexer {
         if (target.equals("//") && get(i - 2, 4).matches("[a-zA-Z0-9]://")) {
           continue;
         }
-        return true;
+        occurrences++;
       }
       else {
         // \L, at the start of a limit, matches the start of a line.
         if (limit.startsWith("\\L")) {
           if (start && limit.substring(2).equals(get(i + 1, llen - 2))) {
-            return false;
+            break;
           }
         }
         else {
@@ -151,13 +152,27 @@ public abstract class ContextSensitiveLexer extends Lexer {
             if (limit.equals("|") && inlink) {
               continue;
             }
-            return false;
+            break;
           }
         }
       }
     }
 
-    return false;
+    return occurrences;
+  }
+
+  /**
+   * Reads ahead in the input stream (as far as it needs) to see if the given
+   * target string occurs before the given limit string.
+   * 
+   * @param target The string being sought out.
+   * @param limit The "failure" string to match.
+   * @return True if and only if the target string occurs before the limit
+   *         string in the rest of the input stream. Hitting EOF counts as a
+   *         failure.
+   */
+  public boolean findBefore(String target, String limit) {
+    return occurrencesBefore(target, limit) > 0;
   }
 
   /**
