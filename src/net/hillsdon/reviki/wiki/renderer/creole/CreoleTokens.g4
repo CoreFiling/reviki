@@ -224,6 +224,8 @@ MacroSt : '<<' -> mode(MACRO) ;
 Any : . ;
 WS  : (' '|'\t')+ ;
 
+EmptyLink : ('[[' WS? ']]' | '{{' WS? '}}' |'[[' WS? '|' WS? ']]' | '{{' WS? '|' WS? '}}') -> skip ;
+
 fragment NOTALNUM : ~('A'..'Z'|'a'..'z'|'0'..'9') ;
 fragment START : {start}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
