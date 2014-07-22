@@ -127,6 +127,21 @@ options { superClass=ContextSensitiveLexer; }
 
     return ends;
   }
+
+  public void doInLink() {
+    String txt = getText().trim();
+    int len = txt.length();
+
+    if(len > 2) {
+      String lastButTwo = txt.substring(len - 3, len - 2);
+      if(lastButTwo.equals("]") || lastButTwo.equals("}")) {
+        txt = txt.substring(0, len - 2);
+        seek(-2);
+      }
+    }
+
+    setText(txt);
+  }
 }
 
 /* ***** Headings ***** */
@@ -246,7 +261,7 @@ ImEnd : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 Sep : ' '* '|' ' '*;
 
-InLink : (~('|'|'\r'|'\n'|']'|'}') | ']' ~']' {seek(-1);} | '}' ~'}' {seek(-1);})+ {setText(getText().trim());};
+InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doInLink();};
 
 mode MACRO;
 
