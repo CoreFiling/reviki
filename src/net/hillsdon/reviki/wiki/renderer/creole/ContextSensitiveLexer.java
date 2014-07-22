@@ -99,10 +99,11 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *
    * @param target The string being sought out.
    * @param limit The end of search string.
+   * @param bail If true, return as soon as the first occurrence is found
    * @return The number of times the target string occurs before the limit
    *         string (or EOF).
    */
-  public int occurrencesBefore(String target, String limit) {
+  public int occurrencesBefore(String target, String limit, boolean bail) {
     int ilen = _input.size() - _input.index();
     int tlen = target.length();
     int llen = limit.length();
@@ -137,6 +138,8 @@ public abstract class ContextSensitiveLexer extends Lexer {
           continue;
         }
         occurrences++;
+        if (bail)
+          break;
       }
       else {
         // \L, at the start of a limit, matches the start of a line.
@@ -161,6 +164,11 @@ public abstract class ContextSensitiveLexer extends Lexer {
     return occurrences;
   }
 
+  /** See {@link #occurrencesBefore(String, String, boolean)}. */
+  public int occurrencesBefore(String target, String limit) {
+    return occurrencesBefore(target, limit, false);
+  }
+
   /**
    * Reads ahead in the input stream (as far as it needs) to see if the given
    * target string occurs before the given limit string.
@@ -172,7 +180,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *         failure.
    */
   public boolean findBefore(String target, String limit) {
-    return occurrencesBefore(target, limit) > 0;
+    return occurrencesBefore(target, limit, true) > 0;
   }
 
   /**
