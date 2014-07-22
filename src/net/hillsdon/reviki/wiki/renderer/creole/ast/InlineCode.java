@@ -6,7 +6,7 @@ import com.uwyn.jhighlight.renderer.Renderer;
 
 import net.hillsdon.fij.text.Escape;
 
-public class InlineCode extends ASTNode {
+public class InlineCode extends BlockableNode<Code> {
   private String contents;
 
   private Renderer highlighter;
@@ -25,6 +25,7 @@ public class InlineCode extends ASTNode {
     this.highlighter = highlighter;
   }
 
+  @Override
   public Code toBlock() {
     if (highlighter == null) {
       return new Code(contents);

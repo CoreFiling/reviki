@@ -29,7 +29,7 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * If a paragraph starts with a sequence of inline code or macros, separated
+   * If a paragraph starts with a sequence of blockable elements, separated
    * by newlines, render them as blocks and the remaining text (if any) as a
    * paragraph following this.
    *
@@ -61,16 +61,11 @@ public class Visitor extends CreoleASTBuilder {
     }
 
     // Only continue if there is a hope of expanding it
-    if (head instanceof InlineCode || head instanceof MacroNode) {
+    if (head instanceof BlockableNode) {
       // Check if we have a valid separator
       ASTNode block = null;
-      if (!reversed && (sep.startsWith("\r\n") || sep.startsWith("\n")) || (reversed && sep.endsWith("\n")) || sep.startsWith("<br")) {
-        if (head instanceof InlineCode) {
-          block = ((InlineCode) head).toBlock();
-        }
-        else if (head instanceof MacroNode) {
-          block = head;
-        }
+      if (sep == null || (!reversed && (sep.startsWith("\r\n") || sep.startsWith("\n")) || (reversed && sep.endsWith("\n")) || sep.startsWith("<br"))) {
+        block = ((BlockableNode) head).toBlock();
       }
 
       // Check if we have a match, and build the result list.

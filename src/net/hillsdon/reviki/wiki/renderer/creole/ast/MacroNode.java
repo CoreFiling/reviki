@@ -13,7 +13,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MacroNode extends ASTNode {
+public class MacroNode extends BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
@@ -31,6 +31,8 @@ public class MacroNode extends ASTNode {
 
   private PageStore store;
 
+  public boolean block = false;
+
   public MacroNode(String name, String args, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super("", null, null);
     this.name = name;
@@ -44,9 +46,8 @@ public class MacroNode extends ASTNode {
   }
 
   public String toXHTML() {
-    // If the macro is converted into HTML before being expanded, return it as
-    // literal text.
-    return "<code>" + Escape.html("<<" + name + ":" + args + ">>") + "</code>";
+    String tag = block ? "pre" : "code";
+    return String.format("<%s>%s</%s>", tag, Escape.html("<<" + name + ":" + args + ">>"), tag);
   }
 
   @Override
@@ -74,5 +75,12 @@ public class MacroNode extends ASTNode {
 
     // Failed to find a macro of the same name.
     return this;
+  }
+
+  @Override
+  public MacroNode toBlock() {
+    MacroNode block = new MacroNode(name, args, store, page, urlOutputFilter, linkHandler, imageHandler);
+    block.block = true;
+    return block;
   }
 }
