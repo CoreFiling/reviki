@@ -279,7 +279,7 @@ mode CODE_BLOCK;
 
 AnyText   : . -> more ;
 
-EndNoWikiBlock : ~' ' '}}}'      {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
+EndNoWikiBlock : (~' ' '}}}' | ' }}}' '\r'? '\n' {seek(-1);}) {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
 EndCppBlock    : ~' ' '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
 EndHtmlBlock   : ~' ' '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
 EndJavaBlock   : ~' ' '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
