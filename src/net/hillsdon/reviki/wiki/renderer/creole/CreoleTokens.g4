@@ -74,7 +74,9 @@ options { superClass=ContextSensitiveLexer; }
 
     if(url.endsWith("://") || url.endsWith("mailto:")) { setType(Any); }
 
-    while((last + next).equals("//") || last.matches("[\\.,)\"';:\\\\=-]")) {
+    String badEnds = inHeader ? "[\\.,)\"';:\\\\=-]" : "[\\.,)\"';:\\\\-]";
+
+    while((last + next).equals("//") || last.matches(badEnds)) {
       seek(-1);
       url = url.substring(0, url.length() - 1);
       last = url.substring(url.length()-1);
