@@ -24,7 +24,7 @@ block     : heading
 
 /* ***** Block Elements ***** */
 
-heading   : HSt WS? {noBreak();} inline {unsetBreaks();} HEnd? ;
+heading   : HSt WS? {noBreak();} inline {unsetBreaks();} HEnd;
 
 paragraph : inline ;
 
