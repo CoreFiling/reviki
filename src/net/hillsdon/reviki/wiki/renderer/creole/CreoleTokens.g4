@@ -246,7 +246,7 @@ ImEnd : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 Sep : ' '* '|' ' '*;
 
-InLink : ~(']'|'}'|'|'|'\r'|'\n')+ {setText(getText().trim());};
+InLink : (~('|'|'\r'|'\n'|']'|'}') | ']' ~']' {seek(-1);} | '}' ~'}' {seek(-1);})+ {setText(getText().trim());};
 
 mode MACRO;
 
