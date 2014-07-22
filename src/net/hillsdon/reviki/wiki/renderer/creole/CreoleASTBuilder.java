@@ -118,7 +118,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   protected String cutOffEndTag(TerminalNode node, String end) {
-    String res = node.getText();
+    String res = node.getText().replaceAll("\\s+$", "");
     return res.substring(0, res.length() - end.length());
   }
 
