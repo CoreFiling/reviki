@@ -242,7 +242,7 @@ RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']'|'"')+ '/'?)+ {doUrl();} ;
 
 fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' ;
 
-Attachment : ALNUM+ '.' ALNUM+ ;
+Attachment : UPNUM ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
 
 WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) {checkBounds("[\\.\\w:]", "\\w")}? ;
 
