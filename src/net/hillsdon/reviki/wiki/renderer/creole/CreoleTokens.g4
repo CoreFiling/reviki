@@ -24,12 +24,6 @@ options { superClass=ContextSensitiveLexer; }
   public boolean inHeader = false;
   public boolean start = false;
   public int listLevel = 0;
-  boolean nowiki = false;
-  boolean cpp = false;
-  boolean html = false;
-  boolean java = false;
-  boolean xhtml = false;
-  boolean xml = false;
   boolean intr = false;
 
   public void doHdr() {
@@ -94,12 +88,6 @@ options { superClass=ContextSensitiveLexer; }
     listLevel = 0;
     inHeader = false;
     intr = false;
-    nowiki = false;
-    cpp = false;
-    html = false;
-    java = false;
-    xhtml = false;
-    xml = false;
   }
 
   public String[] thisKillsTheFormatting() {
@@ -216,12 +204,12 @@ BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
 IEnd : '//' {italic.active && !prior().matches("[a-zA-Z0-9]:")}? {unsetFormatting(italic);} ;
 SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
 
-NoWiki     : '{{{'      {nowiki=true;} -> mode(CODE_INLINE) ;
-StartCpp   : '[<c++>]'   {cpp=true;}   -> mode(CODE_INLINE) ;
-StartHtml  : '[<html>]'  {html=true;}  -> mode(CODE_INLINE) ;
-StartJava  : '[<java>]'  {java=true;}  -> mode(CODE_INLINE) ;
-StartXhtml : '[<xhtml>]' {xhtml=true;} -> mode(CODE_INLINE) ;
-StartXml   : '[<xml>]'   {xml=true;}   -> mode(CODE_INLINE) ;
+NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
+StartCpp   : '[<c++>]'   -> mode(CPP_INLINE) ;
+StartHtml  : '[<html>]'  -> mode(HTML_INLINE) ;
+StartJava  : '[<java>]'  -> mode(JAVA_INLINE) ;
+StartXhtml : '[<xhtml>]' -> mode(XHTML_INLINE) ;
+StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 
 /* ***** Links ***** */
 
@@ -304,26 +292,84 @@ MacroArgs : . -> more ;
 
 MacroEnd  : '>>' -> mode(DEFAULT_MODE) ;
 
-mode CODE_INLINE;
+// ***** NoWiki
 
-AnyInline : ~('\r'|'\n') -> more;
+mode NOWIKI_INLINE;
 
-OopsItsABlock : ('\r'|'\n') {seek(-1);} -> mode(CODE_BLOCK), more ;
+fragment INLINE  : ~('\r'|'\n') ;
+fragment BLOCK   : . ;
+fragment TOBLOCK : ('\r'|'\n') ;
 
-EndNoWikiInline : '}}}' ~'}' {nowiki}? {nowiki=false; seek(-1);} -> mode(DEFAULT_MODE) ;
-EndCppInline   : '[</c++>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
-EndHtmlInline  : '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
-EndJavaInline  : '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
-EndXhtmlInline : '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
-EndXmlInline   : '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
+NoWikiInline    : INLINE -> more ;
+NoWikiToBlock   : TOBLOCK -> mode(NOWIKI_BLOCK), more ;
+EndNoWikiInline : '}}}' ~'}'  {seek(-1);} -> mode(DEFAULT_MODE) ;
 
-mode CODE_BLOCK;
+mode NOWIKI_BLOCK;
 
-AnyText   : . -> more ;
+NoWikiAny      : BLOCK -> more ;
+EndNoWikiBlock : (~' ' '}}}' | ' }}}' '\r'? '\n' {seek(-1);}) -> mode(DEFAULT_MODE) ;
 
-EndNoWikiBlock : (~' ' '}}}' | ' }}}' '\r'? '\n' {seek(-1);}) {nowiki}? {nowiki=false;} -> mode(DEFAULT_MODE) ;
-EndCppBlock    : ~' ' '[</cpp>]'   {cpp}?   {cpp=false;}   -> mode(DEFAULT_MODE) ;
-EndHtmlBlock   : ~' ' '[</html>]'  {html}?  {html=false;}  -> mode(DEFAULT_MODE) ;
-EndJavaBlock   : ~' ' '[</java>]'  {java}?  {java=false;}  -> mode(DEFAULT_MODE) ;
-EndXhtmlBlock  : ~' ' '[</xhtml>]' {xhtml}? {xhtml=false;} -> mode(DEFAULT_MODE) ;
-EndXmlBlock    : ~' ' '[</xml>]'   {xml}?   {xml=false;}   -> mode(DEFAULT_MODE) ;
+// ***** C++
+
+mode CPP_INLINE;
+
+CppInline    : INLINE -> more ;
+CppToBlock   : TOBLOCK -> mode(CPP_BLOCK), more ;
+EndCppInline : '[</c++>]' -> mode(DEFAULT_MODE) ;
+
+mode CPP_BLOCK;
+
+CppAny      : BLOCK -> more ;
+EndCppBlock : ~' ' '[</c++>]' -> mode(DEFAULT_MODE) ;
+
+// ***** HTML
+
+mode HTML_INLINE;
+
+HtmlInline    : INLINE -> more ;
+HtmlToBlock   : TOBLOCK -> mode(HTML_BLOCK), more ;
+EndHtmlInline : '[</html>]'-> mode(DEFAULT_MODE) ;
+
+mode HTML_BLOCK;
+
+HtmlAny      : BLOCK -> more ;
+EndHtmlBlock : ~' ' '[</html>]' -> mode(DEFAULT_MODE) ;
+
+// ***** Java
+
+mode JAVA_INLINE;
+
+JavaInline    : INLINE -> more ;
+JavaToBlock   : TOBLOCK -> mode(JAVA_BLOCK), more ;
+EndJavaInline : '[</java>]'-> mode(DEFAULT_MODE) ;
+
+mode JAVA_BLOCK;
+
+JavaAny      : BLOCK -> more ;
+EndJavaBlock : ~' ' '[</java>]' -> mode(DEFAULT_MODE) ;
+
+// ***** XHTML
+
+mode XHTML_INLINE;
+
+XhtmlInline    : INLINE -> more ;
+XhtmlToBlock   : TOBLOCK -> mode(XHTML_BLOCK), more ;
+EndXhtmlInline : '[</xhtml>]' -> mode(DEFAULT_MODE) ;
+
+mode XHTML_BLOCK;
+
+XhtmlAny      : BLOCK -> more ;
+EndXhtmlBlock : ~' ' '[</xhtml>]' -> mode(DEFAULT_MODE) ;
+
+// ***** XML
+
+mode XML_INLINE;
+
+XmlInline    : INLINE -> more ;
+XmlToBlock   : TOBLOCK -> mode(XML_BLOCK), more ;
+EndXmlInline : '[</xml>]' -> mode(DEFAULT_MODE) ;
+
+mode XML_BLOCK;
+
+XmlAny      : BLOCK -> more ;
+EndXmlBlock : ~' ' '[</xml>]' -> mode(DEFAULT_MODE) ;
