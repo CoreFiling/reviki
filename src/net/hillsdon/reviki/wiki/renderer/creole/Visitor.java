@@ -284,8 +284,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTitlelink(TitlelinkContext ctx) {
-    String target = ctx.InLink(0).getText();
-    String title = (ctx.InLink().size() == 1) ? target : ctx.InLink(1).getText();
+    String target = ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Link(target, title, page, urlOutputFilter, linkHandler);
   }
 
@@ -294,8 +294,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitImglink(ImglinkContext ctx) {
-    String target = ctx.InLink(0).getText();
-    String title = (ctx.InLink().size() == 1) ? target : ctx.InLink(1).getText();
+    String target = ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Image(target, title, page, urlOutputFilter, imageHandler);
   }
 

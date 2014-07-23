@@ -130,7 +130,7 @@ options { superClass=ContextSensitiveLexer; }
     return ends;
   }
 
-  public void doInLink() {
+  public void doLinkEnd() {
     String txt = getText().trim();
     int len = txt.length();
 
@@ -275,9 +275,16 @@ mode LINK;
 LiEnd : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
-Sep : ' '* '|' ' '*;
+Sep : ' '* '|'+ ' '* -> mode(LINK_END);
 
-InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doInLink();};
+InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
+
+mode LINK_END;
+
+InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
+
+LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 mode MACRO;
 
