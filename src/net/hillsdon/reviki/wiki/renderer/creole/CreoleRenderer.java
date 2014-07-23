@@ -7,6 +7,9 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.*;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -77,7 +80,7 @@ public class CreoleRenderer {
    * @param in The input stream to render.
    * @return The AST of the page, after macro application.
    */
-  private static ASTNode renderInternal(ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
+  private static ASTNode renderInternal(ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -121,7 +124,7 @@ public class CreoleRenderer {
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
+  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     String contents = page.getContent();
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
@@ -140,14 +143,15 @@ public class CreoleRenderer {
    * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
    */
   public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    return render(store, page, urlOutputFilter, linkHandler, imageHandler, new ArrayList<Macro>());
+    Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
+    return render(store, page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 
   /**
    * Render a page with images rendered as links to their source. See
    * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
    */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final List<Macro> macros) {
+  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final Supplier<List<Macro>> macros) {
     return render(store, page, urlOutputFilter, linkHandler, linkHandler, macros);
   }
 
@@ -172,7 +176,7 @@ public class CreoleRenderer {
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final List<Macro> macros) {
+  public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     return renderInternal(new ANTLRInputStream(content), store, page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 }

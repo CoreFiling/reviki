@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Supplier;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
@@ -51,10 +53,11 @@ public class MacroNode extends BlockableNode<MacroNode> {
   }
 
   @Override
-  public ASTNode expandMacros(List<Macro> macros) {
+  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
     // This is basically lifted from the old MacroNode.
+    List<Macro> theMacros = macros.get();
     try {
-      for (Macro macro : macros) {
+      for (Macro macro : theMacros) {
         if (macro.getName().equals(name)) {
           String content = macro.handle(page, args);
           switch (macro.getResultFormat()) {

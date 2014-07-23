@@ -37,7 +37,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
   private final InternalLinker internalLinker;
   private final SvnWikiLinkPartHandler linkHandler;
   private final SvnWikiLinkPartHandler imageHandler;
-  private final List<Macro> macros;
+  private final Supplier<List<Macro>> macros;
   private final PageStore pageStore;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
@@ -45,7 +45,7 @@ public class SvnWikiRenderer implements MarkupRenderer {
     this.internalLinker = internalLinker;
     this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
-    this.macros = macros.get();
+    this.macros = macros;
     this.pageStore = pageStore;
   }
 

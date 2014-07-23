@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Supplier;
+
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 /**
@@ -116,7 +118,7 @@ public abstract class ASTNode {
    *         will be returned, however if `this` is returned it cannot be
    *         assumed that none of the node's children contained macros.
    */
-  public ASTNode expandMacros(List<Macro> macros) {
+  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
     if (body != null) {
       body = body.expandMacros(macros);
     }
