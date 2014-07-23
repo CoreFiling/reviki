@@ -72,8 +72,6 @@ options { superClass=ContextSensitiveLexer; }
     String last = url.substring(url.length()-1);
     String next = next();
 
-    if(url.endsWith("://") || url.endsWith("mailto:")) { setType(Any); }
-
     String badEnds = inHeader ? "[\\.,)\"';:\\\\=-]" : "[\\.,)\"';:\\\\-]";
 
     while((last + next).equals("//") || last.matches(badEnds)) {
@@ -81,6 +79,12 @@ options { superClass=ContextSensitiveLexer; }
       url = url.substring(0, url.length() - 1);
       last = url.substring(url.length()-1);
       next = next();
+
+      // Break out if we no longer have a URL
+      if(url.endsWith(":/") || url.endsWith("mailto:")) {
+        setType(Any);
+        break;
+      }
     }
     setText(url);
   }
