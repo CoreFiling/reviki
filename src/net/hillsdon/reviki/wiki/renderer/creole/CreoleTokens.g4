@@ -136,16 +136,6 @@ options { superClass=ContextSensitiveLexer; }
 
     setText(txt);
   }
-
-  public void doAny() {
-    String txt = getText();
-    // Avoid eating the start of a URL
-    if(txt.length() > 1 && next().equals(":")) {
-      int idx = txt.lastIndexOf(" ");
-      seek(-(txt.length() - idx));
-      setText(txt.substring(0, idx));
-    }
-  }
 }
 
 /* ***** Headings ***** */
@@ -244,7 +234,7 @@ MacroSt : '<<' -> mode(MACRO) ;
 
 /* ***** Miscellaneous ***** */
 
-Any : LOWER+ ' ' | . {doAny();} ;
+Any : ALNUM+ | . ;
 WS  : (' '|'\t')+ ;
 
 EmptyLink : ('[[' WS? ']]' | '{{' WS? '}}' |'[[' WS? '|' WS? ']]' | '{{' WS? '|' WS? '}}') -> skip ;
