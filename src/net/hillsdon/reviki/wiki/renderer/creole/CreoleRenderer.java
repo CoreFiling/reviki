@@ -3,9 +3,12 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRErrorStrategy;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -16,12 +19,17 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+/**
+ * Renderer for the Reviki dialect of WikiCreole.
+ *
+ * @author msw
+ */
 public class CreoleRenderer {
   /**
    * Macro expansion depth limit. This gets reset when rendering a page, but not
    * when rendering a partial page. If it hits zero, no macros are expanded.
    */
-  private static int expansionLimit;
+  private static int _expansionLimit;
 
   /**
    * Try to run a parser, resetting the input on failure.
@@ -33,7 +41,7 @@ public class CreoleRenderer {
    * @param pmode The prediction mode.
    * @return A parse tree.
    */
-  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, ANTLRErrorStrategy errors, PredictionMode pmode) {
+  private static ParseTree tryParse(final CommonTokenStream tokens, final Creole parser, final ANTLRErrorStrategy errors, final PredictionMode pmode) {
     parser.setErrorHandler(errors);
     parser.getInterpreter().setPredictionMode(pmode);
     try {
@@ -47,28 +55,11 @@ public class CreoleRenderer {
   }
 
   /**
-   * Helper for tryParse using LL(*) prediction. See
-   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
-   */
-  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, ANTLRErrorStrategy errors) {
-    return tryParse(tokens, parser, errors, PredictionMode.LL);
-  }
-
-  /**
    * Helper for tryParse using the default error strategy. See
    * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
    */
-  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser, PredictionMode pmode) {
+  private static ParseTree tryParse(final CommonTokenStream tokens, final Creole parser, final PredictionMode pmode) {
     return tryParse(tokens, parser, new DefaultErrorStrategy(), pmode);
-  }
-
-  /**
-   * Helper for tryParse using the default error strategy and LL(*) prediction.
-   * See
-   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
-   */
-  private static ParseTree tryParse(CommonTokenStream tokens, Creole parser) {
-    return tryParse(tokens, parser, new DefaultErrorStrategy(), PredictionMode.LL);
   }
 
   /**
@@ -79,7 +70,7 @@ public class CreoleRenderer {
    * @param macros List of macros to apply.
    * @return The AST of the page, after macro expansion.
    */
-  private static ASTNode renderInternal(ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
+  private static ASTNode renderInternal(final ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -92,15 +83,15 @@ public class CreoleRenderer {
       tree = tryParse(tokens, parser, PredictionMode.SLL);
     }
     catch (Exception e1) {
-      tree = tryParse(tokens, parser);
+      tree = tryParse(tokens, parser, PredictionMode.LL);
     }
 
     ASTNode rendered = visitor.visit(tree);
 
     // Decrement the expansion limit
-    expansionLimit--;
+    _expansionLimit--;
 
-    if (expansionLimit >= 0 && macros != null) {
+    if (_expansionLimit >= 0 && macros != null) {
       return rendered.expandMacros(macros);
     }
     else {
@@ -118,7 +109,7 @@ public class CreoleRenderer {
    * @param in The input stream to render.
    * @return The AST of the page, after macro application.
    */
-  private static ASTNode renderInternal(ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  private static ASTNode renderInternal(final ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
     return renderInternal(in, visitor, macros);
   }
@@ -140,11 +131,12 @@ public class CreoleRenderer {
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
     // so add a newline in if there's not one already there.
-    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n"))
+    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n")) {
       contents += "\n";
+    }
 
     // Reset the expansion limit.
-    expansionLimit = 100;
+    _expansionLimit = 100;
 
     return renderInternal(new ANTLRInputStream(contents), store, page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
@@ -178,7 +170,7 @@ public class CreoleRenderer {
 
   /**
    * Render only a part of a page.
-   * 
+   *
    * @param content The content to render.
    * @param visitor The AST builder (may not be null)
    * @param macros List of macros to apply

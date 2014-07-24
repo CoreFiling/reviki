@@ -25,10 +25,10 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
-  /** List of attachments on the page */
-  protected Collection<AttachmentHistory> attachments = null;
+  /** List of attachments on the page. */
+  private Collection<AttachmentHistory> _attachments = null;
 
-  public Visitor(PageStore store, PageInfo page, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler) {
+  public Visitor(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super(store, page, urlOutputFilter, linkHandler, imageHandler);
   }
 
@@ -43,7 +43,7 @@ public class Visitor extends CreoleASTBuilder {
    *          later.
    * @return A list of blocks, which may just consist of the original paragraph.
    */
-  protected List<ASTNode> expandParagraph(Paragraph paragraph, boolean reversed) {
+  protected List<ASTNode> expandParagraph(final Paragraph paragraph, final boolean reversed) {
     ASTNode inline = paragraph.getChildren().get(0);
     List<ASTNode> chunks = inline.getChildren();
     int numchunks = chunks.size();
@@ -99,7 +99,7 @@ public class Visitor extends CreoleASTBuilder {
    * display them sequentially in order.
    */
   @Override
-  public ASTNode visitCreole(CreoleContext ctx) {
+  public ASTNode visitCreole(final CreoleContext ctx) {
     List<ASTNode> blocks = new ArrayList<ASTNode>();
 
     for (BlockContext btx : ctx.block()) {
@@ -152,9 +152,10 @@ public class Visitor extends CreoleASTBuilder {
    * tell us the heading level, and some content.
    */
   @Override
-  public ASTNode visitHeading(HeadingContext ctx) {
-    if (ctx.inline() == null)
+  public ASTNode visitHeading(final HeadingContext ctx) {
+    if (ctx.inline() == null) {
       return new Plaintext(ctx.HSt().getText());
+    }
     return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
   }
 
@@ -162,7 +163,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render a paragraph node. This consists of a single inline element.
    */
   @Override
-  public ASTNode visitParagraph(ParagraphContext ctx) {
+  public ASTNode visitParagraph(final ParagraphContext ctx) {
     return new Paragraph(visit(ctx.inline()));
   }
 
@@ -171,7 +172,7 @@ public class Visitor extends CreoleASTBuilder {
    * units, which are displayed in order.
    */
   @Override
-  public ASTNode visitInline(InlineContext ctx) {
+  public ASTNode visitInline(final InlineContext ctx) {
     List<ASTNode> chunks = new ArrayList<ASTNode>();
 
     // Merge adjacent Any nodes into long Plaintext nodes, to give a more useful
@@ -205,7 +206,7 @@ public class Visitor extends CreoleASTBuilder {
    * displayed with no further processing.
    */
   @Override
-  public ASTNode visitAny(AnyContext ctx) {
+  public ASTNode visitAny(final AnyContext ctx) {
     return new Plaintext(ctx.getText());
   }
 
@@ -213,8 +214,8 @@ public class Visitor extends CreoleASTBuilder {
    * Render a WikiWords link.
    */
   @Override
-  public ASTNode visitWikiwlink(WikiwlinkContext ctx) {
-    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+  public ASTNode visitWikiwlink(final WikiwlinkContext ctx) {
+    return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
   }
 
   /**
@@ -222,21 +223,22 @@ public class Visitor extends CreoleASTBuilder {
    * in plain text.
    */
   @Override
-  public ASTNode visitAttachment(AttachmentContext ctx) {
-    if (store != null) {
+  public ASTNode visitAttachment(final AttachmentContext ctx) {
+    if (store() != null) {
       // Check if the attachment exists
       try {
-        if (attachments == null) {
-          attachments = store.attachments(page);
+        if (_attachments == null) {
+          _attachments = store().attachments(page());
         }
-        for (AttachmentHistory attachment : attachments) {
+        for (AttachmentHistory attachment : _attachments) {
           // Skip deleted attachments
-          if (attachment.isAttachmentDeleted())
+          if (attachment.isAttachmentDeleted()) {
             continue;
+          }
 
           // Render the link if the name matches
           if (attachment.getName().equals(ctx.getText())) {
-            return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+            return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
           }
         }
       }
@@ -250,15 +252,15 @@ public class Visitor extends CreoleASTBuilder {
    * Render a raw URL link.
    */
   @Override
-  public ASTNode visitRawlink(RawlinkContext ctx) {
-    return new Link(ctx.getText(), ctx.getText(), page, urlOutputFilter, linkHandler);
+  public ASTNode visitRawlink(final RawlinkContext ctx) {
+    return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
   }
 
   /**
    * Render bold nodes, with error recovery by {@link #renderInline}.
    */
   @Override
-  public ASTNode visitBold(BoldContext ctx) {
+  public ASTNode visitBold(final BoldContext ctx) {
     return renderInlineMarkup(Bold.class, "**", "BEnd", ctx.BEnd(), ctx.inline());
   }
 
@@ -266,7 +268,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render italic nodes, with error recovery by {@link #renderInline}.
    */
   @Override
-  public ASTNode visitItalic(ItalicContext ctx) {
+  public ASTNode visitItalic(final ItalicContext ctx) {
     return renderInlineMarkup(Italic.class, "//", "IEnd", ctx.IEnd(), ctx.inline());
   }
 
@@ -274,7 +276,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render strikethrough nodes, with error recovery by {@link #renderInline}.
    */
   @Override
-  public ASTNode visitSthrough(SthroughContext ctx) {
+  public ASTNode visitSthrough(final SthroughContext ctx) {
     return renderInlineMarkup(Strikethrough.class, "--", "SEnd", ctx.SEnd(), ctx.inline());
   }
 
@@ -282,36 +284,36 @@ public class Visitor extends CreoleASTBuilder {
    * Render a link node with no title.
    */
   @Override
-  public ASTNode visitLink(LinkContext ctx) {
-    return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page, urlOutputFilter, linkHandler);
+  public ASTNode visitLink(final LinkContext ctx) {
+    return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page(), urlOutputFilter(), linkHandler());
   }
 
   /**
    * Render a link node with a title.
    */
   @Override
-  public ASTNode visitTitlelink(TitlelinkContext ctx) {
+  public ASTNode visitTitlelink(final TitlelinkContext ctx) {
     String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
     String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
-    return new Link(target, title, page, urlOutputFilter, linkHandler);
+    return new Link(target, title, page(), urlOutputFilter(), linkHandler());
   }
 
   /**
    * Render an image node.
    */
   @Override
-  public ASTNode visitImglink(ImglinkContext ctx) {
+  public ASTNode visitImglink(final ImglinkContext ctx) {
     String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
     String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
-    return new Image(target, title, page, urlOutputFilter, imageHandler);
+    return new Image(target, title, page(), urlOutputFilter(), imageHandler());
   }
 
   /**
    * Render an image without a title.
    */
   @Override
-  public ASTNode visitSimpleimg(SimpleimgContext ctx) {
-    return new Image(ctx.InLink().getText(), ctx.InLink().getText(), page, urlOutputFilter, imageHandler);
+  public ASTNode visitSimpleimg(final SimpleimgContext ctx) {
+    return new Image(ctx.InLink().getText(), ctx.InLink().getText(), page(), urlOutputFilter(), imageHandler());
   }
 
   /**
@@ -321,7 +323,7 @@ public class Visitor extends CreoleASTBuilder {
    * TODO: Improve the tokensiation of this.
    */
   @Override
-  public ASTNode visitPreformat(PreformatContext ctx) {
+  public ASTNode visitPreformat(final PreformatContext ctx) {
     return renderInlineCode(ctx.EndNoWikiInline(), "}}}");
   }
 
@@ -330,7 +332,7 @@ public class Visitor extends CreoleASTBuilder {
    * problem as mentioned in {@link #visitPreformat}.
    */
   @Override
-  public ASTNode visitInlinecpp(InlinecppContext ctx) {
+  public ASTNode visitInlinecpp(final InlinecppContext ctx) {
     return renderInlineCode(ctx.EndCppInline(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
   }
 
@@ -338,34 +340,34 @@ public class Visitor extends CreoleASTBuilder {
    * Render a block of literal, unescaped, HTML.
    */
   @Override
-  public ASTNode visitInlinehtml(InlinehtmlContext ctx) {
+  public ASTNode visitInlinehtml(final InlinehtmlContext ctx) {
     String code = ctx.EndHtmlInline().getText();
     return new Raw(code.substring(0, code.length() - "[</html>]".length()));
   }
 
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
-  public ASTNode visitInlinejava(InlinejavaContext ctx) {
+  public ASTNode visitInlinejava(final InlinejavaContext ctx) {
     return renderInlineCode(ctx.EndJavaInline(), "[</java>]", XhtmlRendererFactory.JAVA);
   }
 
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
-  public ASTNode visitInlinexhtml(InlinexhtmlContext ctx) {
+  public ASTNode visitInlinexhtml(final InlinexhtmlContext ctx) {
     return renderInlineCode(ctx.EndXhtmlInline(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
   }
 
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode} */
+  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
-  public ASTNode visitInlinexml(InlinexmlContext ctx) {
+  public ASTNode visitInlinexml(final InlinexmlContext ctx) {
     return renderInlineCode(ctx.EndXmlInline(), "[</xml>]", XhtmlRendererFactory.XML);
   }
 
   /**
-   * Render a literal linebreak node
+   * Render a literal linebreak node.
    */
   @Override
-  public ASTNode visitLinebreak(LinebreakContext ctx) {
+  public ASTNode visitLinebreak(final LinebreakContext ctx) {
     return new Linebreak();
   }
 
@@ -373,7 +375,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render a horizontal rule node.
    */
   @Override
-  public ASTNode visitHrule(HruleContext ctx) {
+  public ASTNode visitHrule(final HruleContext ctx) {
     return new HorizontalRule();
   }
 
@@ -397,7 +399,7 @@ public class Visitor extends CreoleASTBuilder {
    * TODO: Figure out how to have arbitrarily-nested lists.
    */
   @Override
-  public ASTNode visitOlist(OlistContext ctx) {
+  public ASTNode visitOlist(final OlistContext ctx) {
     return renderList(ListType.Ordered, ctx.olist1());
   }
 
@@ -406,7 +408,7 @@ public class Visitor extends CreoleASTBuilder {
     List2Context, List3Context, List4Context, List5Context, List6Context, List7Context, List8Context, List9Context, List10Context
   };
 
-  protected ParserRuleContext olist(ParserRuleContext ctx) {
+  protected ParserRuleContext olist(final ParserRuleContext ctx) {
     switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
       case List2Context:
         return ((List2Context) ctx).olist2();
@@ -431,7 +433,7 @@ public class Visitor extends CreoleASTBuilder {
     }
   }
 
-  protected ParserRuleContext ulist(ParserRuleContext ctx) {
+  protected ParserRuleContext ulist(final ParserRuleContext ctx) {
     switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
       case List2Context:
         return ((List2Context) ctx).ulist2();
@@ -456,7 +458,7 @@ public class Visitor extends CreoleASTBuilder {
     }
   }
 
-  protected ASTNode list(List<? extends ParserRuleContext> ltxs, InListContext inner) {
+  protected ASTNode list(final List<? extends ParserRuleContext> ltxs, final InListContext inner) {
     List<ListItemContext> children = new ArrayList<ListItemContext>();
 
     if (ltxs != null) {
@@ -478,129 +480,129 @@ public class Visitor extends CreoleASTBuilder {
     return renderListItem(children, inners);
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist1(Olist1Context ctx) {
+  public ASTNode visitOlist1(final Olist1Context ctx) {
     return list(ctx.list2(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist2(Olist2Context ctx) {
+  public ASTNode visitOlist2(final Olist2Context ctx) {
     return list(ctx.list3(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist3(Olist3Context ctx) {
+  public ASTNode visitOlist3(final Olist3Context ctx) {
     return list(ctx.list4(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist4(Olist4Context ctx) {
+  public ASTNode visitOlist4(final Olist4Context ctx) {
     return list(ctx.list5(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist5(Olist5Context ctx) {
+  public ASTNode visitOlist5(final Olist5Context ctx) {
     return list(ctx.list6(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist6(Olist6Context ctx) {
+  public ASTNode visitOlist6(final Olist6Context ctx) {
     return list(ctx.list7(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist7(Olist7Context ctx) {
+  public ASTNode visitOlist7(final Olist7Context ctx) {
     return list(ctx.list8(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist8(Olist8Context ctx) {
+  public ASTNode visitOlist8(final Olist8Context ctx) {
     return list(ctx.list9(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist9(Olist9Context ctx) {
+  public ASTNode visitOlist9(final Olist9Context ctx) {
     return list(ctx.list10(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitOlist10(Olist10Context ctx) {
+  public ASTNode visitOlist10(final Olist10Context ctx) {
     return list(null, ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist(UlistContext ctx) {
+  public ASTNode visitUlist(final UlistContext ctx) {
     return renderList(ListType.Unordered, ctx.ulist1());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist1(Ulist1Context ctx) {
+  public ASTNode visitUlist1(final Ulist1Context ctx) {
     return list(ctx.list2(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist2(Ulist2Context ctx) {
+  public ASTNode visitUlist2(final Ulist2Context ctx) {
     return list(ctx.list3(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist3(Ulist3Context ctx) {
+  public ASTNode visitUlist3(final Ulist3Context ctx) {
     return list(ctx.list4(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist4(Ulist4Context ctx) {
+  public ASTNode visitUlist4(final Ulist4Context ctx) {
     return list(ctx.list5(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist5(Ulist5Context ctx) {
+  public ASTNode visitUlist5(final Ulist5Context ctx) {
     return list(ctx.list6(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist6(Ulist6Context ctx) {
+  public ASTNode visitUlist6(final Ulist6Context ctx) {
     return list(ctx.list7(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist7(Ulist7Context ctx) {
+  public ASTNode visitUlist7(final Ulist7Context ctx) {
     return list(ctx.list8(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist8(Ulist8Context ctx) {
+  public ASTNode visitUlist8(final Ulist8Context ctx) {
     return list(ctx.list9(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist9(Ulist9Context ctx) {
+  public ASTNode visitUlist9(final Ulist9Context ctx) {
     return list(ctx.list10(), ctx.inList());
   }
 
-  /** See {@link #visitOlist} */
+  /** See {@link #visitOlist}. */
   @Override
-  public ASTNode visitUlist10(Ulist10Context ctx) {
+  public ASTNode visitUlist10(final Ulist10Context ctx) {
     return list(null, ctx.inList());
   }
 
@@ -609,7 +611,7 @@ public class Visitor extends CreoleASTBuilder {
    * mentioned in {@link #visitPreformat}.
    */
   @Override
-  public ASTNode visitNowiki(NowikiContext ctx) {
+  public ASTNode visitNowiki(final NowikiContext ctx) {
     return renderBlockCode(ctx.EndNoWikiBlock(), "}}}");
   }
 
@@ -617,7 +619,7 @@ public class Visitor extends CreoleASTBuilder {
    * Like {@link #visitInlinecpp}, but for blocks.
    */
   @Override
-  public ASTNode visitCpp(CppContext ctx) {
+  public ASTNode visitCpp(final CppContext ctx) {
     return renderBlockCode(ctx.EndCppBlock(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
   }
 
@@ -625,26 +627,26 @@ public class Visitor extends CreoleASTBuilder {
    * Render a block of literal, unescaped, HTML.
    */
   @Override
-  public ASTNode visitHtml(HtmlContext ctx) {
+  public ASTNode visitHtml(final HtmlContext ctx) {
     String code = ctx.EndHtmlBlock().getText();
     return new Raw(code.substring(0, code.length() - "[</html>]".length()));
   }
 
-  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
-  public ASTNode visitJava(JavaContext ctx) {
+  public ASTNode visitJava(final JavaContext ctx) {
     return renderBlockCode(ctx.EndJavaBlock(), "[</java>]", XhtmlRendererFactory.JAVA);
   }
 
-  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
-  public ASTNode visitXhtml(XhtmlContext ctx) {
+  public ASTNode visitXhtml(final XhtmlContext ctx) {
     return renderBlockCode(ctx.EndXhtmlBlock(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
   }
 
-  /** See {@link #visitCpp} and {@link #renderBlockCode} */
+  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
-  public ASTNode visitXml(XmlContext ctx) {
+  public ASTNode visitXml(final XmlContext ctx) {
     return renderBlockCode(ctx.EndXmlBlock(), "[</xml>]", XhtmlRendererFactory.XML);
   }
 
@@ -652,7 +654,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render a table node. This consists of rendering all rows in sequence.
    */
   @Override
-  public ASTNode visitTable(TableContext ctx) {
+  public ASTNode visitTable(final TableContext ctx) {
     List<ASTNode> rows = new ArrayList<ASTNode>();
 
     for (TrowContext rtx : ctx.trow()) {
@@ -667,7 +669,7 @@ public class Visitor extends CreoleASTBuilder {
    * possible trailing separator.
    */
   @Override
-  public ASTNode visitTrow(TrowContext ctx) {
+  public ASTNode visitTrow(final TrowContext ctx) {
     List<ASTNode> cells = new ArrayList<ASTNode>();
 
     for (TcellContext rtx : ctx.tcell()) {
@@ -681,7 +683,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render a table heading cell.
    */
   @Override
-  public ASTNode visitTh(ThContext ctx) {
+  public ASTNode visitTh(final ThContext ctx) {
     return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
@@ -689,7 +691,7 @@ public class Visitor extends CreoleASTBuilder {
    * Render a table cell.
    */
   @Override
-  public ASTNode visitTd(TdContext ctx) {
+  public ASTNode visitTd(final TdContext ctx) {
     return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
   }
 
@@ -697,11 +699,11 @@ public class Visitor extends CreoleASTBuilder {
    * Render a macro.
    */
   @Override
-  public ASTNode visitMacro(MacroContext ctx) {
+  public ASTNode visitMacro(final MacroContext ctx) {
     // If there are no arguments, it's not a macro
     if (ctx.MacroEndNoArgs() != null) {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
-    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, this);
+    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page(), this);
   }
 }

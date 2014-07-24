@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.misc.Interval;
 
 /**
  * An ANTLR lexer augmented with methods to ease context-sensitive actions.
- * 
+ *
  * @author msw
  */
 public abstract class ContextSensitiveLexer extends Lexer {
@@ -19,19 +19,19 @@ public abstract class ContextSensitiveLexer extends Lexer {
    * same type is not allowed.
    */
   public class Formatting {
-    /** The start/end string */
+    /** The start/end string. */
     String symbol;
 
-    /** Whether we're currently inside it or not */
+    /** Whether we're currently inside it or not. */
     boolean active;
 
-    /** The start token type */
-    int start;
+    /** The start token type. */
+    final int start;
 
-    /** The end token type */
+    /** The end token type. */
     int end;
 
-    public Formatting(String symbol, int start, int end) {
+    public Formatting(final String symbol, final int start, final int end) {
       this.symbol = symbol;
       this.active = false;
       this.start = start;
@@ -44,7 +44,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    */
   List<Formatting> inlineFormatting = new ArrayList<Formatting>();
 
-  public ContextSensitiveLexer(CharStream input) {
+  public ContextSensitiveLexer(final CharStream input) {
     super(input);
     setupFormatting();
   }
@@ -52,20 +52,20 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * Get a subsection of the input stream. This does NOT do bounds checking, and
    * so may throw an exception.
-   * 
+   *
    * @param offset Offset relative to the current position.
    * @param len Length of the substring to get.
    * @return A substring of the given length starting at the appropriate
    *         position.
    */
-  public String get(int offset, int len) {
+  public String get(final int offset, final int len) {
     return _input.getText(new Interval(_input.index() + offset, _input.index() + offset + len - 1));
   }
 
   /**
    * Helper method for {@link #get(int, int)}, which gets a single character.
    */
-  public String get(int offset) {
+  public String get(final int offset) {
     return get(offset, 1);
   }
 
@@ -73,7 +73,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    * Helper method for {@link #get(int, int)}, which gets the next few
    * characters.
    */
-  public String next(int len) {
+  public String next(final int len) {
     return get(0, len);
   }
 
@@ -108,7 +108,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *
    * @param amount The amount to seek by.
    */
-  public void seek(int amount) {
+  public void seek(final int amount) {
     _input.seek(_input.index() + amount);
   }
 
@@ -122,7 +122,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    * @return The number of times the target string occurs before the limit
    *         string (or EOF).
    */
-  public int occurrencesBefore(String target, String limit, boolean bail) {
+  public int occurrencesBefore(final String target, final String limit, final boolean bail) {
     int ilen = _input.size() - _input.index();
     int tlen = target.length();
     int llen = limit.length();
@@ -158,8 +158,9 @@ public abstract class ContextSensitiveLexer extends Lexer {
           continue;
         }
         occurrences++;
-        if (bail)
+        if (bail) {
           break;
+        }
       }
       else {
         // \L, at the start of a limit, matches the start of a line.
@@ -185,36 +186,36 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /** See {@link #occurrencesBefore(String, String, boolean)}. */
-  public int occurrencesBefore(String target, String limit) {
+  public int occurrencesBefore(final String target, final String limit) {
     return occurrencesBefore(target, limit, false);
   }
 
   /**
    * Reads ahead in the input stream (as far as it needs) to see if the given
    * target string occurs before the given limit string.
-   * 
+   *
    * @param target The string being sought out.
    * @param limit The "failure" string to match.
    * @return True if and only if the target string occurs before the limit
    *         string in the rest of the input stream. Hitting EOF counts as a
    *         failure.
    */
-  public boolean findBefore(String target, String limit) {
+  public boolean findBefore(final String target, final String limit) {
     return occurrencesBefore(target, limit, true) > 0;
   }
 
   /**
    * Check whether a string is the start token of some inline formatting, or if
    * it's just some plain text.
-   * 
+   *
    * That is, if bold is "++" and italic is "//", it lets us determine that the
    * first "//" in "++//foo++//" is NOT an italic opening mark.
-   * 
+   *
    * @param formatting The formatting mark which has possibly been found.
    * @return True if and only if the closing formatting mark occurs before any
    *         other closing marks for formatting which was already open.
    */
-  public boolean checkInline(Formatting formatting) {
+  public boolean checkInline(final Formatting formatting) {
     for (Formatting fmat : inlineFormatting) {
       if (fmat == formatting) {
         continue;
@@ -237,11 +238,11 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * Toggle some formatting. If we think we've hit a start token, check if there
    * is an end token: if not, set the token type to the fallback value.
-   * 
+   *
    * @param formatting The formatting we think we've found
    * @param fallback The fallback token type
    */
-  public void toggleFormatting(Formatting formatting, int fallback) {
+  public void toggleFormatting(final Formatting formatting, final int fallback) {
     if (formatting.active) {
       formatting.active = false;
       setType(formatting.end);

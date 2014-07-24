@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.TokenStream;
 
 /**
  * An ANTLR parser augmented with methods to make context sensitivity easier.
- * 
+ *
  * @author msw
  */
 public abstract class ContextSensitiveParser extends Parser {
@@ -16,20 +16,20 @@ public abstract class ContextSensitiveParser extends Parser {
    */
   protected Stack<Boolean> breaks = new Stack<Boolean>();
 
-  public ContextSensitiveParser(TokenStream input) {
+  public ContextSensitiveParser(final TokenStream input) {
     super(input);
     breaks.push(new Boolean(true));
   }
 
   /**
-   * Set the linebreak mode
+   * Set the linebreak mode.
    */
-  protected void setBreaks(boolean breaks) {
-    this.breaks.push(new Boolean(breaks));
+  protected void setBreaks(final boolean brk) {
+    this.breaks.push(new Boolean(brk));
   }
 
   /**
-   * Check if we can break
+   * Check if we can break.
    */
   protected boolean canBreak() {
     return breaks.peek().booleanValue();
@@ -45,13 +45,13 @@ public abstract class ContextSensitiveParser extends Parser {
       breaks.push(new Boolean(true));
     }
   }
-  
-  /** See {@link #setBreaks(boolean)} */
+
+  /** See {@link #setBreaks(boolean)}. */
   protected void yesBreak() {
     setBreaks(true);
   }
-  
-  /** See {@link #setBreaks(boolean)} */
+
+  /** See {@link #setBreaks(boolean)}. */
   protected void noBreak() {
     setBreaks(false);
   }
