@@ -12,9 +12,9 @@ options { superClass=ContextSensitiveLexer; }
   Formatting strike;
 
   public void setupFormatting() {
-    bold   = new Formatting("**");
-    italic = new Formatting("//");
-    strike = new Formatting("--");
+    bold   = new Formatting("**", BSt, BEnd);
+    italic = new Formatting("//", ISt, IEnd);
+    strike = new Formatting("--", SSt, SEnd);
 
     inlineFormatting.add(bold);
     inlineFormatting.add(italic);
@@ -186,13 +186,9 @@ ThStart : '|'+ '=' {intr}? {breakOut(); intr=true;} ;
 
 /* ***** Inline Formatting ***** */
 
-BSt : '**' {!bold.active}?   {setFormatting(bold,   Any);} ;
-ISt : '//' {!italic.active && !prior().matches("[a-zA-Z0-9]:")}? {setFormatting(italic, Any);} ;
-SSt : '--' {!strike.active}? {setFormatting(strike, Any);} ;
-
-BEnd : '**' {bold.active}?   {unsetFormatting(bold);} ;
-IEnd : '//' {italic.active && !prior().matches("[a-zA-Z0-9]:")}? {unsetFormatting(italic);} ;
-SEnd : '--' {strike.active}? {unsetFormatting(strike);} ;
+Bold   : '**' {toggleFormatting(bold, Any);} ;
+Italic : '//' {!prior().matches("[a-zA-Z0-9]:")}? {toggleFormatting(italic, Any);} ;
+Strike : '--' {toggleFormatting(strike, Any);} ;
 
 NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
 StartCpp   : '[<c++>]'   -> mode(CPP_INLINE) ;
@@ -363,3 +359,13 @@ mode XML_BLOCK;
 
 XmlAny      : BLOCK -> more ;
 EndXmlBlock : ~' ' '[</xml>]' -> mode(DEFAULT_MODE) ;
+
+// Helper token types, not directly matched, but seta s the type of other tokens.
+mode HELPERS;
+
+BSt : ;
+ISt : ;
+SSt : ;
+BEnd : ;
+IEnd : ;
+SEnd : ;

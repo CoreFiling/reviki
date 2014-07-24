@@ -25,9 +25,17 @@ public abstract class ContextSensitiveLexer extends Lexer {
     /** Whether we're currently inside it or not */
     boolean active;
 
-    public Formatting(String symbol) {
+    /** The start token type */
+    int start;
+
+    /** The end token type */
+    int end;
+
+    public Formatting(String symbol, int start, int end) {
       this.symbol = symbol;
       this.active = false;
+      this.start = start;
+      this.end = end;
     }
   }
 
@@ -215,28 +223,26 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
-   * Check if a string is the start some inline formatting, and activate it if
-   * so. If it's not, set the token type to the provided fallback value.
+   * Toggle some formatting. If we think we've hit a start token, check if there
+   * is an end token: if not, set the token type to the fallback value.
    * 
-   * @param formatting The possible formatting we've found.
-   * @param fallback The fallback token type.
+   * @param formatting The formatting we think we've found
+   * @param fallback The fallback token type
    */
-  public void setFormatting(Formatting formatting, int fallback) {
-    if (checkInline(formatting)) {
-      formatting.active = true;
+  public void toggleFormatting(Formatting formatting, int fallback) {
+    if (formatting.active) {
+      formatting.active = false;
+      setType(formatting.end);
     }
     else {
-      setType(fallback);
+      if (checkInline(formatting)) {
+        formatting.active = true;
+        setType(formatting.start);
+      }
+      else {
+        setType(fallback);
+      }
     }
-  }
-
-  /**
-   * Disable some active formatting.
-   * 
-   * @param formatting The formatting we've just exited.
-   */
-  public void unsetFormatting(Formatting formatting) {
-    formatting.active = false;
   }
 
   /**
@@ -244,7 +250,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    */
   public void resetFormatting() {
     for (Formatting fmat : inlineFormatting) {
-      unsetFormatting(fmat);
+      fmat.active = false;
     }
   }
 
