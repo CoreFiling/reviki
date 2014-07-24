@@ -160,8 +160,8 @@ O8  : START L L L L L L L O   {listLevel >= 7}? {doList(8);} ;
 O9  : START L L L L L L L L O  {listLevel >= 8}? {doList(9);} ;
 O10 : START L L L L L L L L L O {listLevel >= 9}? {doList(10);} ;
 
-fragment U : '*' ~'*' ;
-fragment O : '#' ~'#' ;
+fragment U : '*' ~('*'|'\r'|'\n') ;
+fragment O : '#' ~('#'|'\r'|'\n') ;
 fragment L : '*' | '#' ;
 
 /* ***** Horizontal Rules ***** */
