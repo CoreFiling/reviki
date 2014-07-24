@@ -250,24 +250,20 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    * Render a list item
    *
    * @param childContexts List of child elements
-   * @param innerOlist Possible inner ordered list
-   * @param innerUlist Possible inner unordered list
-   * @param inner Possible inner inline
+   * @param inner Sorted list (most preferable first) of possible inner elements
    * @return A list item containing with the given child list elements. For
    *         inner elements, olist is preferred over ulist, which is preferred
    *         over inline; if none are given, an empty Plaintext is used.
    */
-  protected ASTNode renderListItem(List<ListItemContext> childContexts, OlistContext innerOlist, UlistContext innerUlist, InlineContext inner) {
+  protected ASTNode renderListItem(List<ListItemContext> childContexts, List<? extends ParserRuleContext> inner) {
     ASTNode body = new Plaintext("");
 
-    if (inner != null)
-      body = visit(inner);
-
-    if (innerUlist != null)
-      body = visit(innerUlist);
-
-    if (innerOlist != null)
-      body = visit(innerOlist);
+    for (ParserRuleContext in : inner) {
+      if (in != null) {
+        body = visit(in);
+        break;
+      }
+    }
 
     if (childContexts == null || childContexts.isEmpty()) {
       return new ListItem(body);

@@ -449,78 +449,86 @@ public class Visitor extends CreoleASTBuilder {
     }
   }
 
-  protected ASTNode list(List<? extends ParserRuleContext> ltxs, OlistContext olist, UlistContext ulist, InlineContext inline) {
+  protected ASTNode list(List<? extends ParserRuleContext> ltxs, InListContext inner) {
     List<ListItemContext> children = new ArrayList<ListItemContext>();
-    for (ParserRuleContext ltx : ltxs) {
-      ParserRuleContext ordered = olist(ltx);
-      ParserRuleContext unordered = ulist(ltx);
 
-      ListType type = (ordered != null) ? ListType.Ordered : ListType.Unordered;
+    if (ltxs != null) {
+      for (ParserRuleContext ltx : ltxs) {
+        ParserRuleContext ordered = olist(ltx);
+        ParserRuleContext unordered = ulist(ltx);
 
-      children.add(new ListItemContext(type, ordered, unordered));
+        ListType type = (ordered != null) ? ListType.Ordered : ListType.Unordered;
+
+        children.add(new ListItemContext(type, ordered, unordered));
+      }
     }
 
-    return renderListItem(children, olist, ulist, inline);
+    List<ParserRuleContext> inners = new ArrayList<ParserRuleContext>();
+    inners.add((ParserRuleContext) inner.olist());
+    inners.add((ParserRuleContext) inner.ulist());
+    inners.add((ParserRuleContext) inner.inline());
+
+    return renderListItem(children, inners);
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist1(Olist1Context ctx) {
-    return list(ctx.list2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list2(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist2(Olist2Context ctx) {
-    return list(ctx.list3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list3(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist3(Olist3Context ctx) {
-    return list(ctx.list4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list4(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist4(Olist4Context ctx) {
-    return list(ctx.list5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list5(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist5(Olist5Context ctx) {
-    return list(ctx.list6(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list6(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist6(Olist6Context ctx) {
-    return list(ctx.list7(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list7(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist7(Olist7Context ctx) {
-    return list(ctx.list8(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list8(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist8(Olist8Context ctx) {
-    return list(ctx.list9(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list9(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist9(Olist9Context ctx) {
-    return list(ctx.list10(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list10(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitOlist10(Olist10Context ctx) {
-    return renderListItem(new ArrayList<ListItemContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(null, ctx.inList());
   }
 
   /** See {@link #visitOlist} */
@@ -532,61 +540,61 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist1(Ulist1Context ctx) {
-    return list(ctx.list2(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list2(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist2(Ulist2Context ctx) {
-    return list(ctx.list3(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list3(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist3(Ulist3Context ctx) {
-    return list(ctx.list4(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list4(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist4(Ulist4Context ctx) {
-    return list(ctx.list5(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list5(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist5(Ulist5Context ctx) {
-    return list(ctx.list6(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list6(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist6(Ulist6Context ctx) {
-    return list(ctx.list7(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list7(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist7(Ulist7Context ctx) {
-    return list(ctx.list8(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list8(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist8(Ulist8Context ctx) {
-    return list(ctx.list9(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list9(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist9(Ulist9Context ctx) {
-    return list(ctx.list10(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(ctx.list10(), ctx.inList());
   }
 
   /** See {@link #visitOlist} */
   @Override
   public ASTNode visitUlist10(Ulist10Context ctx) {
-    return renderListItem(new ArrayList<ListItemContext>(), ctx.olist(), ctx.ulist(), ctx.inline());
+    return list(null, ctx.inList());
   }
 
   /**
