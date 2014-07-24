@@ -216,7 +216,7 @@ RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']'|'"')+ '/'?)+ {doUrl();} ;
 
 fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' ;
 
-Attachment : UPNUM ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
+Attachment : UPPER ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
 
 WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {!prior().matches("[\\.\\w:]")}? {seek(-1);} ;
 
