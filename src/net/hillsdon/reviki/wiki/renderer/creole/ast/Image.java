@@ -7,26 +7,27 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 public class Image extends ASTNode {
-  private LinkPartsHandler handler;
+  private LinkPartsHandler _handler;
 
-  private URLOutputFilter urlOutputFilter;
+  private URLOutputFilter _urlOutputFilter;
 
-  private PageInfo page;
+  private PageInfo _page;
 
-  private LinkParts parts;
+  private LinkParts _parts;
 
-  public Image(String target, String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+  public Image(final String target, final String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     super("img");
 
-    this.parts = (new CreoleLinkContentsSplitter()).split(target, title);
-    this.page = page;
-    this.urlOutputFilter = urlOutputFilter;
-    this.handler = handler;
+    _parts = (new CreoleLinkContentsSplitter()).split(target, title);
+    _page = page;
+    _urlOutputFilter = urlOutputFilter;
+    _handler = handler;
   }
 
+  @Override
   public String toXHTML() {
     try {
-      return handler.handle(page, parts.getText(), parts, urlOutputFilter);
+      return _handler.handle(_page, _parts.getText(), _parts, _urlOutputFilter);
     }
     catch (Exception e) {
       // TODO: Come up with a better way to handle this

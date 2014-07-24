@@ -10,7 +10,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 /**
  * A node in the abstract syntax tree produced by the Creole parser.
- * 
+ *
  * @author msw
  */
 public abstract class ASTNode {
@@ -23,57 +23,57 @@ public abstract class ASTNode {
 
   /**
    * Most elements have a tag. Only two (plaintext and raw) don't.
-   * 
+   *
    * TODO: It feels a bit wrong to have elements with no tags, figure out a
    * nicer representation.
    */
-  protected final String tag;
+  private final String _tag;
 
   /**
    * The immediate contents of the node (may be null). Is rendered before any
    * children in the output.
    */
-  protected ASTNode body;
+  private ASTNode _body;
 
   /**
    * The child elements of the node (may be null).
    */
-  protected List<ASTNode> children;
+  private List<ASTNode> _children;
 
   /**
    * Construct a new AST node.
-   * 
+   *
    * @param tag The tag (optional). If there is no tag, toXHTML *must* be
    *          overridden, and handled appropriately for the node.
    * @param body The immediate content of the node (may be null).
    * @param children Any child elements of the node (may be null).
    */
-  public ASTNode(String tag, ASTNode body, List<ASTNode> children) {
-    this.tag = tag;
-    this.body = body;
+  public ASTNode(final String tag, final ASTNode body, final List<ASTNode> children) {
+    _tag = tag;
+    _body = body;
 
-    this.children = new ArrayList<ASTNode>();
+    _children = new ArrayList<ASTNode>();
     if (children != null) {
       for (ASTNode child : children) {
         if (child != null) {
-          this.children.add(child);
+          _children.add(child);
         }
       }
     }
   }
 
-  /** See {@link #ASTNode(String, ASTNode, List)  */
-  public ASTNode(String tag, ASTNode body) {
+  /** See {@link #ASTNode(String, ASTNode, List). */
+  public ASTNode(final String tag, final ASTNode body) {
     this(tag, body, null);
   }
 
-  /** See {@link #ASTNode(String, ASTNode, List)  */
-  public ASTNode(String tag, List<ASTNode> children) {
+  /** See {@link #ASTNode(String, ASTNode, List). */
+  public ASTNode(final String tag, final List<ASTNode> children) {
     this(tag, null, children);
   }
 
-  /** See {@link #ASTNode(String, ASTNode, List)  */
-  public ASTNode(String tag) {
+  /** See {@link #ASTNode(String, ASTNode, List). */
+  public ASTNode(final String tag) {
     this(tag, null, null);
   }
 
@@ -83,9 +83,10 @@ public abstract class ASTNode {
    */
   public List<ASTNode> getChildren() {
     ArrayList<ASTNode> children = new ArrayList<ASTNode>();
-    if (body != null)
-      children.add(body);
-    children.addAll(this.children);
+    if (_body != null) {
+      children.add(_body);
+    }
+    children.addAll(_children);
     return Collections.unmodifiableList(children);
   }
 
@@ -94,17 +95,17 @@ public abstract class ASTNode {
    * toXHTML for all direct and indirect children) of the node.
    */
   public String toXHTML() {
-    if (getChildren().isEmpty() || (body != null && body.toXHTML().equals("") && children.isEmpty())) {
-      return "<" + tag + " " + CSS_CLASS_ATTR + " />";
+    if (getChildren().isEmpty() || (_body != null && _body.toXHTML().equals("") && _children.isEmpty())) {
+      return "<" + _tag + " " + CSS_CLASS_ATTR + " />";
     }
 
-    String out = "<" + tag + " " + CSS_CLASS_ATTR + ">";
+    String out = "<" + _tag + " " + CSS_CLASS_ATTR + ">";
 
     for (ASTNode node : getChildren()) {
       out += node.toXHTML();
     }
 
-    out += "</" + tag + ">";
+    out += "</" + _tag + ">";
 
     return out;
   }
@@ -112,32 +113,32 @@ public abstract class ASTNode {
   /**
    * Expand macros contained within this node and its children, returning the
    * modified node.
-   * 
-   * @param macro The list of macros
+   *
+   * @param macros The list of macros
    * @return The possibly modified node. If the node was not a macro, `this`
    *         will be returned, however if `this` is returned it cannot be
    *         assumed that none of the node's children contained macros.
    */
-  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
-    if (body != null) {
-      body = body.expandMacros(macros);
+  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
+    if (_body != null) {
+      _body = _body.expandMacros(macros);
     }
 
     List<ASTNode> adoptees = new ArrayList<ASTNode>();
 
-    for (ASTNode child : children) {
+    for (ASTNode child : _children) {
       adoptees.add(child.expandMacros(macros));
     }
 
-    children = adoptees;
+    _children = adoptees;
 
     return this;
   }
 
   /**
-   * Produce a pretty tree representation of the AST
+   * Produce a pretty tree representation of the AST.
    */
-  public String toStringTree() {
+  public final String toStringTree() {
     String out = this.getClass().getSimpleName() + "\n";
 
     if (getChildren().isEmpty()) {
@@ -148,15 +149,17 @@ public abstract class ASTNode {
     for (ASTNode node : getChildren()) {
       boolean first = true;
       for (String line : node.toStringTree().split("\n")) {
-        if(first) {
+        if (first) {
           out += (node == last) ? "┗ " : "┣ ";
           first = false;
-        } else if (node != last) {
+        }
+        else if (node != last) {
           out += "┃ ";
-        } else {
+        }
+        else {
           out += "  ";
         }
-        out +=  line + "\n";
+        out += line + "\n";
       }
     }
 

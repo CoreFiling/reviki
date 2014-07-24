@@ -7,35 +7,35 @@ import com.uwyn.jhighlight.renderer.Renderer;
 import net.hillsdon.fij.text.Escape;
 
 public class InlineCode extends BlockableNode<Code> {
-  private String contents;
+  private String _contents;
 
-  private Renderer highlighter;
+  private Renderer _highlighter;
 
-  public InlineCode(String contents) {
+  public InlineCode(final String contents) {
     super("code", new Raw(Escape.html(contents)));
 
-    this.contents = contents;
-    this.highlighter = null;
+    _contents = contents;
+    _highlighter = null;
   }
 
-  public InlineCode(String contents, Renderer highlighter) throws IOException {
+  public InlineCode(final String contents, final Renderer highlighter) throws IOException {
     super("code", new Raw(highlighter.highlight("", contents, "UTF-8", true).replace("&nbsp;", " ").replace("<br />", "")));
 
-    this.contents = contents;
-    this.highlighter = highlighter;
+    _contents = contents;
+    _highlighter = highlighter;
   }
 
   @Override
   public Code toBlock() {
-    if (highlighter == null) {
-      return new Code(contents);
+    if (_highlighter == null) {
+      return new Code(_contents);
     }
     else {
       try {
-        return new Code(contents, highlighter);
+        return new Code(_contents, _highlighter);
       }
       catch (IOException e) {
-        return new Code(contents);
+        return new Code(_contents);
       }
     }
   }

@@ -8,40 +8,41 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 public class Link extends ASTNode {
-  private LinkPartsHandler handler;
+  private LinkPartsHandler _handler;
 
-  private URLOutputFilter urlOutputFilter;
+  private URLOutputFilter _urlOutputFilter;
 
-  private PageInfo page;
+  private PageInfo _page;
 
-  private LinkParts parts;
+  private LinkParts _parts;
 
-  private String title;
+  private String _title;
 
-  private String target;
+  private String _target;
 
-  public Link(String target, String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
+  public Link(final String target, final String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     super("a");
 
-    this.title = title;
-    this.target = target;
-    this.parts = (new CreoleLinkContentsSplitter()).split(target, title);
-    this.page = page;
-    this.urlOutputFilter = urlOutputFilter;
-    this.handler = handler;
+    _title = title;
+    _target = target;
+    _parts = (new CreoleLinkContentsSplitter()).split(target, title);
+    _page = page;
+    _urlOutputFilter = urlOutputFilter;
+    _handler = handler;
   }
 
+  @Override
   public String toXHTML() {
     try {
-      return handler.handle(page, Escape.html(parts.getText()), parts, urlOutputFilter);
+      return _handler.handle(_page, Escape.html(_parts.getText()), _parts, _urlOutputFilter);
     }
     catch (Exception e) {
 
-      if (target.startsWith("mailto:")) {
-        return String.format("<a href='%s'>%s</a>", target, Escape.html(title));
+      if (_target.startsWith("mailto:")) {
+        return String.format("<a href='%s'>%s</a>", _target, Escape.html(_title));
       }
       else {
-        return Escape.html(parts.getText());
+        return Escape.html(_parts.getText());
       }
     }
   }

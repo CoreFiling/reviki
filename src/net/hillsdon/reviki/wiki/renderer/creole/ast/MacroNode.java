@@ -17,43 +17,40 @@ public class MacroNode extends BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
-  private String name;
+  private String _name;
 
-  private String args;
+  private String _args;
 
-  private final PageInfo page;
+  private final PageInfo _page;
 
-  private final CreoleASTBuilder visitor;
+  private final CreoleASTBuilder _visitor;
 
-  public boolean block = false;
-
-  public MacroNode(String name, String args, final PageInfo page, final CreoleASTBuilder visitor) {
-    super("", null, null);
-    this.name = name;
-    this.args = args;
-    this.page = page;
-    this.visitor = visitor;
-
+  public MacroNode(final String name, final String args, final PageInfo page, final CreoleASTBuilder visitor, final boolean isBlock) {
+    super(isBlock ? "pre" : "code", new Raw(Escape.html("<<" + name + ":" + args + ">>")));
+    _name = name;
+    _args = args;
+    _page = page;
+    _visitor = visitor;
   }
 
-  public String toXHTML() {
-    String tag = block ? "pre" : "code";
-    return String.format("<%s>%s</%s>", tag, Escape.html("<<" + name + ":" + args + ">>"), tag);
+  /** Create a new inline macro node. */
+  public MacroNode(final String name, final String args, final PageInfo page, final CreoleASTBuilder visitor) {
+    this(name, args, page, visitor, false);
   }
 
   @Override
-  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
+  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
     // This is basically lifted from the old MacroNode.
     List<Macro> theMacros = macros.get();
     try {
       for (Macro macro : theMacros) {
-        if (macro.getName().equals(name)) {
-          String content = macro.handle(page, args);
+        if (macro.getName().equals(_name)) {
+          String content = macro.handle(_page, _args);
           switch (macro.getResultFormat()) {
             case XHTML:
               return new Raw(content);
             case WIKI:
-              return CreoleRenderer.renderPartWithVisitor(content, visitor, macros);
+              return CreoleRenderer.renderPartWithVisitor(content, _visitor, macros);
             default:
               return new Plaintext(content);
           }
@@ -62,7 +59,7 @@ public class MacroNode extends BlockableNode<MacroNode> {
 
     }
     catch (Exception e) {
-      LOG.error("Error handling macro on: " + page.getPath(), e);
+      LOG.error("Error handling macro on: " + _page.getPath(), e);
     }
 
     // Failed to find a macro of the same name.
@@ -71,8 +68,6 @@ public class MacroNode extends BlockableNode<MacroNode> {
 
   @Override
   public MacroNode toBlock() {
-    MacroNode block = new MacroNode(name, args, page, visitor);
-    block.block = true;
-    return block;
+    return new MacroNode(_name, _args, _page, _visitor, true);
   }
 }

@@ -1,7 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 public class TableHeaderCell extends ASTNode {
-  public TableHeaderCell(ASTNode body) {
+  public TableHeaderCell(final ASTNode body) {
     super("th", body);
   }
 }
