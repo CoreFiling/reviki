@@ -209,7 +209,7 @@ RawUrl : PROTOCOL (~(' '|'\t'|'\r'|'\n'|'|'|'['|']'|'"')+ '/'?)+ {doUrl();} ;
 
 fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' ;
 
-Attachment : UPPER ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
+Attachment : UPPER CAMEL '.' ALNUM+ ;
 
 WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != ':' && !Character.isLetter(prior())}? {seek(-1);} ;
 
