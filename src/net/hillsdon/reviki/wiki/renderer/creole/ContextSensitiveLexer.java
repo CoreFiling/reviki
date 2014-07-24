@@ -255,24 +255,6 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
-   * Check that the two characters immediately bracketing the current token do
-   * NOT match the given patterns.
-   *
-   * @param forbiddenFst The pattern to check the first character against.
-   * @param forbiddenSnd The pattern to check the second character against.
-   * @return True if and only if the character immediately before and the
-   *         character immediately after do not match it.
-   */
-  public boolean checkBounds(String forbiddenFst, String forbiddenSnd) {
-    return !(prior().matches(forbiddenFst) || next().matches(forbiddenSnd));
-  }
-
-  /** See {@link #checkBounds(String, String)} */
-  public boolean checkBounds(String forbidden) {
-    return checkBounds(forbidden, forbidden);
-  }
-
-  /**
    * Set up any inline formatting.
    */
   public abstract void setupFormatting();

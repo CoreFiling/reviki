@@ -218,7 +218,7 @@ fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' 
 
 Attachment : UPNUM ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
 
-WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) {checkBounds("[\\.\\w:]", "\\w")}? ;
+WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {!prior().matches("[\\.\\w:]")}? {seek(-1);} ;
 
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
