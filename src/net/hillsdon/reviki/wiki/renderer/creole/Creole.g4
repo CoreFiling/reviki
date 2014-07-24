@@ -108,7 +108,7 @@ rawlink    : RawUrl ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
-linebreak  : InlineBrk ({canBreak()}? LineBreak)? ;
+linebreak  : ({canBreak()}? LineBreak)? InlineBrk ({canBreak()}? LineBreak)? ;
 
 macro      : MacroSt MacroName (MacroSep MacroEnd | MacroEndNoArgs) ;
 
