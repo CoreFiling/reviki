@@ -226,7 +226,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
     }
 
     for (String ender : thisKillsTheFormatting()) {
-      if (ender != null && !findBefore(formatting.symbol, ender)) {
+      if (!findBefore(formatting.symbol, ender)) {
         return false;
       }
     }
@@ -274,5 +274,5 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * Get a list of strings which can end inline formatting at this point.
    */
-  public abstract String[] thisKillsTheFormatting();
+  public abstract java.util.Collection<String> thisKillsTheFormatting();
 }

@@ -90,33 +90,26 @@ options { superClass=ContextSensitiveLexer; }
     intr = false;
   }
 
-  public String[] thisKillsTheFormatting() {
-    String[] ends = new String[7];
+  public java.util.Collection<String> thisKillsTheFormatting() {
+    java.util.Collection<String> ends = new java.util.LinkedList<String>();
 
     if(inHeader || intr) {
-      ends[0] = "\n";
-      ends[1] = "\r\n";
-    } else {
-      ends[0] = null;
-      ends[1] = null;
+      ends.add("\n");
+      ends.add("\r\n");
+    }
+    else {
+      ends.add("\n\n");
+      ends.add("\r\n\r\n");
     }
 
     if(intr) {
-      ends[2] = "|";
-    } else {
-      ends[2] = null;
+      ends.add("|");
     }
-
-    ends[3] = "\n\n";
-    ends[4] = "\r\n\r\n";
 
     if(listLevel > 0) {
       // \L (when at the start) matches the start of a line.
-      ends[5] = "\\L*";
-      ends[6] = "\\L#";
-    } else {
-      ends[5] = null;
-      ends[6] = null;
+      ends.add("\\L*");
+      ends.add("\\L#");
     }
 
     return ends;
@@ -146,7 +139,7 @@ HEnd : WS? '='* WS? (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 /* ***** Lists ***** */
 
 U1  : START U                            {doList(1);} ;
-U2  : START L U         {listLevel >= 1 && occurrencesBefore("**", "\n") % 2 == 0}? {doList(2);} ;
+U2  : START L U         {listLevel >= 1}? {doList(2);} ;
 U3  : START L L U        {listLevel >= 2}? {doList(3);} ;
 U4  : START L L L U       {listLevel >= 3}? {doList(4);} ;
 U5  : START L L L L U      {listLevel >= 4}? {doList(5);} ;
