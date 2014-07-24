@@ -16,9 +16,15 @@ public class Link extends ASTNode {
 
   private LinkParts parts;
 
+  private String title;
+
+  private String target;
+
   public Link(String target, String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     super("a");
 
+    this.title = title;
+    this.target = target;
     this.parts = (new CreoleLinkContentsSplitter()).split(target, title);
     this.page = page;
     this.urlOutputFilter = urlOutputFilter;
@@ -26,14 +32,17 @@ public class Link extends ASTNode {
   }
 
   public String toXHTML() {
-    if (parts.getText().startsWith("mailto:")) {
-      return String.format("<a href='%s'>%s</a>", parts.getText(), Escape.html(parts.getText()));
-    }
     try {
       return handler.handle(page, Escape.html(parts.getText()), parts, urlOutputFilter);
     }
     catch (Exception e) {
-      return Escape.html(parts.getText());
+
+      if (target.startsWith("mailto:")) {
+        return String.format("<a href='%s'>%s</a>", target, Escape.html(title));
+      }
+      else {
+        return Escape.html(parts.getText());
+      }
     }
   }
 
