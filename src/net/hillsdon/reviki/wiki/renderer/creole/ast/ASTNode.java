@@ -133,4 +133,33 @@ public abstract class ASTNode {
 
     return this;
   }
+
+  /**
+   * Produce a pretty tree representation of the AST
+   */
+  public String toStringTree() {
+    String out = this.getClass().getSimpleName() + "\n";
+
+    if (getChildren().isEmpty()) {
+      return out;
+    }
+
+    ASTNode last = getChildren().get(getChildren().size() - 1);
+    for (ASTNode node : getChildren()) {
+      boolean first = true;
+      for (String line : node.toStringTree().split("\n")) {
+        if(first) {
+          out += (node == last) ? "┗ " : "┣ ";
+          first = false;
+        } else if (node != last) {
+          out += "┃ ";
+        } else {
+          out += "  ";
+        }
+        out +=  line + "\n";
+      }
+    }
+
+    return out;
+  }
 }
