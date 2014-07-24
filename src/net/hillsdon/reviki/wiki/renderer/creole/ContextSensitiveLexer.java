@@ -80,16 +80,27 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * Helper method for {@link #next(int)} which gets the next character.
    */
-  public String next() {
-    return next(1);
+  public Character next() {
+    String nxt = next(1);
+    return (nxt.length() > 0) ? nxt.charAt(0) : null;
   }
 
   /**
    * Helper method for {@link #get(int)}, which gets the character prior to the
    * token.
    */
-  public String prior() {
-    return (_input.index() > getText().length()) ? get(-getText().length() - 1) : "";
+  public Character prior() {
+    int len = getText().length();
+    return (_input.index() > len) ? get(-len - 1).charAt(0) : null;
+  }
+
+  /**
+   * Helper method for {@link #get(int)}, which gets the character two prior to
+   * the token.
+   */
+  public Character priorprior() {
+    int len = getText().length() + 1;
+    return (_input.index() > len) ? get(-len - 1).charAt(0) : null;
   }
 
   /**
@@ -142,7 +153,8 @@ public abstract class ContextSensitiveLexer extends Lexer {
 
       if (target.equals(get(i, tlen))) {
         // Special case for italics: the "//" in "://" is not an italic symbol.
-        if (target.equals("//") && get(i - 2, 4).matches("[a-zA-Z0-9]://")) {
+        String before = get(i - 2, 4);
+        if (target.equals("//") && before.endsWith("://") && Character.isLetter(before.charAt(0))) {
           continue;
         }
         occurrences++;

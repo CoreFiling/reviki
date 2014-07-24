@@ -48,7 +48,7 @@ options { superClass=ContextSensitiveLexer; }
   }
 
   public void setStart() {
-    String next1 = next();
+    String next1 = next(1);
     String next2 = get(1);
     start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
   }
@@ -64,7 +64,7 @@ options { superClass=ContextSensitiveLexer; }
   public void doUrl() {
     String url = getText();
     String last = url.substring(url.length()-1);
-    String next = next();
+    String next = next(1);
 
     String badEnds = inHeader ? "[\\.,)\"';:\\\\=-]" : "[\\.,)\"';:\\\\-]";
 
@@ -72,7 +72,7 @@ options { superClass=ContextSensitiveLexer; }
       seek(-1);
       url = url.substring(0, url.length() - 1);
       last = url.substring(url.length()-1);
-      next = next();
+      next = next(1);
 
       // Break out if we no longer have a URL
       if(url.endsWith(":/") || url.endsWith("mailto:")) {
@@ -187,7 +187,7 @@ ThStart : '|'+ '=' {intr}? {breakOut(); intr=true;} ;
 /* ***** Inline Formatting ***** */
 
 Bold   : '**' {toggleFormatting(bold, Any);} ;
-Italic : '//' {!prior().matches("[a-zA-Z0-9]:")}? {toggleFormatting(italic, Any);} ;
+Italic : '//' {prior() == null || (prior() != ':' || !Character.isLetterOrDigit(priorprior()))}? {toggleFormatting(italic, Any);} ;
 Strike : '--' {toggleFormatting(strike, Any);} ;
 
 NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
@@ -218,7 +218,7 @@ fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' 
 
 Attachment : UPPER ALNUM+ UPNUM ALNUM* '.' ALNUM+ ;
 
-WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior().equals("") || !prior().equals(".") && !prior().equals(":") && !Character.isLetter(prior().charAt(0))}? {seek(-1);} ;
+WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != ':' && !Character.isLetter(prior())}? {seek(-1);} ;
 
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
