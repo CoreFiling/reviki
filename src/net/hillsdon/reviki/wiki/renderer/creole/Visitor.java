@@ -1,6 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,9 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
+  /** List of attachments on the page */
+  protected Collection<AttachmentHistory> attachments = null;
+
   public Visitor(PageStore store, PageInfo page, URLOutputFilter urlOutputFilter, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler) {
     super(store, page, urlOutputFilter, linkHandler, imageHandler);
   }
@@ -222,7 +226,10 @@ public class Visitor extends CreoleASTBuilder {
     if (store != null) {
       // Check if the attachment exists
       try {
-        for (AttachmentHistory attachment : store.attachments(page)) {
+        if (attachments == null) {
+          attachments = store.attachments(page);
+        }
+        for (AttachmentHistory attachment : attachments) {
           // Skip deleted attachments
           if (attachment.isAttachmentDeleted())
             continue;
@@ -695,6 +702,6 @@ public class Visitor extends CreoleASTBuilder {
     if (ctx.MacroEndNoArgs() != null) {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
-    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), store, page, urlOutputFilter, linkHandler, imageHandler);
+    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page, this);
   }
 }

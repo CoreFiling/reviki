@@ -72,15 +72,14 @@ public class CreoleRenderer {
   }
 
   /**
-   * Render a stream of text. See
-   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)} and
-   * {@link #renderPart(PageInfo, String, URLOutputFilter, LinkPartsHandler, LinkPartsHandler, List)}
-   * for explanation of most arguments.
+   * Render a stream of text.
    *
    * @param in The input stream to render.
-   * @return The AST of the page, after macro application.
+   * @param visitor The visitor to do the rendering.
+   * @param macros List of macros to apply.
+   * @return The AST of the page, after macro expansion.
    */
-  private static ASTNode renderInternal(ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  private static ASTNode renderInternal(ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -96,8 +95,6 @@ public class CreoleRenderer {
       tree = tryParse(tokens, parser);
     }
 
-    ParseTreeVisitor<ASTNode> visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
-
     ASTNode rendered = visitor.visit(tree);
 
     // Decrement the expansion limit
@@ -110,6 +107,20 @@ public class CreoleRenderer {
       // Depth limit has been hit, there is probably a macro loop happening.
       return rendered;
     }
+  }
+
+  /**
+   * Render a stream of text. See
+   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)} and
+   * {@link #renderPart(PageInfo, String, URLOutputFilter, LinkPartsHandler, LinkPartsHandler, List)}
+   * for explanation of most arguments.
+   *
+   * @param in The input stream to render.
+   * @return The AST of the page, after macro application.
+   */
+  private static ASTNode renderInternal(ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+    return renderInternal(in, visitor, macros);
   }
 
   /**
@@ -148,22 +159,6 @@ public class CreoleRenderer {
   }
 
   /**
-   * Render a page with images rendered as links to their source. See
-   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
-   */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final Supplier<List<Macro>> macros) {
-    return render(store, page, urlOutputFilter, linkHandler, linkHandler, macros);
-  }
-
-  /**
-   * Render a page with no macros, and images rendered as links to their source.
-   * See {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
-   */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler) {
-    return render(store, page, urlOutputFilter, linkHandler);
-  }
-
-  /**
    * Render only a part of a page.
    *
    * @param store The page store (may be null).
@@ -173,10 +168,23 @@ public class CreoleRenderer {
    *          etc).
    * @param linkHandler Handler for resolving and rendering links
    * @param imageHandler Handler for resolving and rendering images
-   * @param macros List of macros to reply
+   * @param macros List of macros to apply
    * @return The AST of the page, after macro application.
    */
   public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    return renderInternal(new ANTLRInputStream(content), store, page, urlOutputFilter, linkHandler, imageHandler, macros);
+    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+    return renderPartWithVisitor(content, visitor, macros);
+  }
+
+  /**
+   * Render only a part of a page.
+   * 
+   * @param content The content to render.
+   * @param visitor The AST builder (may not be null)
+   * @param macros List of macros to apply
+   * @return The AST of the page, after macro expansion.
+   */
+  public static ASTNode renderPartWithVisitor(final String content, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
+    return renderInternal(new ANTLRInputStream(content), visitor, macros);
   }
 }

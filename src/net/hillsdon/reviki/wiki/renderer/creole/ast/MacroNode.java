@@ -11,8 +11,10 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.creole.CreoleASTBuilder;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.Visitor;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class MacroNode extends BlockableNode<MacroNode> {
@@ -23,27 +25,18 @@ public class MacroNode extends BlockableNode<MacroNode> {
 
   private String args;
 
-  private URLOutputFilter urlOutputFilter;
+  private final PageInfo page;
 
-  private LinkPartsHandler linkHandler;
-
-  private LinkPartsHandler imageHandler;
-
-  private PageInfo page;
-
-  private PageStore store;
+  private final CreoleASTBuilder visitor;
 
   public boolean block = false;
 
-  public MacroNode(String name, String args, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public MacroNode(String name, String args, final PageInfo page, final CreoleASTBuilder visitor) {
     super("", null, null);
     this.name = name;
     this.args = args;
-    this.store = store;
     this.page = page;
-    this.urlOutputFilter = urlOutputFilter;
-    this.linkHandler = linkHandler;
-    this.imageHandler = imageHandler;
+    this.visitor = visitor;
 
   }
 
@@ -64,7 +57,7 @@ public class MacroNode extends BlockableNode<MacroNode> {
             case XHTML:
               return new Raw(content);
             case WIKI:
-              return CreoleRenderer.renderPart(store, page, content, urlOutputFilter, linkHandler, imageHandler, macros);
+              return CreoleRenderer.renderPartWithVisitor(content, visitor, macros);
             default:
               return new Plaintext(content);
           }
@@ -82,7 +75,7 @@ public class MacroNode extends BlockableNode<MacroNode> {
 
   @Override
   public MacroNode toBlock() {
-    MacroNode block = new MacroNode(name, args, store, page, urlOutputFilter, linkHandler, imageHandler);
+    MacroNode block = new MacroNode(name, args, page, visitor);
     block.block = true;
     return block;
   }
