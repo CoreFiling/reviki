@@ -135,10 +135,9 @@
     "output": "<p><a href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"
   },
   {
-    "bug":    "unimplemented",
     "name":   "Image",
     "input":  "{{image.gif|my image}}",
-    "output": "<p><img src='image.gif' alt='my image'/></p>"
+    "output": "<p><img class='attachment' src='/pages/test//attachments/image.gif' alt='my image' /></p>"
   },
   {
     "name":   "Inline noWiki",
