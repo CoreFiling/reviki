@@ -1,6 +1,5 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.CharStream;
@@ -42,11 +41,11 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * The list of inline formatting tokens.
    */
-  List<Formatting> inlineFormatting = new ArrayList<Formatting>();
+  private final List<Formatting> _inlineFormatting;
 
   public ContextSensitiveLexer(final CharStream input) {
     super(input);
-    setupFormatting();
+    _inlineFormatting = setupFormatting();
   }
 
   /**
@@ -216,7 +215,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *         other closing marks for formatting which was already open.
    */
   public boolean checkInline(final Formatting formatting) {
-    for (Formatting fmat : inlineFormatting) {
+    for (Formatting fmat : _inlineFormatting) {
       if (fmat == formatting) {
         continue;
       }
@@ -262,7 +261,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    * Turn off all formatting.
    */
   public void resetFormatting() {
-    for (Formatting fmat : inlineFormatting) {
+    for (Formatting fmat : _inlineFormatting) {
       fmat.active = false;
     }
   }
@@ -270,10 +269,10 @@ public abstract class ContextSensitiveLexer extends Lexer {
   /**
    * Set up any inline formatting.
    */
-  public abstract void setupFormatting();
+  public abstract List<Formatting> setupFormatting();
 
   /**
    * Get a list of strings which can end inline formatting at this point.
    */
-  public abstract java.util.Collection<String> thisKillsTheFormatting();
+  public abstract List<String> thisKillsTheFormatting();
 }

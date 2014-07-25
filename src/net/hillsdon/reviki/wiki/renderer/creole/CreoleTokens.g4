@@ -11,14 +11,12 @@ options { superClass=ContextSensitiveLexer; }
   Formatting italic;
   Formatting strike;
 
-  public void setupFormatting() {
+  public java.util.List<Formatting> setupFormatting() {
     bold   = new Formatting("**", BSt, BEnd);
     italic = new Formatting("//", ISt, IEnd);
     strike = new Formatting("--", SSt, SEnd);
 
-    inlineFormatting.add(bold);
-    inlineFormatting.add(italic);
-    inlineFormatting.add(strike);
+    return com.google.common.collect.ImmutableList.of(bold, italic, strike);
   }
 
   public boolean inHeader = false;
@@ -90,8 +88,8 @@ options { superClass=ContextSensitiveLexer; }
     intr = false;
   }
 
-  public java.util.Collection<String> thisKillsTheFormatting() {
-    java.util.Collection<String> ends = new java.util.LinkedList<String>();
+  public java.util.List<String> thisKillsTheFormatting() {
+    java.util.List<String> ends = new java.util.ArrayList<String>();
 
     if(inHeader || intr) {
       ends.add("\n");
