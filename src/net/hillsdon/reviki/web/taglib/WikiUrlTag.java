@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create URLs to wiki pages.

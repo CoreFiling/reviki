@@ -7,7 +7,7 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
 import junit.framework.TestCase;
 
 public class TestSvnWikiLinkPartHandler extends TestCase {

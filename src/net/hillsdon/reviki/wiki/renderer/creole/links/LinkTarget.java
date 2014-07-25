@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.wiki.renderer.creole;
+package net.hillsdon.reviki.wiki.renderer.creole.links;
 
 import java.net.URISyntaxException;
 

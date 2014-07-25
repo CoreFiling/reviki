@@ -2,9 +2,9 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.links.CreoleLinkContentsSplitter;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
 
 public class Image extends TaggedNode {
   private LinkPartsHandler _handler;

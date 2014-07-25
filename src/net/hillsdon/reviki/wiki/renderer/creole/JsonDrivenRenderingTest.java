@@ -44,6 +44,8 @@ import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.TaggedNode;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;

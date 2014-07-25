@@ -19,6 +19,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 /**

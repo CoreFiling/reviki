@@ -24,6 +24,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.ListItem;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.OrderedList;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Plaintext;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.UnorderedList;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
 
 /**
  * Helper class providing some useful functions for walking through the Creole

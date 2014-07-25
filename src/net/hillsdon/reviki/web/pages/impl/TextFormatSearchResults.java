@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
 
 /**
  * Currently used by the JavaScript to display the autocomplete search box.

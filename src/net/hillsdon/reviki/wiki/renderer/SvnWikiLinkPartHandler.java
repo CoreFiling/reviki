@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.net.URISyntaxException;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
@@ -26,9 +27,9 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
