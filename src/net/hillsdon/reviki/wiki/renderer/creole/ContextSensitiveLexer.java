@@ -112,84 +112,6 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
-   * Reads ahead in the input stream until the limit string (or EOF, whichever
-   * is sooner), counting the number of occurrences of the target string.
-   *
-   * @param target The string being sought out.
-   * @param limit The end of search string.
-   * @param bail If true, return as soon as the first occurrence is found
-   * @return The number of times the target string occurs before the limit
-   *         string (or EOF).
-   */
-  public int occurrencesBefore(final String target, final String limit, final boolean bail) {
-    int ilen = _input.size() - _input.index();
-    int tlen = target.length();
-    int llen = limit.length();
-
-    int occurrences = 0;
-
-    boolean inlink = false;
-    boolean start = false;
-
-    for (int i = 0; i < ilen - tlen; i++) {
-      // Keep track of whether we're in a link or not.
-      if (get(i, 2).equals("[[") || get(i, 2).equals("{{")) {
-        inlink = true;
-      }
-
-      if (get(i, 2).equals("]]") || get(i, 2).equals("}}")) {
-        inlink = false;
-      }
-
-      // Keep track of whether we're at the start of a line or not.
-      if (get(i).equals("\n")) {
-        start = true;
-      }
-
-      if (start) {
-        start = get(i).trim().equals("");
-      }
-
-      if (target.equals(get(i, tlen))) {
-        // Special case for italics: the "//" in "://" is not an italic symbol.
-        String before = get(i - 2, 4);
-        if (target.equals("//") && before.endsWith("://") && Character.isLetter(before.charAt(0))) {
-          continue;
-        }
-        occurrences++;
-        if (bail) {
-          break;
-        }
-      }
-      else {
-        // \L, at the start of a limit, matches the start of a line.
-        if (limit.startsWith("\\L")) {
-          if (start && limit.substring(2).equals(get(i + 1, llen - 2))) {
-            break;
-          }
-        }
-        else {
-          if (limit.equals(get(i, llen))) {
-            // Special case for tables and links: '|' doesn't kill formatting in
-            // a link.
-            if (limit.equals("|") && inlink) {
-              continue;
-            }
-            break;
-          }
-        }
-      }
-    }
-
-    return occurrences;
-  }
-
-  /** See {@link #occurrencesBefore(String, String, boolean)}. */
-  public int occurrencesBefore(final String target, final String limit) {
-    return occurrencesBefore(target, limit, false);
-  }
-
-  /**
    * Reads ahead in the input stream (as far as it needs) to see if the given
    * target string occurs before the given limit string.
    *
@@ -200,7 +122,59 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *         failure.
    */
   public boolean findBefore(final String target, final String limit) {
-    return occurrencesBefore(target, limit, true) > 0;
+    int ilen = _input.size() - _input.index();
+    int tlen = target.length();
+    int llen = limit.length();
+
+    boolean inlink = false;
+    boolean start = false;
+
+    for (int i = 0; i < ilen - tlen; i++) {
+      // Fast-forward the input stream over links, as special tokenisation rules
+      // apply there
+      String next = get(i, 2);
+      if (next.equals("[[") || next.equals("{{")) {
+        inlink = true;
+      }
+
+      if (inlink) {
+        if (next.equals("]]") || next.equals("}}")) {
+          inlink = false;
+        }
+        else {
+          continue;
+        }
+      }
+
+      // Keep track of whether we're at the start of a line or not.
+      if (get(i).equals("\n") || start) {
+        start = get(i).trim().equals("");
+      }
+
+      // See if we have a match for either string.
+      if (target.equals(get(i, tlen))) {
+        // Special case for italics: the "//" in "://" is not an italic symbol.
+        if (target.equals("//")) {
+          String before = get(i - 2, 2);
+          if (before.endsWith(":") && Character.isLetter(before.charAt(0))) {
+            continue;
+          }
+        }
+
+        return true;
+      }
+      else {
+        // \L, at the start of a limit, matches the start of a line.
+        if (limit.startsWith("\\L") && start && limit.substring(2).equals(get(i + 1, llen - 2))) {
+          break;
+        }
+        else if (limit.equals(get(i, llen))) {
+          break;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
