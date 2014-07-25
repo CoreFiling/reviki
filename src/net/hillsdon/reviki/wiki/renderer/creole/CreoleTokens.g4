@@ -211,7 +211,7 @@ fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' 
 
 Attachment : UPPER CAMEL '.' ALNUM+ ;
 
-WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != ':' && !Character.isLetter(prior())}? {seek(-1);} ;
+WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != '@' && prior() != ':' && !Character.isLetterOrDigit(prior())}? {seek(-1);} ;
 
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
