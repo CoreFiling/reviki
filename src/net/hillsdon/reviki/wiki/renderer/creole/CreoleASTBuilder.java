@@ -215,13 +215,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Types of lists which can be constructed by renderList.
-   */
-  protected enum ListType {
-    Ordered, Unordered
-  };
-
-  /**
    * Class to hold the context of a list item to render.
    */
   protected class ListItemContext {
@@ -235,11 +228,11 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     public ParserRuleContext get() {
-      return (_ordered != null) ? _ordered : _unordered;
+      return ordered() ? _ordered : _unordered;
     }
 
-    public ListType type() {
-      return (_ordered != null) ? ListType.Ordered : ListType.Unordered;
+    public boolean ordered() {
+      return _ordered != null;
     }
   }
 
@@ -320,7 +313,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       // In general, a list can contain any arbitrary combination of ordered and
       // unordered sublists, and we want to preserve the (un)orderedness in the
       // bullet points, so we have to render them all individually.
-      ListType type = null;
+      boolean isOrdered = false;
       List<ASTNode> items = new ArrayList<ASTNode>();
 
       // Build lists of (un)ordered chunks one at a time, rendering them, and
@@ -328,17 +321,17 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       for (ParserRuleContext ctx : childContexts) {
         ListItemContext child = new ListItemContext(olist(ctx), ulist(ctx));
 
-        if (type != null && child.type() != type) {
-          parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
+        if (child.ordered() != isOrdered) {
+          parts.add(isOrdered ? new OrderedList(items) : new UnorderedList(items));
           items.clear();
         }
 
-        type = child.type();
+        isOrdered = child.ordered();
         items.add(visit(child.get()));
       }
 
       if (!items.isEmpty()) {
-        parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
+        parts.add(isOrdered ? new OrderedList(items) : new UnorderedList(items));
       }
     }
 
