@@ -27,6 +27,11 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  */
 public class CreoleRenderer {
   /**
+   * How deep macros will be expanded
+   */
+  public static final int MACRO_DEPTH_LIMIT = 100;
+  
+  /**
    * Macro expansion depth limit. This gets reset when rendering a page, but not
    * when rendering a partial page. If it hits zero, no macros are expanded.
    */
@@ -92,7 +97,7 @@ public class CreoleRenderer {
 
     // Expand macros
     if (reset) {
-      _expansionLimit = 100;
+      _expansionLimit = MACRO_DEPTH_LIMIT;
     }
 
     ASTNode expanded = rendered;
