@@ -10,8 +10,10 @@ import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.collect.Lists;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
@@ -101,23 +103,9 @@ public class CreoleRenderer {
   }
 
   /**
-   * Render a stream of text. See
-   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)} and
-   * {@link #renderPart(PageInfo, String, URLOutputFilter, LinkPartsHandler, LinkPartsHandler, List)}
-   * for explanation of most arguments.
-   *
-   * @param in The input stream to render.
-   * @return The AST of the page, after macro application.
-   */
-  private static ASTNode renderInternal(final ANTLRInputStream in, final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
-    return renderInternal(in, visitor, macros);
-  }
-
-  /**
    * Render a wiki page.
    *
-   * @param store The page store (may be null).
+   * @param store The page store.
    * @param page The page to render.
    * @param urlOutputFilter Filter to apply to URLs (handling jsessionid values
    *          etc).
@@ -126,7 +114,7 @@ public class CreoleRenderer {
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public static ASTNode render(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     String contents = page.getContent();
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
@@ -138,16 +126,30 @@ public class CreoleRenderer {
     // Reset the expansion limit.
     _expansionLimit = 100;
 
-    return renderInternal(new ANTLRInputStream(contents), store, page, urlOutputFilter, linkHandler, imageHandler, macros);
+    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+    return renderInternal(new ANTLRInputStream(contents), visitor, macros);
   }
 
-  /**
-   * Render a page with no macros. See
-   * {@link #render(PageInfo, URLOutputFilter, LinkPartsHandler)}.
-   */
+  /** Render a page with a store. */
+  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    return render(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler, macros);
+  }
+
+  /** Render a page with no store. */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    return render(Optional.<PageStore>absent(), page, urlOutputFilter, linkHandler, imageHandler, macros);
+  }
+
+  /** Render a page with no macros. */
   public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
     return render(store, page, urlOutputFilter, linkHandler, imageHandler, macros);
+  }
+
+  /** Render a page with no macros or store */
+  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
+    return render(page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 
   /**

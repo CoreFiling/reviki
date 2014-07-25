@@ -8,6 +8,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import com.google.common.base.Optional;
 import com.uwyn.jhighlight.renderer.Renderer;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
@@ -31,8 +32,8 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.UnorderedList;
  * @author msw
  */
 public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
-  /** The page store (may be null). */
-  private final PageStore _store;
+  /** The page store. */
+  private final Optional<PageStore> _store;
 
   /** The page being rendered. */
   private final PageInfo _page;
@@ -46,8 +47,12 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /** A final pass over URLs to apply any last-minute changes. */
   private final URLOutputFilter _urlOutputFilter;
 
-  public PageStore store() {
+  public Optional<PageStore> store() {
     return _store;
+  }
+
+  public PageStore unsafeStore() {
+    return _store.get();
   }
 
   public PageInfo page() {
@@ -83,17 +88,27 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /**
    * Construct a new parse tree visitor.
    *
-   * @param store The page store (may be null).
+   * @param store The page store.
    * @param page The page being rendered.
    * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     _store = store;
     _page = page;
     _urlOutputFilter = urlOutputFilter;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
+  }
+
+  /** Helper for the case where the PageStore is present. */
+  public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler);
+  }
+
+  /** Helper for the case where the PageStore is absent. */
+  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler);
   }
 
   /**

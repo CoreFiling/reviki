@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import com.google.common.base.Optional;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.AttachmentHistory;
@@ -28,8 +29,16 @@ public class Visitor extends CreoleASTBuilder {
   /** List of attachments on the page. */
   private Collection<AttachmentHistory> _attachments = null;
 
+  public Visitor(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    super(store, page, urlOutputFilter, linkHandler, imageHandler);
+  }
+
   public Visitor(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super(store, page, urlOutputFilter, linkHandler, imageHandler);
+  }
+
+  public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    super(page, urlOutputFilter, linkHandler, imageHandler);
   }
 
   /**
@@ -224,11 +233,11 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitAttachment(final AttachmentContext ctx) {
-    if (store() != null) {
+    if (store().isPresent()) {
       // Check if the attachment exists
       try {
         if (_attachments == null) {
-          _attachments = store().attachments(page());
+          _attachments = unsafeStore().attachments(page());
         }
         for (AttachmentHistory attachment : _attachments) {
           // Skip deleted attachments
