@@ -94,7 +94,9 @@ public class Visitor extends CreoleASTBuilder {
     if (ctx.inline() == null) {
       return new Plaintext(ctx.HSt().getText());
     }
-    return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
+    else {
+      return new Heading(ctx.HSt().getText().length(), visit(ctx.inline()));
+    }
   }
 
   /**
