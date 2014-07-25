@@ -475,12 +475,7 @@ public class Visitor extends CreoleASTBuilder {
       }
     }
 
-    List<ParserRuleContext> inners = new ArrayList<ParserRuleContext>();
-    inners.add((ParserRuleContext) inner.olist());
-    inners.add((ParserRuleContext) inner.ulist());
-    inners.add((ParserRuleContext) inner.inline());
-
-    return renderListItem(children, inners);
+    return renderListItem(children, inner.listBlock());
   }
 
   /** See {@link #visitOlist}. */

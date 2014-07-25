@@ -62,7 +62,10 @@ list8      : (olist8 | ulist8) LineBreak? ;
 list9      : (olist9 | ulist9) LineBreak? ;
 list10     : (olist10 | ulist10) LineBreak? ;
 
-inList     : WS? (ulist | olist | inline) ;
+inList     : (WS? listBlock ({canBreak()}? LineBreak)?)+
+           ;
+
+listBlock  : code | nowiki | inline ;
 
 hrule      : Rule ;
 
@@ -108,7 +111,7 @@ rawlink    : RawUrl ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
-linebreak  : ({canBreak()}? LineBreak)? InlineBrk ({canBreak()}? LineBreak)? ;
+linebreak  : ({canBreak()}? LineBreak)? InlineBrk LineBreak? ;
 
 macro      : MacroSt MacroName (MacroSep MacroEnd | MacroEndNoArgs) ;
 
