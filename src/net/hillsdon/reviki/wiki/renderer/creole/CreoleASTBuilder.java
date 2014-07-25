@@ -3,27 +3,22 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.google.common.base.Optional;
-import com.uwyn.jhighlight.renderer.Renderer;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
+import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.Creole.InlineContext;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Code;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Inline;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.InlineCode;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ListItem;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.OrderedList;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Plaintext;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.UnorderedList;
+import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
 
 /**
@@ -47,6 +42,9 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
   /** A final pass over URLs to apply any last-minute changes. */
   private final URLOutputFilter _urlOutputFilter;
+
+  /** List of attachments on the page. */
+  private Collection<AttachmentHistory> _attachments = null;
 
   public Optional<PageStore> store() {
     return _store;
@@ -310,5 +308,35 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
       return new ListItem(parts);
     }
+  }
+
+  /**
+   * Check if the page has the named attachment.
+   *
+   * @param name Filename of the attachment.
+   */
+  protected boolean hasAttachment(final String name) {
+    // If there's no store, say we have no attachments.
+    if (!store().isPresent()) {
+      return false;
+    }
+
+    try {
+      // Cache the attachments list
+      if (_attachments == null) {
+        _attachments = unsafeStore().attachments(page());
+      }
+
+      // Read through the list.
+      for (AttachmentHistory attachment : _attachments) {
+        if (!attachment.isAttachmentDeleted() && attachment.getName().equals(name)) {
+          return true;
+        }
+      }
+    }
+    catch (PageStoreException e) {
+    }
+
+    return false;
   }
 }

@@ -1,7 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,10 +9,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import com.google.common.base.Optional;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
-import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
@@ -27,9 +24,6 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
-  /** List of attachments on the page. */
-  private Collection<AttachmentHistory> _attachments = null;
-
   public Visitor(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super(store, page, urlOutputFilter, linkHandler, imageHandler);
   }
@@ -232,28 +226,12 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitAttachment(final AttachmentContext ctx) {
-    if (store().isPresent()) {
-      // Check if the attachment exists
-      try {
-        if (_attachments == null) {
-          _attachments = unsafeStore().attachments(page());
-        }
-        for (AttachmentHistory attachment : _attachments) {
-          // Skip deleted attachments
-          if (attachment.isAttachmentDeleted()) {
-            continue;
-          }
-
-          // Render the link if the name matches
-          if (attachment.getName().equals(ctx.getText())) {
-            return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
-          }
-        }
-      }
-      catch (PageStoreException e) {
-      }
+    if (hasAttachment(ctx.getText())) {
+      return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
     }
-    return new Plaintext(ctx.getText());
+    else {
+      return new Plaintext(ctx.getText());
+    }
   }
 
   /**
