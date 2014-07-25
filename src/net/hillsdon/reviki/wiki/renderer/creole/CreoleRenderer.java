@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -30,7 +31,7 @@ public class CreoleRenderer {
    * How deep macros will be expanded
    */
   public static final int MACRO_DEPTH_LIMIT = 100;
-  
+
   /**
    * Macro expansion depth limit. This gets reset when rendering a page, but not
    * when rendering a partial page. If it hits zero, no macros are expanded.
@@ -47,16 +48,18 @@ public class CreoleRenderer {
    * @param pmode The prediction mode.
    * @return A parse tree.
    */
-  private static ParseTree tryParse(final CommonTokenStream tokens, final Creole parser, final ANTLRErrorStrategy errors, final PredictionMode pmode) {
+  private static Optional<ParseTree> tryParse(final CommonTokenStream tokens, final Creole parser, final ANTLRErrorStrategy errors, final PredictionMode pmode) {
     parser.setErrorHandler(errors);
     parser.getInterpreter().setPredictionMode(pmode);
+
     try {
-      return parser.creole();
+      return Optional.of((ParseTree) parser.creole());
     }
-    catch (RuntimeException ex) {
+    catch (Exception e) {
       tokens.reset();
       parser.reset();
-      throw ex;
+
+      return Optional.<ParseTree> absent();
     }
   }
 
@@ -64,7 +67,7 @@ public class CreoleRenderer {
    * Helper for tryParse using the default error strategy. See
    * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
    */
-  private static ParseTree tryParse(final CommonTokenStream tokens, final Creole parser, final PredictionMode pmode) {
+  private static Optional<ParseTree> tryParse(final CommonTokenStream tokens, final Creole parser, final PredictionMode pmode) {
     return tryParse(tokens, parser, new DefaultErrorStrategy(), pmode);
   }
 
@@ -84,16 +87,13 @@ public class CreoleRenderer {
 
     // First try parsing in SLL mode. This is really fast for pages with no
     // parse errors.
-    ParseTree tree;
+    Optional<ParseTree> tree = tryParse(tokens, parser, PredictionMode.SLL);
 
-    try {
-      tree = tryParse(tokens, parser, PredictionMode.SLL);
-    }
-    catch (Exception e1) {
+    if (!tree.isPresent()) {
       tree = tryParse(tokens, parser, PredictionMode.LL);
     }
 
-    ASTNode rendered = visitor.visit(tree);
+    ASTNode rendered = visitor.visit(tree.get());
 
     // Expand macros
     if (reset) {
