@@ -28,7 +28,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
     final int start;
 
     /** The end token type. */
-    int end;
+    final int end;
 
     public Formatting(final String symbol, final int start, final int end) {
       this.symbol = symbol;
