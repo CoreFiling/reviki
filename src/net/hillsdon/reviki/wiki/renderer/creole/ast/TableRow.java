@@ -4,6 +4,6 @@ import java.util.List;
 
 public class TableRow extends ASTNode {
   public TableRow(final List<ASTNode> cells) {
-    super("tr", null, cells);
+    super("tr", cells);
   }
 }

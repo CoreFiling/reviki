@@ -10,7 +10,7 @@ import java.util.List;
  */
 public abstract class ContainerNode<T extends ASTNode> extends ASTNode {
   public ContainerNode(final List<ASTNode> children) {
-    super("", null, children);
+    super("", children);
   }
 
   @Override

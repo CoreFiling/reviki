@@ -14,7 +14,7 @@ public abstract class TextNode extends ASTNode {
   private boolean _escape;
 
   public TextNode(final String contents, final boolean escape) {
-    super("", null, null);
+    super("");
     _contents = contents;
     _escape = escape;
   }

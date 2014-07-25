@@ -30,13 +30,7 @@ public abstract class ASTNode {
   private final String _tag;
 
   /**
-   * The immediate contents of the node (may be null). Is rendered before any
-   * children in the output.
-   */
-  private ASTNode _body;
-
-  /**
-   * The child elements of the node (may be null).
+   * The child elements of the node.
    */
   private List<ASTNode> _children;
 
@@ -45,36 +39,37 @@ public abstract class ASTNode {
    *
    * @param tag The tag (optional). If there is no tag, toXHTML *must* be
    *          overridden, and handled appropriately for the node.
-   * @param body The immediate content of the node (may be null).
-   * @param children Any child elements of the node (may be null).
+   * @param children Any child elements of the node.
    */
-  public ASTNode(final String tag, final ASTNode body, final List<ASTNode> children) {
+  public ASTNode(final String tag, final List<ASTNode> children) {
     _tag = tag;
-    _body = body;
 
     _children = new ArrayList<ASTNode>();
-    if (children != null) {
-      for (ASTNode child : children) {
-        if (child != null) {
-          _children.add(child);
-        }
+    for (ASTNode child : children) {
+      if (child != null) {
+        _children.add(child);
       }
     }
   }
 
-  /** See {@link #ASTNode(String, ASTNode, List). */
+  /**
+   * Helper method for elements with just one child. See
+   * {@link #ASTNode(String, List)}.
+   */
   public ASTNode(final String tag, final ASTNode body) {
-    this(tag, body, null);
+    _tag = tag;
+
+    _children = new ArrayList<ASTNode>();
+    _children.add(body);
   }
 
-  /** See {@link #ASTNode(String, ASTNode, List). */
-  public ASTNode(final String tag, final List<ASTNode> children) {
-    this(tag, null, children);
-  }
-
-  /** See {@link #ASTNode(String, ASTNode, List). */
+  /**
+   * Helper method for elements with no children. See
+   * {@link #ASTNode(String, List).
+   */
   public ASTNode(final String tag) {
-    this(tag, null, null);
+    _tag = tag;
+    _children = new ArrayList<ASTNode>();
   }
 
   /**
@@ -82,12 +77,7 @@ public abstract class ASTNode {
    * as the first element of the list. This will not be null.
    */
   public List<ASTNode> getChildren() {
-    ArrayList<ASTNode> children = new ArrayList<ASTNode>();
-    if (_body != null) {
-      children.add(_body);
-    }
-    children.addAll(_children);
-    return Collections.unmodifiableList(children);
+    return Collections.unmodifiableList(_children);
   }
 
   /**
@@ -95,19 +85,18 @@ public abstract class ASTNode {
    * toXHTML for all direct and indirect children) of the node.
    */
   public String toXHTML() {
-    if (getChildren().isEmpty() || (_body != null && _body.toXHTML().equals("") && _children.isEmpty())) {
-      return "<" + _tag + " " + CSS_CLASS_ATTR + " />";
-    }
-
-    String out = "<" + _tag + " " + CSS_CLASS_ATTR + ">";
+    String inner = "";
 
     for (ASTNode node : getChildren()) {
-      out += node.toXHTML();
+      inner += node.toXHTML();
     }
 
-    out += "</" + _tag + ">";
-
-    return out;
+    if (getChildren().isEmpty() || inner.equals("")) {
+      return "<" + _tag + " " + CSS_CLASS_ATTR + " />";
+    }
+    else {
+      return "<" + _tag + " " + CSS_CLASS_ATTR + ">" + inner + "</" + _tag + ">";
+    }
   }
 
   /**
@@ -120,10 +109,6 @@ public abstract class ASTNode {
    *         assumed that none of the node's children contained macros.
    */
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    if (_body != null) {
-      _body = _body.expandMacros(macros);
-    }
-
     List<ASTNode> adoptees = new ArrayList<ASTNode>();
 
     for (ASTNode child : _children) {

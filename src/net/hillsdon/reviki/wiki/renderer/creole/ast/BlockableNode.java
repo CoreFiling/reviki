@@ -8,16 +8,12 @@ import java.util.List;
  * @author msw
  */
 public abstract class BlockableNode<T extends ASTNode> extends ASTNode {
-  public BlockableNode(final String tag, final ASTNode body, final List<ASTNode> children) {
-    super(tag, body, children);
+  public BlockableNode(final String tag, final List<ASTNode> children) {
+    super(tag, children);
   }
 
   public BlockableNode(final String tag, final ASTNode body) {
     super(tag, body);
-  }
-
-  public BlockableNode(final String tag, final List<ASTNode> children) {
-    super(tag, children);
   }
 
   public BlockableNode(final String tag) {
