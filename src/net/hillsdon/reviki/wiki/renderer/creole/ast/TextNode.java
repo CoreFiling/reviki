@@ -8,9 +8,9 @@ import net.hillsdon.fij.text.Escape;
  * @author msw
  */
 public abstract class TextNode extends ASTNode {
-  private String _contents;
+  private final String _contents;
 
-  private boolean _escape;
+  private final boolean _escape;
 
   public TextNode(final String contents, final boolean escape) {
     _contents = contents;

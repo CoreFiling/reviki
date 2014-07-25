@@ -16,9 +16,9 @@ public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
-  private String _name;
+  private final String _name;
 
-  private String _args;
+  private final String _args;
 
   private final CreoleASTBuilder _visitor;
 

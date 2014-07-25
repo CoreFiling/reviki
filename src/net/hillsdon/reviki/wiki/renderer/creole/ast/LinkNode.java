@@ -13,17 +13,17 @@ import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
  * @author msw
  */
 public abstract class LinkNode extends TaggedNode {
-  private LinkPartsHandler _handler;
+  private final LinkPartsHandler _handler;
 
-  private URLOutputFilter _urlOutputFilter;
+  private final URLOutputFilter _urlOutputFilter;
 
-  private PageInfo _page;
+  private final PageInfo _page;
 
-  private LinkParts _parts;
+  private final LinkParts _parts;
 
-  private String _title;
+  private final String _title;
 
-  private String _target;
+  private final String _target;
 
   public LinkNode(final String tag, final String target, final String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
     super(tag);
@@ -51,5 +51,4 @@ public abstract class LinkNode extends TaggedNode {
       }
     }
   }
-
 }

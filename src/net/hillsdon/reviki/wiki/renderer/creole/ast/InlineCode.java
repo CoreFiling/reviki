@@ -10,9 +10,9 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class InlineCode extends TaggedNode implements BlockableNode<Code> {
-  private String _contents;
+  private final String _contents;
 
-  private Renderer _highlighter;
+  private final Renderer _highlighter;
 
   public InlineCode(final String contents) {
     super("code", new Raw(Escape.html(contents)));
