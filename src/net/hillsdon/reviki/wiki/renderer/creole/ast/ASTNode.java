@@ -1,10 +1,9 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -17,7 +16,7 @@ public abstract class ASTNode {
   /**
    * The child elements of the node.
    */
-  private List<ASTNode> _children;
+  private ImmutableList<ASTNode> _children;
 
   /**
    * Construct a new AST node.
@@ -25,12 +24,7 @@ public abstract class ASTNode {
    * @param children Any child elements of the node.
    */
   public ASTNode(final List<ASTNode> children) {
-    _children = new ArrayList<ASTNode>();
-    for (ASTNode child : children) {
-      if (child != null) {
-        _children.add(child);
-      }
-    }
+    _children = ImmutableList.copyOf(children);
   }
 
   /**
@@ -38,23 +32,22 @@ public abstract class ASTNode {
    * {@link #ASTNode(String, List)}.
    */
   public ASTNode(final ASTNode body) {
-    _children = new ArrayList<ASTNode>();
-    _children.add(body);
+    _children = ImmutableList.of(body);
   }
 
   /**
    * Leaf nodes are fine too.
    */
   public ASTNode() {
-    _children = new ArrayList<ASTNode>();
+    _children = ImmutableList.of();
   }
 
   /**
    * Return a list of the children of this node. This includes the body (if any)
    * as the first element of the list. This will not be null.
    */
-  public List<ASTNode> getChildren() {
-    return Collections.unmodifiableList(_children);
+  public ImmutableList<ASTNode> getChildren() {
+    return _children;
   }
 
   /**
@@ -81,13 +74,13 @@ public abstract class ASTNode {
    *         assumed that none of the node's children contained macros.
    */
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    List<ASTNode> adoptees = new ArrayList<ASTNode>();
+    ImmutableList.Builder<ASTNode> adoptees = new ImmutableList.Builder<ASTNode>();
 
     for (ASTNode child : _children) {
       adoptees.add(child.expandMacros(macros));
     }
 
-    _children = adoptees;
+    _children = adoptees.build();
 
     return this;
   }
