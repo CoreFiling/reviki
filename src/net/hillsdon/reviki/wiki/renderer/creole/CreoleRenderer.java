@@ -91,13 +91,13 @@ public class CreoleRenderer {
     }
 
     ASTNode expanded = rendered;
-    _expansionLimit--;
 
-    if (_expansionLimit >= 0) {
+    if (_expansionLimit > 0) {
+      _expansionLimit --;
       expanded = rendered.expandMacros(macros);
+      _expansionLimit ++;
     }
 
-    _expansionLimit++;
     return expanded;
   }
 
