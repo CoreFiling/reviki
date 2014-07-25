@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.AttachmentHistory;
@@ -77,7 +78,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    */
   @Override
   protected ASTNode aggregateResult(final ASTNode aggregate, final ASTNode nextResult) {
-    return nextResult == null ? aggregate : nextResult;
+    return (nextResult == null) ? aggregate : nextResult;
   }
 
   /**
@@ -129,17 +130,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
     // If the end tag is missing, undo the error recovery
     if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
-      List<ASTNode> chunks = new ArrayList<ASTNode>();
-      chunks.add(new Plaintext(symbol));
-      chunks.add(inner);
+      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol), inner);
       return new Inline(chunks);
     }
 
     // If the inner text is missing, this is not markup
     if (inner.toXHTML().trim().equals("")) {
-      List<ASTNode> chunks = new ArrayList<ASTNode>();
-      chunks.add(new Plaintext(symbol + symbol));
-      chunks.add(inner);
+      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol + symbol), inner);
       return new Inline(chunks);
     }
 
@@ -150,7 +147,9 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
     catch (Throwable e) {
       // Never reached if you pass in correct params
-      return null;
+      // TODO: Get rid of this (a lambda to construct, rather than reflection,
+      // would work)
+      throw new RuntimeException(e);
     }
   }
 
@@ -224,20 +223,21 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    * Class to hold the context of a list item to render.
    */
   protected class ListItemContext {
-    private final ListType _type;
-
     private final ParserRuleContext _ordered;
 
     private final ParserRuleContext _unordered;
 
     public ListItemContext(final ParserRuleContext ordered, final ParserRuleContext unordered) {
-      _type = (ordered == null) ? ListType.Unordered : ListType.Ordered;
       _ordered = ordered;
       _unordered = unordered;
     }
 
     public ParserRuleContext get() {
-      return (_type == ListType.Ordered) ? _ordered : _unordered;
+      return (_ordered != null) ? _ordered : _unordered;
+    }
+
+    public ListType type() {
+      return (_ordered != null) ? ListType.Ordered : ListType.Unordered;
     }
   }
 
@@ -314,10 +314,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       }
     }
 
-    if (childContexts.isEmpty()) {
-      return new ListItem(parts);
-    }
-    else {
+    if (!childContexts.isEmpty()) {
       // In general, a list can contain any arbitrary combination of ordered and
       // unordered sublists, and we want to preserve the (un)orderedness in the
       // bullet points, so we have to render them all individually.
@@ -329,21 +326,21 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       for (ParserRuleContext ctx : childContexts) {
         ListItemContext child = new ListItemContext(olist(ctx), ulist(ctx));
 
-        if (type != null && child._type != type) {
+        if (type != null && child.type() != type) {
           parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
           items.clear();
         }
 
-        type = child._type;
+        type = child.type();
         items.add(visit(child.get()));
       }
 
       if (!items.isEmpty()) {
         parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
       }
-
-      return new ListItem(parts);
     }
+
+    return new ListItem(parts);
   }
 
   /**
