@@ -148,7 +148,7 @@ public class Visitor extends CreoleASTBuilder {
     List<ASTNode> blocksNonEmpty = new ArrayList<ASTNode>();
 
     for (ASTNode block : blocks) {
-      if (block != null && !(block instanceof Paragraph && block.getChildren().get(0).toXHTML().trim().equals(""))) {
+      if (block != null && !(block instanceof Paragraph && ((Paragraph)block).innerXHTML().trim().equals(""))) {
         blocksNonEmpty.add(block);
       }
     }
