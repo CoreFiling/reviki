@@ -7,7 +7,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
-public class Link extends ASTNode {
+public class Link extends TaggedNode {
   private LinkPartsHandler _handler;
 
   private URLOutputFilter _urlOutputFilter;

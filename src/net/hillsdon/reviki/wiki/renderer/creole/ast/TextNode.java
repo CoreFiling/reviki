@@ -3,8 +3,7 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 import net.hillsdon.fij.text.Escape;
 
 /**
- * Abstract class for AST nodes which have no tag or child elements, and just
- * contain text.
+ * Abstract class for AST nodes which just contain text.
  *
  * @author msw
  */
@@ -14,7 +13,6 @@ public abstract class TextNode extends ASTNode {
   private boolean _escape;
 
   public TextNode(final String contents, final boolean escape) {
-    super("");
     _contents = contents;
     _escape = escape;
   }

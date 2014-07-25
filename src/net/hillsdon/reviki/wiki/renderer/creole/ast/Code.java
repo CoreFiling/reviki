@@ -6,7 +6,7 @@ import net.hillsdon.fij.text.Escape;
 
 import com.uwyn.jhighlight.renderer.Renderer;
 
-public class Code extends ASTNode {
+public class Code extends TaggedNode {
   public Code(final String contents) {
     super("pre", new Raw(Escape.html(contents)));
   }

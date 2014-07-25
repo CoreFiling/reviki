@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author msw
  */
-public abstract class BlockableNode<T extends ASTNode> extends ASTNode {
+public abstract class BlockableNode<T extends TaggedNode> extends TaggedNode {
   public BlockableNode(final String tag, final List<ASTNode> children) {
     super(tag, children);
   }

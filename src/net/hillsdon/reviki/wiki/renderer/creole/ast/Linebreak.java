@@ -1,6 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-public class Linebreak extends ASTNode {
+public class Linebreak extends TaggedNode {
   public Linebreak() {
     super("br");
   }
