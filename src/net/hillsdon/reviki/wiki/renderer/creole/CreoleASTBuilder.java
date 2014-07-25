@@ -305,7 +305,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
       // Build lists of (un)ordered chunks one at a time, rendering them, and
       // adding to the list of lists.
-      System.out.println();
       for (ListItemContext child : childContexts) {
         if (type != null && child._type != type) {
           lists.add(renderList(type, contexts));
