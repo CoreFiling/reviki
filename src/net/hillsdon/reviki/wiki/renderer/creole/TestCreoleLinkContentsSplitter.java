@@ -18,32 +18,21 @@ public class TestCreoleLinkContentsSplitter extends TestCase {
   protected void setUp() throws Exception {
     _splitter = new CreoleLinkContentsSplitter();
   }
-  
-  public void testOddInputs() {
-    // Not much fussed what happens with weird inputs, we just can't explode.
-    _splitter.split("");
-    _splitter.split(" ");
-    _splitter.split("  ");
-    _splitter.split("|");
-    _splitter.split("foo|");
-    _splitter.split("| ");
-    _splitter.split("a||b");
-  }
-  
+
   public void testExpectedInputsURI() {
-    assertEquals(new LinkParts(EXAMPLE_URI_STRING, EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING));
-    assertEquals(new LinkParts("Some text", EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING + "|" + "Some text"));
+    assertEquals(new LinkParts(EXAMPLE_URI_STRING, EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING, EXAMPLE_URI_STRING));
+    assertEquals(new LinkParts("Some text", EXAMPLE_URI), _splitter.split(EXAMPLE_URI_STRING, "Some text"));
   }
 
   public void testReservedCharsBug13502() {
-    assertEquals(new LinkParts("Some text", EXAMPLE_UNESCAPED_URI), _splitter.split(EXAMPLE_URI_STRING_RESERVED + "|" + "Some text"));
+    assertEquals(new LinkParts("Some text", EXAMPLE_UNESCAPED_URI), _splitter.split(EXAMPLE_URI_STRING_RESERVED , "Some text"));
   }
     
   public void testExpectedInputsWiki() {
-    assertEquals(new LinkParts("foo:Bar", "foo", "Bar", null, null), _splitter.split("foo:Bar"));
-    assertEquals(new LinkParts("text", "foo", "Bar", null, null), _splitter.split("foo:Bar|text"));
-    assertEquals(new LinkParts("Bar", null, "Bar", null, null), _splitter.split("Bar"));
-    assertEquals(new LinkParts("text", null, "Bar", null, null), _splitter.split("Bar|text"));
+    assertEquals(new LinkParts("foo:Bar", "foo", "Bar", null, null), _splitter.split("foo:Bar", "foo:Bar"));
+    assertEquals(new LinkParts("text", "foo", "Bar", null, null), _splitter.split("foo:Bar", "text"));
+    assertEquals(new LinkParts("Bar", null, "Bar", null, null), _splitter.split("Bar", "Bar"));
+    assertEquals(new LinkParts("text", null, "Bar", null, null), _splitter.split("Bar", "text"));
   }
   
 }

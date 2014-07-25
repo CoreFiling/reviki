@@ -19,27 +19,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.regex.MatchResult;
 
-import org.apache.commons.lang.StringUtils;
-
-public class CreoleLinkContentsSplitter implements LinkContentSplitter {
-
-  public LinkParts split(final MatchResult match) {
-    String in = match.group(1);
-    return split(in);
-  }
-
-  /**
-   * Splits links of the form target or text|target
-   */
-  public LinkParts split(final String in) {
-    String target = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
-    String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
-    
-    return split(target, text);
-  }
-
+public class CreoleLinkContentsSplitter {
   /**
    * Splits links where target is
    * 
