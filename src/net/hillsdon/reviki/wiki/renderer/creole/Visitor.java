@@ -115,7 +115,7 @@ public class Visitor extends CreoleASTBuilder {
       ASTNode ren = visit(btx);
 
       // If we have a paragraph, rip off initial and trailing inline code and
-      // macros.
+      // macros. Otherwise, just add the block to the list as-is.
       if (ren instanceof Paragraph) {
         List<ASTNode> expandedInit = expandParagraph((Paragraph) ren, false);
         List<ASTNode> expandedTail = new ArrayList<ASTNode>();
@@ -136,19 +136,17 @@ public class Visitor extends CreoleASTBuilder {
 
         blocks.addAll(expandedInit);
         blocks.addAll(expandedTail);
-
-        continue;
       }
-
-      // Otherwise, just add the block to the list.
-      blocks.add(ren);
+      else {
+        blocks.add(ren);
+      }
     }
 
     // Remove paragraphs just consisting of whitespace
     List<ASTNode> blocksNonEmpty = new ArrayList<ASTNode>();
 
     for (ASTNode block : blocks) {
-      if (block != null && !(block instanceof Paragraph && ((Paragraph)block).innerXHTML().trim().equals(""))) {
+      if (block != null && !(block instanceof Paragraph && ((Paragraph) block).innerXHTML().trim().equals(""))) {
         blocksNonEmpty.add(block);
       }
     }
