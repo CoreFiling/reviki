@@ -62,7 +62,7 @@ public abstract class TaggedNode extends ASTNode {
    */
   public String toXHTML() {
     // Render the children
-    String inner = super.toXHTML();
+    String inner = innerXHTML();
 
     // Render the tag
     if (inner.equals("")) {
@@ -71,5 +71,12 @@ public abstract class TaggedNode extends ASTNode {
     else {
       return "<" + tag() + " " + CSS_CLASS_ATTR + ">" + inner + "</" + tag() + ">";
     }
+  }
+
+  /**
+   * Render just the children to XHTML.
+   */
+  public String innerXHTML() {
+    return super.toXHTML();
   }
 }
