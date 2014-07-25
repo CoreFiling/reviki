@@ -1,5 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import com.google.common.base.Supplier;
@@ -16,7 +17,7 @@ public abstract class ASTNode {
   /**
    * The child elements of the node.
    */
-  private ImmutableList<ASTNode> _children;
+  private final ImmutableList<ASTNode> _children;
 
   /**
    * Construct a new AST node.
@@ -68,21 +69,52 @@ public abstract class ASTNode {
    * Expand macros contained within this node and its children, returning the
    * modified node.
    *
+   * This uses reflection to achieve immutability, and so MUST be overridden if
+   * the constructor is overridden to have a different signature.
+   *
    * @param macros The list of macros
-   * @return The possibly modified node. If the node was not a macro, `this`
-   *         will be returned, however if `this` is returned it cannot be
-   *         assumed that none of the node's children contained macros.
+   * @return A new node, with macros expanded.
    */
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    ImmutableList.Builder<ASTNode> adoptees = new ImmutableList.Builder<ASTNode>();
-
-    for (ASTNode child : _children) {
-      adoptees.add(child.expandMacros(macros));
+    // Nodes with no children stay the same, and so we return `this`.
+    if (_children.size() == 0) {
+      return this;
     }
 
-    _children = adoptees.build();
+    // Nodes with children recursively expand them, and so we construct a new
+    // object.
+    try {
+      // Expand all children first
+      ImmutableList.Builder<ASTNode> adoptees = new ImmutableList.Builder<ASTNode>();
 
-    return this;
+      for (ASTNode child : _children) {
+        adoptees.add(child.expandMacros(macros));
+      }
+
+      ImmutableList<ASTNode> expanded = adoptees.build();
+
+      // Prefer the single-node constructor if it's available and we only have
+      // one child.
+      if (_children.size() == 1) {
+        try {
+          Constructor<? extends ASTNode> constructor = getClass().getDeclaredConstructor(ASTNode.class);
+          return constructor.newInstance(expanded.get(0));
+        }
+        catch (Exception e) {
+          // The single-node constructor might not be available, but the list
+          // one might be, so just ignore this exception and continue.
+        }
+      }
+
+      Constructor<? extends ASTNode> constructor = getClass().getDeclaredConstructor(List.class);
+      return constructor.newInstance(expanded);
+    }
+
+    catch (Exception e) {
+      // All failed. This method should have been overridden by the subclass
+      // pulling it in. Whoever did this should be identified and shamed.
+      throw new RuntimeException(e);
+    }
   }
 
   /**

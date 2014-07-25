@@ -12,7 +12,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.CreoleASTBuilder;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MacroNode extends BlockableNode<MacroNode> {
+public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
@@ -62,7 +62,6 @@ public class MacroNode extends BlockableNode<MacroNode> {
     return this;
   }
 
-  @Override
   public MacroNode toBlock() {
     return new MacroNode(_name, _args, _visitor, true);
   }

@@ -1,12 +1,15 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.io.IOException;
+import java.util.List;
 
+import com.google.common.base.Supplier;
 import com.uwyn.jhighlight.renderer.Renderer;
 
 import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class InlineCode extends BlockableNode<Code> {
+public class InlineCode extends TaggedNode implements BlockableNode<Code> {
   private String _contents;
 
   private Renderer _highlighter;
@@ -25,7 +28,6 @@ public class InlineCode extends BlockableNode<Code> {
     _highlighter = highlighter;
   }
 
-  @Override
   public Code toBlock() {
     if (_highlighter == null) {
       return new Code(_contents);
@@ -38,5 +40,10 @@ public class InlineCode extends BlockableNode<Code> {
         return new Code(_contents);
       }
     }
+  }
+
+  @Override
+  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
+    return this;
   }
 }
