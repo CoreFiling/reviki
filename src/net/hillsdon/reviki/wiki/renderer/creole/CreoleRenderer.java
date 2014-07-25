@@ -90,16 +90,16 @@ public class CreoleRenderer {
 
     ASTNode rendered = visitor.visit(tree);
 
-    // Decrement the expansion limit
+    // Expand macros
+    ASTNode expanded = rendered;
     _expansionLimit--;
 
-    if (_expansionLimit >= 0 && macros != null) {
-      return rendered.expandMacros(macros);
+    if (_expansionLimit >= 0) {
+      expanded = rendered.expandMacros(macros);
     }
-    else {
-      // Depth limit has been hit, there is probably a macro loop happening.
-      return rendered;
-    }
+
+    _expansionLimit++;
+    return expanded;
   }
 
   /**
@@ -137,7 +137,7 @@ public class CreoleRenderer {
 
   /** Render a page with no store. */
   public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    return render(Optional.<PageStore>absent(), page, urlOutputFilter, linkHandler, imageHandler, macros);
+    return render(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler, macros);
   }
 
   /** Render a page with no macros. */
