@@ -474,8 +474,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitHtml(final HtmlContext ctx) {
-    String code = ctx.EndHtmlBlock().getText();
-    return new Raw(code.substring(0, code.length() - "[</html>]".length()));
+    return new Raw(cutOffEndTag(ctx.EndHtmlBlock(), "[</html>]"));
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode}. */
