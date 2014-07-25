@@ -152,6 +152,14 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
   }
 
+  /**
+   * Remove the ending tag (possibly followed by trailing whitespace) from a
+   * string.
+   *
+   * @param node The body + ending tag.
+   * @param end The ending tag text.
+   * @return The body of the tag.
+   */
   protected String cutOffEndTag(final TerminalNode node, final String end) {
     String res = node.getText().replaceAll("\\s+$", "");
     return res.substring(0, res.length() - end.length());
