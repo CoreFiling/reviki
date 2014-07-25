@@ -82,14 +82,14 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Construct a new parse tree visitor.
+   * Construct a new AST builder.
    *
    * @param store The page store.
    * @param page The page being rendered.
    * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  public CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     _store = store;
     _page = page;
     _urlOutputFilter = urlOutputFilter;
@@ -97,12 +97,12 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     _imageHandler = imageHandler;
   }
 
-  /** Helper for the case where the PageStore is present. */
+  /** Construct a new AST builder with a page store. */
   public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     this(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler);
   }
 
-  /** Helper for the case where the PageStore is absent. */
+  /** Construct a new AST builder without a page store. */
   public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     this(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler);
   }

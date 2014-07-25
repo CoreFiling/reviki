@@ -10,10 +10,8 @@ import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
@@ -71,9 +69,10 @@ public class CreoleRenderer {
    * @param in The input stream to render.
    * @param visitor The visitor to do the rendering.
    * @param macros List of macros to apply.
+   * @param reset Whether to reset the expansion limit or not.
    * @return The AST of the page, after macro expansion.
    */
-  private static ASTNode renderInternal(final ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
+  private static ASTNode renderInternal(final ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros, final boolean reset) {
     CreoleTokens lexer = new CreoleTokens(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
@@ -92,6 +91,10 @@ public class CreoleRenderer {
     ASTNode rendered = visitor.visit(tree);
 
     // Expand macros
+    if (reset) {
+      _expansionLimit = 100;
+    }
+
     ASTNode expanded = rendered;
     _expansionLimit--;
 
@@ -115,30 +118,15 @@ public class CreoleRenderer {
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode render(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    String contents = page.getContent();
-
-    // The grammar and lexer assume they'll not hit an EOF after various things,
-    // so add a newline in if there's not one already there.
-    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n")) {
-      contents += "\n";
-    }
-
-    // Reset the expansion limit.
-    _expansionLimit = 100;
-
-    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
-    return renderInternal(new ANTLRInputStream(contents), visitor, macros);
-  }
-
-  /** Render a page with a store. */
   public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    return render(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler, macros);
+    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+    return renderWithVisitor(visitor, macros);
   }
 
   /** Render a page with no store. */
   public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    return render(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler, macros);
+    CreoleASTBuilder visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
+    return renderWithVisitor(visitor, macros);
   }
 
   /** Render a page with no macros. */
@@ -151,6 +139,25 @@ public class CreoleRenderer {
   public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
     return render(page, urlOutputFilter, linkHandler, imageHandler, macros);
+  }
+
+  /**
+   * Render a wiki page.
+   *
+   * @param visitor The AST builder.
+   * @param macros List of macros to reply.
+   * @return The AST of the page, after macro application.
+   */
+  public static ASTNode renderWithVisitor(final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
+    String contents = visitor.page().getContent();
+
+    // The grammar and lexer assume they'll not hit an EOF after various things,
+    // so add a newline in if there's not one already there.
+    if (contents.length() == 0 || !contents.substring(contents.length() - 1).equals("\n")) {
+      contents += "\n";
+    }
+
+    return renderInternal(new ANTLRInputStream(contents), visitor, macros, true);
   }
 
   /**
@@ -175,11 +182,11 @@ public class CreoleRenderer {
    * Render only a part of a page.
    *
    * @param content The content to render.
-   * @param visitor The AST builder (may not be null)
-   * @param macros List of macros to apply
+   * @param visitor The AST builder.
+   * @param macros List of macros to apply.
    * @return The AST of the page, after macro expansion.
    */
   public static ASTNode renderPartWithVisitor(final String content, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
-    return renderInternal(new ANTLRInputStream(content), visitor, macros);
+    return renderInternal(new ANTLRInputStream(content), visitor, macros, false);
   }
 }
