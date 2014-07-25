@@ -103,6 +103,14 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
+   * Helper method for {@link #get(int)}, which gets the last character of the
+   * token.
+   */
+  public Character last() {
+    return get(-1, 1).charAt(0);
+  }
+
+  /**
    * Seek the input stream, relative to the current position.
    *
    * @param amount The amount to seek by.
