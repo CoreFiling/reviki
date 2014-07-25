@@ -194,11 +194,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /**
    * Render a block of code with syntax highlighting. See
    * {@link #renderInlineCode}.
-   *
-   * @param code The token containing the code
-   * @param end The end marker
-   * @param language The language to use
-   * @return A block code node with the end token stripped.
    */
   protected ASTNode renderBlockCode(final TerminalNode node, final String end, final String language) {
     String code = node.getText();
