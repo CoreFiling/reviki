@@ -44,12 +44,10 @@ public class CreoleRenderer {
    * @param tokens The token stream. Consumed by the parser, and reset on
    *          failure.
    * @param parser The parser. Reset on failure.
-   * @param errors The error recovery strategy.
    * @param pmode The prediction mode.
    * @return A parse tree.
    */
-  private static Optional<ParseTree> tryParse(final CommonTokenStream tokens, final Creole parser, final ANTLRErrorStrategy errors, final PredictionMode pmode) {
-    parser.setErrorHandler(errors);
+  private static Optional<ParseTree> tryParse(final CommonTokenStream tokens, final Creole parser, final PredictionMode pmode) {
     parser.getInterpreter().setPredictionMode(pmode);
 
     try {
@@ -61,14 +59,6 @@ public class CreoleRenderer {
 
       return Optional.<ParseTree> absent();
     }
-  }
-
-  /**
-   * Helper for tryParse using the default error strategy. See
-   * {@link #tryParse(CommonTokenStream, Creole, ANTLRErrorStrategy, PredictionMode)}
-   */
-  private static Optional<ParseTree> tryParse(final CommonTokenStream tokens, final Creole parser, final PredictionMode pmode) {
-    return tryParse(tokens, parser, new DefaultErrorStrategy(), pmode);
   }
 
   /**
