@@ -77,12 +77,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    */
   @Override
   protected ASTNode aggregateResult(final ASTNode aggregate, final ASTNode nextResult) {
-    if (nextResult == null) {
-      return aggregate;
-    }
-    else {
-      return nextResult;
-    }
+    return nextResult == null ? aggregate : nextResult;
   }
 
   /**
@@ -169,28 +164,18 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *
    * @param code The token containing the code
    * @param end The end marker
-   * @param renderer The renderer to use
+   * @param language The language to use
    * @return An inline code node with the end token stripped.
    */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end, final Renderer renderer) {
+  protected ASTNode renderInlineCode(final TerminalNode node, final String end, final String language) {
     String code = cutOffEndTag(node, end);
 
     try {
-      return new InlineCode(code, renderer);
+      return new InlineCode(code, XhtmlRendererFactory.getRenderer(language));
     }
     catch (IOException e) {
       return new InlineCode(code);
     }
-  }
-
-  /**
-   * Render an inline piece of code with syntax highlighting. See
-   * {@link #renderInlineCode}.
-   *
-   * @param language The language to use
-   */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end, final String language) {
-    return renderInlineCode(node, end, XhtmlRendererFactory.getRenderer(language));
   }
 
   /**
@@ -206,29 +191,19 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *
    * @param code The token containing the code
    * @param end The end marker
-   * @param renderer The renderer to use
+   * @param language The language to use
    * @return A block code node with the end token stripped.
    */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end, final Renderer renderer) {
+  protected ASTNode renderBlockCode(final TerminalNode node, final String end, final String language) {
     String code = node.getText();
     code = code.substring(0, code.length() - end.length());
 
     try {
-      return new Code(code, renderer);
+      return new Code(code, XhtmlRendererFactory.getRenderer(language));
     }
     catch (IOException e) {
       return new Code(code);
     }
-  }
-
-  /**
-   * Render a block of code with syntax highlighting. See
-   * {@link #renderBlockCode}.
-   *
-   * @param language The language to use
-   */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end, final String language) {
-    return renderBlockCode(node, end, XhtmlRendererFactory.getRenderer(language));
   }
 
   /**
@@ -255,10 +230,10 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
     private final ParserRuleContext _unordered;
 
-    public ListItemContext(final ListType type, final ParserRuleContext ordered, final ParserRuleContext unordered) {
-      this._type = type;
-      this._ordered = ordered;
-      this._unordered = unordered;
+    public ListItemContext(final ParserRuleContext ordered, final ParserRuleContext unordered) {
+      _type = (ordered == null) ? ListType.Unordered : ListType.Ordered;
+      _ordered = ordered;
+      _unordered = unordered;
     }
 
     public ParserRuleContext get() {

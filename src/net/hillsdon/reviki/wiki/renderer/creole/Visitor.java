@@ -472,12 +472,7 @@ public class Visitor extends CreoleASTBuilder {
 
     if (ltxs != null) {
       for (ParserRuleContext ltx : ltxs) {
-        ParserRuleContext ordered = olist(ltx);
-        ParserRuleContext unordered = ulist(ltx);
-
-        ListType type = (ordered != null) ? ListType.Ordered : ListType.Unordered;
-
-        children.add(new ListItemContext(type, ordered, unordered));
+        children.add(new ListItemContext(olist(ltx), ulist(ltx)));
       }
     }
 
