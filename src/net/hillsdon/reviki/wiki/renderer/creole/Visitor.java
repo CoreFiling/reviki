@@ -125,7 +125,7 @@ public class Visitor extends CreoleASTBuilder {
       }
       else {
         if (last instanceof Plaintext && rendered instanceof Plaintext) {
-          last = new Plaintext(((Plaintext) last).getText() + ((Plaintext) rendered).getText());
+          last = ((Plaintext) last).append(((Plaintext) rendered));
         }
         else {
           chunks.add(last);
