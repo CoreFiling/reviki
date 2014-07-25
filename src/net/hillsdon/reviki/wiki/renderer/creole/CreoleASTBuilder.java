@@ -313,7 +313,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       // In general, a list can contain any arbitrary combination of ordered and
       // unordered sublists, and we want to preserve the (un)orderedness in the
       // bullet points, so we have to render them all individually.
-      boolean isOrdered = false;
+      Boolean isOrdered = null;
       List<ASTNode> items = new ArrayList<ASTNode>();
 
       // Build lists of (un)ordered chunks one at a time, rendering them, and
@@ -321,17 +321,17 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       for (ParserRuleContext ctx : childContexts) {
         ListItemContext child = new ListItemContext(olist(ctx), ulist(ctx));
 
-        if (child.ordered() != isOrdered) {
-          parts.add(isOrdered ? new OrderedList(items) : new UnorderedList(items));
+        if (isOrdered != null && child.ordered() != isOrdered.booleanValue()) {
+          parts.add(isOrdered.booleanValue() ? new OrderedList(items) : new UnorderedList(items));
           items.clear();
         }
 
-        isOrdered = child.ordered();
+        isOrdered = Boolean.valueOf(child.ordered());
         items.add(visit(child.get()));
       }
 
       if (!items.isEmpty()) {
-        parts.add(isOrdered ? new OrderedList(items) : new UnorderedList(items));
+        parts.add(isOrdered.booleanValue() ? new OrderedList(items) : new UnorderedList(items));
       }
     }
 
