@@ -141,11 +141,10 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     try {
-      @SuppressWarnings("unchecked")
-      Constructor<ASTNode> constructor = (Constructor<ASTNode>) type.getConstructors()[0];
+      Constructor<? extends ASTNode> constructor = type.getConstructor(ASTNode.class);
       return constructor.newInstance(inner);
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       // Never reached if you pass in correct params
       // TODO: Get rid of this (a lambda to construct, rather than reflection,
       // would work)
