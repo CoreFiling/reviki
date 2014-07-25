@@ -554,7 +554,7 @@ public class Visitor extends CreoleASTBuilder {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
     else {
-      return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page(), this);
+      return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), this);
     }
   }
 }
