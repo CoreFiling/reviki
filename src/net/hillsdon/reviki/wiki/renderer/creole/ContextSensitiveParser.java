@@ -11,48 +11,29 @@ import org.antlr.v4.runtime.TokenStream;
  * @author msw
  */
 public abstract class ContextSensitiveParser extends Parser {
-  /**
-   * Whether to allow linebreaks in the current context or not.
-   */
-  protected Stack<Boolean> breaks = new Stack<Boolean>();
+  private final Stack<Boolean> _breaks = new Stack<Boolean>();
 
   public ContextSensitiveParser(final TokenStream input) {
     super(input);
-    breaks.push(new Boolean(true));
   }
 
-  /**
-   * Set the linebreak mode.
-   */
-  protected void setBreaks(final boolean brk) {
-    this.breaks.push(new Boolean(brk));
+  /** Check if we can break. The default is yes. */
+  public boolean canBreak() {
+    return _breaks.isEmpty() || _breaks.peek().booleanValue();
   }
 
-  /**
-   * Check if we can break.
-   */
-  protected boolean canBreak() {
-    return breaks.peek().booleanValue();
+  /** Revert to the prior linebreak mode. */
+  public void unsetBreaks() {
+    _breaks.pop();
   }
 
-  /**
-   * Revert to the prior linebreak mode. The default mode is to allow breaks.
-   */
-  protected void unsetBreaks() {
-    breaks.pop();
-
-    if (breaks.empty()) {
-      breaks.push(new Boolean(true));
-    }
+  /** Allow breaks in this context. */
+  public void allowBreaks() {
+    _breaks.push(new Boolean(true));
   }
 
   /** See {@link #setBreaks(boolean)}. */
-  protected void yesBreak() {
-    setBreaks(true);
-  }
-
-  /** See {@link #setBreaks(boolean)}. */
-  protected void noBreak() {
-    setBreaks(false);
+  protected void disallowBreaks() {
+    _breaks.push(new Boolean(false));
   }
 }
