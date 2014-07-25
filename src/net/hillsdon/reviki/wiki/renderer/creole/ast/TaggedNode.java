@@ -23,8 +23,7 @@ public abstract class TaggedNode extends ASTNode {
   /**
    * Construct a new tagged node.
    *
-   * @param tag The tag (optional). If there is no tag, toXHTML *must* be
-   *          overridden, and handled appropriately for the node.
+   * @param tag The tag.
    * @param children Any child elements of the node.
    */
   public TaggedNode(final String tag, final List<ASTNode> children) {
