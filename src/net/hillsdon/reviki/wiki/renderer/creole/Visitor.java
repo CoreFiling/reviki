@@ -37,65 +37,6 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * If a paragraph starts with a sequence of blockable elements, separated by
-   * newlines, render them as blocks and the remaining text (if any) as a
-   * paragraph following this.
-   *
-   * @param paragraph The paragraph to expand out.
-   * @param reversed Whether the paragraph is reversed or not. If so, the final
-   *          trailing paragraph has its chunks reversed, to ease re-ordering
-   *          later.
-   * @return A list of blocks, which may just consist of the original paragraph.
-   */
-  protected List<ASTNode> expandParagraph(final Paragraph paragraph, final boolean reversed) {
-    ASTNode inline = paragraph.getChildren().get(0);
-    List<ASTNode> chunks = inline.getChildren();
-    int numchunks = chunks.size();
-
-    // Drop empty inlines, as that means we've examined an entire paragraph.
-    if (numchunks == 0) {
-      return new ArrayList<ASTNode>();
-    }
-
-    ASTNode head = chunks.get(0);
-    String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
-    List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
-    Paragraph rest = new Paragraph(new Inline(tail));
-    List<ASTNode> out = new ArrayList<ASTNode>();
-
-    // Drop leading whitespace
-    if (head.toXHTML().matches("^\r?\n$")) {
-      return expandParagraph(rest, reversed);
-    }
-
-    // Only continue if there is a hope of expanding it
-    if (head instanceof BlockableNode) {
-      // Check if we have a valid separator
-      ASTNode block = null;
-      if (sep == null || (!reversed && (sep.startsWith("\r\n") || sep.startsWith("\n")) || (reversed && sep.endsWith("\n")) || sep.startsWith("<br"))) {
-        block = ((BlockableNode) head).toBlock();
-      }
-
-      // Check if we have a match, and build the result list.
-      if (block != null) {
-        out.add(block);
-        out.addAll(expandParagraph(rest, reversed));
-        return out;
-      }
-    }
-
-    if (reversed) {
-      List<ASTNode> rchunks = new ArrayList<ASTNode>(inline.getChildren());
-      Collections.reverse(rchunks);
-      out.add(new Paragraph(new Inline(rchunks)));
-    }
-    else {
-      out.add(paragraph);
-    }
-    return out;
-  }
-
-  /**
    * Render the root node, creole. creole contains zero or more block elements
    * separated by linebreaks and paragraph breaks.
    *
@@ -366,220 +307,152 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * Render an ordered list. List rendering is a bit of a mess at the moment,
-   * but it basically works like this:
+   * Render an ordered list. List rendering is a bit of a mess, with lots of
+   * almost code duplication due to the way I've handled nesting.
    *
-   * - Lists have a root node, which contains level 1 elements.
-   *
-   * - There are levels 1 through 5.
-   *
-   * - Each level (other than 5) may have child list elements.
-   *
-   * - Each level (other than root) may also have some content, which can be a
-   * new list (ordered or unordered), or inline text.
-   *
-   * The root list node is rendered by displaying all level 1 entities in
-   * sequence, where level n entities are rendered by displaying their content
-   * and then any children they have.
-   *
-   * TODO: Figure out how to have arbitrarily-nested lists.
+   * TODO: Figure out how to nest lists arbitrarily deep.
    */
   @Override
   public ASTNode visitOlist(final OlistContext ctx) {
-    return renderList(ListType.Ordered, ctx.olist1());
-  }
+    List<ASTNode> children = new ArrayList<ASTNode>();
 
-  /** Helper functions for lists. */
-  protected enum ListCtxType {
-    List2Context, List3Context, List4Context, List5Context, List6Context, List7Context, List8Context, List9Context, List10Context
-  };
-
-  protected ParserRuleContext olist(final ParserRuleContext ctx) {
-    switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
-      case List2Context:
-        return ((List2Context) ctx).olist2();
-      case List3Context:
-        return ((List3Context) ctx).olist3();
-      case List4Context:
-        return ((List4Context) ctx).olist4();
-      case List5Context:
-        return ((List5Context) ctx).olist5();
-      case List6Context:
-        return ((List6Context) ctx).olist6();
-      case List7Context:
-        return ((List7Context) ctx).olist7();
-      case List8Context:
-        return ((List8Context) ctx).olist8();
-      case List9Context:
-        return ((List9Context) ctx).olist9();
-      case List10Context:
-        return ((List10Context) ctx).olist10();
-      default:
-        throw new RuntimeException("Unknown list context type");
-    }
-  }
-
-  protected ParserRuleContext ulist(final ParserRuleContext ctx) {
-    switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
-      case List2Context:
-        return ((List2Context) ctx).ulist2();
-      case List3Context:
-        return ((List3Context) ctx).ulist3();
-      case List4Context:
-        return ((List4Context) ctx).ulist4();
-      case List5Context:
-        return ((List5Context) ctx).ulist5();
-      case List6Context:
-        return ((List6Context) ctx).ulist6();
-      case List7Context:
-        return ((List7Context) ctx).ulist7();
-      case List8Context:
-        return ((List8Context) ctx).ulist8();
-      case List9Context:
-        return ((List9Context) ctx).ulist9();
-      case List10Context:
-        return ((List10Context) ctx).ulist10();
-      default:
-        throw new RuntimeException("Unknown list context type");
-    }
-  }
-
-  protected ASTNode list(final List<? extends ParserRuleContext> ltxs, final InListContext inner) {
-    List<ListItemContext> children = new ArrayList<ListItemContext>();
-
-    if (ltxs != null) {
-      for (ParserRuleContext ltx : ltxs) {
-        children.add(new ListItemContext(olist(ltx), ulist(ltx)));
-      }
+    for (ParserRuleContext rtx : ctx.olist1()) {
+      children.add(visit(rtx));
     }
 
-    return renderListItem(children, inner.listBlock());
+    return new OrderedList(children);
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist1(final Olist1Context ctx) {
-    return list(ctx.list2(), ctx.inList());
+    return renderListItem(ctx.list2(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist2(final Olist2Context ctx) {
-    return list(ctx.list3(), ctx.inList());
+    return renderListItem(ctx.list3(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist3(final Olist3Context ctx) {
-    return list(ctx.list4(), ctx.inList());
+    return renderListItem(ctx.list4(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist4(final Olist4Context ctx) {
-    return list(ctx.list5(), ctx.inList());
+    return renderListItem(ctx.list5(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist5(final Olist5Context ctx) {
-    return list(ctx.list6(), ctx.inList());
+    return renderListItem(ctx.list6(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist6(final Olist6Context ctx) {
-    return list(ctx.list7(), ctx.inList());
+    return renderListItem(ctx.list7(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist7(final Olist7Context ctx) {
-    return list(ctx.list8(), ctx.inList());
+    return renderListItem(ctx.list8(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist8(final Olist8Context ctx) {
-    return list(ctx.list9(), ctx.inList());
+    return renderListItem(ctx.list9(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist9(final Olist9Context ctx) {
-    return list(ctx.list10(), ctx.inList());
+    return renderListItem(ctx.list10(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist10(final Olist10Context ctx) {
-    return list(null, ctx.inList());
+    return renderListItem(null, ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist(final UlistContext ctx) {
-    return renderList(ListType.Unordered, ctx.ulist1());
+    List<ASTNode> children = new ArrayList<ASTNode>();
+
+    for (ParserRuleContext rtx : ctx.ulist1()) {
+      children.add(visit(rtx));
+    }
+
+    return new UnorderedList(children);
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist1(final Ulist1Context ctx) {
-    return list(ctx.list2(), ctx.inList());
+    return renderListItem(ctx.list2(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist2(final Ulist2Context ctx) {
-    return list(ctx.list3(), ctx.inList());
+    return renderListItem(ctx.list3(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist3(final Ulist3Context ctx) {
-    return list(ctx.list4(), ctx.inList());
+    return renderListItem(ctx.list4(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist4(final Ulist4Context ctx) {
-    return list(ctx.list5(), ctx.inList());
+    return renderListItem(ctx.list5(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist5(final Ulist5Context ctx) {
-    return list(ctx.list6(), ctx.inList());
+    return renderListItem(ctx.list6(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist6(final Ulist6Context ctx) {
-    return list(ctx.list7(), ctx.inList());
+    return renderListItem(ctx.list7(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist7(final Ulist7Context ctx) {
-    return list(ctx.list8(), ctx.inList());
+    return renderListItem(ctx.list8(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist8(final Ulist8Context ctx) {
-    return list(ctx.list9(), ctx.inList());
+    return renderListItem(ctx.list9(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist9(final Ulist9Context ctx) {
-    return list(ctx.list10(), ctx.inList());
+    return renderListItem(ctx.list10(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist10(final Ulist10Context ctx) {
-    return list(null, ctx.inList());
+    return renderListItem(null, ctx.inList());
   }
 
   /**
@@ -680,6 +553,8 @@ public class Visitor extends CreoleASTBuilder {
     if (ctx.MacroEndNoArgs() != null) {
       return new Plaintext("<<" + ctx.MacroName().getText() + ">>");
     }
-    return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page(), this);
+    else {
+      return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), page(), this);
+    }
   }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -240,25 +241,60 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
   }
 
-  /**
-   * Render a list.
-   *
-   * @param type The type of list to build.
-   * @param childContexts the children of the list.
-   * @return A list node containing the given elements
-   */
-  protected ASTNode renderList(final ListType type, final List<? extends ParserRuleContext> childContexts) {
-    List<ASTNode> children = new ArrayList<ASTNode>();
+  /** Types of list contexts */
+  protected enum ListCtxType {
+    List2Context, List3Context, List4Context, List5Context, List6Context, List7Context, List8Context, List9Context, List10Context
+  };
 
-    for (ParserRuleContext ctx : childContexts) {
-      children.add(visit(ctx));
+  /** Get the ordered component of a list context. */
+  protected ParserRuleContext olist(final ParserRuleContext ctx) {
+    switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
+      case List2Context:
+        return ((List2Context) ctx).olist2();
+      case List3Context:
+        return ((List3Context) ctx).olist3();
+      case List4Context:
+        return ((List4Context) ctx).olist4();
+      case List5Context:
+        return ((List5Context) ctx).olist5();
+      case List6Context:
+        return ((List6Context) ctx).olist6();
+      case List7Context:
+        return ((List7Context) ctx).olist7();
+      case List8Context:
+        return ((List8Context) ctx).olist8();
+      case List9Context:
+        return ((List9Context) ctx).olist9();
+      case List10Context:
+        return ((List10Context) ctx).olist10();
+      default:
+        throw new RuntimeException("Unknown list context type");
     }
+  }
 
-    if (type == ListType.Ordered) {
-      return new OrderedList(children);
-    }
-    else {
-      return new UnorderedList(children);
+  /** Get the unordered component of a list context. */
+  protected ParserRuleContext ulist(final ParserRuleContext ctx) {
+    switch (ListCtxType.valueOf(ctx.getClass().getSimpleName())) {
+      case List2Context:
+        return ((List2Context) ctx).ulist2();
+      case List3Context:
+        return ((List3Context) ctx).ulist3();
+      case List4Context:
+        return ((List4Context) ctx).ulist4();
+      case List5Context:
+        return ((List5Context) ctx).ulist5();
+      case List6Context:
+        return ((List6Context) ctx).ulist6();
+      case List7Context:
+        return ((List7Context) ctx).ulist7();
+      case List8Context:
+        return ((List8Context) ctx).ulist8();
+      case List9Context:
+        return ((List9Context) ctx).ulist9();
+      case List10Context:
+        return ((List10Context) ctx).ulist10();
+      default:
+        throw new RuntimeException("Unknown list context type");
     }
   }
 
@@ -267,20 +303,18 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *
    * @param childContexts List of child elements
    * @param inner List of inner elements.
-   * @return A list item containing with the given child list elements. For
-   *         inner elements, olist is preferred over ulist, which is preferred
-   *         over inline; if none are given, an empty Plaintext is used.
+   * @return A list item containing with the given child list elements.
    */
-  protected ASTNode renderListItem(final List<ListItemContext> childContexts, final List<? extends ParserRuleContext> inner) {
+  protected ASTNode renderListItem(final List<? extends ParserRuleContext> childContexts, final InListContext inner) {
     List<ASTNode> parts = new ArrayList<ASTNode>();
 
-    for (ParserRuleContext in : inner) {
+    for (ParserRuleContext in : inner.listBlock()) {
       if (in != null) {
         parts.add(visit(in));
       }
     }
 
-    if (childContexts == null || childContexts.isEmpty()) {
+    if (childContexts.isEmpty()) {
       return new ListItem(parts);
     }
     else {
@@ -288,22 +322,24 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       // unordered sublists, and we want to preserve the (un)orderedness in the
       // bullet points, so we have to render them all individually.
       ListType type = null;
-      List<ParserRuleContext> contexts = new ArrayList<ParserRuleContext>();
+      List<ASTNode> items = new ArrayList<ASTNode>();
 
       // Build lists of (un)ordered chunks one at a time, rendering them, and
       // adding to the list of lists.
-      for (ListItemContext child : childContexts) {
+      for (ParserRuleContext ctx : childContexts) {
+        ListItemContext child = new ListItemContext(olist(ctx), ulist(ctx));
+
         if (type != null && child._type != type) {
-          parts.add(renderList(type, contexts));
-          contexts.clear();
+          parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
+          items.clear();
         }
 
         type = child._type;
-        contexts.add(child.get());
+        items.add(visit(child.get()));
       }
 
-      if (!contexts.isEmpty()) {
-        parts.add(renderList(type, contexts));
+      if (!items.isEmpty()) {
+        parts.add((type == ListType.Ordered) ? new OrderedList(items) : new UnorderedList(items));
       }
 
       return new ListItem(parts);
@@ -338,5 +374,64 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     return false;
+  }
+
+  /**
+   * If a paragraph starts with a sequence of blockable elements, separated by
+   * newlines, render them as blocks and the remaining text (if any) as a
+   * paragraph following this.
+   *
+   * @param paragraph The paragraph to expand out.
+   * @param reversed Whether the paragraph is reversed or not. If so, the final
+   *          trailing paragraph has its chunks reversed, to ease re-ordering
+   *          later.
+   * @return A list of blocks, which may just consist of the original paragraph.
+   */
+  protected List<ASTNode> expandParagraph(final Paragraph paragraph, final boolean reversed) {
+    ASTNode inline = paragraph.getChildren().get(0);
+    List<ASTNode> chunks = inline.getChildren();
+    int numchunks = chunks.size();
+
+    // Drop empty inlines, as that means we've examined an entire paragraph.
+    if (numchunks == 0) {
+      return new ArrayList<ASTNode>();
+    }
+
+    ASTNode head = chunks.get(0);
+    String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
+    List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
+    Paragraph rest = new Paragraph(new Inline(tail));
+    List<ASTNode> out = new ArrayList<ASTNode>();
+
+    // Drop leading whitespace
+    if (head.toXHTML().matches("^\r?\n$")) {
+      return expandParagraph(rest, reversed);
+    }
+
+    // Only continue if there is a hope of expanding it
+    if (head instanceof BlockableNode) {
+      // Check if we have a valid separator
+      ASTNode block = null;
+      if (sep == null || (!reversed && (sep.startsWith("\r\n") || sep.startsWith("\n")) || (reversed && sep.endsWith("\n")) || sep.startsWith("<br"))) {
+        block = ((BlockableNode) head).toBlock();
+      }
+
+      // Check if we have a match, and build the result list.
+      if (block != null) {
+        out.add(block);
+        out.addAll(expandParagraph(rest, reversed));
+        return out;
+      }
+    }
+
+    if (reversed) {
+      List<ASTNode> rchunks = new ArrayList<ASTNode>(inline.getChildren());
+      Collections.reverse(rchunks);
+      out.add(new Paragraph(new Inline(rchunks)));
+    }
+    else {
+      out.add(paragraph);
+    }
+    return out;
   }
 }
