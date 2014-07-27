@@ -32,7 +32,7 @@ public class CreoleLinkContentsSplitter {
    * @param in The String to split
    * @return The split LinkParts
    */
-  public LinkParts split(String target, String text) {
+  public static LinkParts split(String target, String text) {
     if (target == null) {
       target = "";
     }

@@ -30,7 +30,7 @@ public abstract class LinkNode extends TaggedNode {
 
     _title = title;
     _target = target;
-    _parts = (new CreoleLinkContentsSplitter()).split(target, title);
+    _parts = CreoleLinkContentsSplitter.split(target, title);
     _page = page;
     _urlOutputFilter = urlOutputFilter;
     _handler = handler;
