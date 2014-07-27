@@ -16,6 +16,14 @@ public class Heading extends TaggedNode {
 
   @Override
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    return new Heading(_level, getChildren().get(0).expandMacros(macros));
+    ASTNode child = getChildren().get(0);
+    ASTNode expanded = child.expandMacros(macros);
+
+    if(child == expanded) {
+      return this;
+    }
+    else {
+      return new Heading(_level, expanded);
+    }
   }
 }

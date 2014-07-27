@@ -67,49 +67,53 @@ public abstract class ASTNode {
 
   /**
    * Expand macros contained within this node and its children, returning the
-   * modified node.
+   * modified node. If no macros were expanded, `this` is returned.
    *
    * This uses reflection to achieve immutability, and so MUST be overridden if
    * the constructor is overridden to have a different signature.
    *
    * @param macros The list of macros
-   * @return A new node, with macros expanded.
+   * @return A node, with macros expanded.
    */
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    // Nodes with no children stay the same, and so we return `this`.
-    if (_children.size() == 0) {
+    // Expand all children
+    boolean mutated = false;
+    ImmutableList.Builder<ASTNode> adoptees = new ImmutableList.Builder<ASTNode>();
+
+    for (ASTNode child : _children) {
+      ASTNode expanded = child.expandMacros(macros);
+      adoptees.add(expanded);
+
+      if (expanded != child) {
+        mutated = true;
+      }
+    }
+
+    // If no children were expanded, return `this`.
+    if (!mutated) {
       return this;
     }
 
-    // Nodes with children recursively expand them, and so we construct a new
-    // object.
+    // Mutation occurred, let's build a new node.
+    ImmutableList<ASTNode> expanded = adoptees.build();
+
+    // Prefer the single-node constructor if it's available and we only have
+    // one child.
+    if (_children.size() == 1) {
+      try {
+        Constructor<? extends ASTNode> constructor = getClass().getDeclaredConstructor(ASTNode.class);
+        return constructor.newInstance(expanded.get(0));
+      }
+      catch (Exception e) {
+        // The single-node constructor might not be available, but the list
+        // one might be, so just ignore this exception and continue.
+      }
+    }
+
     try {
-      // Expand all children first
-      ImmutableList.Builder<ASTNode> adoptees = new ImmutableList.Builder<ASTNode>();
-
-      for (ASTNode child : _children) {
-        adoptees.add(child.expandMacros(macros));
-      }
-
-      ImmutableList<ASTNode> expanded = adoptees.build();
-
-      // Prefer the single-node constructor if it's available and we only have
-      // one child.
-      if (_children.size() == 1) {
-        try {
-          Constructor<? extends ASTNode> constructor = getClass().getDeclaredConstructor(ASTNode.class);
-          return constructor.newInstance(expanded.get(0));
-        }
-        catch (Exception e) {
-          // The single-node constructor might not be available, but the list
-          // one might be, so just ignore this exception and continue.
-        }
-      }
-
       Constructor<? extends ASTNode> constructor = getClass().getDeclaredConstructor(List.class);
       return constructor.newInstance(expanded);
     }
-
     catch (Exception e) {
       // All failed. This method should have been overridden by the subclass
       // pulling it in. Whoever did this should be identified and shamed.
