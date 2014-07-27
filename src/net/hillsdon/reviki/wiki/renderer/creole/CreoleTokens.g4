@@ -1,12 +1,11 @@
-/* Todo:
- *  - Comments justifying and explaining every rule.
- */
-
 lexer grammar CreoleTokens;
 
 options { superClass=ContextSensitiveLexer; }
 
 @members {
+  // We keep track of whether we're in bold or not with this state. It's not
+  // ideal, but as the start/end formatting tokens are all the same, this is
+  // probably the best we can do (short of going crazy with lexer modes).
   Formatting bold;
   Formatting italic;
   Formatting strike;
@@ -24,6 +23,8 @@ options { superClass=ContextSensitiveLexer; }
   public int listLevel = 0;
   boolean intr = false;
 
+  // Check if a header start is actually a header start (<= 6 long), and
+  // avoid eating the trailing non-= if it is.
   public void doHdr() {
     String prefix = getText().trim();
     boolean seekback = false;
@@ -45,20 +46,22 @@ options { superClass=ContextSensitiveLexer; }
     }
   }
 
-  public void setStart() {
-    String next1 = next(1);
-    String next2 = get(1);
-    start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
-  }
-
+  // Start matching a list item: this updates the list level (allowing deeper
+  // list tokens to be matched), and breaks out of any formatting we may have
+  // going on - which may trigger parser error-correction.
   public void doList(int level) {
     listLevel = level;
 
     seek(-1);
-    setStart();
     resetFormatting();
+
+    String next1 = get(0);
+    String next2 = get(1);
+    start = (next1.equals("*") && !next2.equals("*")) || (next1.equals("#") && !next2.equals("#"));
   }
 
+  // When we think we've matched a URL, seek back through it until we have
+  // something more reasonable looking.
   public void doUrl() {
     String url = getText();
     String last = url.substring(url.length()-1);
@@ -81,6 +84,7 @@ options { superClass=ContextSensitiveLexer; }
     setText(url);
   }
 
+  // Reset all special lexer state.
   public void breakOut() {
     resetFormatting();
     listLevel = 0;
@@ -88,6 +92,8 @@ options { superClass=ContextSensitiveLexer; }
     intr = false;
   }
 
+  // Determine which tokens can, at this stage, break out of any inline
+  // formatting.
   public java.util.List<String> thisKillsTheFormatting() {
     java.util.List<String> ends = new java.util.ArrayList<String>();
 
@@ -113,6 +119,7 @@ options { superClass=ContextSensitiveLexer; }
     return ends;
   }
 
+  // Handle a link target or title ending with a ']' or '}'.
   public void doLinkEnd() {
     String txt = getText().trim();
     int len = txt.length();
@@ -135,6 +142,15 @@ HSt  : LINE '='+ ~'=' {doHdr();} ;
 HEnd : WS? '='* WS? (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */
+
+// Lists are messy, as in the parser. One notable trait is that sublists can
+// start with any combination of *s and #s, which is perhaps too flexible, but
+// it works (and was easy to specify). It means we can do things like this:
+// * Level 1 Unordered
+// *# Sublist which is ordered
+// *#* Sublist which is unordered
+// #** Item of same unordered sublist
+// ##* Item of same unordered sublist
 
 U1  : START U                            {doList(1);} ;
 U2  : START L U         {listLevel >= 1}? {doList(2);} ;
@@ -224,11 +240,10 @@ MacroSt : '<<' -> mode(MACRO) ;
 Any : ALNUM+ | . ;
 WS  : (' '|'\t')+ ;
 
+// Skip empty links like [[]] and {{}}. These are commonly used to break up WikiWords.
 EmptyLink : ('[[' WS? ']]' | '{{' WS? '}}' |'[[' WS? '|' WS? ']]' | '{{' WS? '|' WS? '}}') -> skip ;
 
 fragment NOTALNUM : ~('A'..'Z'|'a'..'z'|'0'..'9') ;
-fragment START : {start}? | LINE ;
-fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 fragment LOWNUM : (LOWER | DIGIT) ;
 fragment UPNUM  : (UPPER | DIGIT) ;
 fragment ALNUM : (ALPHA | DIGIT) ;
@@ -236,6 +251,12 @@ fragment ALPHA : (UPPER | LOWER) ;
 fragment UPPER : ('A'..'Z') ;
 fragment LOWER : ('a'..'z') ;
 fragment DIGIT : ('0'..'9') ;
+
+// 'START' matches something which is start-of-line-like. Currently that's only
+// handled by entering a new list level, but it could in principle be more
+// general, replacing the use of 'LINE' entirely.
+fragment START : {start}? | LINE ;
+fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 
 /* ***** Contextual stuff ***** */
 

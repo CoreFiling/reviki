@@ -1,17 +1,20 @@
 /* Todo:
- *  - Comments justifying and explaining every rule.
  *  - Allow arbitrarily-nested lists (see actions/attributes)
  */
 
 parser grammar Creole;
 
 options {
+  // Where to find the token definitions
   tokenVocab=CreoleTokens;
+
+  // Use a custom superclass, rather than the stock ANTLR parser
   superClass=ContextSensitiveParser;
 }
 
 /* ***** Top level elements ***** */
 
+// A page consists of a sequence of block elements, separated by newlines.
 creole    : (block (LineBreak | ParBreak)*)* EOF ;
 
 block     : heading
@@ -28,6 +31,14 @@ heading   : HSt WS? {disallowBreaks();} inline {unsetBreaks();} HEnd;
 
 paragraph : inline ;
 
+// This is horrible. Sadly, I couldn't figure out how to do arbitrarily-nested
+// lists, so up to 10 levels of nesting are hardcoded here. There's a bit of
+// noise due to linebreaks, but it's not so complicated. A list consists of a
+// sequence of list items, each of which has some content (`inList`), and some
+// potential child list elements. All but the last child element can include
+// linebreaks. The last child cannot, because then detecting the end of a list
+// is ambiguous.
+// If you want/need a linebreak in the last child, you can use an inline break.
 ulist      : {allowBreaks();} (ulist1 LineBreak?)* {unsetBreaks();} {disallowBreaks();} ulist1 LineBreak? {unsetBreaks();};
 ulist1     : U1  inList LineBreak? ({allowBreaks();} list2* {unsetBreaks();} {disallowBreaks();} list2 {unsetBreaks();})? ;
 ulist2     : U2  inList LineBreak? ({allowBreaks();} list3* {unsetBreaks();} {disallowBreaks();} list3 {unsetBreaks();})? ;
@@ -62,8 +73,7 @@ list8      : (olist8 | ulist8) LineBreak? ;
 list9      : (olist9 | ulist9) LineBreak? ;
 list10     : (olist10 | ulist10) LineBreak? ;
 
-inList     : (WS? listBlock ({canBreak()}? LineBreak)?)+
-           ;
+inList     : (WS? listBlock ({canBreak()}? LineBreak)?)+ ;
 
 listBlock  : code | nowiki | inline ;
 
