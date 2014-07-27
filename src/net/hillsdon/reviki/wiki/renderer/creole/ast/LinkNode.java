@@ -36,6 +36,13 @@ public abstract class LinkNode extends TaggedNode {
     _handler = handler;
   }
 
+  /**
+   * Get the split link.
+   */
+  public LinkParts getParts() {
+    return _parts;
+  }
+
   @Override
   public String toXHTML() {
     try {
