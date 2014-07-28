@@ -23,29 +23,6 @@ options { superClass=ContextSensitiveLexer; }
   public int listLevel = 0;
   boolean intr = false;
 
-  // Check if a header start is actually a header start (<= 6 long), and
-  // avoid eating the trailing non-= if it is.
-  public void doHdr() {
-    String prefix = getText().trim();
-    boolean seekback = false;
-
-    if(!prefix.substring(prefix.length() - 1).equals("=")) {
-      prefix = prefix.substring(0, prefix.length() - 1);
-      seekback = true;
-    }
-
-    if(prefix.length() <= 6) {
-      if(seekback) {
-        seek(-1);
-      }
-
-      setText(prefix);
-      inHeader = true;
-    } else {
-      setType(Any);
-    }
-  }
-
   // Start matching a list item: this updates the list level (allowing deeper
   // list tokens to be matched), and breaks out of any formatting we may have
   // going on - which may trigger parser error-correction.
@@ -138,7 +115,7 @@ options { superClass=ContextSensitiveLexer; }
 
 /* ***** Headings ***** */
 
-HSt  : LINE '='+ ~'=' {doHdr();} ;
+HSt  : LINE ('=' | '==' | '===' | '====' | '=====' | '======') ~'=' {inHeader=true; seek(-1);} ;
 HEnd : WS? '='* WS? (LineBreak | ParBreak) {inHeader}? {breakOut();} ;
 
 /* ***** Lists ***** */
