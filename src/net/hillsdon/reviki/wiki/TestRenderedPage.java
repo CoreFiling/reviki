@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.wiki;
 
-import static java.util.Arrays.asList;
-
 import java.util.Collections;
 
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
@@ -40,15 +38,4 @@ public class TestRenderedPage extends TestCase {
     RenderedPage rendered = create("");
     rendered.getPage().equals("FrontPage");
   }
-
-  public void testGetOutgoingLinksExistingPage() throws Exception {
-    RenderedPage existingPage = create("<a href='pages/Foo'>Foo</a> to <a class='existing-page other-class' href='pages/Bar'>Bar description</a>");
-    assertEquals(asList("Bar"), existingPage.findOutgoingWikiLinks());
-  }
-
-  public void testGetOutgoingLinksNewPage() throws Exception {
-    RenderedPage newPage = create("<a href='pages/Foo'>Foo</a> to <a class='other-class new-page' href='pages/Bar'>Bar description</a>");
-    assertEquals(asList("Bar"), newPage.findOutgoingWikiLinks());
-  }
-
 }
