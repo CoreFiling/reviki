@@ -9,7 +9,7 @@ public abstract class ASTVisitor<T> {
   /** Enum of node types */
   public static enum NodeTypes {
     ASTNode, Anchor,
-    BlockableNode, Bold,
+    BlockableNode, Blockquote, Bold,
     Code,
     Heading, HorizontalRule,
     Image, Inline, InlineCode, Italic,
@@ -32,6 +32,7 @@ public abstract class ASTVisitor<T> {
     // This doesn't include the abstract node types, as they can't be instantiated.
     switch(NodeTypes.valueOf(node.getClass().getSimpleName())) {
       case Anchor:          return visitAnchor((Anchor) node);
+      case Blockquote:      return visitBlockquote((Blockquote) node);
       case Bold:            return visitBold((Bold) node);
       case Code:            return visitCode((Code) node);
       case Heading:         return visitHeading((Heading) node);
@@ -71,6 +72,7 @@ public abstract class ASTVisitor<T> {
 
   public T visitAnchor(Anchor node)                   { return visitASTNode(node); }
   public T visitBlockableNode(BlockableNode node)     { return visitASTNode((ASTNode) node); }
+  public T visitBlockquote(Blockquote node)           { return visitASTNode(node); }
   public T visitBold(Bold node)                       { return visitASTNode(node); }
   public T visitCode(Code node)                       { return visitASTNode(node); }
   public T visitHeading(Heading node)                 { return visitASTNode(node); }
