@@ -8,7 +8,7 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 public abstract class ASTVisitor<T> {
   /** Enum of node types */
   public static enum NodeTypes {
-    ASTNode,
+    ASTNode, Anchor,
     BlockableNode, Bold,
     Code,
     Heading, HorizontalRule,
@@ -31,6 +31,7 @@ public abstract class ASTVisitor<T> {
   public T visit(ASTNode node) {
     // This doesn't include the abstract node types, as they can't be instantiated.
     switch(NodeTypes.valueOf(node.getClass().getSimpleName())) {
+      case Anchor:          return visitAnchor((Anchor) node);
       case Bold:            return visitBold((Bold) node);
       case Code:            return visitCode((Code) node);
       case Heading:         return visitHeading((Heading) node);
@@ -68,6 +69,7 @@ public abstract class ASTVisitor<T> {
    */
   public abstract T visitASTNode(ASTNode node);
 
+  public T visitAnchor(Anchor node)                   { return visitASTNode(node); }
   public T visitBlockableNode(BlockableNode node)     { return visitASTNode((ASTNode) node); }
   public T visitBold(Bold node)                       { return visitASTNode(node); }
   public T visitCode(Code node)                       { return visitASTNode(node); }

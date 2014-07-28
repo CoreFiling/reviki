@@ -93,6 +93,7 @@ inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | simpleimg | imglink | wikiwlink | attachment | rawlink
+           | anchor
            | inlinecode | preformat
            | linebreak
            | macro
@@ -118,6 +119,8 @@ wikiwlink  : WikiWords ;
 attachment : Attachment ;
 
 rawlink    : RawUrl ;
+
+anchor     : AnSt InAnchor AnEnd ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
