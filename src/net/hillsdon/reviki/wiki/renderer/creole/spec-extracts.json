@@ -12,7 +12,7 @@
   {
     "name":   "bold, italics cross lines",
     "input":  "Bold and italics should //be\nable// to cross lines.\n\nBut, should //not be...\n\n...able// to cross paragraphs.",
-    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.\n</p><p>\nBut, should //not be...\n</p><p>\n...able// to cross paragraphs.</p>"
+    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.</p><p>But, should //not be...</p><p>...able// to cross paragraphs.\n</p>"
   },
   {
     "name":   "bold and italics nested",
@@ -30,17 +30,17 @@
     "comment": "altered from spec as we do parse markup within headings (permitted but not required by the spec)",
     "name":   "headings",
     "input":  "= Level 1 (largest) =\n== Level 2 ==\n=== Level 3 ===\n==== Level 4 ====\n===== Level 5 =====\n====== Level 6 ======\n=== Also level 3\n=== Also level 3 =\n=== Also level 3 ==\n=== **not** //parsed// ===",
-    "output": "<h1>Level 1 (largest)</h1><h2>Level 2</h2><h3>Level 3</h3><h4>Level 4</h4><h5>Level 5</h5><h6>Level 6</h6><h3>Also level 3</h3><h3>Also level 3</h3><h3>Also level 3</h3><h3><strong>not</strong> <em>parsed</em></h3>"
+    "output": "<h1> Level 1 (largest)</h1><h2> Level 2</h2><h3> Level 3</h3><h4> Level 4</h4><h5> Level 5</h5><h6> Level 6</h6><h3> Also level 3</h3><h3> Also level 3</h3><h3> Also level 3</h3><h3> <strong>not</strong> <em>parsed</em></h3>"
   },
   {
     "name":   "linking",
     "input":  "[[link]]\n[[MyBigPage|Go to my page]]\n\n[[http://www.wikicreole.org/]]\nhttp://www.rawlink.org/, http://www.another.rawlink.org\n[[http://www.wikicreole.org/|Visit the WikiCreole website]]\n[[Weird Stuff|**Weird** //Stuff//]]\n[[Ohana:WikiFamily]]",
-    "output": "<p><a rel='nofollow' class='new-page' href='/pages/test/link'>link</a>\n<a rel='nofollow' class='new-page' href='/pages/test/MyBigPage'>Go to my page</a>\n</p><p>\n<a class='external' href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a href='http://www.rawlink.org/'>http://www.rawlink.org/</a>, <a href='http://www.another.rawlink.org'>http://www.another.rawlink.org</a>\n<a class='external' href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a rel='nofollow' class='new-page' href='/pages/test/Weird%20Stuff'>**Weird** //Stuff//</a>\n<a class='inter-wiki' href='http://wikiohana.net/cgi-bin/wiki.pl/WikiFamily'>Ohana:WikiFamily</a></p>"
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link'>link</a>\n<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/MyBigPage'>Go to my page</a></p><p><a class='external' href='http://www.wikicreole.org/'>http://www.wikicreole.org/</a>\n<a class='external' href='http://www.rawlink.org/'>http://www.rawlink.org/</a>, <a class='external' href='http://www.another.rawlink.org'>http://www.another.rawlink.org</a>\n<a class='external' href='http://www.wikicreole.org/'>Visit the WikiCreole website</a>\n<a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Weird%20Stuff'>**Weird** //Stuff//</a>\nOhana:WikiFamily</p>"
   },
   {
     "name":   "paragraphs",
     "input":  "This is my text.\n\nThis is more text.",
-    "output": "<p>This is my text.\n</p><p>\nThis is more text.</p>"
+    "output": "<p>This is my text.</p><p>This is more text.\n</p>"
   },
   {
     "bug":    "we don't handle line breaks within paragraphs for some reason",
@@ -51,12 +51,12 @@
   {
     "name":   "bulleted list",
     "input":  "* Item 1\n** Item 1.1\n* Item 2",
-    "output": "<ul><li> Item 1<ul>\n<li> Item 1.1</li></ul></li>\n<li> Item 2</li></ul>"
+    "output": "<ul><li> Item 1\n<ul><li> Item 1.1</li></ul></li><li> Item 2</li></ul>"
   },
   {
     "name":   "numbered list",
     "input":  "# Item 1\n## Item 1.1\n# Item 2",
-    "output": "<ol><li> Item 1<ol>\n<li> Item 1.1</li></ol></li>\n<li> Item 2</li></ol>"
+    "output": "<ol><li> Item 1\n<ol><li> Item 1.1</li></ol></li><li> Item 2</li></ol>"
   },
   {
     "name":   "horizontal rule",
@@ -66,7 +66,8 @@
   {
     "name":   "image link",
     "input":  "{{myimage.png|this is my image}}",
-    "output": "<p><img class='attachment' src='/pages/test//attachments/myimage.png' alt='this is my image' /></p>"
+    "output": "<p><img class='attachment' src='http://www.example.com/reviki/pages/test-wiki//attachments/myimage.png' alt='this is my
+image' /></p>"
   },
   {
     "bug":    "similar to line breaks bug",
