@@ -552,4 +552,12 @@ public class Visitor extends CreoleASTBuilder {
       return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), this);
     }
   }
+
+  /**
+   * Render a blockquote.
+   */
+  @Override
+  public ASTNode visitBlockquote(BlockquoteContext ctx) {
+    return new Blockquote(visit(ctx.creole()));
+  }
 }

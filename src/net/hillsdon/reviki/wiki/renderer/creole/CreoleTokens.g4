@@ -212,6 +212,11 @@ fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UP
 
 MacroSt : '<<' -> mode(MACRO) ;
 
+/* ***** Quotes ***** */
+
+BlockquoteSt  : '[<blockquote>]' ;
+BlockquoteEnd : '[</blockquote>]' ;
+
 /* ***** Miscellaneous ***** */
 
 Any : ALNUM+ | . ;

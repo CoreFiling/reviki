@@ -22,6 +22,7 @@ block     : heading
           | hrule
           | table
           | code | nowiki
+          | blockquote
           | paragraph
           ;
 
@@ -86,6 +87,8 @@ th         : ThStart inline? ;
 td         : TdStart inline? ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
+
+blockquote : BlockquoteSt creole BlockquoteEnd ;
 
 /* ***** Inline Elements ***** */
 
