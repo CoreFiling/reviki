@@ -25,4 +25,5 @@ public interface LinkPartsHandler {
 
   String handle(PageReference page, String xhtmlContent, LinkParts parts, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
 
+  LinkResolutionContext getContext();
 }

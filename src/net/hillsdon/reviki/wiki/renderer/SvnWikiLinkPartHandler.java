@@ -75,6 +75,15 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _interWikiLinker = interWikiLinker;
   }
 
+  public LinkResolutionContext getContext() {
+    if (_linkResolutionContext != null) {
+      return _linkResolutionContext;
+    }
+    else {
+      return new LinkResolutionContext(_internalLinker, _interWikiLinker, _store);
+    }
+  }
+
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
     // Lazily initialise interWikiLinker from configuration. Trying to do this in the constructor causes an exception.
     if (_configuration != null) {
