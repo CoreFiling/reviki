@@ -6,6 +6,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.links.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
 
 /**
  * Abstract node type for things rendered using link handlers.
@@ -41,6 +42,13 @@ public abstract class LinkNode extends TaggedNode {
    */
   public LinkParts getParts() {
     return _parts;
+  }
+
+  /**
+   * Get the resolution context.
+   */
+  public LinkResolutionContext getContext() {
+    return _handler.getContext();
   }
 
   @Override
