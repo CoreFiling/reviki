@@ -15,81 +15,68 @@
  */
 package net.hillsdon.reviki.wiki;
 
-import java.io.IOException;
-import java.io.StringReader;
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-
-import org.cyberneko.html.parsers.SAXParser;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTVisitor;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Link;
 
 public class RenderedPage {
 
-  private static final Pattern RE_NEW_PAGE_CLASS = Pattern.compile("(^|\\s)new-page($|\\s)");
-  private static final Pattern RE_EXIST_PAGE_CLASS = Pattern.compile("(^|\\s)existing-page($|\\s)");
-  
+  private static final String NEW_PAGE_CLASS = "new-page";
+
+  private static final String EXIST_PAGE_CLASS = "existing-page";
+
   private final String _pageName;
-  private final String _rendered; 
+
+  private final ASTNode _ast;
 
   public RenderedPage(final String pageName, final ASTNode resultNode) {
     _pageName = pageName;
-    _rendered = resultNode.toXHTML();
+    _ast = resultNode;
   }
 
   public String getPage() {
     return _pageName;
   }
-  
+
   /**
    * @return outgoing links in document order.
-   * @throws IOException If we fail to parse. 
    */
-  public List<String> findOutgoingWikiLinks() throws IOException {
-    final List<String> outgoing = new ArrayList<String>();
-    SAXParser parser = new SAXParser();
-    parser.setContentHandler(new DefaultHandler() {
-      public void startElement(final String uri, final String localName, final String name, final Attributes attributes) throws SAXException {
-        if (localName.equals("A")) {
-          boolean wikiPageClass = false;
-          String href = null;
-          for (int i = 0, len = attributes.getLength(); i < len; ++i) {
-            if ("class".equals(attributes.getLocalName(i))) {
-              wikiPageClass = hasWikiPageClass(attributes.getValue(i));
-            }
-            else if ("href".equals(attributes.getLocalName(i))) {
-              href = attributes.getValue(i);
-            }
-          }
-          if (wikiPageClass && href != null) {
-            int lastSlash = href.lastIndexOf('/');
-            outgoing.add(href.substring(lastSlash + 1));
-          }
+  public List<String> findOutgoingWikiLinks() {
+    return (new Visitor()).visit(_ast);
+  }
+
+  private final class Visitor extends ASTVisitor<List<String>> {
+    @Override
+    public List<String> visitASTNode(ASTNode node) {
+      List<String> outgoing = new ArrayList<String>();
+
+      for (ASTNode child : node.getChildren()) {
+        outgoing.addAll(visit(child));
+      }
+
+      return outgoing;
+    }
+
+    @Override
+    public List<String> visitLink(Link node) {
+      try {
+        String style = node.getParts().getStyleClass(node.getContext());
+        String href = node.getParts().getURL(node.getContext());
+
+        if (style.equals(NEW_PAGE_CLASS) || style.equals(EXIST_PAGE_CLASS)) {
+          return ImmutableList.of(href.substring(href.lastIndexOf('/') + 1));
         }
       }
-    });
-    try {
-      parser.parse(new InputSource(new StringReader(_rendered)));
-    }
-    catch (final SAXException ex) {
-      throw new IOException("Parse error") {
-        private static final long serialVersionUID = 1L;
-        @Override
-        public Throwable getCause() {
-          return ex;
-        }
-      };
-    }
-    return outgoing;
-  }
+      catch (Exception e) {
+        // Ignore the bad link, we only care about links to pages on this wiki.
+      }
 
-  private boolean hasWikiPageClass(final String clazz) {
-    return RE_EXIST_PAGE_CLASS.matcher(clazz).find() || RE_NEW_PAGE_CLASS.matcher(clazz).find();
+      return ImmutableList.of();
+    }
   }
-
 }
