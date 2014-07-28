@@ -26,7 +26,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.

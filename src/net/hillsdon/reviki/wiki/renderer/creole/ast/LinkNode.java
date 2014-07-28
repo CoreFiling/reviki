@@ -3,10 +3,10 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.links.CreoleLinkContentsSplitter;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Abstract node type for things rendered using link handlers.

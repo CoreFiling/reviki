@@ -21,7 +21,7 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 /**
  * Helper class providing some useful functions for walking through the Creole

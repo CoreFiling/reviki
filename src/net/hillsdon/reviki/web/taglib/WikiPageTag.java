@@ -24,8 +24,8 @@ import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkParts;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Uses an {@link InternalLinker} to create links to wiki pages.

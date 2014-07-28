@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.wiki.renderer.creole.links;
+package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.net.URI;
 

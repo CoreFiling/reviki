@@ -44,7 +44,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.links.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * A particular wiki (sub-wiki, whatever).
