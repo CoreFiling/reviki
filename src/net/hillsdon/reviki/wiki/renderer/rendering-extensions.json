@@ -12,7 +12,7 @@
   {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
-    "output": "<p>Hello <code>//there//</code>.</p>"
+    "output": "<p>Hello <code>//there//</code>.\n</p>"
   },
   {
     "name":   "Unnamed URL",
@@ -99,7 +99,7 @@
   {
     "name":   "Blank named link",
     "input":  "[[|]]",
-    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/'></a></p>"
+    "output": ""
   }
 ]
 
