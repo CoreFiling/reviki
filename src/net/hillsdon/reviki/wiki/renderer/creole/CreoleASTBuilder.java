@@ -135,7 +135,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     // If the inner text is missing, this is not markup
-    if (inner.toXHTML().trim().equals("")) {
+    if (inner.toXHTML().equals("")) {
       List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol + symbol), inner);
       return new Inline(chunks);
     }
