@@ -22,6 +22,7 @@ block     : heading
           | hrule
           | table
           | code | nowiki
+          | directive
           | paragraph
           ;
 
@@ -86,6 +87,10 @@ th         : ThStart inline? ;
 td         : TdStart inline? ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
+
+directive  : DirectiveEnable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Enable
+           | DirectiveDisable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Disable
+           ;
 
 /* ***** Inline Elements ***** */
 

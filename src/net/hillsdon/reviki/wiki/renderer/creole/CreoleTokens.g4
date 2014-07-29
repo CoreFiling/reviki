@@ -212,6 +212,10 @@ fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UP
 
 MacroSt : '<<' -> mode(MACRO) ;
 
+DirectiveEnable : '<<+' -> mode(MACRO) ;
+
+DirectiveDisable : '<<-' -> mode(MACRO) ;
+
 /* ***** Miscellaneous ***** */
 
 Any : ALNUM+ | . ;

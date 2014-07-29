@@ -216,8 +216,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTitlelink(final TitlelinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Link(target, title, page(), urlOutputFilter(), linkHandler());
   }
 
@@ -226,8 +226,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitImglink(final ImglinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Image(target, title, page(), urlOutputFilter(), imageHandler());
   }
 
@@ -550,6 +550,32 @@ public class Visitor extends CreoleASTBuilder {
     }
     else {
       return new MacroNode(ctx.MacroName().getText(), cutOffEndTag(ctx.MacroEnd(), ">>"), this);
+    }
+  }
+
+  /**
+   * Enable a directive.
+   */
+  @Override
+  public ASTNode visitEnable(EnableContext ctx) {
+    if (ctx.MacroEndNoArgs() == null) {
+      return new DirectiveNode(ctx.MacroName().getText(), true, cutOffEndTag(ctx.MacroEnd(), ">>"));
+    }
+    else {
+      return new DirectiveNode(ctx.MacroName().getText(), true);
+    }
+  }
+
+  /**
+   * Disable a directive.
+   */
+  @Override
+  public ASTNode visitDisable(DisableContext ctx) {
+    if (ctx.MacroEndNoArgs() == null) {
+      return new DirectiveNode(ctx.MacroName().getText(), false, cutOffEndTag(ctx.MacroEnd(), ">>"));
+    }
+    else {
+      return new DirectiveNode(ctx.MacroName().getText(), false);
     }
   }
 }
