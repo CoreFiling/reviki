@@ -32,7 +32,6 @@ import net.hillsdon.fij.io.Lsof;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.RenderedPageFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -83,8 +82,8 @@ public class TestLuceneSearcher extends TestCase {
   protected void setUp() throws Exception {
     _dir = createTempDir();
     _dir2 = createTempDir();
-    _searcher = new LuceneSearcher(WIKI_NAME, _dir, Arrays.asList(_dir2), new RenderedPageFactory(MarkupRenderer.AS_IS));
-    _searcher2 = new LuceneSearcher(WIKI_NAME2, _dir2, Arrays.asList(_dir), new RenderedPageFactory(MarkupRenderer.AS_IS));
+    _searcher = new LuceneSearcher(WIKI_NAME, _dir, Arrays.asList(_dir2), MarkupRenderer.AS_IS);
+    _searcher2 = new LuceneSearcher(WIKI_NAME2, _dir2, Arrays.asList(_dir), MarkupRenderer.AS_IS);
   }
 
   @Override

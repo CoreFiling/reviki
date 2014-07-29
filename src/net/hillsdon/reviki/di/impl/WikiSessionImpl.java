@@ -68,7 +68,6 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedPageStore;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.RenderedPageFactory;
 import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
@@ -113,12 +112,12 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
     // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
-    RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
+    MarkupRenderer renderer = new MarkupRenderer() {
       public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, urlOutputFilter);
       }
-    });
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));
+    };
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
@@ -151,7 +150,6 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(wikiGraph);
     container.addComponent(Configuration.class, pageStoreConfiguration);
     container.addComponent(internalLinker);
-    container.addComponent(renderedPageFactory);
     container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_searchEngine);
