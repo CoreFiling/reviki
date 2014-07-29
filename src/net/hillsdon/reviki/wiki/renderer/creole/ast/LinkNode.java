@@ -1,5 +1,8 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
+import java.util.List;
+import java.util.Map;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -52,7 +55,7 @@ public abstract class LinkNode extends TaggedNode {
   }
 
   @Override
-  public String toXHTML() {
+  public String toXHTML(Map<String, List<String>> enabledDirectives) {
     try {
       return _handler.handle(_page, Escape.html(_parts.getText()), _parts, _urlOutputFilter);
     }
