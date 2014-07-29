@@ -536,7 +536,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTh(final ThContext ctx) {
-    return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    ASTNode inner = (ctx.inTable() != null) ? visit(ctx.inTable()) : null;
+    return new TableHeaderCell((inner != null) ? inner : new Plaintext(""));
   }
 
   /**
@@ -544,7 +545,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTd(final TdContext ctx) {
-    return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    ASTNode inner = (ctx.inTable() != null) ? visit(ctx.inTable()) : null;
+    return new TableCell((inner != null) ? inner : new Plaintext(""));
   }
 
   /**

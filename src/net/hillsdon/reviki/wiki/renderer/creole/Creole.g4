@@ -80,11 +80,13 @@ listBlock  : code | nowiki | inline ;
 
 hrule      : Rule ;
 
-table      : {disallowBreaks();} (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? {unsetBreaks();};
+table      : (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? ;
 trow       : tcell+ ;
 tcell      : th | td ;
-th         : ThStart inline? ;
-td         : TdStart inline? ;
+th         : ThStart inTable? ;
+td         : TdStart inTable? ;
+
+inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
 
