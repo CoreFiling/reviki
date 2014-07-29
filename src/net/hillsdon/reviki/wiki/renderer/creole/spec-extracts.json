@@ -66,8 +66,7 @@
   {
     "name":   "image link",
     "input":  "{{myimage.png|this is my image}}",
-    "output": "<p><img class='attachment' src='http://www.example.com/reviki/pages/test-wiki//attachments/myimage.png' alt='this is my
-image' /></p>"
+    "output": "<p><img class='attachment' src='http://www.example.com/reviki/pages/test-wiki//attachments/myimage.png' alt='this is my image' /></p>"
   },
   {
     "bug":    "similar to line breaks bug",
