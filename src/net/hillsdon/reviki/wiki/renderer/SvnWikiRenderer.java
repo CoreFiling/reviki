@@ -25,20 +25,20 @@ import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
-public class SvnWikiRenderer implements MarkupRenderer {
-
+public class SvnWikiRenderer extends MarkupRenderer<String> {
   private final Configuration configuration;
   private final InternalLinker internalLinker;
   private final SvnWikiLinkPartHandler linkHandler;
   private final SvnWikiLinkPartHandler imageHandler;
   private final Supplier<List<Macro>> macros;
   private final PageStore pageStore;
+  private final HtmlRenderer _renderer;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
     this.configuration = configuration;
@@ -47,9 +47,24 @@ public class SvnWikiRenderer implements MarkupRenderer {
     this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
     this.macros = macros;
     this.pageStore = pageStore;
+
+    _renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
   }
 
-  public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return CreoleRenderer.render(pageStore, page, urlOutputFilter, linkHandler, imageHandler, macros);
+  /**
+   * Return the inner renderer.
+   */
+  public HtmlRenderer getRenderer() {
+    return _renderer;
+  }
+
+  @Override
+  public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
+    return _renderer.render(page);
+  }
+
+  @Override
+  public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    return _renderer.build(ast, urlOutputFilter);
   }
 }

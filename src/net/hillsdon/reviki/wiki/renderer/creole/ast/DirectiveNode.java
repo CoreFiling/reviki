@@ -1,7 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.util.List;
-import java.util.Map;
 
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -50,21 +49,12 @@ public class DirectiveNode extends ASTNode {
   }
 
   @Override
-  public String toXHTML(Map<String, List<String>> enabledDirectives) {
-    if (_enabled) {
-      // If a directive is enabled multiple times, the most recent one takes
-      // effect. This is because the arguments may be different.
-      enabledDirectives.put(_name, _args);
-    }
-    else {
-      enabledDirectives.remove(_name);
-    }
-
-    return "";
+  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
+    return this;
   }
 
   @Override
-  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
-    return this;
+  public String toSmallString() {
+    return "";
   }
 }

@@ -18,7 +18,6 @@ import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -41,9 +40,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
   /** The URL handler for images. */
   private final LinkPartsHandler _imageHandler;
-
-  /** A final pass over URLs to apply any last-minute changes. */
-  private final URLOutputFilter _urlOutputFilter;
 
   /** List of attachments on the page. */
   private Collection<AttachmentHistory> _attachments = null;
@@ -68,10 +64,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     return _imageHandler;
   }
 
-  public URLOutputFilter urlOutputFilter() {
-    return _urlOutputFilter;
-  }
-
   /**
    * Aggregate results produced by visitChildren. This returns the "right"most
    * non-null result found.
@@ -86,25 +78,23 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *
    * @param store The page store.
    * @param page The page being rendered.
-   * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     _store = store;
     _page = page;
-    _urlOutputFilter = urlOutputFilter;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
   }
 
   /** Construct a new AST builder with a page store. */
-  public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    this(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler);
+  public CreoleASTBuilder(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.of(store), page, linkHandler, imageHandler);
   }
 
   /** Construct a new AST builder without a page store. */
-  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    this(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler);
+  public CreoleASTBuilder(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.<PageStore> absent(), page, linkHandler, imageHandler);
   }
 
   /**
@@ -135,7 +125,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     // If the inner text is missing, this is not markup
-    if (inner.toXHTML().equals("")) {
+    if (inner.toSmallString().equals("")) {
       List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol + symbol), inner);
       return new Inline(chunks);
     }
@@ -390,13 +380,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     ASTNode head = chunks.get(0);
-    String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
+    String sep = (numchunks > 1) ? chunks.get(1).toSmallString() : "\r\n";
     List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
     Paragraph rest = new Paragraph(new Inline(tail));
     List<ASTNode> out = new ArrayList<ASTNode>();
 
     // Drop leading whitespace
-    if (head.toXHTML().matches("^\r?\n$")) {
+    if (head.toSmallString().matches("^\r?\n$")) {
       return expandParagraph(rest, reversed);
     }
 

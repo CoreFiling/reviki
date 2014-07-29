@@ -1,10 +1,6 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Map;
-
-import net.hillsdon.fij.text.Escape;
 
 /**
  * Abstract class for AST nodes which just contain text.
@@ -21,11 +17,6 @@ public abstract class TextNode extends ASTNode {
     _escape = escape;
   }
 
-  @Override
-  public String toXHTML(Map<String, List<String>> enabledDirectives) {
-    return _escape ? Escape.html(_contents) : _contents;
-  }
-
   /**
    * Get the (unescaped) text contained within this node.
    *
@@ -33,6 +24,13 @@ public abstract class TextNode extends ASTNode {
    */
   public String getText() {
     return _contents;
+  }
+
+  /**
+   * Get whether the contents should be escaped.
+   */
+  public boolean isEscaped() {
+    return _escape;
   }
 
   /**
@@ -70,5 +68,10 @@ public abstract class TextNode extends ASTNode {
    */
   public TextNode append(TextNode follower) {
     return append(follower.getText());
+  }
+
+  @Override
+  public String toSmallString() {
+    return getText();
   }
 }

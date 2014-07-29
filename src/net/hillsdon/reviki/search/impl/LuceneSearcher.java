@@ -36,7 +36,6 @@ import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTVisitor;
@@ -165,7 +164,7 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   private Document createWikiPageDocument(final PageInfo page) throws IOException, PageStoreException {
-    ASTNode pageAST = _renderer.render(page, URLOutputFilter.NULL);
+    ASTNode pageAST = _renderer.render(page);
     final String path = page.getPath();
     final String wiki = page.getWiki();
     final String content = page.getContent();

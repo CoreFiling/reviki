@@ -10,7 +10,6 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 
@@ -22,12 +21,12 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
-  public Visitor(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    super(store, page, urlOutputFilter, linkHandler, imageHandler);
+  public Visitor(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    super(store, page, linkHandler, imageHandler);
   }
 
-  public Visitor(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    super(page, urlOutputFilter, linkHandler, imageHandler);
+  public Visitor(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    super(page, linkHandler, imageHandler);
   }
 
   /**
@@ -76,7 +75,7 @@ public class Visitor extends CreoleASTBuilder {
     List<ASTNode> blocksNonEmpty = new ArrayList<ASTNode>();
 
     for (ASTNode block : blocks) {
-      if (block != null && !(block instanceof Paragraph && ((Paragraph) block).innerXHTML().trim().equals(""))) {
+      if (block != null && !(block instanceof Paragraph && block.toSmallString().trim().equals("Paragraph"))) {
         blocksNonEmpty.add(block);
       }
     }
@@ -154,7 +153,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitWikiwlink(final WikiwlinkContext ctx) {
-    return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
+    return new Link(ctx.getText(), ctx.getText(), page(), linkHandler());
   }
 
   /**
@@ -164,7 +163,7 @@ public class Visitor extends CreoleASTBuilder {
   @Override
   public ASTNode visitAttachment(final AttachmentContext ctx) {
     if (hasAttachment(ctx.getText())) {
-      return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
+      return new Link(ctx.getText(), ctx.getText(), page(), linkHandler());
     }
     else {
       return new Plaintext(ctx.getText());
@@ -176,7 +175,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitRawlink(final RawlinkContext ctx) {
-    return new Link(ctx.getText(), ctx.getText(), page(), urlOutputFilter(), linkHandler());
+    return new Link(ctx.getText(), ctx.getText(), page(), linkHandler());
   }
 
   /**
@@ -208,7 +207,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitLink(final LinkContext ctx) {
-    return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page(), urlOutputFilter(), linkHandler());
+    return new Link(ctx.InLink().getText(), ctx.InLink().getText(), page(), linkHandler());
   }
 
   /**
@@ -218,7 +217,7 @@ public class Visitor extends CreoleASTBuilder {
   public ASTNode visitTitlelink(final TitlelinkContext ctx) {
     String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
     String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
-    return new Link(target, title, page(), urlOutputFilter(), linkHandler());
+    return new Link(target, title, page(), linkHandler());
   }
 
   /**
@@ -228,7 +227,7 @@ public class Visitor extends CreoleASTBuilder {
   public ASTNode visitImglink(final ImglinkContext ctx) {
     String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
     String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
-    return new Image(target, title, page(), urlOutputFilter(), imageHandler());
+    return new Image(target, title, page(), imageHandler());
   }
 
   /**
@@ -236,7 +235,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitSimpleimg(final SimpleimgContext ctx) {
-    return new Image(ctx.InLink().getText(), ctx.InLink().getText(), page(), urlOutputFilter(), imageHandler());
+    return new Image(ctx.InLink().getText(), ctx.InLink().getText(), page(), imageHandler());
   }
 
   /**

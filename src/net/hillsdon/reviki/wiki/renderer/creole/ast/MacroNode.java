@@ -12,7 +12,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.CreoleASTBuilder;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
+public class MacroNode extends ASTNode implements BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
@@ -22,11 +22,14 @@ public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
 
   private final CreoleASTBuilder _visitor;
 
+  private final boolean _block;
+
   public MacroNode(final String name, final String args, final CreoleASTBuilder visitor, final boolean isBlock) {
-    super(isBlock ? "pre" : "code", new Raw(Escape.html("<<" + name + ":" + args + ">>")));
+    super(new Raw(Escape.html("<<" + name + ":" + args + ">>")));
     _name = name;
     _args = args;
     _visitor = visitor;
+    _block = isBlock;
   }
 
   /** Create a new inline macro node. */
@@ -60,6 +63,13 @@ public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
 
     // Failed to find a macro of the same name.
     return this;
+  }
+
+  /**
+   * Whether this occurs in a block context or not.
+   */
+  public boolean isBlock() {
+    return _block;
   }
 
   public MacroNode toBlock() {

@@ -1,9 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
@@ -51,30 +49,6 @@ public abstract class ASTNode {
    */
   public ImmutableList<ASTNode> getChildren() {
     return _children;
-  }
-
-  /**
-   * Produce a valid XHTML representation (assuming valid implementations of
-   * toXHTML for all direct and indirect children) of the node.
-   */
-  public final String toXHTML() {
-    return toXHTML(new HashMap<String, List<String>>());
-  }
-
-  /**
-   * Render the node with the given directives (and their arguments) enabled.
-   *
-   * enabledDirectives MUST be mutable.
-   * This method MAY mutate enabledDirectives.
-   */
-  public String toXHTML(Map<String, List<String>> enabledDirectives) {
-    String out = "";
-
-    for (ASTNode node : getChildren()) {
-      out += node.toXHTML(enabledDirectives);
-    }
-
-    return out;
   }
 
   /**
@@ -162,5 +136,33 @@ public abstract class ASTNode {
     }
 
     return out;
+  }
+
+  /**
+   * Produce a very small string representation of the AST.
+   *
+   * This is used only to check if elements don't contain any text, and probably
+   * should be done in a nicer way.
+   *
+   * Elements which are invisible should override this to return the empty
+   * string.
+   */
+  public String toSmallString() {
+    String out = getClass().getSimpleName();
+    for (ASTNode child : getChildren()) {
+      out += child.toSmallString();
+    }
+    return out;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ASTNode)) {
+      return false;
+    }
+
+    // Poor man's equality check: try "rendering" them both and compare the
+    // results.
+    return this.toStringTree().equals(((ASTNode) obj).toStringTree());
   }
 }

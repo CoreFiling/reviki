@@ -69,9 +69,9 @@ import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
@@ -164,7 +164,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final CachingPageStore _store;
 
-  private final MarkupRenderer _renderer;
+  private final HtmlRenderer _renderer;
 
   private final WikiGraph _graph;
 
@@ -176,7 +176,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final HtmlRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _configuration = configuration;
     _store = store;
     _renderer = renderer;
@@ -365,8 +365,9 @@ public class DefaultPageImpl implements DefaultPage {
             }
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ASTNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
-          request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
+          ASTNode ast = _renderer.render(pageInfo);
+          String rendered = _renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+          request.setAttribute(ATTR_PREVIEW, rendered);
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
@@ -400,8 +401,9 @@ public class DefaultPageImpl implements DefaultPage {
       return new RawPageView(main);
     }
     else {
-      ASTNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
-      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
+      ASTNode ast = _renderer.render(main);
+      String rendered = _renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       return new JspView("ViewPage");
     }
   }

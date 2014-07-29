@@ -6,12 +6,16 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Supplier;
 
-public class Heading extends TaggedNode {
+public class Heading extends ASTNode {
   private final int _level;
 
   public Heading(final int level, final ASTNode body) {
-    super("h" + level, body);
+    super(body);
     _level = level;
+  }
+
+  public int getLevel() {
+    return _level;
   }
 
   @Override
@@ -19,7 +23,7 @@ public class Heading extends TaggedNode {
     ASTNode child = getChildren().get(0);
     ASTNode expanded = child.expandMacros(macros);
 
-    if(child == expanded) {
+    if (child == expanded) {
       return this;
     }
     else {

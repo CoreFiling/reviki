@@ -100,9 +100,15 @@ public class SearchIndexBuilder implements Runnable {
     File primarySearchDir = wikiConf.getSearchIndexDirectory();
     List<File> otherSearchDirs = wikiConf.getOtherSearchIndexDirectories();
     // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
-    MarkupRenderer renderer = new MarkupRenderer() {
-      public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(page, urlOutputFilter);
+    MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
+      @Override
+      public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.render(page);
+      }
+
+      @Override
+      public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.build(ast, urlOutputFilter);
       }
     };
     LuceneSearcher searcher = new LuceneSearcher(wikiConf.getWikiName(), primarySearchDir, otherSearchDirs, renderer);

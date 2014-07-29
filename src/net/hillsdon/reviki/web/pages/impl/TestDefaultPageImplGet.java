@@ -22,9 +22,7 @@ import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ATTR_PAGE_INFO;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.MAX_NUMBER_OF_BACKLINKS_TO_DISPLAY;
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.PARAM_DIFF_REVISION;
 import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -45,15 +43,15 @@ import net.hillsdon.reviki.web.common.InvalidInputException;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
 import org.easymock.EasyMock;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -66,7 +64,7 @@ public class TestDefaultPageImplGet extends TestCase {
   private static final PageReference THE_PAGE = new PageReferenceImpl("ThePage");
 
   private CachingPageStore _store;
-  private MarkupRenderer _renderer;
+  private HtmlRenderer _renderer;
   private WikiGraph _graph;
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
@@ -81,7 +79,7 @@ public class TestDefaultPageImplGet extends TestCase {
     _request = new MockHttpServletRequest();
     _response = null;
     _store = createMock(CachingPageStore.class);
-    _renderer = createMock(MarkupRenderer.class);
+    _renderer = new HtmlRenderer(_store, null, null, null);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
@@ -180,15 +178,16 @@ public class TestDefaultPageImplGet extends TestCase {
   }
 
   private void verify() {
-    EasyMock.verify(_store, _renderer, _graph, _diffGenerator);
+    EasyMock.verify(_store, _graph, _diffGenerator);
   }
 
   private void replay() {
-    EasyMock.replay(_store, _renderer, _graph, _diffGenerator);
+    EasyMock.replay(_store, _graph, _diffGenerator);
   }
 
   private void expectRenderContent() throws Exception  {
-    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())), isA(URLOutputFilter.class))).andReturn(new Raw("Content")).once();
+    ASTNode eq = new Page(ImmutableList.of((ASTNode) new Paragraph(new Inline(ImmutableList.of((ASTNode) new Plaintext("Content"))))));
+    assertTrue(_renderer.render(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())).equals(eq));
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {

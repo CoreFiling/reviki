@@ -41,9 +41,9 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.TaggedNode;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
@@ -117,7 +117,7 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
       final String actual = render(input);
       
       // We ignore the CSS class we add to save cluttering the expectations.
-      String tidiedActual = actual.replaceAll(" " + TaggedNode.CSS_CLASS_ATTR, "");
+      String tidiedActual = actual.replaceAll(" " + HtmlRenderer.CSS_CLASS_ATTR, "");
       final boolean match = expected.equals(tidiedActual);
       if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);

@@ -1,25 +1,23 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.util.List;
-import java.util.Map;
 
-import net.hillsdon.fij.text.Escape;
+import com.google.common.base.Supplier;
+
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 /**
  * Abstract node type for things rendered using link handlers.
  *
  * @author msw
  */
-public abstract class LinkNode extends TaggedNode {
+public abstract class LinkNode extends ASTNode {
   private final LinkPartsHandler _handler;
-
-  private final URLOutputFilter _urlOutputFilter;
 
   private final PageInfo _page;
 
@@ -29,15 +27,26 @@ public abstract class LinkNode extends TaggedNode {
 
   private final String _target;
 
-  public LinkNode(final String tag, final String target, final String title, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler handler) {
-    super(tag);
-
+  public LinkNode(final String target, final String title, final PageInfo page, final LinkPartsHandler handler) {
     _title = title;
     _target = target;
     _parts = CreoleLinkContentsSplitter.split(target, title);
     _page = page;
-    _urlOutputFilter = urlOutputFilter;
     _handler = handler;
+  }
+
+  /**
+   * Get the handler.
+   */
+  public LinkPartsHandler getHandler() {
+    return _handler;
+  }
+
+  /**
+   * Get the page.
+   */
+  public PageInfo getPage() {
+    return _page;
   }
 
   /**
@@ -54,19 +63,22 @@ public abstract class LinkNode extends TaggedNode {
     return _handler.getContext();
   }
 
+  /**
+   * Get the title.
+   */
+  public String getTitle() {
+    return _title;
+  }
+
+  /**
+   * Get the target.
+   */
+  public String getTarget() {
+    return _target;
+  }
+
   @Override
-  public String toXHTML(Map<String, List<String>> enabledDirectives) {
-    try {
-      return _handler.handle(_page, Escape.html(_parts.getText()), _parts, _urlOutputFilter);
-    }
-    catch (Exception e) {
-      // Special case: render mailto: as a link if it didn't get interwiki'd
-      if (_target.startsWith("mailto:") && tag().equals("a")) {
-        return String.format("<a href='%s'>%s</a>", _target, Escape.html(_title));
-      }
-      else {
-        return Escape.html(_parts.getText());
-      }
-    }
+  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
+    return this;
   }
 }
