@@ -1,6 +1,8 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.Map;
 
 import net.hillsdon.fij.text.Escape;
 
@@ -20,7 +22,7 @@ public abstract class TextNode extends ASTNode {
   }
 
   @Override
-  public String toXHTML() {
+  public String toXHTML(Map<String, List<String>> enabledDirectives) {
     return _escape ? Escape.html(_contents) : _contents;
   }
 

@@ -1,6 +1,8 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract class for AST nodes with an associated XHTML tag.
@@ -59,9 +61,9 @@ public abstract class TaggedNode extends ASTNode {
    * Produce a valid XHTML representation (assuming valid implementations of
    * toXHTML for all direct and indirect children) of the node.
    */
-  public String toXHTML() {
+  public String toXHTML(Map<String, List<String>> enabledDirectives) {
     // Render the children
-    String inner = innerXHTML();
+    String inner = innerXHTML(enabledDirectives);
 
     // Render the tag
     if (inner.equals("")) {
@@ -76,6 +78,13 @@ public abstract class TaggedNode extends ASTNode {
    * Render just the children to XHTML.
    */
   public String innerXHTML() {
-    return super.toXHTML();
+    return innerXHTML(new HashMap<String, List<String>>());
+  }
+
+  /**
+   * Render just the children to XHTML with the given directives.
+   */
+  public String innerXHTML(Map<String, List<String>> enabledDirectives) {
+    return super.toXHTML(enabledDirectives);
   }
 }
