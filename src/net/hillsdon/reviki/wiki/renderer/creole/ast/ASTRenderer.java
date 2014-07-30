@@ -11,7 +11,17 @@ import com.google.common.base.Optional;
 public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   /** Languages available for syntax highlighting. */
   public static enum Languages {
-    CPLUSPLUS, JAVA, XHTML, XML
+    CPLUSPLUS("c++"), JAVA("java"), XHTML("xhtml"), XML("xml");
+
+    private final String _name;
+
+    private Languages(String name) {
+      _name = name;
+    }
+
+    public String toString() {
+      return _name;
+    }
   }
 
   /** Directives (and arguments) active at this time. */
