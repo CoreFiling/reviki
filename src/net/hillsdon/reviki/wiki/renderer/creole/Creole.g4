@@ -15,7 +15,7 @@ options {
 /* ***** Top level elements ***** */
 
 // A page consists of a sequence of block elements, separated by newlines.
-creole    : (block (LineBreak | ParBreak)*)* EOF ;
+creole    : (block (LineBreak | ParBreak)*)* ;
 
 block     : heading
           | ulist | olist
