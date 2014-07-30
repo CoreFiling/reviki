@@ -9,6 +9,11 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import com.google.common.base.Optional;
 
 public abstract class ASTRenderer<T> extends ASTVisitor<T> {
+  /** Languages available for syntax highlighting. */
+  public static enum Languages {
+    CPLUSPLUS, JAVA, XHTML, XML
+  }
+
   /** Directives (and arguments) active at this time. */
   private final Map<String, List<String>> _enabledDirectives;
 

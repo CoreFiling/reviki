@@ -1,8 +1,12 @@
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import com.uwyn.jhighlight.renderer.Renderer;
+import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
@@ -74,6 +78,46 @@ public class HtmlRenderer extends MarkupRenderer<String> {
       }
     }
 
+    /**
+     * Render some syntax-highlighted code.
+     */
+    public String highlight(String code, Optional<Languages> language) {
+      Renderer highlighter = null;
+      if (language.isPresent()) {
+        String lang = null;
+        switch (language.get()) {
+          case CPLUSPLUS:
+            lang = XhtmlRendererFactory.CPLUSPLUS;
+            break;
+          case JAVA:
+            lang = XhtmlRendererFactory.JAVA;
+            break;
+          case XHTML:
+            lang = XhtmlRendererFactory.XHTML;
+            break;
+          case XML:
+            lang = XhtmlRendererFactory.XML;
+            break;
+        }
+        highlighter = XhtmlRendererFactory.getRenderer(lang);
+      }
+
+      String highlighted = null;
+      if (highlighter == null) {
+        highlighted = Escape.html(code);
+      }
+      else {
+        try {
+          highlighted = highlighter.highlight("", code, "UTF-8", true);
+        }
+        catch (IOException e) {
+          highlighted = Escape.html(code);
+        }
+      }
+
+      return highlighted.replace("&nbsp;", " ").replace("<br />", "\n");
+    }
+
     @Override
     public String visitBold(Bold node) {
       return renderTagged("strong", node);
@@ -81,7 +125,10 @@ public class HtmlRenderer extends MarkupRenderer<String> {
 
     @Override
     public String visitCode(Code node) {
-      return renderTagged("pre", node);
+      String out = "<pre " + CSS_CLASS_ATTR + ">";
+      out += highlight(node.getText(), node.getLanguage());
+      out += "</pre>";
+      return out;
     }
 
     @Override
@@ -110,7 +157,10 @@ public class HtmlRenderer extends MarkupRenderer<String> {
 
     @Override
     public String visitInlineCode(InlineCode node) {
-      return renderTagged("code", node);
+      String out = "<code " + CSS_CLASS_ATTR + ">";
+      out += highlight(node.getText(), node.getLanguage());
+      out += "</code>";
+      return out;
     }
 
     @Override

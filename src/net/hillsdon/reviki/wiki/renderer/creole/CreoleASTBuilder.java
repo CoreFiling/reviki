@@ -156,55 +156,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Render an inline piece of code with syntax highlighting.
-   *
-   * @param code The token containing the code
-   * @param end The end marker
-   * @param language The language to use
-   * @return An inline code node with the end token stripped.
-   */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end, final String language) {
-    String code = cutOffEndTag(node, end);
-
-    try {
-      return new InlineCode(code, XhtmlRendererFactory.getRenderer(language));
-    }
-    catch (IOException e) {
-      return new InlineCode(code);
-    }
-  }
-
-  /**
-   * Render some inline code without syntax highlighting.
-   */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end) {
-    return new InlineCode(cutOffEndTag(node, end));
-  }
-
-  /**
-   * Render a block of code with syntax highlighting. See
-   * {@link #renderInlineCode}.
-   */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end, final String language) {
-    String code = node.getText();
-    code = code.substring(0, code.length() - end.length());
-
-    try {
-      return new Code(code, XhtmlRendererFactory.getRenderer(language));
-    }
-    catch (IOException e) {
-      return new Code(code);
-    }
-  }
-
-  /**
-   * Render a block of code without syntax highlighting.
-   */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end) {
-    return new Code(cutOffEndTag(node, end));
-  }
-
-  /**
    * Class to hold the context of a list item to render.
    */
   protected class ListItemContext {

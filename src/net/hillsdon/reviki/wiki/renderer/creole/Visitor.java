@@ -11,6 +11,7 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 
 /**
@@ -246,7 +247,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitPreformat(final PreformatContext ctx) {
-    return renderInlineCode(ctx.EndNoWikiInline(), "}}}");
+    return new InlineCode(cutOffEndTag(ctx.EndNoWikiInline(), "}}}"));
   }
 
   /**
@@ -255,7 +256,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecpp(final InlinecppContext ctx) {
-    return renderInlineCode(ctx.EndCppInline(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
+    return new InlineCode(cutOffEndTag(ctx.EndCppInline(), "[</c++>]"), Languages.CPLUSPLUS);
   }
 
   /**
@@ -270,19 +271,19 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
   public ASTNode visitInlinejava(final InlinejavaContext ctx) {
-    return renderInlineCode(ctx.EndJavaInline(), "[</java>]", XhtmlRendererFactory.JAVA);
+    return new InlineCode(cutOffEndTag(ctx.EndJavaInline(), "[</java>]"), Languages.JAVA);
   }
 
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
   public ASTNode visitInlinexhtml(final InlinexhtmlContext ctx) {
-    return renderInlineCode(ctx.EndXhtmlInline(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
+    return new InlineCode(cutOffEndTag(ctx.EndXhtmlInline(), "[</xhtml>]"), Languages.XHTML);
   }
 
   /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
   @Override
   public ASTNode visitInlinexml(final InlinexmlContext ctx) {
-    return renderInlineCode(ctx.EndXmlInline(), "[</xml>]", XhtmlRendererFactory.XML);
+    return new InlineCode(cutOffEndTag(ctx.EndXmlInline(), "[</xml>]"), Languages.XML);
   }
 
   /**
@@ -456,7 +457,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitNowiki(final NowikiContext ctx) {
-    return renderBlockCode(ctx.EndNoWikiBlock(), "}}}");
+    return new Code(cutOffEndTag(ctx.EndNoWikiBlock(), "}}}"));
   }
 
   /**
@@ -464,7 +465,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCpp(final CppContext ctx) {
-    return renderBlockCode(ctx.EndCppBlock(), "[</c++>]", XhtmlRendererFactory.CPLUSPLUS);
+    return new Code(cutOffEndTag(ctx.EndCppBlock(), "[</c++>]"), Languages.CPLUSPLUS);
   }
 
   /**
@@ -478,19 +479,19 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
   public ASTNode visitJava(final JavaContext ctx) {
-    return renderBlockCode(ctx.EndJavaBlock(), "[</java>]", XhtmlRendererFactory.JAVA);
+    return new Code(cutOffEndTag(ctx.EndJavaBlock(), "[</java>]"), Languages.JAVA);
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
   public ASTNode visitXhtml(final XhtmlContext ctx) {
-    return renderBlockCode(ctx.EndXhtmlBlock(), "[</xhtml>]", XhtmlRendererFactory.XHTML);
+    return new Code(cutOffEndTag(ctx.EndXhtmlBlock(), "[</xhtml]"), Languages.XHTML);
   }
 
   /** See {@link #visitCpp} and {@link #renderBlockCode}. */
   @Override
   public ASTNode visitXml(final XmlContext ctx) {
-    return renderBlockCode(ctx.EndXmlBlock(), "[</xml>]", XhtmlRendererFactory.XML);
+    return new Code(cutOffEndTag(ctx.EndXmlBlock(), "[</xml>]"), Languages.XML);
   }
 
   /**
