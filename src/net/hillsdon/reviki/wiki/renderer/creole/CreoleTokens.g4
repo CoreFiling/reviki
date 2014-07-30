@@ -29,13 +29,6 @@ options { superClass=ContextSensitiveLexer; }
   public void doList(int level) {
     seek(-1);
 
-    // If we're in a table, check that there is a linebreak before the cell end.
-    // If there isn't, assume this isn't a list.
-    if(intr && !findBefore("\n", "|")) {
-      setType(Any);
-      return;
-    }
-
     listLevel = level;
 
     resetFormatting();
