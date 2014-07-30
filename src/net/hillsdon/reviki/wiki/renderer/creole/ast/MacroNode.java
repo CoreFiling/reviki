@@ -7,12 +7,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Supplier;
 
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleASTBuilder;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MacroNode extends ASTNode implements BlockableNode<MacroNode> {
+public class MacroNode extends TextNode implements BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
@@ -25,7 +24,7 @@ public class MacroNode extends ASTNode implements BlockableNode<MacroNode> {
   private final boolean _block;
 
   public MacroNode(final String name, final String args, final CreoleASTBuilder visitor, final boolean isBlock) {
-    super(new Raw(Escape.html("<<" + name + ":" + args + ">>")));
+    super("<<" + name + ":" + args + ">>", true);
     _name = name;
     _args = args;
     _visitor = visitor;

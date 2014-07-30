@@ -6,23 +6,22 @@ import java.util.List;
 import com.google.common.base.Supplier;
 import com.uwyn.jhighlight.renderer.Renderer;
 
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class InlineCode extends ASTNode implements BlockableNode<Code> {
+public class InlineCode extends TextNode implements BlockableNode<Code> {
   private final String _contents;
 
   private final Renderer _highlighter;
 
   public InlineCode(final String contents) {
-    super(new Raw(Escape.html(contents)));
+    super(contents, true);
 
     _contents = contents;
     _highlighter = null;
   }
 
   public InlineCode(final String contents, final Renderer highlighter) throws IOException {
-    super(new Raw(highlighter.highlight("", contents, "UTF-8", true).replace("&nbsp;", " ").replace("<br />", "")));
+    super(highlighter.highlight("", contents, "UTF-8", true).replace("&nbsp;", " ").replace("<br />", ""), false);
 
     _contents = contents;
     _highlighter = highlighter;
@@ -45,5 +44,14 @@ public class InlineCode extends ASTNode implements BlockableNode<Code> {
   @Override
   public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
     return this;
+  }
+
+  @Override
+  public String getText() {
+    return _contents;
+  }
+
+  public Renderer getHighlighter() {
+    return _highlighter;
   }
 }
