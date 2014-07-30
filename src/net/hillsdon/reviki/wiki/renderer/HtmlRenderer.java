@@ -53,6 +53,11 @@ public class HtmlRenderer extends MarkupRenderer<String> {
       super("");
     }
 
+    @Override
+    protected String combine(String x1, String x2) {
+      return x1 + x2;
+    }
+
     /**
      * Render a node with a tag.
      */
@@ -67,17 +72,6 @@ public class HtmlRenderer extends MarkupRenderer<String> {
       else {
         return "<" + tag + " " + CSS_CLASS_ATTR + ">" + inner + "</" + tag + ">";
       }
-    }
-
-    @Override
-    public String visitASTNode(ASTNode node) {
-      String out = "";
-
-      for (ASTNode child : node.getChildren()) {
-        out += visit(child);
-      }
-
-      return out;
     }
 
     @Override

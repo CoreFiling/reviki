@@ -15,12 +15,22 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   /** Apply final touches (jsessionid params, etc) to URLs. */
   private URLOutputFilter _urlOutputFilter;
 
-  /** A null value for the output type. */
+  /**
+   * A null value for the output type. This is the unit of
+   * {@link #combine(T, T)}.
+   */
   private final T _nullval;
 
   public ASTRenderer(T nullval) {
     _enabledDirectives = new HashMap<String, List<String>>();
     _nullval = nullval;
+  }
+
+  /**
+   * Default constructor for cases where `null` is the null value.
+   */
+  public ASTRenderer() {
+    this(null);
   }
 
   /**
@@ -86,6 +96,20 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   }
 
   /**
+   * Default behaviour for visiting ASTNodes.
+   */
+  @Override
+  public T visitASTNode(ASTNode node) {
+    T out = _nullval;
+
+    for (ASTNode child : node.getChildren()) {
+      out = combine(out, visit(child));
+    }
+
+    return out;
+  }
+
+  /**
    * Default behaviour for visiting DirectiveNodes.
    */
   @Override
@@ -100,5 +124,20 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
     }
 
     return _nullval;
+  }
+
+  /**
+   * Combine two values. Together with {@link #nullval()}, this should form a
+   * monoid:
+   *
+   * combine(nullval(), x) = x = combine(x, nullval()).
+   *
+   * combine(a, combine(b, c)) = combine(combine(a, b), c).
+   *
+   * The default implementation returns the leftmost non-nullval() (compared
+   * with ==) value.
+   */
+  protected T combine(T x1, T x2) {
+    return (x1 == _nullval) ? x2 : x1;
   }
 }
