@@ -148,6 +148,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_renderer.getRenderer());
+    container.addComponent(_renderer.getDocbook());
     container.addComponent(_searchEngine);
     container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
     container.addComponent(FeedWriter.class, AtomFeedWriter.class);

@@ -20,9 +20,12 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequired
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +39,11 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
@@ -63,6 +71,7 @@ import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
+import net.hillsdon.reviki.web.handlers.StreamView;
 import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
@@ -71,6 +80,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.wiki.renderer.DocbookRenderer;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
@@ -81,6 +91,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -164,7 +175,10 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final CachingPageStore _store;
 
+  // TODO: Having a field for every renderer isn't good, have some sort of renderer map.
   private final HtmlRenderer _renderer;
+
+  private final DocbookRenderer _docbook;
 
   private final WikiGraph _graph;
 
@@ -176,10 +190,11 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final HtmlRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final HtmlRenderer renderer, final DocbookRenderer docbook, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _configuration = configuration;
     _store = store;
     _renderer = renderer;
+    _docbook = docbook;
     _graph = graph;
     _diffGenerator = diffGenerator;
     _wikiUrls = wikiUrls;
@@ -399,6 +414,20 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
       return new RawPageView(main);
+    }
+    else if (ViewTypeConstants.is(request,  ViewTypeConstants.CTYPE_DOCBOOK)) {
+      ASTNode ast = _docbook.render(main);
+      Document doc = _docbook.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      TransformerFactory tf = TransformerFactory.newInstance();
+      Transformer transformer = tf.newTransformer();
+      transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      StringWriter writer = new StringWriter();
+      transformer.transform(new DOMSource(doc), new StreamResult(writer));
+      String xml = writer.getBuffer().toString();
+      InputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+
+      return new StreamView("text/xml", stream);
     }
     else {
       ASTNode ast = _renderer.render(main);

@@ -58,6 +58,10 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     return _renderer;
   }
 
+  public DocbookRenderer getDocbook() {
+    return new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
+  }
+
   @Override
   public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
     return _renderer.render(page);

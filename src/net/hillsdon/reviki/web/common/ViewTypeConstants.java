@@ -30,27 +30,32 @@ public final class ViewTypeConstants {
    * Given to select a non-default view type.
    */
   public static final String PARAM_CTYPE = "ctype";
-  
+
   /**
    * Plain text.
    */
   public static final String CTYPE_TEXT = "txt";
-  
+
   /**
    * Latest published atom standard.
    */
   public static final String CTYPE_ATOM = "atom";
-  
+
   /**
    * Hmm.  A little dubious.
    */
   public static final String CTYPE_RAW = "raw";
 
+  /**
+   * Docbook XML.
+   */
+  public static final String CTYPE_DOCBOOK = "docbook";
+
   public static boolean is(final HttpServletRequest request, final String type) {
     return type != null && type.equals(request.getParameter(PARAM_CTYPE));
   }
-  
+
   private ViewTypeConstants() {
   }
-  
+
 }
