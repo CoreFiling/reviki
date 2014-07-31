@@ -56,6 +56,13 @@ public final class ViewTypeConstants {
    */
   public static final String CTYPE_DOCBOOK = "docbook";
 
+  /**
+   * List of ctypes available to regular page views.
+   *
+   * This is used to generate the drop-down list.
+   */
+  public static final String[] CTYPES = { CTYPE_DEFAULT, CTYPE_DOCBOOK, CTYPE_RAW };
+
   public static boolean is(final HttpServletRequest request, final String type) {
     return type != null && type.equals(request.getParameter(PARAM_CTYPE));
   }
