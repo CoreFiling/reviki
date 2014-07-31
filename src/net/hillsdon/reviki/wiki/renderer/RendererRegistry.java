@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 
 /**
@@ -13,49 +12,37 @@ import net.hillsdon.reviki.wiki.MarkupRenderer;
  * @author msw
  */
 public class RendererRegistry {
-  /** Renderers which can put content directly into a HTMl page. */
-  private final Map<String, MarkupRenderer<String>> _pageOutputRenderers;
+  /** The default (HTML) renderer. */
+  private final HtmlRenderer _default;
 
   /** Renderers which produce a stream of output. */
-  private final Map<String, MarkupRenderer<InputStream>> _streamOutputRenderers;
+  private final Map<String, MarkupRenderer<InputStream>> _renderers;
 
   /**
-   * @param html The default renderer.
+   * @param html The default HTML renderer.
    */
   public RendererRegistry(final HtmlRenderer html) {
-    _pageOutputRenderers = new HashMap<String, MarkupRenderer<String>>();
-    _streamOutputRenderers = new HashMap<String, MarkupRenderer<InputStream>>();
-
-    addPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT, html);
+    _default = html;
+    _renderers = new HashMap<String, MarkupRenderer<InputStream>>();
   }
 
-  /** Add a new string renderer. */
-  public void addPageOutputRenderer(final String ctype, final MarkupRenderer<String> renderer) {
-    _pageOutputRenderers.put(ctype, renderer);
+  /** Return the default (HTML) renderer. */
+  public HtmlRenderer getDefaultRenderer() {
+    return _default;
   }
 
   /** Add a new stream renderer. */
-  public void addStreamOutputRenderer(final String ctype, final MarkupRenderer<InputStream> renderer) {
-    _streamOutputRenderers.put(ctype, renderer);
-  }
-
-  /** Check if we have a string renderer for the desired ctype. */
-  public boolean hasPageOutputRenderer(final String ctype) {
-    return _pageOutputRenderers.containsKey(ctype);
+  public void addRenderer(final String ctype, final MarkupRenderer<InputStream> renderer) {
+    _renderers.put(ctype, renderer);
   }
 
   /** Check if we have a stream renderer for the desired ctype. */
-  public boolean hasStreamOutputRenderer(final String ctype) {
-    return _streamOutputRenderers.containsKey(ctype);
-  }
-
-  /** Get the string renderer for this ctype. */
-  public MarkupRenderer<String> getPageOutputRenderer(final String ctype) {
-    return _pageOutputRenderers.get(ctype);
+  public boolean hasRenderer(final String ctype) {
+    return _renderers.containsKey(ctype);
   }
 
   /** Get the stream renderer for this ctype. */
-  public MarkupRenderer<InputStream> getStreamOutputRenderer(final String ctype) {
-    return _streamOutputRenderers.get(ctype);
+  public MarkupRenderer<InputStream> getRenderer(final String ctype) {
+    return _renderers.get(ctype);
   }
 }

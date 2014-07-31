@@ -1,7 +1,10 @@
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -17,7 +20,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
-public class WrappedXMLRenderer extends MarkupRenderer<String> {
+public class WrappedXMLRenderer extends MarkupRenderer<InputStream> {
   /** The wrapped renderer. */
   private final MarkupRenderer<Document> _renderer;
 
@@ -34,7 +37,8 @@ public class WrappedXMLRenderer extends MarkupRenderer<String> {
   }
 
   @Override
-  public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    String out;
     try {
       Document doc = _renderer.build(ast, urlOutputFilter);
       TransformerFactory tf = TransformerFactory.newInstance();
@@ -43,11 +47,13 @@ public class WrappedXMLRenderer extends MarkupRenderer<String> {
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       StringWriter writer = new StringWriter();
       transformer.transform(new DOMSource(doc), new StreamResult(writer));
-      return writer.getBuffer().toString();
+      out = writer.getBuffer().toString();
     }
     catch (Exception e) {
-      return "error: " + e;
+      out = "error: " + e;
     }
+
+    return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override

@@ -34,7 +34,6 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
-import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
@@ -81,7 +80,7 @@ public class WikiHandlerImpl implements WikiHandler {
 
   public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls, Configuration configuration) {
     _cachingPageStore = cachingPageStore;
-    _renderer = renderer.getRenderers().getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    _renderer = renderer;
     _internalLinker = internalLinker;
     _syncUpdater = syncUpdater;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;

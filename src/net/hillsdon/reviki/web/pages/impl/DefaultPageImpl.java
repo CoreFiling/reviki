@@ -72,7 +72,6 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
@@ -166,8 +165,6 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final CachingPageStore _store;
 
-  private final HtmlRenderer _renderer;
-
   private final RendererRegistry _renderers;
 
   private final WikiGraph _graph;
@@ -188,15 +185,6 @@ public class DefaultPageImpl implements DefaultPage {
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
     _renderers = renderers;
-
-    // Get a direct reference to the default renderer, for convenience.
-    if(renderers == null) {
-      // Some tests don't use the renderer, so cater for that use-case.
-      _renderer = null;
-    }
-    else {
-      _renderer = (HtmlRenderer) renderers.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
-    }
   }
 
   public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -379,8 +367,8 @@ public class DefaultPageImpl implements DefaultPage {
             }
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ASTNode ast = _renderer.render(pageInfo);
-          String rendered = _renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+          ASTNode ast = _renderers.getDefaultRenderer().render(pageInfo);
+          String rendered = _renderers.getDefaultRenderer().build(ast, new ResponseSessionURLOutputFilter(request, response));
           request.setAttribute(ATTR_PREVIEW, rendered);
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
@@ -413,20 +401,15 @@ public class DefaultPageImpl implements DefaultPage {
       }
       return new JspView("ViewDiff");
     }
-    else if (_renderers.hasStreamOutputRenderer(ctypeParam)) {
-      MarkupRenderer<InputStream> renderer = _renderers.getStreamOutputRenderer(ctypeParam);
+    else if (_renderers.hasRenderer(ctypeParam)) {
+      MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctypeParam);
       ASTNode ast = renderer.render(main);
       InputStream stream = renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
       return new StreamView(renderer.getContentType(), stream);
     }
     else {
-      MarkupRenderer<String> renderer = _renderer;
-      if (_renderers.hasPageOutputRenderer(ctypeParam)) {
-        renderer = _renderers.getPageOutputRenderer(ctypeParam);
-      }
-
-      ASTNode ast = renderer.render(main);
-      String rendered = renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      ASTNode ast = _renderers.getDefaultRenderer().render(main);
+      String rendered = _renderers.getDefaultRenderer().build(ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       return new JspView("ViewPage");
     }

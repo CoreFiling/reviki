@@ -44,8 +44,8 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     RawRenderer raw = new RawRenderer();
 
     _registry = new RendererRegistry(html);
-    _registry.addStreamOutputRenderer(ViewTypeConstants.CTYPE_DOCBOOK, new WrappedStreamRenderer(new WrappedXMLRenderer(docbook)));
-    _registry.addStreamOutputRenderer(ViewTypeConstants.CTYPE_RAW, new WrappedStreamRenderer(raw));
+    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCBOOK, new WrappedXMLRenderer(docbook));
+    _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, new WrappedStreamRenderer(raw));
   }
 
   /**
@@ -57,13 +57,13 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
 
   @Override
   public ASTNode render(PageInfo page) throws IOException, PageStoreException {
-    MarkupRenderer<String> renderer = _registry.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
     return renderer.render(page);
   }
 
   @Override
   public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
-    MarkupRenderer<String> renderer = _registry.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
     return renderer.build(ast, urlOutputFilter);
   }
 }
