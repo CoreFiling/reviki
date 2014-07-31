@@ -38,6 +38,7 @@ import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
@@ -87,6 +88,34 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     };
 
     _registry.addStreamOutputRenderer(ViewTypeConstants.CTYPE_DOCBOOK, docbook);
+
+    MarkupRenderer<InputStream> raw = new MarkupRenderer<InputStream>() {
+      private PageInfo _page;
+
+      @Override
+      public ASTNode render(final PageInfo page) {
+        _page = page;
+        return CreoleRenderer.render(pageStore, page, linkHandler, imageHandler, macros);
+      }
+
+      @Override
+      public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return new ByteArrayInputStream(_page.getContent().getBytes(StandardCharsets.UTF_8));
+      }
+
+      @Override
+      public String getContentType() {
+        // This is a cludge. We should represent 'special' pages better.
+        if (_page.getPath().equals("ConfigCss")) {
+          return "text/css";
+        }
+        else {
+          return "text/plain";
+        }
+      }
+    };
+
+    _registry.addStreamOutputRenderer(ViewTypeConstants.CTYPE_RAW, raw);
   }
 
   /**

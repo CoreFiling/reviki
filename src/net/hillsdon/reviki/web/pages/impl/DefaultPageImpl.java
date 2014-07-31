@@ -64,7 +64,6 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.handlers.StreamView;
-import net.hillsdon.reviki.web.handlers.RawPageView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
@@ -413,9 +412,6 @@ public class DefaultPageImpl implements DefaultPage {
         request.setAttribute("flash", "Note this diff is reversed.");
       }
       return new JspView("ViewDiff");
-    }
-    else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
-      return new RawPageView(main);
     }
     else if (_renderers.hasStreamOutputRenderer(ctypeParam)) {
       MarkupRenderer<InputStream> renderer = _renderers.getStreamOutputRenderer(ctypeParam);
