@@ -85,9 +85,9 @@ public class DocbookRenderer extends MarkupRenderer<Document> {
       Element article = _document.createElement("article");
 
       article.setAttribute("xmlns", "http://docbook.org/ns/docbook");
-      article.setAttributeNS("xmlns", "xl", "http://www.w3.org/1999/xlink");
+      article.setAttribute("xmlns:xl", "http://www.w3.org/1999/xlink");
       article.setAttribute("version", "5.0");
-      article.setAttributeNS("xml", "lang", "en");
+      article.setAttribute("xml:lang", "en");
 
       // Render the contents
       Element section = null;
@@ -268,13 +268,13 @@ public class DocbookRenderer extends MarkupRenderer<Document> {
 
       try {
         uri = handler.handle(page, parts, urlOutputFilter());
-        out.setAttributeNS("xl", "href", uri);
+        out.setAttribute("xl:href", uri);
         out.appendChild(_document.createTextNode(title));
       }
       catch (Exception e) {
         // Treat mailto links specially.
         if (target.startsWith("mailto:")) {
-          out.setAttributeNS("xl", "href", target);
+          out.setAttribute("xl:href", target);
           out.appendChild(_document.createTextNode(title));
         }
         else {
