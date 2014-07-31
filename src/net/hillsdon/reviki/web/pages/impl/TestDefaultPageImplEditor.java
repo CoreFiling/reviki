@@ -8,7 +8,6 @@ import static org.easymock.EasyMock.eq;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +29,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
 import org.easymock.EasyMock;
@@ -50,6 +50,7 @@ public class TestDefaultPageImplEditor extends TestCase {
   private CachingPageStore _store;
   private PageStore _pageStore;
   private HtmlRenderer _renderer;
+  private RendererRegistry _renderers;
   private WikiGraph _graph;
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
@@ -67,11 +68,12 @@ public class TestDefaultPageImplEditor extends TestCase {
     _pageStore = createMock(PageStore.class);
     _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
     _renderer = new HtmlRenderer(_pageStore, null, null, null);
+    _renderers = new RendererRegistry(_renderer);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
   }
 

@@ -34,6 +34,7 @@ import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
 import net.hillsdon.reviki.web.dispatching.WikiHandler;
 import net.hillsdon.reviki.web.handlers.PageHandler;
@@ -43,6 +44,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
@@ -67,7 +69,7 @@ public class WikiHandlerImpl implements WikiHandler {
   public static final String ATTRIBUTE_WIKI_IS_VALID = "wikiIsValid";
 
   private final RequestLifecycleAwareManager _requestLifecycleAwareManager;
-  private final SvnWikiRenderer _renderer;
+  private final MarkupRenderer<String> _renderer;
   private final CachingPageStore _cachingPageStore;
   private final InternalLinker _internalLinker;
   private final ChangeNotificationDispatcher _syncUpdater;
@@ -79,7 +81,7 @@ public class WikiHandlerImpl implements WikiHandler {
 
   public WikiHandlerImpl(CachingPageStore cachingPageStore, SvnWikiRenderer renderer, InternalLinker internalLinker, ChangeNotificationDispatcher syncUpdater, RequestLifecycleAwareManager requestLifecycleAwareManager, ResourceHandler resources, PageHandler handler, WikiUrls wikiUrls, Configuration configuration) {
     _cachingPageStore = cachingPageStore;
-    _renderer = renderer;
+    _renderer = renderer.getRenderers().getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
     _internalLinker = internalLinker;
     _syncUpdater = syncUpdater;
     _requestLifecycleAwareManager = requestLifecycleAwareManager;

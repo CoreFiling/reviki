@@ -43,8 +43,14 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     renderer = new HtmlVisitor();
   }
 
+  @Override
   public ASTNode render(final PageInfo page) {
     return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
+  }
+
+  @Override
+  public String getContentType() {
+    return "text/html";
   }
 
   private final class HtmlVisitor extends ASTRenderer<String> {

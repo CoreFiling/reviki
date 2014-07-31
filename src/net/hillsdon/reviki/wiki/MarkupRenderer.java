@@ -84,4 +84,11 @@ public abstract class MarkupRenderer<T> {
     renderer.setUrlOutputFilter(urlOutputFilter);
     return renderer.visit(ast);
   }
+
+  /**
+   * Return the MIME type of the generated output.
+   */
+  public String getContentType() {
+    return "application/octet-stream";
+  }
 }

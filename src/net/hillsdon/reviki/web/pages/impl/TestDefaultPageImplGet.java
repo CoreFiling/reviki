@@ -47,6 +47,7 @@ import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
 import org.easymock.EasyMock;
@@ -65,6 +66,7 @@ public class TestDefaultPageImplGet extends TestCase {
 
   private CachingPageStore _store;
   private HtmlRenderer _renderer;
+  private RendererRegistry _renderers;
   private WikiGraph _graph;
   private MockHttpServletRequest _request;
   private HttpServletResponse _response;
@@ -80,11 +82,12 @@ public class TestDefaultPageImplGet extends TestCase {
     _response = null;
     _store = createMock(CachingPageStore.class);
     _renderer = new HtmlRenderer(_store, null, null, null);
+    _renderers = new RendererRegistry(_renderer);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
   }
 
   /**

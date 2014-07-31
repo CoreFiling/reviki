@@ -15,60 +15,96 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 public class SvnWikiRenderer extends MarkupRenderer<String> {
-  private final Configuration configuration;
-  private final InternalLinker internalLinker;
-  private final SvnWikiLinkPartHandler linkHandler;
-  private final SvnWikiLinkPartHandler imageHandler;
-  private final Supplier<List<Macro>> macros;
-  private final PageStore pageStore;
-  private final HtmlRenderer _renderer;
+  private final RendererRegistry _registry;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
-    this.configuration = configuration;
-    this.internalLinker = internalLinker;
-    this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
-    this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
-    this.macros = macros;
-    this.pageStore = pageStore;
+    final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
+    final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
-    _renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    _registry = new RendererRegistry(new HtmlRenderer(pageStore, linkHandler, imageHandler, macros));
+
+    MarkupRenderer<InputStream> docbook = new MarkupRenderer<InputStream>() {
+      private final DocbookRenderer _renderer = new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
+
+      @Override
+      public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.render(page);
+      }
+
+      @Override
+      public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        try {
+          Document doc = _renderer.build(ast, urlOutputFilter);
+          TransformerFactory tf = TransformerFactory.newInstance();
+          Transformer transformer = tf.newTransformer();
+          transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+          transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+          StringWriter writer = new StringWriter();
+          transformer.transform(new DOMSource(doc), new StreamResult(writer));
+          String xml = writer.getBuffer().toString();
+          return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        }
+        catch (Exception e) {
+          String error = "error: " + e;
+          return new ByteArrayInputStream(error.getBytes(StandardCharsets.UTF_8));
+        }
+      }
+
+      @Override
+      public String getContentType() {
+        return "text/xml";
+      }
+    };
+
+    _registry.addStreamOutputRenderer(ViewTypeConstants.CTYPE_DOCBOOK, docbook);
   }
 
   /**
-   * Return the inner renderer.
+   * Return a source of renderers.
    */
-  public HtmlRenderer getRenderer() {
-    return _renderer;
-  }
-
-  public DocbookRenderer getDocbook() {
-    return new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
+  public RendererRegistry getRenderers() {
+    return _registry;
   }
 
   @Override
-  public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
-    return _renderer.render(page);
+  public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+    MarkupRenderer<String> renderer = _registry.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    return renderer.render(page);
   }
 
   @Override
   public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
-    return _renderer.build(ast, urlOutputFilter);
+    MarkupRenderer<String> renderer = _registry.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    return renderer.build(ast, urlOutputFilter);
   }
 }

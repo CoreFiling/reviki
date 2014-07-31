@@ -20,12 +20,9 @@ import static net.hillsdon.reviki.web.common.RequestParameterReaders.getRequired
 import static net.hillsdon.reviki.web.common.RequestParameterReaders.getString;
 import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_ATOM;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,11 +36,6 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
@@ -78,10 +70,11 @@ import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.DocbookRenderer;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
@@ -91,7 +84,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -175,10 +167,9 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final CachingPageStore _store;
 
-  // TODO: Having a field for every renderer isn't good, have some sort of renderer map.
   private final HtmlRenderer _renderer;
 
-  private final DocbookRenderer _docbook;
+  private final RendererRegistry _renderers;
 
   private final WikiGraph _graph;
 
@@ -190,15 +181,23 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final HtmlRenderer renderer, final DocbookRenderer docbook, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _configuration = configuration;
     _store = store;
-    _renderer = renderer;
-    _docbook = docbook;
     _graph = graph;
     _diffGenerator = diffGenerator;
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
+    _renderers = renderers;
+
+    // Get a direct reference to the default renderer, for convenience.
+    if(renderers == null) {
+      // Some tests don't use the renderer, so cater for that use-case.
+      _renderer = null;
+    }
+    else {
+      _renderer = (HtmlRenderer) renderers.getPageOutputRenderer(ViewTypeConstants.CTYPE_DEFAULT);
+    }
   }
 
   public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -242,7 +241,8 @@ public class DefaultPageImpl implements DefaultPage {
       else {
         InputStream in = file.getInputStream();
         try {
-          // get the page from store - needed to get content of the special pages which were not saved yet
+          // get the page from store - needed to get content of the special
+          // pages which were not saved yet
           PageInfo pageInfo = _store.get(page, -1);
           // IE sends the full file path.
           storeAttachment(pageInfo, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
@@ -277,7 +277,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (storeName.indexOf('.') == -1) {
       final int indexOfDotInFileName = fileName.indexOf('.');
-      if(indexOfDotInFileName!=-1) {
+      if (indexOfDotInFileName != -1) {
         storeName += fileName.substring(indexOfDotInFileName);
       }
     }
@@ -319,7 +319,7 @@ public class DefaultPageImpl implements DefaultPage {
     Collection<AttachmentHistory> allAttachments = _store.attachments(page);
     Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
     Collection<AttachmentHistory> deletedAttachments = new LinkedList<AttachmentHistory>();
-    for (AttachmentHistory history: allAttachments) {
+    for (AttachmentHistory history : allAttachments) {
       if (history.isAttachmentDeleted()) {
         deletedAttachments.add(history);
       }
@@ -397,6 +397,8 @@ public class DefaultPageImpl implements DefaultPage {
   public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String revisionParam = request.getParameter(PARAM_REVISION);
     final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
+    final String ctypeParam = request.getParameter(ViewTypeConstants.PARAM_CTYPE);
+
     addBacklinksInformation(request, page);
     final VersionedPageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
     request.setAttribute(ATTR_PAGE_INFO, main);
@@ -415,23 +417,20 @@ public class DefaultPageImpl implements DefaultPage {
     else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
       return new RawPageView(main);
     }
-    else if (ViewTypeConstants.is(request,  ViewTypeConstants.CTYPE_DOCBOOK)) {
-      ASTNode ast = _docbook.render(main);
-      Document doc = _docbook.build(ast, new ResponseSessionURLOutputFilter(request, response));
-      TransformerFactory tf = TransformerFactory.newInstance();
-      Transformer transformer = tf.newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      StringWriter writer = new StringWriter();
-      transformer.transform(new DOMSource(doc), new StreamResult(writer));
-      String xml = writer.getBuffer().toString();
-      InputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-
-      return new StreamView("text/xml", stream);
+    else if (_renderers.hasStreamOutputRenderer(ctypeParam)) {
+      MarkupRenderer<InputStream> renderer = _renderers.getStreamOutputRenderer(ctypeParam);
+      ASTNode ast = renderer.render(main);
+      InputStream stream = renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      return new StreamView(renderer.getContentType(), stream);
     }
     else {
-      ASTNode ast = _renderer.render(main);
-      String rendered = _renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      MarkupRenderer<String> renderer = _renderer;
+      if (_renderers.hasPageOutputRenderer(ctypeParam)) {
+        renderer = _renderers.getPageOutputRenderer(ctypeParam);
+      }
+
+      ASTNode ast = renderer.render(main);
+      String rendered = renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       return new JspView("ViewPage");
     }
@@ -609,7 +608,7 @@ public class DefaultPageImpl implements DefaultPage {
     String attrPart = null;
     String valuePart = null;
     Map<String, String> attributes = new LinkedHashMap<String, String>();
-    for(String line: lines){
+    for (String line : lines) {
       line = line.trim();
       matcher = pattern.matcher(line);
       if (matcher.find()) {
@@ -620,7 +619,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     String originalAttributesString = getRequiredString(request, PARAM_ORIGINAL_ATTRIBUTES).trim();
     String[] originalAttrs = originalAttributesString.split("\n");
-    for(String attr: originalAttrs) {
+    for (String attr : originalAttrs) {
       attr = attr.trim();
       if (attr.length() > 0 && !attributes.containsKey(attr)) {
         attributes.put(attr, null);
@@ -642,7 +641,6 @@ public class DefaultPageImpl implements DefaultPage {
     else if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    
 
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName());
   }
@@ -654,6 +652,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   /**
    * Gets the PageInfo from a diff or rev parameter. I.e. "1234" or "PageName.1234"
+   *
    * @param defaultPage The page (used when the parameter does not override the page).
    * @param revisionText The parameter value.
    * @param paramName The name of the parameter for error messages.

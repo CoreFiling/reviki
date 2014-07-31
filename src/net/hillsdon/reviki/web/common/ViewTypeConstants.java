@@ -32,6 +32,11 @@ public final class ViewTypeConstants {
   public static final String PARAM_CTYPE = "ctype";
 
   /**
+   * The default view.
+   */
+  public static final String CTYPE_DEFAULT = "default";
+
+  /**
    * Plain text.
    */
   public static final String CTYPE_TEXT = "txt";
