@@ -31,6 +31,14 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
  */
 public abstract class MarkupRenderer<T> {
   /**
+   * This directive controls the vertical alignment of table cells. It takes a
+   * single parameter, of ehich acceptable values are "top", "middle", and
+   * "bottom". If unspecified or disabled, the default vertical alignment, which
+   * may be output format dependent, will be used.
+   */
+  public static final String TABLE_ALIGNMENT_DIRECTIVE = "table-alignment";
+
+  /**
    * Useful for testing.
    */
   public static final MarkupRenderer<ASTNode> AS_IS = new MarkupRenderer<ASTNode>() {

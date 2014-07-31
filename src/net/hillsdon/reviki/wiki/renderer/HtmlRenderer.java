@@ -48,11 +48,6 @@ public class HtmlRenderer extends MarkupRenderer<String> {
   }
 
   private final class HtmlVisitor extends ASTRenderer<String> {
-    /**
-     * This directive controls the vertical alignment of table cells.
-     */
-    private static final String TABLE_ALIGNMENT_DIRECTIVE = "table-alignment";
-
     public HtmlVisitor() {
       super("");
     }
