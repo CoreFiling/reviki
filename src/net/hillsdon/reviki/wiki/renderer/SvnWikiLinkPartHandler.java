@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.hillsdon.fij.text.Escape;
