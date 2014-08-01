@@ -2,6 +2,7 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,9 +10,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 import net.hillsdon.reviki.vc.PageInfo;
@@ -27,9 +25,9 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   /** Posible output types. */
   public static enum FoOutput {
     XSLFO("-foout", "text/xml; charset=utf-8"),
-    RTF("-rtf", "text/rtf; charset=utf-8"),
-    PDF("-pdf", "application/pdf"),
-    PS("-ps", "application/postscript");
+    RTF  ("-rtf",   "text/rtf; charset=utf-8"),
+    PDF  ("-pdf",   "application/pdf"),
+    PS   ("-ps",    "application/postscript");
 
     public final String arg;
 
@@ -47,27 +45,44 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   /** The selected output format. */
   private final FoOutput _format;
 
-  /** Path to the fop script. */
-  private static final String FOP_PATH = "/home/local/msw/fop-1.1/fop";
+  /** The path to the Java executable. */
+  private static final String JAVA_PATH = System.getProperty("java.home") + "/bin/java";
 
-  /** Path to the docbook xsl file. */
-  private static final String XSL_PATH = "/home/local/msw/Downloads/docbook/fo/docbook.xsl";
+  /** The directory where FOP lives. */
+  private static File FOP_DIR = null;
 
-  /** The length of the last generated output. */
-  private Optional<Integer> _length;
+  /** Relative path to the fop jar. */
+  private static final String FOP_JAR = "fop.jar";
 
-  public XSLFORenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros, FoOutput format) {
+  /** Path to dependencies of fop. */
+  private static final String FOP_CLASSPATH = ".";
+
+  /** Relative path to the docbook xsl file. */
+  private static final String XSL_PATH = "../docbook/fo/docbook.xsl";
+
+  public XSLFORenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros, FoOutput format) throws IOException {
     this(new DocbookRenderer(pageStore, linkHandler, imageHandler, macros), format);
   }
 
-  public XSLFORenderer(DocbookRenderer docbook) {
+  public XSLFORenderer(DocbookRenderer docbook) throws IOException {
     this(docbook, FoOutput.XSLFO);
   }
 
-  public XSLFORenderer(DocbookRenderer docbook, FoOutput format) {
+  public XSLFORenderer(DocbookRenderer docbook, FoOutput format) throws IOException {
     _docbook = new WrappedXMLRenderer(docbook);
     _format = format;
-    _length = Optional.<Integer> absent();
+
+    // We find the path to fop by working relatively from the path to the jar:
+    // we can get that by asking the class loaded for the location of this
+    // class, and then trimming off the extra stuff. Then we know that
+    // xslfo/fop is in the same directory as the jar.
+    //
+    // This assumes the war has been exploded.
+    if (FOP_DIR == null) {
+      String clazz = getClass().getResource("XSLFORenderer.class").toString();
+      String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
+      FOP_DIR = new File(workingdir + "xslfo/fop");
+    }
   }
 
   @Override
@@ -80,7 +95,13 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
     String docbook = _docbook.buildString(ast, urlOutputFilter);
 
     try {
-      ProcessBuilder builder = new ProcessBuilder(FOP_PATH, "-xml", "-", "-xsl", XSL_PATH, _format.arg, "-");
+      ProcessBuilder builder = new ProcessBuilder(
+          JAVA_PATH, "-cp", FOP_CLASSPATH, "-jar", FOP_JAR,
+          "-xml", "-",       // read xml from stdin.
+          "-xsl", XSL_PATH,  // use this xsl file for transformation.
+          _format.arg, "-"); // dump the result, in the requested format, to stdout.
+
+      builder.directory(FOP_DIR);
       Process process = builder.start();
 
       InputStream stdout = process.getInputStream();
@@ -93,10 +114,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       writer.close();
 
       // Read response from stdout
-      byte[] result = IOUtils.toByteArray(stdout);
-      _length = Optional.of(new Integer(result.length));
-      System.out.println(_length);
-      return new ByteArrayInputStream(result);
+      return stdout;
     }
     catch (Exception e) {
       return new ByteArrayInputStream(("error " + e).getBytes(StandardCharsets.UTF_8));
