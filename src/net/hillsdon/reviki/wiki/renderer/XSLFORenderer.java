@@ -40,7 +40,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   };
 
   /** The underlying docbook renderer. */
-  private final WrappedXMLRenderer _docbook;
+  private final DocbookRenderer _docbook;
 
   /** The selected output format. */
   private final FoOutput _format;
@@ -69,7 +69,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   }
 
   public XSLFORenderer(DocbookRenderer docbook, FoOutput format) throws IOException {
-    _docbook = new WrappedXMLRenderer(docbook);
+    _docbook = docbook;
     _format = format;
 
     // We find the path to fop by working relatively from the path to the jar:
