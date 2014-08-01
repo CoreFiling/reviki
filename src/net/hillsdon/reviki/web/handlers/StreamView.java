@@ -45,6 +45,6 @@ public class StreamView implements View {
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     response.setContentType(_mimeType);
-    IOUtils.copy(_contents, response.getWriter());
+    IOUtils.copy(_contents, response.getOutputStream());
   }
 }
