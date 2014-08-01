@@ -42,8 +42,16 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
     DocbookRenderer docbook = new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
     RawRenderer raw = new RawRenderer();
+    XSLFORenderer xslfo = new XSLFORenderer(docbook);
+    XSLFORenderer rtf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.RTF);
+    XSLFORenderer pdf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PDF);
+    XSLFORenderer ps = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PS);
 
     _registry = new RendererRegistry(html);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_PDF, pdf);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_PS, ps);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_XSLFO, xslfo);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_RTF, rtf);
     _registry.addRenderer(ViewTypeConstants.CTYPE_DOCBOOK, new WrappedXMLRenderer(docbook));
     _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, new WrappedStreamRenderer(raw));
   }
