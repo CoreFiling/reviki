@@ -50,7 +50,7 @@ public class HtmlRenderer extends MarkupRenderer<String> {
 
   @Override
   public String getContentType() {
-    return "text/html";
+    return "text/html; charset=utf-8";
   }
 
   private final class HtmlVisitor extends ASTRenderer<String> {
