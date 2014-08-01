@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -121,39 +122,66 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     @Override
     public List<Node> visitPage(Page node) {
       Element article = _document.createElement("article");
-
       article.setAttribute("xmlns", "http://docbook.org/ns/docbook");
       article.setAttribute("xmlns:xl", "http://www.w3.org/1999/xlink");
       article.setAttribute("version", "5.0");
       article.setAttribute("xml:lang", "en");
 
-      // Render the contents
-      Element section = null;
+      // Stack of sections and subsections. Head of stack is what we're
+      // currently rendering to.
+      Stack<Element> sections = new Stack<Element>();
+
+      // Stack of heading levels. Head of stack is the last heading we saw.
+      // Seeing a smaller heading results in a new subsection being created,
+      // seeing a larger heading results in sections being popped and saved to
+      // the document/parent sections.
+      //
+      // Invariant: sections.size() == levels.size()
+      //
+      // There may be one more section than heading because the document might
+      // not start off with a heading.
+      Stack<Integer> levels = new Stack<Integer>();
+
       for (ASTNode child : node.getChildren()) {
-        // Upon hitting a heading, the section is committed to the document and
-        // a new section begun.
+        // Upon hitting a heading, we need to start a new section.
         if (child instanceof Heading) {
-          // The null section (and this check) is so that if the document starts
-          // with a title, we don't commit an empty section.
-          if (section != null) {
-            article.appendChild(section);
+          // If there are sections around at the moment, we may need to
+          // rearrange the document: we compare with the current heading:
+          // popping things off the stack and merging them into their parent
+          // sections if it's bigger.
+          Integer hdr = new Integer(((Heading) child).getLevel());
+
+          while (!levels.isEmpty() && levels.peek() >= hdr) {
+            Element sect = sections.pop();
+            levels.pop();
+
+            Element parent = sections.isEmpty() ? article : sections.peek();
+            parent.appendChild(sect);
           }
 
-          section = _document.createElement("section");
+          // Then we finally make a new section.
+          sections.push(_document.createElement("section"));
+          levels.push(hdr);
         }
 
-        // But after the initial check, we definitely need a section.
-        if (section == null) {
-          section = _document.createElement("section");
+        // The document might not start off with a heading, in which case we
+        // pretend there was a level 1 heading.
+        if (sections.empty()) {
+          sections.push(_document.createElement("section"));
+          levels.push(new Integer(1));
         }
 
+        // Add everything to the current section.
         for (Node sibling : visit(child)) {
-          section.appendChild(sibling);
+          sections.peek().appendChild(sibling);
         }
       }
 
-      if (section != null) {
-        article.appendChild(section);
+      // Save the last subsection stack.
+      while (!sections.isEmpty()) {
+        Element sect = sections.pop();
+        Element parent = sections.isEmpty() ? article : sections.peek();
+        parent.appendChild(sect);
       }
 
       // And we're done.
