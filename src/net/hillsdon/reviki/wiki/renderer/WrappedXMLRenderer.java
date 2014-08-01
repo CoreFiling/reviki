@@ -38,6 +38,11 @@ public class WrappedXMLRenderer extends MarkupRenderer<InputStream> {
 
   @Override
   public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    String out = buildString(ast, urlOutputFilter);
+    return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
+  }
+
+  public String buildString(ASTNode ast, URLOutputFilter urlOutputFilter) {
     String out;
     try {
       Document doc = _renderer.build(ast, urlOutputFilter);
@@ -53,11 +58,11 @@ public class WrappedXMLRenderer extends MarkupRenderer<InputStream> {
       out = "error: " + e;
     }
 
-    return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
+    return out;
   }
 
   @Override
   public String getContentType() {
-    return "text/xml";
+    return "text/xml; charset=utf-8";
   }
 }
