@@ -68,8 +68,5 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/vnu.jar"/>
 	<classpathentry kind="lib" path="lib/antlr4.jar"/>
-	<classpathentry kind="lib" path="lib/poi-ooxml-3.10-FINAL-20140208.jar"/>
-	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
-	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
