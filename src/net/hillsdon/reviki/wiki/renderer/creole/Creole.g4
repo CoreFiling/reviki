@@ -83,8 +83,8 @@ hrule      : Rule ;
 table      : (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? ;
 trow       : tcell+ ;
 tcell      : th | td ;
-th         : ThStart inTable? ;
-td         : TdStart inTable? ;
+th         : ThStart inTable+ ;
+td         : TdStart inTable+ ;
 
 inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 

@@ -238,7 +238,7 @@ fragment DIGIT : ('0'..'9') ;
 
 // 'START' matches something which is start-of-line-like. Currently that's upon
 // entering a list item or table cell
-fragment START : {start}? | {intr && (prior() == '|' || prior() == '=')}? | LINE ;
+fragment START : {start}? | {intr && (priorNonWS() == '|' || priorNonWS() == '=')}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 
 /* ***** Contextual stuff ***** */

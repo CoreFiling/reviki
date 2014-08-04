@@ -224,8 +224,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTitlelink(final TitlelinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Link(target, title, page(), urlOutputFilter(), linkHandler());
   }
 
@@ -234,8 +234,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitImglink(final ImglinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Image(target, title, page(), urlOutputFilter(), imageHandler());
   }
 
@@ -536,8 +536,12 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTh(final ThContext ctx) {
-    ASTNode inner = (ctx.inTable() != null) ? visit(ctx.inTable()) : null;
-    return new TableHeaderCell((inner != null) ? inner : new Plaintext(""));
+    List<ASTNode> inner = new ArrayList<ASTNode>();
+    for (InTableContext itx : ctx.inTable()) {
+      inner.add(visit(itx));
+    }
+
+    return new TableHeaderCell(inner);
   }
 
   /**
@@ -545,8 +549,12 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTd(final TdContext ctx) {
-    ASTNode inner = (ctx.inTable() != null) ? visit(ctx.inTable()) : null;
-    return new TableCell((inner != null) ? inner : new Plaintext(""));
+    List<ASTNode> inner = new ArrayList<ASTNode>();
+    for (InTableContext itx : ctx.inTable()) {
+      inner.add(visit(itx));
+    }
+
+    return new TableCell(inner);
   }
 
   /**
