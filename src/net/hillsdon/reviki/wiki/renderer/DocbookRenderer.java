@@ -354,9 +354,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
           }
 
           System.err.println("Failed to insert link " + linkText);
-          e.printStackTrace();
-          throw new RuntimeException(e);
-          // return singleton(_document.createTextNode(linkText));
+          return singleton(_document.createTextNode(linkText));
         }
       }
 
