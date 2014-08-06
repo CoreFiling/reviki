@@ -30,6 +30,13 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+/**
+ * Render a docx file. The output is all styled with Styles (with the exception
+ * of runs of bold, italic, or strikethrough text) to enable easy editing of the
+ * resultant document.
+ *
+ * @author msw
+ */
 public class DocxRenderer extends MarkupRenderer<InputStream> {
 
   private final PageStore _pageStore;
@@ -40,7 +47,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
   private final Supplier<List<Macro>> _macros;
 
-  public DocxRenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros) {
+  public DocxRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
@@ -50,7 +57,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
   }
 
   @Override
-  public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+  public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
     return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
   }
 
@@ -98,15 +105,15 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     private static final String HYPERLINK_STYLE = "InternetLink";
 
     /** The number style IDs for ordered and unordered lists. */
-    private static final BigInteger _ordered = BigInteger.valueOf(2);
+    private static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(2);
 
-    private static final BigInteger _unordered = BigInteger.valueOf(1);
+    private static final BigInteger UNORDERED_LIST_ID = BigInteger.valueOf(1);
 
     /** The numbering definitions. */
-    private static final Numbering _numbering;
+    private static final Numbering CUSTOM_NUMBERING;
 
     /** Custom styles. */
-    private static final List<Style> _styles;
+    private static final List<Style> CUSTOM_STYLES;
 
     /** Docx files are arranged into a "package" of smaller xml files. */
     private final WordprocessingMLPackage _package;
@@ -153,31 +160,31 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       ObjectFactory factory = new ObjectFactory();
 
       /* ***** Lists. */
-      _numbering = factory.createNumbering();
+      CUSTOM_NUMBERING = factory.createNumbering();
 
       // Construct the ordered lists
       NumberFormat[] orderedFmats = new NumberFormat[] { NumberFormat.DECIMAL, NumberFormat.LOWER_LETTER, NumberFormat.LOWER_ROMAN };
       String[] orderedStrs = new String[] { "%C)" }; // "C" is replaced with the
                                                      // appropriate number
                                                      // counter.
-      Numbering.AbstractNum ordered = constructAbstractNumbering(_ordered, orderedFmats, orderedStrs);
-      Numbering.Num orderedNum = constructConcreteNumbering(_ordered);
+      Numbering.AbstractNum ordered = constructAbstractNumbering(ORDERED_LIST_ID, orderedFmats, orderedStrs);
+      Numbering.Num orderedNum = constructConcreteNumbering(ORDERED_LIST_ID);
 
       // Construct the unordered lists
       NumberFormat[] unorderedFmats = new NumberFormat[] { NumberFormat.BULLET };
       String[] unorderedStrs = new String[] { "•", "◦", "▪" };
-      Numbering.AbstractNum unordered = constructAbstractNumbering(_unordered, unorderedFmats, unorderedStrs);
-      Numbering.Num unorderedNum = constructConcreteNumbering(_unordered);
+      Numbering.AbstractNum unordered = constructAbstractNumbering(UNORDERED_LIST_ID, unorderedFmats, unorderedStrs);
+      Numbering.Num unorderedNum = constructConcreteNumbering(UNORDERED_LIST_ID);
 
       // Add the lists to the numbering.
-      _numbering.getAbstractNum().add(ordered);
-      _numbering.getNum().add(orderedNum);
+      CUSTOM_NUMBERING.getAbstractNum().add(ordered);
+      CUSTOM_NUMBERING.getNum().add(orderedNum);
 
-      _numbering.getAbstractNum().add(unordered);
-      _numbering.getNum().add(unorderedNum);
+      CUSTOM_NUMBERING.getAbstractNum().add(unordered);
+      CUSTOM_NUMBERING.getNum().add(unorderedNum);
 
       /* ***** Styles. */
-      _styles = new ArrayList<Style>();
+      CUSTOM_STYLES = new ArrayList<Style>();
 
       // Spacing for normal text, values from libreoffice
       PPrBase.Spacing spacing = factory.createPPrBaseSpacing();
@@ -216,9 +223,9 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       tblstyle.getTblPr().getTblCellMar().setRight(margin);
 
       // Finally, save the styles so they can be added to documents.
-      _styles.add(textBody);
-      _styles.add(tableContents);
-      _styles.add(tableHeader);
+      CUSTOM_STYLES.add(textBody);
+      CUSTOM_STYLES.add(tableContents);
+      CUSTOM_STYLES.add(tableHeader);
     }
 
     public DocxVisitor() {
@@ -251,7 +258,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       // Apply the statically-constructed numbering definitions.
       try {
         NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
-        ndp.setJaxbElement(_numbering);
+        ndp.setJaxbElement(CUSTOM_NUMBERING);
         _mainPart.addTargetPart(ndp);
       }
       catch (Exception e) {
@@ -259,7 +266,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       }
 
       // Apply the statically-constructed style definitions.
-      _mainPart.getStyleDefinitionsPart().getJaxbElement().getStyle().addAll(_styles);
+      _mainPart.getStyleDefinitionsPart().getJaxbElement().getStyle().addAll(CUSTOM_STYLES);
     }
 
     /**
@@ -270,7 +277,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * @param id The ID of the abstract numbering.
      * @return A new concrete numbering with a matching ID.
      */
-    private static Numbering.Num constructConcreteNumbering(BigInteger id) {
+    private static Numbering.Num constructConcreteNumbering(final BigInteger id) {
       ObjectFactory factory = new ObjectFactory();
       Numbering.Num num = factory.createNumberingNum();
 
@@ -293,7 +300,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      *          allowing ordered lists to be produced.
      * @return A new abstract numbering, with up to 10 levels of list nesting.
      */
-    private static Numbering.AbstractNum constructAbstractNumbering(BigInteger id, NumberFormat[] fmats, String[] strs) {
+    private static Numbering.AbstractNum constructAbstractNumbering(final BigInteger id, final NumberFormat[] fmats, final String[] strs) {
       ObjectFactory factory = new ObjectFactory();
 
       Numbering.AbstractNum abstractNum = factory.createNumberingAbstractNum();
@@ -326,7 +333,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * @param str The bullet string.
      * @return A new numbering level, for this level of indentation.
      */
-    private static Lvl constructNumberingLevel(NumberFormat fmat, long ilvl, String str) {
+    private static Lvl constructNumberingLevel(final NumberFormat fmat, final long ilvl, final String str) {
       ObjectFactory factory = new ObjectFactory();
 
       Lvl lvl = factory.createLvl();
@@ -367,7 +374,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       return lvl;
     }
 
-    private static Style constructStyle(String name, String basedOn, String type, Optional<JcEnumeration> justification, Optional<PPrBase.Spacing> spacing, boolean bold) {
+    private static Style constructStyle(final String name, final String basedOn, final String type, final Optional<JcEnumeration> justification, final Optional<PPrBase.Spacing> spacing, final boolean bold) {
       ObjectFactory factory = new ObjectFactory();
 
       // Create the style
@@ -402,7 +409,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /**
      * Style IDs are names with no spaces.
      */
-    private static String styleNameToId(String name) {
+    private static String styleNameToId(final String name) {
       return name.replace(" ", "");
     }
 
@@ -411,7 +418,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * input stream.
      */
     @Override
-    public InputStream visitPage(Page node) {
+    public InputStream visitPage(final Page node) {
       // Build document
       visitASTNode(node);
 
@@ -429,7 +436,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Set some formatting, visit children, and unset the formatting. */
-    private InputStream withFormatting(BooleanDefaultTrue fmat, ASTNode node) {
+    private InputStream withFormatting(final BooleanDefaultTrue fmat, final ASTNode node) {
       fmat.setVal(true);
       visitASTNode(node);
       fmat.setVal(false);
@@ -438,15 +445,16 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /**
-     * Like withContextSimple, but also adds the context to the containing block
+     * Like withContextSimple, but also adds the context to the containing
+     * block.
      */
-    private InputStream withContext(ContentAccessor ctx, ASTNode node, boolean block) {
+    private InputStream withContext(final ContentAccessor ctx, final ASTNode node, final boolean block) {
       _blockContexts.peek().getContent().add(ctx);
       return withContextSimple(ctx, node, block);
     }
 
     /** Push a context, visit children, and pop the context. */
-    private InputStream withContextSimple(ContentAccessor ctx, ASTNode node, boolean block) {
+    private InputStream withContextSimple(final ContentAccessor ctx, final ASTNode node, final boolean block) {
       _contexts.push(ctx);
       if (block) {
         _blockContexts.push(ctx);
@@ -463,7 +471,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Construct a new numbering, push it, visit children, and pop. */
-    private InputStream withNumbering(BigInteger type, ASTNode node) {
+    private InputStream withNumbering(final BigInteger type, final ASTNode node) {
       // Construct a new list context at the appropriate indentation level and
       // push it to the stack.
       PPrBase.NumPr numpr = _factory.createPPrBaseNumPr();
@@ -488,7 +496,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Style a paragraph. */
-    public void paraStyle(P paragraph, String style) {
+    public void paraStyle(final P paragraph, final String style) {
       if (paragraph.getPPr() == null) {
         paragraph.setPPr(_factory.createPPr());
       }
@@ -501,7 +509,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Style a run. */
-    public void runStyle(R run, String style) {
+    public void runStyle(final R run, final String style) {
       if (run.getRPr() == null) {
         run.setRPr(_factory.createRPr());
       }
@@ -514,7 +522,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Set the text of a run. */
-    public void runText(R run, String str) {
+    public void runText(final R run, final String str) {
       Text text = _factory.createText();
       text.setValue(str);
       run.getContent().add(_factory.createRT(text));
@@ -528,12 +536,12 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitBold(Bold node) {
+    public InputStream visitBold(final Bold node) {
       return withFormatting(_bold, node);
     }
 
     @Override
-    public InputStream visitCode(Code node) {
+    public InputStream visitCode(final Code node) {
       R run = constructRun();
       runStyle(run, CODE_STYLE);
       runText(run, node.getText());
@@ -542,7 +550,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitHeading(Heading node) {
+    public InputStream visitHeading(final Heading node) {
       P heading = _factory.createP();
 
       // Apply the style
@@ -571,7 +579,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitHorizontalRule(HorizontalRule node) {
+    public InputStream visitHorizontalRule(final HorizontalRule node) {
       P hrule = _factory.createP();
       _document.getContent().add(hrule);
       paraStyle(hrule, HORIZONTAL_RULE_STYLE);
@@ -580,7 +588,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream renderImage(String target, String title, Image node) {
+    public InputStream renderImage(final String target, final String title, final Image node) {
       // First we get a relation pointing to the image
       BinaryPartAbstractImage imagePart;
       org.docx4j.dml.wordprocessingDrawing.Inline inline;
@@ -606,7 +614,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitInlineCode(InlineCode node) {
+    public InputStream visitInlineCode(final InlineCode node) {
       R run = constructRun();
       runStyle(run, CODE_STYLE);
       runText(run, node.getText());
@@ -615,19 +623,19 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitItalic(Italic node) {
+    public InputStream visitItalic(final Italic node) {
       return withFormatting(_italic, node);
     }
 
     @Override
-    public InputStream visitLinebreak(Linebreak node) {
+    public InputStream visitLinebreak(final Linebreak node) {
       _contexts.peek().getContent().add(_factory.createBr());
 
       return nullval();
     }
 
     @Override
-    public InputStream renderLink(String target, String title, Link node) {
+    public InputStream renderLink(final String target, final String title, final Link node) {
       P.Hyperlink hyperlink = _factory.createPHyperlink();
       hyperlink.setAnchor(target);
 
@@ -642,7 +650,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitListItem(ListItem node) {
+    public InputStream visitListItem(final ListItem node) {
       // A list item is just a paragraph with some numbering applied.
       P listitem = _factory.createP();
       listitem.setPPr(_factory.createPPr());
@@ -652,7 +660,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitMacroNode(MacroNode node) {
+    public InputStream visitMacroNode(final MacroNode node) {
       // If in block position, render to a new paragraph.
       if (node.isBlock()) {
         P para = _factory.createP();
@@ -671,12 +679,12 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitOrderedList(OrderedList node) {
-      return withNumbering(_ordered, node);
+    public InputStream visitOrderedList(final OrderedList node) {
+      return withNumbering(ORDERED_LIST_ID, node);
     }
 
     @Override
-    public InputStream visitParagraph(Paragraph node) {
+    public InputStream visitParagraph(final Paragraph node) {
       P paragraph = _factory.createP();
 
       // If there's a paragraph style currently in effect, apply it.
@@ -691,12 +699,12 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitStrikethrough(Strikethrough node) {
+    public InputStream visitStrikethrough(final Strikethrough node) {
       return withFormatting(_strike, node);
     }
 
     @Override
-    public InputStream visitTable(Table node) {
+    public InputStream visitTable(final Table node) {
       Tbl table = _factory.createTbl();
 
       // Set the style to our custom one.
@@ -728,7 +736,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitTableCell(TableCell node) {
+    public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
       _blockContexts.peek().getContent().add(tablecell);
 
@@ -740,7 +748,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitTableHeaderCell(TableHeaderCell node) {
+    public InputStream visitTableHeaderCell(final TableHeaderCell node) {
       Tc tablecell = _factory.createTc();
       _blockContexts.peek().getContent().add(tablecell);
 
@@ -752,12 +760,12 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitTableRow(TableRow node) {
+    public InputStream visitTableRow(final TableRow node) {
       return withContext(_factory.createTr(), node, true);
     }
 
     @Override
-    public InputStream visitTextNode(TextNode node) {
+    public InputStream visitTextNode(final TextNode node) {
       R run = constructRun();
 
       // Set formatting
@@ -773,8 +781,8 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public InputStream visitUnorderedList(UnorderedList node) {
-      return withNumbering(_unordered, node);
+    public InputStream visitUnorderedList(final UnorderedList node) {
+      return withNumbering(UNORDERED_LIST_ID, node);
     }
   }
 }

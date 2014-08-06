@@ -37,7 +37,7 @@ public abstract class TextNode extends ASTNode {
    * Construct a new TextNode of the same type by appending the text of the
    * follower to this.
    */
-  public TextNode append(String more) {
+  public TextNode append(final String more) {
     String text = _contents + more;
 
     // First try a constructor which just takes a string.
@@ -66,7 +66,7 @@ public abstract class TextNode extends ASTNode {
    * Construct a new TextNode of the same type by appending the text of the
    * follower to this.
    */
-  public TextNode append(TextNode follower) {
+  public TextNode append(final TextNode follower) {
     return append(follower.getText());
   }
 

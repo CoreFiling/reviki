@@ -156,7 +156,7 @@ public abstract class ASTNode {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof ASTNode)) {
       return false;
     }
@@ -164,5 +164,10 @@ public abstract class ASTNode {
     // Poor man's equality check: try "rendering" them both and compare the
     // results.
     return this.toStringTree().equals(((ASTNode) obj).toStringTree());
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode() + _children.size();
   }
 }

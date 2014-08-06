@@ -530,7 +530,7 @@ public class Visitor extends CreoleASTBuilder {
    * Enable a directive.
    */
   @Override
-  public ASTNode visitEnable(EnableContext ctx) {
+  public ASTNode visitEnable(final EnableContext ctx) {
     if (ctx.MacroEndNoArgs() == null) {
       return new DirectiveNode(ctx.MacroName().getText(), true, cutOffEndTag(ctx.MacroEnd(), ">>"));
     }
@@ -543,7 +543,7 @@ public class Visitor extends CreoleASTBuilder {
    * Disable a directive.
    */
   @Override
-  public ASTNode visitDisable(DisableContext ctx) {
+  public ASTNode visitDisable(final DisableContext ctx) {
     if (ctx.MacroEndNoArgs() == null) {
       return new DirectiveNode(ctx.MacroName().getText(), false, cutOffEndTag(ctx.MacroEnd(), ">>"));
     }

@@ -10,6 +10,13 @@ import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
+/**
+ * A basic renderer which just turns its input into a stream. This exploits the
+ * fact that {@link #render(PageInfo)} is always called before
+ * {@link #build(ASTNode, URLOutputFilter)}.
+ *
+ * @author msw
+ */
 public class RawRenderer extends MarkupRenderer<InputStream> {
   private PageInfo _page;
 
@@ -20,7 +27,7 @@ public class RawRenderer extends MarkupRenderer<InputStream> {
   }
 
   @Override
-  public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     return new ByteArrayInputStream(_page.getContent().getBytes(StandardCharsets.UTF_8));
   }
 

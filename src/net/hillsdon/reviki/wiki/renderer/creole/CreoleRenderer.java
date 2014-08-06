@@ -24,7 +24,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  */
 public class CreoleRenderer {
   /**
-   * How deep macros will be expanded
+   * How deep macros will be expanded.
    */
   public static final int MACRO_DEPTH_LIMIT = 100;
 
@@ -89,9 +89,9 @@ public class CreoleRenderer {
     ASTNode expanded = rendered;
 
     if (_expansionLimit > 0) {
-      _expansionLimit --;
+      _expansionLimit--;
       expanded = rendered.expandMacros(macros);
-      _expansionLimit ++;
+      _expansionLimit++;
     }
 
     return expanded;
@@ -124,7 +124,7 @@ public class CreoleRenderer {
     return render(store, page, linkHandler, imageHandler, macros);
   }
 
-  /** Render a page with no macros or store */
+  /** Render a page with no macros or store. */
   public static ASTNode render(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
     return render(page, linkHandler, imageHandler, macros);

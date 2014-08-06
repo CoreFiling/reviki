@@ -74,13 +74,13 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
   }
 
   @Override
-  public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+  public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
     MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
     return renderer.render(page);
   }
 
   @Override
-  public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public String build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
     return renderer.build(ast, urlOutputFilter);
   }

@@ -1,7 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.PageInfo;
@@ -11,6 +11,12 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 import com.google.common.base.Optional;
 
+/**
+ * Wrapper over ASTVisitor to make rendering easier. In particular, this tracks
+ * enabled directives, and provides a monoid-like abstraction over the output.
+ *
+ * @author msw
+ */
 public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   /** Languages available for syntax highlighting. */
   public static enum Languages {
@@ -18,7 +24,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
 
     private final String _name;
 
-    private Languages(String name) {
+    private Languages(final String name) {
       _name = name;
     }
 
@@ -39,7 +45,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    */
   private final T _nullval;
 
-  public ASTRenderer(T nullval) {
+  public ASTRenderer(final T nullval) {
     _enabledDirectives = new HashMap<String, List<String>>();
     _nullval = nullval;
   }
@@ -54,7 +60,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   /**
    * Set the URL output filter.
    */
-  public void setUrlOutputFilter(URLOutputFilter urlOutputFilter) {
+  public void setUrlOutputFilter(final URLOutputFilter urlOutputFilter) {
     _urlOutputFilter = urlOutputFilter;
   }
 
@@ -76,28 +82,28 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Turn on a directive. If the directive was already enabled, replace its
    * arguments.
    */
-  protected void enable(String directive, List<String> args) {
+  protected void enable(final String directive, final List<String> args) {
     _enabledDirectives.put(directive, args);
   }
 
   /**
    * Turn off a directive.
    */
-  protected void disable(String directive) {
+  protected void disable(final String directive) {
     _enabledDirectives.remove(directive);
   }
 
   /**
    * Check if a directive is enabled.
    */
-  protected boolean isEnabled(String directive) {
+  protected boolean isEnabled(final String directive) {
     return _enabledDirectives.containsKey(directive);
   }
 
   /**
    * Get the args for a directive, if enabled.
    */
-  protected Optional<List<String>> getArgs(String directive) {
+  protected Optional<List<String>> getArgs(final String directive) {
     if (isEnabled(directive)) {
       return Optional.of(_enabledDirectives.get(directive));
     }
@@ -109,7 +115,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
   /**
    * Get the args for a directive, unsafely.
    */
-  protected List<String> unsafeGetArgs(String directive) {
+  protected List<String> unsafeGetArgs(final String directive) {
     return getArgs(directive).get();
   }
 
@@ -117,7 +123,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Default behaviour for visiting ASTNodes.
    */
   @Override
-  public T visitASTNode(ASTNode node) {
+  public T visitASTNode(final ASTNode node) {
     T out = _nullval;
 
     for (ASTNode child : node.getChildren()) {
@@ -131,7 +137,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Default behaviour for visiting DirectiveNodes.
    */
   @Override
-  public T visitDirectiveNode(DirectiveNode node) {
+  public T visitDirectiveNode(final DirectiveNode node) {
     if (node.isEnabled()) {
       // If a directive is enabled multiple times, the most recent one takes
       // effect. This is because the arguments may be different.
@@ -149,7 +155,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * display function or an error handler.
    */
   @Override
-  public T visitImage(Image node) {
+  public T visitImage(final Image node) {
     LinkPartsHandler handler = node.getHandler();
     PageInfo page = node.getPage();
     LinkParts parts = node.getParts();
@@ -166,7 +172,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Render an image. The default implementation does nothing, allowing people
    * to choose instead to override visitLink.
    */
-  public T renderImage(String target, String title, Image node) {
+  public T renderImage(final String target, final String title, final Image node) {
     return nullval();
   }
 
@@ -174,7 +180,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Render a broken image. The default implementation simply displays it as
    * text.
    */
-  public T renderBrokenImage(Image node) {
+  public T renderBrokenImage(final Image node) {
     String title = node.getTitle();
     String target = node.getTarget();
     String imageText;
@@ -195,7 +201,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * display function or an error handler.
    */
   @Override
-  public T visitLink(Link node) {
+  public T visitLink(final Link node) {
     LinkPartsHandler handler = node.getHandler();
     PageInfo page = node.getPage();
     LinkParts parts = node.getParts();
@@ -221,7 +227,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Render a link. The default implementation does nothing, allowing people to
    * choose instead to override visitLink.
    */
-  public T renderLink(String target, String title, Link node) {
+  public T renderLink(final String target, final String title, final Link node) {
     return nullval();
   }
 
@@ -229,7 +235,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * Render a broken link. The default implementation simply displays it as
    * text.
    */
-  public T renderBrokenLink(Link node) {
+  public T renderBrokenLink(final Link node) {
     // Just display the link as text.
     String title = node.getTitle();
     String target = node.getTarget();
@@ -257,7 +263,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    * The default implementation returns the leftmost non-nullval() (compared
    * with ==) value.
    */
-  protected T combine(T x1, T x2) {
+  protected T combine(final T x1, final T x2) {
     return (x1 == _nullval) ? x2 : x1;
   }
 }

@@ -21,19 +21,26 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+/**
+ * A renderer to XSL-FO, and various formats which can be produced from it. This
+ * uses the Docbook renderer as the source, and uses Apache Fop to perform the
+ * transformations. As Fop depends on different versions of things to Reviki, it
+ * can't easily be linked into the Jar. Thus, it it executed at runtime, as a
+ * standalone program, to do what we want. However, this requires the Reviki
+ * .war to be exploded.
+ *
+ * @author msw
+ */
 public class XSLFORenderer extends MarkupRenderer<InputStream> {
   /** Posible output types. */
   public static enum FoOutput {
-    XSLFO("-foout", "text/xml; charset=utf-8"),
-    RTF  ("-rtf",   "text/rtf; charset=utf-8"),
-    PDF  ("-pdf",   "application/pdf"),
-    PS   ("-ps",    "application/postscript");
+    XSLFO("-foout", "text/xml; charset=utf-8"), RTF("-rtf", "text/rtf; charset=utf-8"), PDF("-pdf", "application/pdf"), PS("-ps", "application/postscript");
 
     public final String arg;
 
     public final String mime;
 
-    FoOutput(String arg, String mime) {
+    FoOutput(final String arg, final String mime) {
       this.arg = arg;
       this.mime = mime;
     }
@@ -72,15 +79,15 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
     FOP_DIR = new File(workingdir + "xslfo/fop");
   }
 
-  public XSLFORenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros, FoOutput format) throws IOException {
+  public XSLFORenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros, final FoOutput format) throws IOException {
     this(new DocbookRenderer(pageStore, linkHandler, imageHandler, macros), format);
   }
 
-  public XSLFORenderer(DocbookRenderer docbook) throws IOException {
+  public XSLFORenderer(final DocbookRenderer docbook) throws IOException {
     this(docbook, FoOutput.XSLFO);
   }
 
-  public XSLFORenderer(DocbookRenderer docbook, FoOutput format) throws IOException {
+  public XSLFORenderer(final DocbookRenderer docbook, final FoOutput format) throws IOException {
     _docbook = docbook;
     _format = format;
   }
@@ -91,7 +98,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   }
 
   @Override
-  public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String docbook = _docbook.buildString(ast, urlOutputFilter);
 
     try {
@@ -99,7 +106,8 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
           JAVA_PATH, "-cp", FOP_CLASSPATH, "-jar", FOP_JAR,
           "-xml", "-",       // read xml from stdin.
           "-xsl", XSL_PATH,  // use this xsl file for transformation.
-          _format.arg, "-"); // dump the result, in the requested format, to stdout.
+          _format.arg, "-"); // dump the result, in the requested format, to
+                             // stdout.
 
       builder.directory(FOP_DIR);
       Process process = builder.start();

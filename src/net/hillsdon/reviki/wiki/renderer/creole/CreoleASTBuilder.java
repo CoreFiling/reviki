@@ -18,7 +18,6 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 /**
  * Helper class providing some useful functions for walking through the Creole
@@ -140,9 +139,9 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Trim whitespace of an inline node
+   * Trim whitespace of an inline node.
    */
-  public Inline trimInline(Inline inline) {
+  public Inline trimInline(final Inline inline) {
     List<ASTNode> chunks = new ArrayList<ASTNode>();
     chunks.addAll(inline.getChildren());
 

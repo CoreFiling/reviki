@@ -46,7 +46,7 @@ public abstract class MarkupRenderer<T> {
       return new Raw(page.getContent());
     }
 
-    public ASTNode build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    public ASTNode build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
       return ast;
     }
   };
@@ -62,7 +62,7 @@ public abstract class MarkupRenderer<T> {
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public final Optional<T> build(PageInfo page, URLOutputFilter urlOutputFilter) {
+  public final Optional<T> build(final PageInfo page, final URLOutputFilter urlOutputFilter) {
     try {
       ASTNode rendered = render(page);
       return Optional.of(build(rendered, urlOutputFilter));
@@ -80,7 +80,7 @@ public abstract class MarkupRenderer<T> {
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public T build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public T build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     renderer.setUrlOutputFilter(urlOutputFilter);
     return renderer.visit(ast);
   }

@@ -18,6 +18,12 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+/**
+ * Render to HTML. This is largely a direct translation of the old
+ * ASTNode.toXHTML() style of rendering, with few changes.
+ *
+ * @author msw
+ */
 public class HtmlRenderer extends MarkupRenderer<String> {
   /**
    * Most elements have a consistent CSS class. Links and images are an
@@ -34,7 +40,7 @@ public class HtmlRenderer extends MarkupRenderer<String> {
 
   private final Supplier<List<Macro>> _macros;
 
-  public HtmlRenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros) {
+  public HtmlRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
@@ -59,14 +65,14 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    protected String combine(String x1, String x2) {
+    protected String combine(final String x1, final String x2) {
       return x1 + x2;
     }
 
     /**
      * Render a node with a tag.
      */
-    public String renderTagged(String tag, ASTNode node) {
+    public String renderTagged(final String tag, final ASTNode node) {
       // Render the children
       String inner = visitASTNode(node);
 
@@ -82,7 +88,7 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     /**
      * Render some syntax-highlighted code.
      */
-    public String highlight(String code, Optional<Languages> language) {
+    public String highlight(final String code, final Optional<Languages> language) {
       Renderer highlighter = null;
       if (language.isPresent()) {
         String lang = null;
@@ -120,12 +126,12 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitBold(Bold node) {
+    public String visitBold(final Bold node) {
       return renderTagged("strong", node);
     }
 
     @Override
-    public String visitCode(Code node) {
+    public String visitCode(final Code node) {
       String out = "<pre " + CSS_CLASS_ATTR + ">";
       out += highlight(node.getText(), node.getLanguage());
       out += "</pre>";
@@ -133,17 +139,17 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitHeading(Heading node) {
+    public String visitHeading(final Heading node) {
       return renderTagged("h" + node.getLevel(), node);
     }
 
     @Override
-    public String visitHorizontalRule(HorizontalRule node) {
+    public String visitHorizontalRule(final HorizontalRule node) {
       return renderTagged("hr", node);
     }
 
     @Override
-    public String visitImage(Image node) {
+    public String visitImage(final Image node) {
       LinkPartsHandler handler = node.getHandler();
       PageInfo page = node.getPage();
       LinkParts parts = node.getParts();
@@ -157,7 +163,7 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitInlineCode(InlineCode node) {
+    public String visitInlineCode(final InlineCode node) {
       String out = "<code " + CSS_CLASS_ATTR + ">";
       out += highlight(node.getText(), node.getLanguage());
       out += "</code>";
@@ -165,17 +171,17 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitItalic(Italic node) {
+    public String visitItalic(final Italic node) {
       return renderTagged("em", node);
     }
 
     @Override
-    public String visitLinebreak(Linebreak node) {
+    public String visitLinebreak(final Linebreak node) {
       return renderTagged("br", node);
     }
 
     @Override
-    public String visitLink(Link node) {
+    public String visitLink(final Link node) {
       LinkPartsHandler handler = node.getHandler();
       PageInfo page = node.getPage();
       LinkParts parts = node.getParts();
@@ -197,39 +203,39 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitListItem(ListItem node) {
+    public String visitListItem(final ListItem node) {
       return renderTagged("li", node);
     }
 
     @Override
-    public String visitMacroNode(MacroNode node) {
+    public String visitMacroNode(final MacroNode node) {
       String tag = node.isBlock() ? "pre" : "code";
       String inner = Escape.html(node.getText());
       return "<" + tag + " " + CSS_CLASS_ATTR + ">" + inner + "</" + tag + ">";
     }
 
     @Override
-    public String visitOrderedList(OrderedList node) {
+    public String visitOrderedList(final OrderedList node) {
       return renderTagged("ol", node);
     }
 
     @Override
-    public String visitParagraph(Paragraph node) {
+    public String visitParagraph(final Paragraph node) {
       return renderTagged("p", node);
     }
 
     @Override
-    public String visitStrikethrough(Strikethrough node) {
+    public String visitStrikethrough(final Strikethrough node) {
       return renderTagged("strike", node);
     }
 
     @Override
-    public String visitTable(Table node) {
+    public String visitTable(final Table node) {
       return renderTagged("table", node);
     }
 
     @Override
-    public String visitTableCell(TableCell node) {
+    public String visitTableCell(final TableCell node) {
       if (!isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
         return renderTagged("td", node);
       }
@@ -248,7 +254,7 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitTableHeaderCell(TableHeaderCell node) {
+    public String visitTableHeaderCell(final TableHeaderCell node) {
       if (!isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
         return renderTagged("th", node);
       }
@@ -267,18 +273,18 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     }
 
     @Override
-    public String visitTableRow(TableRow node) {
+    public String visitTableRow(final TableRow node) {
       return renderTagged("tr", node);
     }
 
     @Override
-    public String visitTextNode(TextNode node) {
+    public String visitTextNode(final TextNode node) {
       String text = node.getText();
       return node.isEscaped() ? Escape.html(text) : text;
     }
 
     @Override
-    public String visitUnorderedList(UnorderedList node) {
+    public String visitUnorderedList(final UnorderedList node) {
       return renderTagged("ul", node);
     }
   }

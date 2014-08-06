@@ -31,6 +31,15 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+/**
+ * A renderer for Docbook. Rather than an XML document, this renders to an input
+ * stream for easy integration with the http output. The document (and string
+ * serialisation) can be accessed with the
+ * {@link #buildString(ASTNode, URLOutputFilter)} and
+ * {@link #buildDocument(ASTNode, URLOutputFilter)} methods.
+ *
+ * @author msw
+ */
 public class DocbookRenderer extends MarkupRenderer<InputStream> {
   private final PageStore _pageStore;
 
@@ -40,7 +49,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
 
   private final Supplier<List<Macro>> _macros;
 
-  public DocbookRenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros) {
+  public DocbookRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
@@ -53,7 +62,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
   }
 
   @Override
-  public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String out = buildString(ast, urlOutputFilter);
     return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
   }
@@ -63,7 +72,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     return "text/xml; charset=utf-8";
   }
 
-  public String buildString(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public String buildString(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String out;
     try {
       Document doc = buildDocument(ast, urlOutputFilter);
@@ -82,7 +91,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     return out;
   }
 
-  public Document buildDocument(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public Document buildDocument(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     Document document;
     try {
       document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -105,13 +114,13 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
   private final class DocbookVisitor extends ASTRenderer<List<Node>> {
     private final Document _document;
 
-    public DocbookVisitor(Document document) {
+    public DocbookVisitor(final Document document) {
       super(new ArrayList<Node>());
       _document = document;
     }
 
     @Override
-    protected List<Node> combine(List<Node> x1, List<Node> x2) {
+    protected List<Node> combine(final List<Node> x1, final List<Node> x2) {
       List<Node> combined = new ArrayList<Node>();
       combined.addAll(x1);
       combined.addAll(x2);
@@ -119,7 +128,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitPage(Page node) {
+    public List<Node> visitPage(final Page node) {
       Element article = _document.createElement("article");
       article.setAttribute("xmlns", "http://docbook.org/ns/docbook");
       article.setAttribute("xmlns:xl", "http://www.w3.org/1999/xlink");
@@ -191,14 +200,14 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
      * Helper function: build a node from an element type name and an ASTNode
      * containing children.
      */
-    public Element wraps(String element, ASTNode node) {
+    public Element wraps(final String element, final ASTNode node) {
       return (Element) build(_document.createElement(element), visitASTNode(node)).get(0);
     }
 
     /**
      * Helper function: build a node list from an element and some children.
      */
-    public List<Node> build(Element container, List<Node> siblings) {
+    public List<Node> build(final Element container, final List<Node> siblings) {
       for (Node sibling : siblings) {
         container.appendChild(sibling);
       }
@@ -209,21 +218,21 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     /**
      * Helper function: build a singleton list.
      */
-    public List<Node> singleton(Node n) {
+    public List<Node> singleton(final Node n) {
       List<Node> out = new ArrayList<Node>();
       out.add(n);
       return out;
     }
 
     @Override
-    public List<Node> visitBold(Bold node) {
+    public List<Node> visitBold(final Bold node) {
       Element strong = _document.createElement("emphasis");
       strong.setAttribute("role", "bold");
       return build(strong, visitASTNode(node));
     }
 
     @Override
-    public List<Node> visitCode(Code node) {
+    public List<Node> visitCode(final Code node) {
       Element out = _document.createElement("programlisting");
       out.setAttribute("language", "c++");
 
@@ -237,7 +246,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitHeading(Heading node) {
+    public List<Node> visitHeading(final Heading node) {
       Element out = _document.createElement("info");
       Element title = wraps("title", node);
       out.appendChild(title);
@@ -246,14 +255,14 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitHorizontalRule(HorizontalRule node) {
+    public List<Node> visitHorizontalRule(final HorizontalRule node) {
       Element out = _document.createElement("bridgehead");
       out.setAttribute("role", "separator");
       return singleton(out);
     }
 
     @Override
-    public List<Node> renderImage(String target, String title, Image node) {
+    public List<Node> renderImage(final String target, final String title, final Image node) {
       Element out = _document.createElement("imageobject");
 
       // Header
@@ -270,7 +279,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitInlineCode(InlineCode node) {
+    public List<Node> visitInlineCode(final InlineCode node) {
       Element out = _document.createElement("code");
       out.setAttribute("language", "c++");
 
@@ -284,17 +293,17 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitItalic(Italic node) {
+    public List<Node> visitItalic(final Italic node) {
       return singleton(wraps("emphasis", node));
     }
 
     @Override
-    public List<Node> visitLinebreak(Linebreak node) {
+    public List<Node> visitLinebreak(final Linebreak node) {
       return singleton(_document.createElement("sbr"));
     }
 
     @Override
-    public List<Node> renderLink(String target, String title, Link node) {
+    public List<Node> renderLink(final String target, final String title, final Link node) {
       Element out = _document.createElement("link");
       out.setAttribute("xl:href", target);
       out.appendChild(_document.createTextNode(title));
@@ -302,39 +311,39 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitListItem(ListItem node) {
+    public List<Node> visitListItem(final ListItem node) {
       return singleton(wraps("listitem", node));
     }
 
     @Override
-    public List<Node> visitMacroNode(MacroNode node) {
+    public List<Node> visitMacroNode(final MacroNode node) {
       return singleton(wraps(node.isBlock() ? "pre" : "code", node));
     }
 
     @Override
-    public List<Node> visitOrderedList(OrderedList node) {
+    public List<Node> visitOrderedList(final OrderedList node) {
       return singleton(wraps("orderedlist", node));
     }
 
     @Override
-    public List<Node> visitParagraph(Paragraph node) {
+    public List<Node> visitParagraph(final Paragraph node) {
       return singleton(wraps("para", node));
     }
 
     @Override
-    public List<Node> visitStrikethrough(Strikethrough node) {
+    public List<Node> visitStrikethrough(final Strikethrough node) {
       Element strong = _document.createElement("emphasis");
       strong.setAttribute("role", "strike");
       return build(strong, visitASTNode(node));
     }
 
     @Override
-    public List<Node> visitTable(Table node) {
+    public List<Node> visitTable(final Table node) {
       return singleton(wraps("table", node));
     }
 
     @Override
-    public List<Node> visitTableCell(TableCell node) {
+    public List<Node> visitTableCell(final TableCell node) {
       Element out = (Element) wraps("td", node);
 
       if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
@@ -350,7 +359,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitTableHeaderCell(TableHeaderCell node) {
+    public List<Node> visitTableHeaderCell(final TableHeaderCell node) {
       Element out = (Element) wraps("th", node);
 
       if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
@@ -366,18 +375,18 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitTableRow(TableRow node) {
+    public List<Node> visitTableRow(final TableRow node) {
       return singleton(wraps("tr", node));
     }
 
     @Override
-    public List<Node> visitTextNode(TextNode node) {
+    public List<Node> visitTextNode(final TextNode node) {
       String text = node.getText();
       return singleton(node.isEscaped() ? _document.createCDATASection(text) : _document.createTextNode(text));
     }
 
     @Override
-    public List<Node> visitUnorderedList(UnorderedList node) {
+    public List<Node> visitUnorderedList(final UnorderedList node) {
       return singleton(wraps("itemizedlist", node));
     }
   }
