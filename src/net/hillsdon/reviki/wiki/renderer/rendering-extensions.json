@@ -12,7 +12,7 @@
   {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
-    "output": "<p>Hello <code>//there//</code>.\n</p>"
+    "output": "<p>Hello <code>//there//</code>.</p>"
   },
   {
     "name":   "Unnamed URL",
