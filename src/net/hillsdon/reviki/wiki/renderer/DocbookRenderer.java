@@ -27,7 +27,6 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
@@ -254,44 +253,19 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitImage(Image node) {
-      LinkPartsHandler handler = node.getHandler();
-      PageInfo page = node.getPage();
-      LinkParts parts = node.getParts();
-
+    public List<Node> renderImage(String target, String title, Image node) {
       Element out = _document.createElement("imageobject");
 
       // Header
       Element info = _document.createElement("info");
-      Element title = _document.createElement("title");
-      title.appendChild(_document.createTextNode(node.getTitle()));
-      info.appendChild(title);
+      Element etitle = _document.createElement("title");
+      etitle.appendChild(_document.createTextNode(title));
+      info.appendChild(etitle);
 
       // Image data
       Element imagedata = _document.createElement("imagedata");
+      imagedata.setAttribute("fileref", target);
 
-      try {
-        String uri = handler.handle(page, parts, urlOutputFilter());
-        imagedata.setAttribute("fileref", uri);
-      }
-      catch (Exception e) {
-        // Just display the image as text.
-        String imageText;
-        if (node.getTitle().equals(node.getTarget())) {
-          imageText = "{{" + node.getTarget() + "}}";
-        }
-        else {
-          imageText = "{{" + node.getTarget() + "|" + node.getTitle() + "}}";
-        }
-        out.appendChild(_document.createTextNode(imageText));
-
-        System.err.println("Failed to insert image " + imageText);
-        return singleton(out);
-      }
-
-      // Done
-      out.appendChild(info);
-      out.appendChild(imagedata);
       return singleton(out);
     }
 
@@ -320,44 +294,10 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     }
 
     @Override
-    public List<Node> visitLink(Link node) {
-      LinkPartsHandler handler = node.getHandler();
-      PageInfo page = node.getPage();
-      LinkParts parts = node.getParts();
-
-      String title = node.getTitle();
-      String target = node.getTarget();
-
-      String uri;
-
+    public List<Node> renderLink(String target, String title, Link node) {
       Element out = _document.createElement("link");
-
-      try {
-        uri = handler.handle(page, parts, urlOutputFilter());
-        out.setAttribute("xl:href", uri);
-        out.appendChild(_document.createTextNode(title));
-      }
-      catch (Exception e) {
-        // Treat mailto links specially.
-        if (target.startsWith("mailto:")) {
-          out.setAttribute("xl:href", target);
-          out.appendChild(_document.createTextNode(title));
-        }
-        else {
-          // Just display the link as text.
-          String linkText;
-          if (title.equals(target)) {
-            linkText = "[[" + target + "]]";
-          }
-          else {
-            linkText = "[[" + target + "|" + title + "]]";
-          }
-
-          System.err.println("Failed to insert link " + linkText);
-          return singleton(_document.createTextNode(linkText));
-        }
-      }
-
+      out.setAttribute("xl:href", target);
+      out.appendChild(_document.createTextNode(title));
       return singleton(out);
     }
 

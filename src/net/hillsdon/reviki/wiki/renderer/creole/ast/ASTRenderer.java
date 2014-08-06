@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 import com.google.common.base.Optional;
 
@@ -139,6 +142,108 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
     }
 
     return _nullval;
+  }
+
+  /**
+   * Default behaviour for visiting Images: expand the target and call either a
+   * display function or an error handler.
+   */
+  @Override
+  public T visitImage(Image node) {
+    LinkPartsHandler handler = node.getHandler();
+    PageInfo page = node.getPage();
+    LinkParts parts = node.getParts();
+
+    try {
+      return renderImage(handler.handle(page, parts, urlOutputFilter()), node.getTitle(), node);
+    }
+    catch (Exception e) {
+      return renderBrokenImage(node);
+    }
+  }
+
+  /**
+   * Render an image. The default implementation does nothing, allowing people
+   * to choose instead to override visitLink.
+   */
+  public T renderImage(String target, String title, Image node) {
+    return nullval();
+  }
+
+  /**
+   * Render a broken image. The default implementation simply displays it as
+   * text.
+   */
+  public T renderBrokenImage(Image node) {
+    String title = node.getTitle();
+    String target = node.getTarget();
+    String imageText;
+    if (title.equals(target)) {
+      imageText = "{{" + target + "}}";
+    }
+    else {
+      imageText = "{{" + target + "|" + title + "}}";
+    }
+
+    System.err.println("Failed to insert image " + imageText);
+
+    return visitTextNode(new Plaintext(imageText));
+  }
+
+  /**
+   * Default behaviour for visiting Links: expand the target and call either a
+   * display function or an error handler.
+   */
+  @Override
+  public T visitLink(Link node) {
+    LinkPartsHandler handler = node.getHandler();
+    PageInfo page = node.getPage();
+    LinkParts parts = node.getParts();
+
+    String title = node.getTitle();
+    String target = node.getTarget();
+
+    try {
+      return renderLink(handler.handle(page, parts, urlOutputFilter()), title, node);
+    }
+    catch (Exception e) {
+      // Treat mailto links specially.
+      if (target.startsWith("mailto:")) {
+        return renderLink(target, title, node);
+      }
+      else {
+        return renderBrokenLink(node);
+      }
+    }
+  }
+
+  /**
+   * Render a link. The default implementation does nothing, allowing people to
+   * choose instead to override visitLink.
+   */
+  public T renderLink(String target, String title, Link node) {
+    return nullval();
+  }
+
+  /**
+   * Render a broken link. The default implementation simply displays it as
+   * text.
+   */
+  public T renderBrokenLink(Link node) {
+    // Just display the link as text.
+    String title = node.getTitle();
+    String target = node.getTarget();
+    String linkText;
+    if (title.equals(target)) {
+      linkText = "[[" + target + "]]";
+    }
+    else {
+      linkText = "[[" + target + "|" + title + "]]";
+    }
+
+    System.err.println("Failed to insert link " + linkText);
+
+    return visitTextNode(new Plaintext(linkText));
   }
 
   /**
