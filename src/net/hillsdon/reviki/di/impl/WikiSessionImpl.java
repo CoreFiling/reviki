@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.di.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +25,9 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.WikiSession;
 import net.hillsdon.reviki.search.impl.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.impl.LuceneSearcher;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
@@ -54,6 +57,7 @@ import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 import net.hillsdon.reviki.web.vcintegration.AutoProperiesFromConfigPage;
@@ -63,6 +67,7 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedPageStore;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
@@ -73,6 +78,7 @@ import net.hillsdon.reviki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.reviki.wiki.macros.SearchMacro;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import org.picocontainer.MutablePicoContainer;
@@ -105,9 +111,18 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     File primarySearchDir = configuration.getSearchIndexDirectory();
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
-    // This is here so we can refer to the renderer when we need it, but it depends upon wikiGraph,
-    // which is initialised further down because of circularity!
-    final List<WikiGraph> wikiGraphStore = new ArrayList<WikiGraph>();
+    // Wrapping to get around _renderer not being initialised yet
+    MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
+      @Override
+      public ASTNode render(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.render(page);
+      }
+
+      public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.build(ast,  urlOutputFilter);
+      }
+    };
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer));
 
     InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
@@ -118,23 +133,18 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     final RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
     Configuration pageStoreConfiguration = new PageStoreConfiguration(cachingPageStore, applicationUrls);
+    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
-        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraphStore.get(0)), new OutgoingLinksMacro(wikiGraphStore.get(0)), new SearchMacro(_searchEngine), new AttrMacro(pageStore)));
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new AttrMacro(pageStore)));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }
     });
 
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, _renderer));
-
     _plugins = new PluginsImpl(pageStore);
     _searchEngine.setPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
-
-    // Now we can finally instantiate the wikigraph.
-    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
-    wikiGraphStore.add(wikiGraph);
 
     container.addComponent(tracker);
     container.addComponent(operations);
