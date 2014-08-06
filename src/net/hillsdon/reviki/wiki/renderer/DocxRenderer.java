@@ -735,10 +735,33 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       return withContext(table, node, true);
     }
 
+    /**
+     * Apply the vertical alignment directive to table cells.
+     */
+    private void applyValign(final Tc tablecell) {
+      if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
+        tablecell.setTcPr(_factory.createTcPr());
+        tablecell.getTcPr().setVAlign(_factory.createCTVerticalJc());
+
+        String valign = unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0);
+
+        if (valign.equals("top")) {
+          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.TOP);
+        }
+        else if (valign.equals("middle") || valign.equals("center") || valign.equals("centre")) {
+          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.CENTER);
+        }
+        else if (valign.equals("bottom")) {
+          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.BOTTOM);
+        }
+      }
+    }
+
     @Override
     public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
       _blockContexts.peek().getContent().add(tablecell);
+      applyValign(tablecell);
 
       P para = _factory.createP();
       tablecell.getContent().add(para);
@@ -751,6 +774,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     public InputStream visitTableHeaderCell(final TableHeaderCell node) {
       Tc tablecell = _factory.createTc();
       _blockContexts.peek().getContent().add(tablecell);
+      applyValign(tablecell);
 
       P para = _factory.createP();
       tablecell.getContent().add(para);
