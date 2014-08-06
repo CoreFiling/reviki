@@ -110,58 +110,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInline(final InlineContext ctx) {
-    List<ASTNode> chunks = new ArrayList<ASTNode>();
-
-    // Merge adjacent Any nodes into long Plaintext nodes, to give a more useful
-    // AST.
-    ASTNode last = null;
-    for (InlinestepContext itx : ctx.inlinestep()) {
-      ASTNode rendered = visit(itx);
-      if (last == null) {
-        last = rendered;
-      }
-      else {
-        if (last instanceof Plaintext && rendered instanceof Plaintext) {
-          last = ((Plaintext) last).append(((Plaintext) rendered));
-        }
-        else {
-          chunks.add(last);
-          last = rendered;
-        }
-      }
-    }
-
-    if (last != null) {
-      chunks.add(last);
-    }
-
-    // Left-trim the first chunk if it's plaintext
-    int sz = chunks.size();
-    if (sz > 0 && chunks.get(0) instanceof Plaintext) {
-      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(0)).getText().replaceAll("^\\s+", ""));
-
-      if (trimmed.getText().equals("")) {
-        chunks.remove(0);
-        sz = chunks.size();
-      }
-      else {
-        chunks.set(0, trimmed);
-      }
-    }
-
-    // Right-trim the last chunk if it's plaintext
-    if (sz > 0 && chunks.get(sz - 1) instanceof Plaintext) {
-      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(sz - 1)).getText().replaceAll("\\s+$", ""));
-
-      if (trimmed.getText().equals("")) {
-        chunks.remove(sz - 1);
-      }
-      else {
-        chunks.set(sz - 1, trimmed);
-      }
-    }
-
-    return new Inline(chunks);
+    return trimInline(visitInlineNoTrim(ctx));
   }
 
   /**

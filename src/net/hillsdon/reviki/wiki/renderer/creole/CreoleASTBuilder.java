@@ -1,6 +1,5 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +11,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
@@ -117,22 +115,21 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    */
   protected ASTNode renderInlineMarkup(final Class<? extends ASTNode> type, final String symbol, final String sname, final TerminalNode end, final InlineContext inline) {
     ASTNode inner = (inline != null) ? visit(inline) : new Plaintext("");
+    ASTNode innerNoTrim = (inline != null) ? visitInlineNoTrim(inline) : new Plaintext("");
 
     // If the end tag is missing, undo the error recovery
     if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
-      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol), inner);
-      return new Inline(chunks);
+      return new Inline(ImmutableList.of((ASTNode) new Plaintext(symbol)));
     }
 
     // If the inner text is missing, this is not markup
-    if (inner.toSmallString().equals("")) {
-      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol + symbol), inner);
-      return new Inline(chunks);
+    if (innerNoTrim.toSmallString().equals("")) {
+      return new Inline(ImmutableList.of((ASTNode) new Plaintext(symbol + symbol)));
     }
 
     try {
       Constructor<? extends ASTNode> constructor = type.getConstructor(ASTNode.class);
-      return constructor.newInstance(inner);
+      return constructor.newInstance(inner.toSmallString().equals("") ? innerNoTrim : inner);
     }
     catch (Exception e) {
       // Never reached if you pass in correct params
@@ -140,6 +137,74 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       // would work)
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Trim whitespace of an inline node
+   */
+  public Inline trimInline(Inline inline) {
+    List<ASTNode> chunks = new ArrayList<ASTNode>();
+    chunks.addAll(inline.getChildren());
+
+    // Left-trim the first chunk if it's plaintext
+    int sz = chunks.size();
+    if (sz > 0 && chunks.get(0) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(0)).getText().replaceAll("^\\s+", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(0);
+        sz = chunks.size();
+      }
+      else {
+        chunks.set(0, trimmed);
+      }
+    }
+
+    // Right-trim the last chunk if it's plaintext
+    if (sz > 0 && chunks.get(sz - 1) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(sz - 1)).getText().replaceAll("\\s+$", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(sz - 1);
+      }
+      else {
+        chunks.set(sz - 1, trimmed);
+      }
+    }
+
+    return new Inline(chunks);
+  }
+
+  /**
+   * Render an inline node with no whitespace trimming.
+   */
+  public Inline visitInlineNoTrim(final InlineContext ctx) {
+    List<ASTNode> chunks = new ArrayList<ASTNode>();
+
+    // Merge adjacent Any nodes into long Plaintext nodes, to give a more useful
+    // AST.
+    ASTNode last = null;
+    for (InlinestepContext itx : ctx.inlinestep()) {
+      ASTNode rendered = visit(itx);
+      if (last == null) {
+        last = rendered;
+      }
+      else {
+        if (last instanceof Plaintext && rendered instanceof Plaintext) {
+          last = ((Plaintext) last).append(((Plaintext) rendered));
+        }
+        else {
+          chunks.add(last);
+          last = rendered;
+        }
+      }
+    }
+
+    if (last != null) {
+      chunks.add(last);
+    }
+
+    return new Inline(chunks);
   }
 
   /**
