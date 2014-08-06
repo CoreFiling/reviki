@@ -95,14 +95,14 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     private static final String TABLE_CONTENTS_STYLE = "Table Contents";
 
-    /** Style for both block and inline code. */
+    /** Style for block code. */
     private static final String CODE_STYLE = "Preformatted Text";
+
+    /** Font for block and inline code. */
+    private static final String CODE_FONT = "Courier New";
 
     /** Style for paragraphs-turned-into-horizontal rules. */
     private static final String HORIZONTAL_RULE_STYLE = "Horizontal Line";
-
-    /** Style for hyperlinks. */
-    private static final String HYPERLINK_STYLE = "InternetLink";
 
     /** The number style IDs for ordered and unordered lists. */
     private static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(2);
@@ -194,8 +194,14 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       spacing.setBefore(BigInteger.ZERO);
 
       Style textBody = constructStyle(TEXT_BODY_STYLE, "Normal", "paragraph", Optional.<JcEnumeration> absent(), Optional.of(spacing), false);
-      Style tableContents = constructStyle(TABLE_CONTENTS_STYLE, "TextBody", "paragraph", Optional.<JcEnumeration> absent(), Optional.<PPrBase.Spacing> absent(), false);
-      Style tableHeader = constructStyle(TABLE_HEADER_STYLE, "TableContents", "paragraph", Optional.of(JcEnumeration.CENTER), Optional.<PPrBase.Spacing> absent(), true);
+      Style code = constructStyle(CODE_STYLE, TEXT_BODY_STYLE, "paragraph", Optional.<JcEnumeration> absent(), Optional.of(spacing), false);
+      Style tableContents = constructStyle(TABLE_CONTENTS_STYLE, TEXT_BODY_STYLE, "paragraph", Optional.<JcEnumeration> absent(), Optional.<PPrBase.Spacing> absent(), false);
+      Style tableHeader = constructStyle(TABLE_HEADER_STYLE, TABLE_CONTENTS_STYLE, "paragraph", Optional.of(JcEnumeration.CENTER), Optional.<PPrBase.Spacing> absent(), true);
+
+      // Set code font
+      code.getRPr().setRFonts(factory.createRFonts());
+      code.getRPr().getRFonts().setAscii(CODE_FONT);
+      code.getRPr().getRFonts().setHAnsi(CODE_FONT);
 
       // The table style is very different to text styles, so it's just
       // constructed here.
@@ -224,6 +230,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
       // Finally, save the styles so they can be added to documents.
       CUSTOM_STYLES.add(textBody);
+      CUSTOM_STYLES.add(code);
       CUSTOM_STYLES.add(tableContents);
       CUSTOM_STYLES.add(tableHeader);
     }
@@ -381,27 +388,30 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       Style style = factory.createStyle();
       style.setStyleId(styleNameToId(name));
       style.setBasedOn(factory.createStyleBasedOn());
-      style.getBasedOn().setVal(basedOn);
+      style.getBasedOn().setVal(styleNameToId(basedOn));
       style.setName(factory.createStyleName());
       style.getName().setVal(name);
       style.setType(type);
 
       // Paragraph formatting
-      style.setPPr(factory.createPPr());
+      if (justification.isPresent() || spacing.isPresent()) {
+        style.setPPr(factory.createPPr());
 
-      if (justification.isPresent()) {
-        style.getPPr().setJc(factory.createJc());
-        style.getPPr().getJc().setVal(justification.get());
-      }
+        if (justification.isPresent()) {
+          style.getPPr().setJc(factory.createJc());
+          style.getPPr().getJc().setVal(justification.get());
+        }
 
-      if (spacing.isPresent()) {
-        style.getPPr().setSpacing(spacing.get());
+        if (spacing.isPresent()) {
+          style.getPPr().setSpacing(spacing.get());
+        }
       }
 
       // Run formatting
-      style.setRPr(factory.createRPr());
-      style.getRPr().setB(new BooleanDefaultTrue());
-      style.getRPr().getB().setVal(new Boolean(bold));
+      if (bold) {
+        style.setRPr(factory.createRPr());
+        style.getRPr().setB(new BooleanDefaultTrue());
+      }
 
       return style;
     }
@@ -508,19 +518,6 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       paragraph.getPPr().getPStyle().setVal(styleNameToId(style));
     }
 
-    /** Style a run. */
-    public void runStyle(final R run, final String style) {
-      if (run.getRPr() == null) {
-        run.setRPr(_factory.createRPr());
-      }
-
-      if (run.getRPr().getRStyle() == null) {
-        run.getRPr().setRStyle(_factory.createRStyle());
-      }
-
-      run.getRPr().getRStyle().setVal(style);
-    }
-
     /** Set the text of a run. */
     public void runText(final R run, final String str) {
       Text text = _factory.createText();
@@ -542,9 +539,14 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     @Override
     public InputStream visitCode(final Code node) {
+      P code = _factory.createP();
+      paraStyle(code, CODE_STYLE);
+
       R run = constructRun();
-      runStyle(run, CODE_STYLE);
       runText(run, node.getText());
+
+      code.getContent().add(run);
+      _blockContexts.peek().getContent().add(code);
 
       return nullval();
     }
@@ -616,7 +618,10 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     @Override
     public InputStream visitInlineCode(final InlineCode node) {
       R run = constructRun();
-      runStyle(run, CODE_STYLE);
+      run.setRPr(_factory.createRPr());
+      run.getRPr().setRFonts(_factory.createRFonts());
+      run.getRPr().getRFonts().setAscii(CODE_FONT);
+      run.getRPr().getRFonts().setHAnsi(CODE_FONT);
       runText(run, node.getText());
 
       return nullval();
@@ -641,7 +646,6 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
       R run = _factory.createR();
       hyperlink.getContent().add(run);
-      runStyle(run, HYPERLINK_STYLE);
       runText(run, title);
 
       _contexts.peek().getContent().add(hyperlink);
