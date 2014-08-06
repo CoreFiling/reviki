@@ -49,7 +49,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   private static final String JAVA_PATH = System.getProperty("java.home") + "/bin/java";
 
   /** The directory where FOP lives. */
-  private static File FOP_DIR = null;
+  private static final File FOP_DIR;
 
   /** Relative path to the fop jar. */
   private static final String FOP_JAR = "fop.jar";
@@ -59,6 +59,18 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
 
   /** Relative path to the docbook xsl file. */
   private static final String XSL_PATH = "../docbook/fo/docbook.xsl";
+
+  static {
+    // We find the path to fop by working relatively from the path to the jar:
+    // we can get that by asking the class loaded for the location of this
+    // class, and then trimming off the extra stuff. Then we know that
+    // xslfo/fop is in the same directory as the jar.
+    //
+    // This assumes the war has been exploded.
+    String clazz = XSLFORenderer.class.getResource("XSLFORenderer.class").toString();
+    String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
+    FOP_DIR = new File(workingdir + "xslfo/fop");
+  }
 
   public XSLFORenderer(PageStore pageStore, LinkPartsHandler linkHandler, LinkPartsHandler imageHandler, Supplier<List<Macro>> macros, FoOutput format) throws IOException {
     this(new DocbookRenderer(pageStore, linkHandler, imageHandler, macros), format);
@@ -71,18 +83,6 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   public XSLFORenderer(DocbookRenderer docbook, FoOutput format) throws IOException {
     _docbook = docbook;
     _format = format;
-
-    // We find the path to fop by working relatively from the path to the jar:
-    // we can get that by asking the class loaded for the location of this
-    // class, and then trimming off the extra stuff. Then we know that
-    // xslfo/fop is in the same directory as the jar.
-    //
-    // This assumes the war has been exploded.
-    if (FOP_DIR == null) {
-      String clazz = getClass().getResource("XSLFORenderer.class").toString();
-      String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
-      FOP_DIR = new File(workingdir + "xslfo/fop");
-    }
   }
 
   @Override
