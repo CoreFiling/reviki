@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
-
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
@@ -135,6 +133,32 @@ public class Visitor extends CreoleASTBuilder {
 
     if (last != null) {
       chunks.add(last);
+    }
+
+    // Left-trim the first chunk if it's plaintext
+    int sz = chunks.size();
+    if (sz > 0 && chunks.get(0) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(0)).getText().replaceAll("^\\s+", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(0);
+        sz = chunks.size();
+      }
+      else {
+        chunks.set(0, trimmed);
+      }
+    }
+
+    // Right-trim the last chunk if it's plaintext
+    if (sz > 0 && chunks.get(sz - 1) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(sz - 1)).getText().replaceAll("\\s+$", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(sz - 1);
+      }
+      else {
+        chunks.set(sz - 1, trimmed);
+      }
     }
 
     return new Inline(chunks);
