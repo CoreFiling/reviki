@@ -42,10 +42,12 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
     DocbookRenderer docbook = new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
     RawRenderer raw = new RawRenderer();
+    DocxRenderer docx = new DocxRenderer(pageStore, linkHandler, imageHandler, macros);
 
     _registry = new RendererRegistry(html);
     _registry.addRenderer(ViewTypeConstants.CTYPE_DOCBOOK, docbook);
     _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, raw);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCX, docx);
 
     // XSL-FO renderers need to extract FOP. If that fails, don't add them.
     try {

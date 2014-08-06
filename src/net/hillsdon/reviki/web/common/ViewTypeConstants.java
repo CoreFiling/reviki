@@ -64,12 +64,14 @@ public final class ViewTypeConstants {
 
   public static final String CTYPE_PS = "postscript";
 
+  public static final String CTYPE_DOCX = "docx";
+
   /**
    * List of ctypes available to regular page views.
    *
    * This is used to generate the drop-down list.
    */
-  public static final String[] CTYPES = { CTYPE_DEFAULT, CTYPE_PDF, CTYPE_DOCBOOK, CTYPE_RTF, CTYPE_PS, CTYPE_RAW };
+  public static final String[] CTYPES = { CTYPE_DEFAULT, CTYPE_PDF, CTYPE_DOCX, CTYPE_DOCBOOK, CTYPE_RTF, CTYPE_PS, CTYPE_RAW };
 
   public static boolean is(final HttpServletRequest request, final String type) {
     return type != null && type.equals(request.getParameter(PARAM_CTYPE));
