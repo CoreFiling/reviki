@@ -203,7 +203,9 @@ public class HtmlRenderer extends MarkupRenderer<String> {
 
     @Override
     public String visitMacroNode(MacroNode node) {
-      return renderTagged(node.isBlock() ? "pre" : "code", node);
+      String tag = node.isBlock() ? "pre" : "code";
+      String inner = Escape.html(node.getText());
+      return "<" + tag + " " + CSS_CLASS_ATTR + ">" + inner + "</" + tag + ">";
     }
 
     @Override
