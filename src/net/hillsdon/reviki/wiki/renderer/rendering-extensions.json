@@ -100,6 +100,26 @@
     "name":   "Blank named link",
     "input":  "[[|]]",
     "output": ""
+  },
+  {
+    "name":   "Unexpanded macro node",
+    "input":  "<<macro:args>>",
+    "output": "<pre>&lt;&lt;macro:args&gt;&gt;</pre>"
+  },
+  {
+    "name":   "Table valignment directive",
+    "input":  "<<+table-alignment:top>>\n\n|=foo|bar|",
+    "output": "<table><tr><th style='vertical-align:top'>foo</th><td style='vertical-align:top'>bar</td></tr></table>"
+  },
+  {
+    "name":   "Broken valignment directive ",
+    "input":  "<<+table-alignment>>\n\n|foo|=bar|",
+    "output": "<table><tr><td>foo</td><th>bar</th></tr></table>"
+  },
+  {
+    "name":   "Directive disabling",
+    "input":  "<<+table-alignment:top>>\n\n|foo|\n\n<<-table-alignment>>\n\n|bar|",
+    "output": "<table><tr><td style='vertical-align:top'>foo</td></tr></table><table><tr><td>bar</td></tr></table>"
   }
 ]
 
