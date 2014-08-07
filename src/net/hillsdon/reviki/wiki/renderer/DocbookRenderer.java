@@ -318,7 +318,10 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
 
     @Override
     public List<Node> visitMacroNode(final MacroNode node) {
-      return singleton(wraps(node.isBlock() ? "pre" : "code", node));
+      Element out = _document.createElement(node.isBlock() ? "programlisting" : "code");
+      String text = node.getText();
+      out.appendChild(node.isBlock() ? _document.createCDATASection(text) : _document.createTextNode(text));
+      return singleton(out);
     }
 
     @Override
