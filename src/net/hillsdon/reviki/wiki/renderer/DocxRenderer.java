@@ -199,6 +199,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       Style tableHeader = constructStyle(TABLE_HEADER_STYLE, TABLE_CONTENTS_STYLE, "paragraph", Optional.of(JcEnumeration.CENTER), Optional.<PPrBase.Spacing> absent(), true);
 
       // Set code font
+      code.setRPr(factory.createRPr());
       code.getRPr().setRFonts(factory.createRFonts());
       code.getRPr().getRFonts().setAscii(CODE_FONT);
       code.getRPr().getRFonts().setHAnsi(CODE_FONT);
