@@ -466,15 +466,15 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     /** Push a context, visit children, and pop the context. */
     protected InputStream withContextSimple(final ContentAccessor ctx, final ASTNode node, final boolean block) {
-      setContext(ctx, block);
+      enterContext(ctx, block);
       visitASTNode(node);
-      unsetContext(block);
+      exitContext(block);
 
       return nullval();
     }
 
     /** Push a context. */
-    protected void setContext(final ContentAccessor ctx, final boolean block) {
+    protected void enterContext(final ContentAccessor ctx, final boolean block) {
       _contexts.push(ctx);
       if (block) {
         _blockContexts.push(ctx);
@@ -482,7 +482,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Pop a context. */
-    protected void unsetContext(final boolean block) {
+    protected void exitContext(final boolean block) {
       if (block) {
         _blockContexts.pop();
       }
@@ -491,6 +491,15 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     /** Construct a new numbering, push it, visit children, and pop. */
     protected InputStream withNumbering(final BigInteger type, final ASTNode node) {
+      enterListContext(type);
+      visitASTNode(node);
+      exitListContext();
+
+      return nullval();
+    }
+
+    /** Construct and push a new list context. */
+    protected void enterListContext(final BigInteger type) {
       // Construct a new list context at the appropriate indentation level and
       // push it to the stack.
       PPrBase.NumPr numpr = _factory.createPPrBaseNumPr();
@@ -500,7 +509,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       numpr.getNumId().setVal(type);
 
       if (_numberings.isEmpty()) {
-        numpr.getIlvl().setVal(BigInteger.valueOf(0));
+        numpr.getIlvl().setVal(BigInteger.ZERO);
       }
       else {
         BigInteger last = _numberings.peek().getIlvl().getVal();
@@ -508,10 +517,11 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       }
 
       _numberings.push(numpr);
-      visitASTNode(node);
-      _numberings.pop();
+    }
 
-      return nullval();
+    /** Leave a list context. */
+    protected void exitListContext() {
+      _numberings.pop();
     }
 
     /** Style a paragraph. */
