@@ -234,7 +234,6 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     @Override
     public List<Node> visitCode(final Code node) {
       Element out = _document.createElement("programlisting");
-      out.setAttribute("language", "c++");
 
       if (node.getLanguage().isPresent()) {
         out.setAttribute("language", node.getLanguage().get().toString());
@@ -284,7 +283,6 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     @Override
     public List<Node> visitInlineCode(final InlineCode node) {
       Element out = _document.createElement("code");
-      out.setAttribute("language", "c++");
 
       if (node.getLanguage().isPresent()) {
         out.setAttribute("language", node.getLanguage().get().toString());
