@@ -70,88 +70,88 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
    * Generating a docx is very side-effectful - so all the methods return null,
    * except for visitPage which bundles the generated document into a stream.
    */
-  private static final class DocxVisitor extends ASTRenderer<InputStream> {
+  protected static final class DocxVisitor extends ASTRenderer<InputStream> {
 
     /** Styles for headings. We only go up to h6 in the ast. */
-    private static final String HEADING1_STYLE = "Heading 1";
+    public static final String HEADING1_STYLE = "Heading 1";
 
-    private static final String HEADING2_STYLE = "Heading 2";
+    public static final String HEADING2_STYLE = "Heading 2";
 
-    private static final String HEADING3_STYLE = "Heading 3";
+    public static final String HEADING3_STYLE = "Heading 3";
 
-    private static final String HEADING4_STYLE = "Heading 4";
+    public static final String HEADING4_STYLE = "Heading 4";
 
-    private static final String HEADING5_STYLE = "Heading 5";
+    public static final String HEADING5_STYLE = "Heading 5";
 
-    private static final String HEADING6_STYLE = "Heading 6";
+    public static final String HEADING6_STYLE = "Heading 6";
 
     /** The default text style. */
-    private static final String TEXT_BODY_STYLE = "Text Body";
+    public static final String TEXT_BODY_STYLE = "Text Body";
 
     /** Styles for tables. */
-    private static final String TABLE_STYLE = "Padded Table";
+    public static final String TABLE_STYLE = "Padded Table";
 
-    private static final String TABLE_HEADER_STYLE = "Table Heading";
+    public static final String TABLE_HEADER_STYLE = "Table Heading";
 
-    private static final String TABLE_CONTENTS_STYLE = "Table Contents";
+    public static final String TABLE_CONTENTS_STYLE = "Table Contents";
 
     /** Style for block code. */
-    private static final String CODE_STYLE = "Preformatted Text";
+    public static final String CODE_STYLE = "Preformatted Text";
 
     /** Font for block and inline code. */
-    private static final String CODE_FONT = "Courier New";
+    public static final String CODE_FONT = "Courier New";
 
     /** Style for paragraphs-turned-into-horizontal rules. */
-    private static final String HORIZONTAL_RULE_STYLE = "Horizontal Line";
+    public static final String HORIZONTAL_RULE_STYLE = "Horizontal Line";
 
     /** The number style IDs for ordered and unordered lists. */
-    private static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(2);
+    public static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(2);
 
-    private static final BigInteger UNORDERED_LIST_ID = BigInteger.valueOf(1);
+    public static final BigInteger UNORDERED_LIST_ID = BigInteger.valueOf(1);
 
     /** The numbering definitions. */
-    private static final Numbering CUSTOM_NUMBERING;
+    public static final Numbering CUSTOM_NUMBERING;
 
     /** Custom styles. */
-    private static final List<Style> CUSTOM_STYLES;
+    public static final List<Style> CUSTOM_STYLES;
 
     /** Docx files are arranged into a "package" of smaller xml files. */
-    private final WordprocessingMLPackage _package;
+    protected final WordprocessingMLPackage _package;
 
     /** The "main" part of the document, which has reference to other parts. */
-    private final MainDocumentPart _mainPart;
+    protected final MainDocumentPart _mainPart;
 
     /** This is the actual document being rendered. */
-    private final Document _document;
+    protected final Document _document;
 
     /** And this is the body of the document! */
-    private final Body _body;
+    protected final Body _body;
 
     /** All objects have to come from a factory. */
-    private final ObjectFactory _factory;
+    protected final ObjectFactory _factory;
 
     /** The stack of containing contexts for new inline objects. */
-    private final Stack<ContentAccessor> _contexts = new Stack<ContentAccessor>();
+    protected final Stack<ContentAccessor> _contexts = new Stack<ContentAccessor>();
 
     /** The stack of containing contexts for new block objects. */
-    private final Stack<ContentAccessor> _blockContexts = new Stack<ContentAccessor>();
+    protected final Stack<ContentAccessor> _blockContexts = new Stack<ContentAccessor>();
 
     /** The stack of numbering styles for nested lists. */
-    private final Stack<PPrBase.NumPr> _numberings = new Stack<PPrBase.NumPr>();
+    protected final Stack<PPrBase.NumPr> _numberings = new Stack<PPrBase.NumPr>();
 
     /*
      * We can't nest bold/italic/strikethrough/etc text - so we need to keep
      * track of which bits are active when we generate "runs" - bits of plain
      * text.
      */
-    private BooleanDefaultTrue _bold;
+    protected BooleanDefaultTrue _bold;
 
-    private BooleanDefaultTrue _italic;
+    protected BooleanDefaultTrue _italic;
 
-    private BooleanDefaultTrue _strike;
+    protected BooleanDefaultTrue _strike;
 
     /** Style to apply to all paragraphs, if set. */
-    private String _paragraphStyle = null;
+    protected String _paragraphStyle = null;
 
     /**
      * Set up numbering and styles
@@ -285,7 +285,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * @param id The ID of the abstract numbering.
      * @return A new concrete numbering with a matching ID.
      */
-    private static Numbering.Num constructConcreteNumbering(final BigInteger id) {
+    protected static Numbering.Num constructConcreteNumbering(final BigInteger id) {
       ObjectFactory factory = new ObjectFactory();
       Numbering.Num num = factory.createNumberingNum();
 
@@ -308,7 +308,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      *          allowing ordered lists to be produced.
      * @return A new abstract numbering, with up to 10 levels of list nesting.
      */
-    private static Numbering.AbstractNum constructAbstractNumbering(final BigInteger id, final NumberFormat[] fmats, final String[] strs) {
+    protected static Numbering.AbstractNum constructAbstractNumbering(final BigInteger id, final NumberFormat[] fmats, final String[] strs) {
       ObjectFactory factory = new ObjectFactory();
 
       Numbering.AbstractNum abstractNum = factory.createNumberingAbstractNum();
@@ -341,7 +341,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * @param str The bullet string.
      * @return A new numbering level, for this level of indentation.
      */
-    private static Lvl constructNumberingLevel(final NumberFormat fmat, final long ilvl, final String str) {
+    protected static Lvl constructNumberingLevel(final NumberFormat fmat, final long ilvl, final String str) {
       ObjectFactory factory = new ObjectFactory();
 
       Lvl lvl = factory.createLvl();
@@ -382,7 +382,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       return lvl;
     }
 
-    private static Style constructStyle(final String name, final String basedOn, final String type, final Optional<JcEnumeration> justification, final Optional<PPrBase.Spacing> spacing, final boolean bold) {
+    protected static Style constructStyle(final String name, final String basedOn, final String type, final Optional<JcEnumeration> justification, final Optional<PPrBase.Spacing> spacing, final boolean bold) {
       ObjectFactory factory = new ObjectFactory();
 
       // Create the style
@@ -420,7 +420,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /**
      * Style IDs are names with no spaces.
      */
-    private static String styleNameToId(final String name) {
+    protected static String styleNameToId(final String name) {
       return name.replace(" ", "");
     }
 
@@ -447,7 +447,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Set some formatting, visit children, and unset the formatting. */
-    private InputStream withFormatting(final BooleanDefaultTrue fmat, final ASTNode node) {
+    protected InputStream withFormatting(final BooleanDefaultTrue fmat, final ASTNode node) {
       fmat.setVal(true);
       visitASTNode(node);
       fmat.setVal(false);
@@ -459,13 +459,13 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * Like withContextSimple, but also adds the context to the containing
      * block.
      */
-    private InputStream withContext(final ContentAccessor ctx, final ASTNode node, final boolean block) {
+    protected InputStream withContext(final ContentAccessor ctx, final ASTNode node, final boolean block) {
       _blockContexts.peek().getContent().add(ctx);
       return withContextSimple(ctx, node, block);
     }
 
     /** Push a context, visit children, and pop the context. */
-    private InputStream withContextSimple(final ContentAccessor ctx, final ASTNode node, final boolean block) {
+    protected InputStream withContextSimple(final ContentAccessor ctx, final ASTNode node, final boolean block) {
       setContext(ctx, block);
       visitASTNode(node);
       unsetContext(block);
@@ -474,7 +474,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Push a context. */
-    private void setContext(final ContentAccessor ctx, final boolean block) {
+    protected void setContext(final ContentAccessor ctx, final boolean block) {
       _contexts.push(ctx);
       if (block) {
         _blockContexts.push(ctx);
@@ -482,7 +482,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Pop a context. */
-    private void unsetContext(final boolean block) {
+    protected void unsetContext(final boolean block) {
       if (block) {
         _blockContexts.pop();
       }
@@ -490,7 +490,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Construct a new numbering, push it, visit children, and pop. */
-    private InputStream withNumbering(final BigInteger type, final ASTNode node) {
+    protected InputStream withNumbering(final BigInteger type, final ASTNode node) {
       // Construct a new list context at the appropriate indentation level and
       // push it to the stack.
       PPrBase.NumPr numpr = _factory.createPPrBaseNumPr();
@@ -751,7 +751,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /**
      * Apply the vertical alignment directive to table cells.
      */
-    private void applyValign(final Tc tablecell) {
+    protected void applyValign(final Tc tablecell) {
       if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
         tablecell.setTcPr(_factory.createTcPr());
         tablecell.getTcPr().setVAlign(_factory.createCTVerticalJc());
