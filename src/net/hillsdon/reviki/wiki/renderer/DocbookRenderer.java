@@ -275,6 +275,9 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
       Element imagedata = _document.createElement("imagedata");
       imagedata.setAttribute("fileref", target);
 
+      out.appendChild(info);
+      out.appendChild(imagedata);
+
       return singleton(out);
     }
 
