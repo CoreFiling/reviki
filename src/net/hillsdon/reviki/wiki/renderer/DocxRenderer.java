@@ -466,19 +466,27 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     /** Push a context, visit children, and pop the context. */
     private InputStream withContextSimple(final ContentAccessor ctx, final ASTNode node, final boolean block) {
+      setContext(ctx, block);
+      visitASTNode(node);
+      unsetContext(block);
+
+      return nullval();
+    }
+
+    /** Push a context. */
+    private void setContext(final ContentAccessor ctx, final boolean block) {
       _contexts.push(ctx);
       if (block) {
         _blockContexts.push(ctx);
       }
+    }
 
-      visitASTNode(node);
-
+    /** Pop a context. */
+    private void unsetContext(final boolean block) {
       if (block) {
         _blockContexts.pop();
       }
       _contexts.pop();
-
-      return nullval();
     }
 
     /** Construct a new numbering, push it, visit children, and pop. */
