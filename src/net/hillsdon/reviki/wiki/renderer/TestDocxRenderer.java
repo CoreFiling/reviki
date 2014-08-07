@@ -1,14 +1,28 @@
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.xml.bind.JAXBElement;
 
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
+import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 import net.hillsdon.reviki.wiki.renderer.DocxRenderer.DocxVisitor;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Page;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+import org.apache.commons.io.IOUtils;
 import org.docx4j.wml.*;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Suppliers;
 
 import junit.framework.TestCase;
 
@@ -17,6 +31,8 @@ import junit.framework.TestCase;
  * the more clean parts of it. Hopefully that's enough.
  */
 public class TestDocxRenderer extends TestCase {
+  private DocxRenderer _renderer;
+
   private DocxVisitor _visitor;
 
   private ObjectFactory _factory;
@@ -24,6 +40,9 @@ public class TestDocxRenderer extends TestCase {
   public void setUp() {
     _visitor = new DocxVisitor();
     _factory = new ObjectFactory();
+
+    SvnWikiRenderer svnrenderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()));
+    _renderer = (DocxRenderer) svnrenderer.getRenderers().getRenderer(ViewTypeConstants.CTYPE_DOCX);
   }
 
   /** Test that we can construct concrete numberings. */
@@ -205,8 +224,22 @@ public class TestDocxRenderer extends TestCase {
   public void testConstructRun() {
     P paragraph = _factory.createP();
     _visitor.enterContext(paragraph, false);
-    R run = _visitor.constructRun();
+
+    _visitor._bold.setVal(Boolean.TRUE);
+    _visitor._italic.setVal(Boolean.TRUE);
+
+    R run = _visitor.constructRun(false);
+
     assertTrue(paragraph.getContent().contains(run));
+    assertFalse(run.getRPr().getB().isVal());
+    assertFalse(run.getRPr().getI().isVal());
+    assertFalse(run.getRPr().getStrike().isVal());
+
+    run = _visitor.constructRun(true);
+
+    assertTrue(run.getRPr().getB().isVal());
+    assertTrue(run.getRPr().getI().isVal());
+    assertFalse(run.getRPr().getStrike().isVal());
   }
 
   /** Test that we can set the font of a run. */
@@ -232,5 +265,42 @@ public class TestDocxRenderer extends TestCase {
     assertTrue(_visitor._blockContexts.peek().getContent().contains(paragraph));
     assertTrue(paragraph.getContent().contains(run));
     assertFalse(_visitor._blockContexts.peek().getContent().contains(run));
+  }
+
+  /** Test that we can align table cells. */
+  public void testTableCellValign() {
+    Tc tablecell = _factory.createTc();
+
+    DocxVisitor.applyValign(tablecell, "top");
+    assertTrue(tablecell.getTcPr().getVAlign().getVal().equals(STVerticalJc.TOP));
+
+    DocxVisitor.applyValign(tablecell, "middle");
+    assertTrue(tablecell.getTcPr().getVAlign().getVal().equals(STVerticalJc.CENTER));
+
+    DocxVisitor.applyValign(tablecell, "center");
+    assertTrue(tablecell.getTcPr().getVAlign().getVal().equals(STVerticalJc.CENTER));
+
+    DocxVisitor.applyValign(tablecell, "centre");
+    assertTrue(tablecell.getTcPr().getVAlign().getVal().equals(STVerticalJc.CENTER));
+
+    DocxVisitor.applyValign(tablecell, "bottom");
+    assertTrue(tablecell.getTcPr().getVAlign().getVal().equals(STVerticalJc.BOTTOM));
+  }
+
+  /** Sanity check: check that we actually get output. */
+  public void testSanity() {
+    Page page = new Page(new ArrayList<ASTNode>());
+    InputStream is = _renderer.build(page, URLOutputFilter.NULL);
+
+    assertNotNull(is);
+
+    try {
+      byte[] rendered = IOUtils.toByteArray(is);
+      assertFalse(0 == rendered.length);
+    }
+    catch (IOException e) {
+      assertFalse("Failed to extract byte array", true);
+    }
+
   }
 }
