@@ -1,0 +1,72 @@
+[
+  {
+    "name":   "Nested sections",
+    "input":  "= Heading 1\n\n== Heading 2",
+    "output": "<section>\n<info>\n<title>Heading 1</title>\n</info>\n<section>\n<info>\n<title>Heading 2</title>\n</info>\n</section>\n</section>"
+  },
+  {
+    "name":   "Complicated sections",
+    "input":  "= Heading 1\n\n== Heading 2\n\n= Heading 1",
+    "output": "<section>\n<info>\n<title>Heading 1</title>\n</info>\n<section>\n<info>\n<title>Heading 2</title>\n</info>\n</section>\n</section>\n<section>\n<info>\n<title>Heading 1</title>\n</info>\n</section>"
+  },
+  {
+    "name":   "Start without a heading",
+    "input":  "Hello, world!",
+    "output": "<section>\n<para>Hello, world!</para>\n</section>"
+  },
+  {
+    "name":   "Ordered lists",
+    "input":  "# Li 1\n# Li 2",
+    "output": "<section>\n<orderedlist>\n<listitem>Li 1</listitem>\n<listitem>Li 2</listitem>\n</orderedlist>\n</section>"
+  },
+  {
+    "name":   "Unordered lists",
+    "input":  "* Li 1\n* Li 2",
+    "output": "<section>\n<itemizedlist>\n<listitem>Li 1</listitem>\n<listitem>Li 2</listitem>\n</itemizedlist>\n</section>"
+  },
+  {
+    "name":   "Inline formatting",
+    "input":  "**Bold //italic --strike--//**",
+    "output": "<section>\n<para>\n<emphasis role=\"bold\">Bold <emphasis>italic <emphasis role=\"strike\">strike</emphasis>\n</emphasis>\n</emphasis>\n</para>\n</section>"
+  },
+  {
+    "name":   "Images",
+    "input":  "{{foo.png|An Image called Foo}} {{http://www.example.com/example.png}}",
+    "output": "<section>\n<para>\n<imageobject>\n<info>\n<title>An Image called Foo</title>\n</info>\n<imagedata fileref=\"http://www.example.com/reviki/pages/test-wiki/TestPage/attachments/foo.png\"/>\n</imageobject> <imageobject>\n<info>\n<title>http://www.example.com/example.png</title>\n</info>\n<imagedata fileref=\"http://www.example.com/example.png\"/>\n</imageobject>\n</para>\n</section>"
+  },
+  {
+    "name":   "Links",
+    "input":  "[[Foo|Title]] [[http://www.example.com|Another Title]]",
+    "output": "<section>\n<para>\n<link xl:href=\"http://www.example.com/reviki/pages/test-wiki/Foo\">Title</link> <link xl:href=\"http://www.example.com\">Another Title</link>\n</para>\n</section>"
+  },
+  {
+    "name":   "Aligned table cells",
+    "input":  "<<+table-alignment: top>>\n\n|foo|=foo'|\n\n<<+table-alignment:middle>>\n\n|bar|=bar'|\n\n<<-table-alignment>>\n\n|baz|=baz'|",
+    "output": "<section>\n<table>\n<tr>\n<td valign=\"top\">foo</td>\n<th valign=\"top\">foo'</th>\n</tr>\n</table>\n<table>\n<tr>\n<td valign=\"middle\">bar</td>\n<th valign=\"middle\">bar'</th>\n</tr>\n</table>\n<table>\n<tr>\n<td>baz</td>\n<th>baz'</th>\n</tr>\n</table>\n</section>"
+  },
+  {
+    "name":   "NoWiki",
+    "input":  "{{{I am}}} inline.\n\n{{{I am\nblock}}}",
+    "output": "<section>\n<para>\n<code>I am</code> inline.</para>\n<programlisting><![CDATA[I am\nblock]]></programlisting>\n</section>"
+  },
+  {
+    "name":   "Syntax highlighting",
+    "input":  "[<java>]I am[</java>] inline.\n\n[<java>]I am\nblock[</java>]",
+    "output": "<section>\n<para>\n<code language=\"java\">I am</code> inline.</para>\n<programlisting language=\"java\"><![CDATA[I am\nblock]]></programlisting>\n</section>"
+  },
+  {
+    "name":   "Linebreak",
+    "input":  "Foo\\\\Bar\\\\Baz",
+    "output": "<section>\n<para>Foo<sbr/>Bar<sbr/>Baz</para>\n</section>"
+  },
+  {
+    "name":   "Horizontal Rule",
+    "input":  "----",
+    "output": "<section>\n<bridgehead role=\"separator\"/>\n</section>"
+  },
+  {
+    "name":   "Unexpanded macros",
+    "input":  "Hello <<world:args>>\n\n<<macro:args2>>",
+    "output": "<section>\n<para>Hello <code>&lt;&lt;world:args&gt;&gt;</code>\n</para>\n<programlisting><![CDATA[<<macro:args2>>]]></programlisting>\n</section>"
+  }
+]
