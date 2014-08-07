@@ -24,6 +24,7 @@ import com.google.common.base.Supplier;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -52,13 +53,17 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
     _macros = macros;
-
-    renderer = new DocxVisitor();
   }
 
   @Override
   public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
     return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
+  }
+
+  @Override
+  public InputStream build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    DocxVisitor visitor = new DocxVisitor(urlOutputFilter);
+    return visitor.visit(ast);
   }
 
   @Override
@@ -234,7 +239,9 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       CUSTOM_STYLES.add(tableHeader);
     }
 
-    public DocxVisitor() {
+    public DocxVisitor(URLOutputFilter urlOutputFilter) {
+      super(urlOutputFilter);
+
       try {
         _package = WordprocessingMLPackage.createPackage();
         _mainPart = _package.getMainDocumentPart();

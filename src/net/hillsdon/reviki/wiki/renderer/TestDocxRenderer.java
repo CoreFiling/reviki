@@ -38,7 +38,7 @@ public class TestDocxRenderer extends TestCase {
   private ObjectFactory _factory;
 
   public void setUp() {
-    _visitor = new DocxVisitor();
+    _visitor = new DocxVisitor(URLOutputFilter.NULL);
     _factory = new ObjectFactory();
 
     SvnWikiRenderer svnrenderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()));
@@ -231,9 +231,7 @@ public class TestDocxRenderer extends TestCase {
     R run = _visitor.constructRun(false);
 
     assertTrue(paragraph.getContent().contains(run));
-    assertFalse(run.getRPr().getB().isVal());
-    assertFalse(run.getRPr().getI().isVal());
-    assertFalse(run.getRPr().getStrike().isVal());
+    assertNull(run.getRPr());
 
     run = _visitor.constructRun(true);
 

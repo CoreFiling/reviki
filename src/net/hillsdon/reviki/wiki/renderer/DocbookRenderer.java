@@ -102,8 +102,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
       throw new RuntimeException(e);
     }
 
-    DocbookVisitor renderer = new DocbookVisitor(document);
-    renderer.setUrlOutputFilter(urlOutputFilter);
+    DocbookVisitor renderer = new DocbookVisitor(document, urlOutputFilter);
 
     // The renderer builds the root element, in this case.
     document.appendChild(renderer.visit(ast).get(0));
@@ -114,8 +113,8 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
   private final class DocbookVisitor extends ASTRenderer<List<Node>> {
     private final Document _document;
 
-    public DocbookVisitor(final Document document) {
-      super(new ArrayList<Node>());
+    public DocbookVisitor(final Document document, URLOutputFilter urlOutputFilter) {
+      super(new ArrayList<Node>(), urlOutputFilter);
       _document = document;
     }
 

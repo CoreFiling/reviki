@@ -11,6 +11,7 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
@@ -45,8 +46,6 @@ public class HtmlRenderer extends MarkupRenderer<String> {
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
     _macros = macros;
-
-    renderer = new HtmlVisitor();
   }
 
   @Override
@@ -55,13 +54,19 @@ public class HtmlRenderer extends MarkupRenderer<String> {
   }
 
   @Override
+  public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+    HtmlVisitor visitor = new HtmlVisitor(urlOutputFilter);
+    return visitor.visit(ast);
+  }
+
+  @Override
   public String getContentType() {
     return "text/html; charset=utf-8";
   }
 
   private final class HtmlVisitor extends ASTRenderer<String> {
-    public HtmlVisitor() {
-      super("");
+    public HtmlVisitor(URLOutputFilter urlOutputFilter) {
+      super("", urlOutputFilter);
     }
 
     @Override

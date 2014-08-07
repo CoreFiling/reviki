@@ -51,9 +51,6 @@ public abstract class MarkupRenderer<T> {
     }
   };
 
-  /** The renderer for this format. */
-  protected ASTRenderer<T> renderer = null;
-
   /**
    * Render a page to an AST.
    */
@@ -80,10 +77,7 @@ public abstract class MarkupRenderer<T> {
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public T build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
-    renderer.setUrlOutputFilter(urlOutputFilter);
-    return renderer.visit(ast);
-  }
+  public abstract T build(final ASTNode ast, final URLOutputFilter urlOutputFilter);
 
   /**
    * Return the MIME type of the generated output.

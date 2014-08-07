@@ -45,23 +45,17 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
    */
   private final T _nullval;
 
-  public ASTRenderer(final T nullval) {
+  public ASTRenderer(final T nullval, final URLOutputFilter urlOutputFilter) {
     _enabledDirectives = new HashMap<String, List<String>>();
     _nullval = nullval;
-  }
-
-  /**
-   * Default constructor for cases where `null` is the null value.
-   */
-  public ASTRenderer() {
-    this(null);
-  }
-
-  /**
-   * Set the URL output filter.
-   */
-  public void setUrlOutputFilter(final URLOutputFilter urlOutputFilter) {
     _urlOutputFilter = urlOutputFilter;
+  }
+
+  /**
+   * Shorthand constructor for cases where `null` is the null value.
+   */
+  public ASTRenderer(final URLOutputFilter urlOutputFilter) {
+    this(null, urlOutputFilter);
   }
 
   /**
