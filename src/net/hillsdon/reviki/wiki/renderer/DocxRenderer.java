@@ -424,6 +424,30 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       return name.replace(" ", "");
     }
 
+    /** Style a paragraph. */
+    protected static void paraStyle(final P paragraph, final String style) {
+      ObjectFactory factory = new ObjectFactory();
+
+      if (paragraph.getPPr() == null) {
+        paragraph.setPPr(factory.createPPr());
+      }
+
+      if (paragraph.getPPr().getPStyle() == null) {
+        paragraph.getPPr().setPStyle(factory.createPPrBasePStyle());
+      }
+
+      paragraph.getPPr().getPStyle().setVal(styleNameToId(style));
+    }
+
+    /** Set the text of a run. */
+    protected static void runText(final R run, final String str) {
+      ObjectFactory factory = new ObjectFactory();
+
+      Text text = factory.createText();
+      text.setValue(str);
+      run.getContent().add(factory.createRT(text));
+    }
+
     /**
      * Build the document by visiting the children, and then serialise it to an
      * input stream.
@@ -522,26 +546,6 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /** Leave a list context. */
     protected void exitListContext() {
       _numberings.pop();
-    }
-
-    /** Style a paragraph. */
-    public void paraStyle(final P paragraph, final String style) {
-      if (paragraph.getPPr() == null) {
-        paragraph.setPPr(_factory.createPPr());
-      }
-
-      if (paragraph.getPPr().getPStyle() == null) {
-        paragraph.getPPr().setPStyle(_factory.createPPrBasePStyle());
-      }
-
-      paragraph.getPPr().getPStyle().setVal(styleNameToId(style));
-    }
-
-    /** Set the text of a run. */
-    public void runText(final R run, final String str) {
-      Text text = _factory.createText();
-      text.setValue(str);
-      run.getContent().add(_factory.createRT(text));
     }
 
     /** Make a new run, adding it to the current context. */
