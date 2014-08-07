@@ -138,7 +138,7 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
     }
   }
 
-  private void validate(final String caseName, final String actual) {
+  protected void validate(final String caseName, final String actual) {
     // Put the content in a <body> tag first.
     final String content = HTML_PREFIX + actual + HTML_SUFFIX;
     try {
