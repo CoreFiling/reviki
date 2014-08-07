@@ -287,7 +287,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
         out.setAttribute("language", node.getLanguage().get().toString());
       }
 
-      out.appendChild(_document.createCDATASection(node.getText()));
+      out.appendChild(_document.createTextNode(node.getText()));
 
       return singleton(out);
     }
@@ -382,7 +382,7 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
     @Override
     public List<Node> visitTextNode(final TextNode node) {
       String text = node.getText();
-      return singleton(node.isEscaped() ? _document.createCDATASection(text) : _document.createTextNode(text));
+      return singleton(node.isEscaped() ? _document.createTextNode(text) : _document.createCDATASection(text));
     }
 
     @Override
