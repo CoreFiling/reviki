@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
@@ -14,8 +16,7 @@ import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 import net.hillsdon.reviki.wiki.renderer.DocxRenderer.DocxVisitor;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Page;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import org.apache.commons.io.IOUtils;
@@ -209,15 +210,20 @@ public class TestDocxRenderer extends TestCase {
     assertTrue(paragraph.getPPr().getPStyle().getVal().equals(style2));
   }
 
-  /** Test that we can set the text of a run. */
+  /** Get the text of a run. */
   @SuppressWarnings("unchecked")
+  protected String getRunText(R run) {
+    return ((JAXBElement<Text>) run.getContent().get(0)).getValue().getValue();
+  }
+
+  /** Test that we can set the text of a run. */
   public void testRunText() {
     R run = _factory.createR();
     String text = "hello world";
 
     DocxVisitor.runText(run, text);
 
-    assertTrue(((JAXBElement<Text>) run.getContent().get(0)).getValue().getValue().equals(text));
+    assertTrue(getRunText(run).equals(text));
   }
 
   /** Test that we can construct a run and push it to a context. */
@@ -299,6 +305,82 @@ public class TestDocxRenderer extends TestCase {
     catch (IOException e) {
       assertFalse("Failed to extract byte array", true);
     }
+  }
 
+  /**
+   * Test the rendering of a four-element table, including styles and cell
+   * contents.
+   */
+  public void testTables() {
+    List<ASTNode> foo = Arrays.asList(new ASTNode[] { new Plaintext("foo") });
+    List<ASTNode> bar = Arrays.asList(new ASTNode[] { new Plaintext("bar") });
+    List<ASTNode> baz = Arrays.asList(new ASTNode[] { new Plaintext("baz") });
+    List<ASTNode> bat = Arrays.asList(new ASTNode[] { new Plaintext("bat") });
+    TableHeaderCell th1 = new TableHeaderCell(new Inline(foo));
+    TableHeaderCell th2 = new TableHeaderCell(new Inline(bar));
+    TableCell td1 = new TableCell(new Inline(baz));
+    TableCell td2 = new TableCell(new Inline(bat));
+    TableRow tr1 = new TableRow(Arrays.asList(new ASTNode[] { th1, th2 }));
+    TableRow tr2 = new TableRow(Arrays.asList(new ASTNode[] { td1, td2 }));
+    Table table = new Table(Arrays.asList(new ASTNode[] { tr1, tr2 }));
+
+    Body body = _factory.createBody();
+    _visitor.enterContext(body, true);
+
+    _visitor.visit(table);
+
+    assertEquals(1, body.getContent().size());
+
+    Tbl tbl = (Tbl) body.getContent().get(0);
+
+    assertEquals(2, tbl.getContent().size());
+    assertNotNull(tbl.getTblPr().getTblW());
+    assertFalse(tbl.getTblPr().getTblW().getW().equals(BigInteger.ZERO));
+
+    Tr tblTr1 = (Tr) tbl.getContent().get(0);
+    Tr tblTr2 = (Tr) tbl.getContent().get(1);
+
+    Tc tblTr1Tc1 = (Tc) tblTr1.getContent().get(0);
+    Tc tblTr1Tc2 = (Tc) tblTr1.getContent().get(1);
+    Tc tblTr2Tc1 = (Tc) tblTr2.getContent().get(0);
+    Tc tblTr2Tc2 = (Tc) tblTr2.getContent().get(1);
+
+    assertEquals(1, tblTr1Tc1.getContent().size());
+    assertEquals(1, tblTr1Tc2.getContent().size());
+    assertEquals(1, tblTr2Tc1.getContent().size());
+    assertEquals(1, tblTr2Tc2.getContent().size());
+
+    P p1 = (P) tblTr1Tc1.getContent().get(0);
+    P p2 = (P) tblTr1Tc2.getContent().get(0);
+    P p3 = (P) tblTr2Tc1.getContent().get(0);
+    P p4 = (P) tblTr2Tc2.getContent().get(0);
+
+    assertNotNull(p1.getPPr());
+    assertNotNull(p2.getPPr());
+    assertNotNull(p3.getPPr());
+    assertNotNull(p4.getPPr());
+
+    String headerStyle = DocxVisitor.styleNameToId(DocxVisitor.TABLE_HEADER_STYLE);
+    String contentStyle = DocxVisitor.styleNameToId(DocxVisitor.TABLE_CONTENTS_STYLE);
+
+    assertTrue(p1.getPPr().getPStyle().getVal().equals(headerStyle));
+    assertTrue(p2.getPPr().getPStyle().getVal().equals(headerStyle));
+    assertTrue(p3.getPPr().getPStyle().getVal().equals(contentStyle));
+    assertTrue(p4.getPPr().getPStyle().getVal().equals(contentStyle));
+
+    assertEquals(1, p1.getContent().size());
+    assertEquals(1, p2.getContent().size());
+    assertEquals(1, p3.getContent().size());
+    assertEquals(1, p4.getContent().size());
+
+    R r1 = (R) p1.getContent().get(0);
+    R r2 = (R) p2.getContent().get(0);
+    R r3 = (R) p3.getContent().get(0);
+    R r4 = (R) p4.getContent().get(0);
+
+    assertTrue(getRunText(r1).equals("foo"));
+    assertTrue(getRunText(r2).equals("bar"));
+    assertTrue(getRunText(r3).equals("baz"));
+    assertTrue(getRunText(r4).equals("bat"));
   }
 }
