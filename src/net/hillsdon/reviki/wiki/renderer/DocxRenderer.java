@@ -252,13 +252,13 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
       // Set-up the formatting
       _bold = _factory.createBooleanDefaultTrue();
-      _bold.setVal(new Boolean(false));
+      _bold.setVal(Boolean.FALSE);
 
       _italic = _factory.createBooleanDefaultTrue();
-      _italic.setVal(new Boolean(false));
+      _italic.setVal(Boolean.FALSE);
 
       _strike = _factory.createBooleanDefaultTrue();
-      _strike.setVal(new Boolean(false));
+      _strike.setVal(Boolean.FALSE);
 
       // Apply the statically-constructed numbering definitions.
       try {
@@ -454,6 +454,24 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       props.getRFonts().setHAnsi(font);
     }
 
+    /** Apply alignment to a table cell. */
+    protected static void applyValign(final Tc tablecell, final String valign) {
+      ObjectFactory factory = new ObjectFactory();
+
+      tablecell.setTcPr(factory.createTcPr());
+      tablecell.getTcPr().setVAlign(factory.createCTVerticalJc());
+
+      if (valign.equals("top")) {
+        tablecell.getTcPr().getVAlign().setVal(STVerticalJc.TOP);
+      }
+      else if (valign.equals("middle") || valign.equals("center") || valign.equals("centre")) {
+        tablecell.getTcPr().getVAlign().setVal(STVerticalJc.CENTER);
+      }
+      else if (valign.equals("bottom")) {
+        tablecell.getTcPr().getVAlign().setVal(STVerticalJc.BOTTOM);
+      }
+    }
+
     /**
      * Build the document by visiting the children, and then serialise it to an
      * input stream.
@@ -555,9 +573,17 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     }
 
     /** Make a new run, adding it to the current context. */
-    public R constructRun() {
+    public R constructRun(final boolean applyFormatting) {
       R run = _factory.createR();
       commitInline(run);
+
+      if (applyFormatting) {
+        run.setRPr(_factory.createRPr());
+        run.getRPr().setB(_bold);
+        run.getRPr().setI(_italic);
+        run.getRPr().setStrike(_strike);
+      }
+
       return run;
     }
 
@@ -581,7 +607,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       P code = _factory.createP();
       paraStyle(code, CODE_STYLE);
 
-      R run = constructRun();
+      R run = constructRun(false);
       runText(run, node.getText());
 
       code.getContent().add(run);
@@ -644,7 +670,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       }
 
       // Then we add it to the current paragraph.
-      R run = constructRun();
+      R run = constructRun(false);
 
       Drawing drawing = _factory.createDrawing();
       run.getContent().add(drawing);
@@ -656,7 +682,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     @Override
     public InputStream visitInlineCode(final InlineCode node) {
-      R run = constructRun();
+      R run = constructRun(false);
       run.setRPr(_factory.createRPr());
       runFont(run.getRPr(), CODE_FONT);
       runText(run, node.getText());
@@ -779,22 +805,9 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /**
      * Apply the vertical alignment directive to table cells.
      */
-    protected void applyValign(final Tc tablecell) {
+    protected void valign(final Tc tablecell) {
       if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
-        tablecell.setTcPr(_factory.createTcPr());
-        tablecell.getTcPr().setVAlign(_factory.createCTVerticalJc());
-
-        String valign = unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0);
-
-        if (valign.equals("top")) {
-          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.TOP);
-        }
-        else if (valign.equals("middle") || valign.equals("center") || valign.equals("centre")) {
-          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.CENTER);
-        }
-        else if (valign.equals("bottom")) {
-          tablecell.getTcPr().getVAlign().setVal(STVerticalJc.BOTTOM);
-        }
+        applyValign(tablecell, unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0));
       }
     }
 
@@ -802,7 +815,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
       commitBlock(tablecell);
-      applyValign(tablecell);
+      valign(tablecell);
 
       P para = _factory.createP();
       tablecell.getContent().add(para);
@@ -815,7 +828,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     public InputStream visitTableHeaderCell(final TableHeaderCell node) {
       Tc tablecell = _factory.createTc();
       commitBlock(tablecell);
-      applyValign(tablecell);
+      valign(tablecell);
 
       P para = _factory.createP();
       tablecell.getContent().add(para);
@@ -831,13 +844,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     @Override
     public InputStream visitTextNode(final TextNode node) {
-      R run = constructRun();
-
-      // Set formatting
-      run.setRPr(_factory.createRPr());
-      run.getRPr().setB(_bold);
-      run.getRPr().setI(_italic);
-      run.getRPr().setStrike(_strike);
+      R run = constructRun(true);
 
       // Set text
       runText(run, node.getText());
