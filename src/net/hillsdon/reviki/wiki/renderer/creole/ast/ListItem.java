@@ -6,8 +6,4 @@ public class ListItem extends ASTNode {
   public ListItem(final List<ASTNode> children) {
     super(children);
   }
-
-  public ListItem(final ASTNode body) {
-    super(body);
-  }
 }
