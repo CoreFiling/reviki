@@ -200,9 +200,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
       // Set code font
       code.setRPr(factory.createRPr());
-      code.getRPr().setRFonts(factory.createRFonts());
-      code.getRPr().getRFonts().setAscii(CODE_FONT);
-      code.getRPr().getRFonts().setHAnsi(CODE_FONT);
+      runFont(code.getRPr(), CODE_FONT);
 
       // The table style is very different to text styles, so it's just
       // constructed here.
@@ -250,8 +248,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       _body = _factory.createBody();
 
       _document.setBody(_body);
-      _contexts.push(_body);
-      _blockContexts.push(_body);
+      enterContext(_body, true);
 
       // Set-up the formatting
       _bold = _factory.createBooleanDefaultTrue();
@@ -448,6 +445,15 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       run.getContent().add(factory.createRT(text));
     }
 
+    /** Set the font of some run properties. */
+    protected static void runFont(RPr props, final String font) {
+      ObjectFactory factory = new ObjectFactory();
+
+      props.setRFonts(factory.createRFonts());
+      props.getRFonts().setAscii(font);
+      props.getRFonts().setHAnsi(font);
+    }
+
     /**
      * Build the document by visiting the children, and then serialise it to an
      * input stream.
@@ -484,7 +490,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
      * block.
      */
     protected InputStream withContext(final ContentAccessor ctx, final ASTNode node, final boolean block) {
-      _blockContexts.peek().getContent().add(ctx);
+      commitBlock(ctx);
       return withContextSimple(ctx, node, block);
     }
 
@@ -551,8 +557,18 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     /** Make a new run, adding it to the current context. */
     public R constructRun() {
       R run = _factory.createR();
-      _contexts.peek().getContent().add(run);
+      commitInline(run);
       return run;
+    }
+
+    /** Save a block to the top block context. */
+    protected void commitBlock(Object o) {
+      _blockContexts.peek().getContent().add(o);
+    }
+
+    /** Save an inline element to the top context. */
+    protected void commitInline(Object o) {
+      _contexts.peek().getContent().add(o);
     }
 
     @Override
@@ -569,7 +585,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       runText(run, node.getText());
 
       code.getContent().add(run);
-      _blockContexts.peek().getContent().add(code);
+      commitBlock(code);
 
       return nullval();
     }
@@ -606,7 +622,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     @Override
     public InputStream visitHorizontalRule(final HorizontalRule node) {
       P hrule = _factory.createP();
-      _document.getContent().add(hrule);
+      commitBlock(hrule);
       paraStyle(hrule, HORIZONTAL_RULE_STYLE);
 
       return nullval();
@@ -642,9 +658,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     public InputStream visitInlineCode(final InlineCode node) {
       R run = constructRun();
       run.setRPr(_factory.createRPr());
-      run.getRPr().setRFonts(_factory.createRFonts());
-      run.getRPr().getRFonts().setAscii(CODE_FONT);
-      run.getRPr().getRFonts().setHAnsi(CODE_FONT);
+      runFont(run.getRPr(), CODE_FONT);
       runText(run, node.getText());
 
       return nullval();
@@ -657,7 +671,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
 
     @Override
     public InputStream visitLinebreak(final Linebreak node) {
-      _contexts.peek().getContent().add(_factory.createBr());
+      commitInline(_factory.createBr());
 
       return nullval();
     }
@@ -671,7 +685,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       hyperlink.getContent().add(run);
       runText(run, title);
 
-      _contexts.peek().getContent().add(hyperlink);
+      commitInline(hyperlink);
 
       return nullval();
     }
@@ -691,7 +705,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
       // If in block position, render to a new paragraph.
       if (node.isBlock()) {
         P para = _factory.createP();
-        _blockContexts.peek().getContent().add(para);
+        commitBlock(para);
         _contexts.push(para);
       }
 
@@ -787,7 +801,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     @Override
     public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
-      _blockContexts.peek().getContent().add(tablecell);
+      commitBlock(tablecell);
       applyValign(tablecell);
 
       P para = _factory.createP();
@@ -800,7 +814,7 @@ public class DocxRenderer extends MarkupRenderer<InputStream> {
     @Override
     public InputStream visitTableHeaderCell(final TableHeaderCell node) {
       Tc tablecell = _factory.createTc();
-      _blockContexts.peek().getContent().add(tablecell);
+      commitBlock(tablecell);
       applyValign(tablecell);
 
       P para = _factory.createP();
