@@ -239,42 +239,33 @@ public class HtmlRenderer extends MarkupRenderer<String> {
       return renderTagged("table", node);
     }
 
-    @Override
-    public String visitTableCell(final TableCell node) {
+    /** Render a table cell with vertical alignment. */
+    protected String valign(final String tag, final ASTNode node) {
       if (!isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
-        return renderTagged("td", node);
+        return renderTagged(tag, node);
       }
 
       try {
-        String out = "<td " + CSS_CLASS_ATTR;
+        String out = "<" + tag + " " + CSS_CLASS_ATTR;
         out += " style='vertical-align:" + unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0) + "'>";
         out += visitASTNode(node);
-        out += "</td>";
+        out += "</" + tag + ">";
         return out;
       }
       catch (Exception e) {
         System.err.println("Error when handling directive " + TABLE_ALIGNMENT_DIRECTIVE);
-        return renderTagged("td", node);
+        return renderTagged(tag, node);
       }
     }
 
     @Override
-    public String visitTableHeaderCell(final TableHeaderCell node) {
-      if (!isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
-        return renderTagged("th", node);
-      }
+    public String visitTableCell(final TableCell node) {
+      return valign("td", node);
+    }
 
-      try {
-        String out = "<th " + CSS_CLASS_ATTR;
-        out += " style='vertical-align:" + unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0) + "'>";
-        out += visitASTNode(node);
-        out += "</th>";
-        return out;
-      }
-      catch (Exception e) {
-        System.err.println("Error when handling directive " + TABLE_ALIGNMENT_DIRECTIVE);
-        return renderTagged("th", node);
-      }
+    @Override
+    public String visitTableHeaderCell(final TableHeaderCell node) {
+      return valign("th", node);
     }
 
     @Override

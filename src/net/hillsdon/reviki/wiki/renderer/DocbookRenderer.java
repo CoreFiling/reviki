@@ -345,35 +345,29 @@ public class DocbookRenderer extends MarkupRenderer<InputStream> {
       return singleton(wraps("table", node));
     }
 
-    @Override
-    public List<Node> visitTableCell(final TableCell node) {
-      Element out = (Element) wraps("td", node);
-
+    /** Apply vertical alignment to a table cell. */
+    protected void valign(final Element tablecell) {
       if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
         try {
-          out.setAttribute("valign", unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0));
+          tablecell.setAttribute("valign", unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0));
         }
         catch (Exception e) {
           System.err.println("Error when handling directive " + TABLE_ALIGNMENT_DIRECTIVE);
         }
       }
+    }
 
+    @Override
+    public List<Node> visitTableCell(final TableCell node) {
+      Element out = (Element) wraps("td", node);
+      valign(out);
       return singleton(out);
     }
 
     @Override
     public List<Node> visitTableHeaderCell(final TableHeaderCell node) {
       Element out = (Element) wraps("th", node);
-
-      if (isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
-        try {
-          out.setAttribute("valign", unsafeGetArgs(TABLE_ALIGNMENT_DIRECTIVE).get(0));
-        }
-        catch (Exception e) {
-          System.err.println("Error when handling directive " + TABLE_ALIGNMENT_DIRECTIVE);
-        }
-      }
-
+      valign(out);
       return singleton(out);
     }
 
