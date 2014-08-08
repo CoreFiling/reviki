@@ -36,7 +36,7 @@ public class TestCoreCreole extends JsonDrivenRenderingTest {
         new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration()),
         Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>()));
 
-    Optional<String> rendered = renderer.build(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL);
+    Optional<String> rendered = renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL);
 
     return rendered.isPresent() ? rendered.get() : "";
   }

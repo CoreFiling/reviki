@@ -164,7 +164,7 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   private Document createWikiPageDocument(final PageInfo page) throws IOException, PageStoreException {
-    ASTNode pageAST = _renderer.render(page);
+    ASTNode pageAST = _renderer.parse(page);
     final String path = page.getPath();
     final String wiki = page.getWiki();
     final String content = page.getContent();

@@ -22,11 +22,8 @@ import org.w3c.dom.Node;
 
 import com.google.common.base.Supplier;
 
-import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
@@ -40,29 +37,13 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  *
  * @author msw
  */
-public class DocbookRenderer extends MarkupRenderer<InputStream> {
-  private final PageStore _pageStore;
-
-  private final LinkPartsHandler _linkHandler;
-
-  private final LinkPartsHandler _imageHandler;
-
-  private final Supplier<List<Macro>> _macros;
-
+public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
   public DocbookRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    _pageStore = pageStore;
-    _linkHandler = linkHandler;
-    _imageHandler = imageHandler;
-    _macros = macros;
+    super(pageStore, linkHandler, imageHandler, macros);
   }
 
   @Override
-  public ASTNode render(final PageInfo page) {
-    return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
-  }
-
-  @Override
-  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String out = buildString(ast, urlOutputFilter);
     return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
   }

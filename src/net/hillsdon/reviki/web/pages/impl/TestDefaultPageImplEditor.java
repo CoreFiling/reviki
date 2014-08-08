@@ -123,7 +123,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setAttribute(RequestAttributes.USERNAME, USERNAME);
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
-    assertTrue(_renderer.render(new PageInfoImpl("", THE_PAGE.getPath(), "rendered preview" + Strings.CRLF, Collections.<String, String>emptyMap())).equals(mkResult("rendered preview")));
+    assertTrue(_renderer.parse(new PageInfoImpl("", THE_PAGE.getPath(), "rendered preview" + Strings.CRLF, Collections.<String, String>emptyMap())).equals(mkResult("rendered preview")));
     expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();
     replay();

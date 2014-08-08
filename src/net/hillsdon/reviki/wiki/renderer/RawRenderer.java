@@ -12,8 +12,8 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 /**
  * A basic renderer which just turns its input into a stream. This exploits the
- * fact that {@link #render(PageInfo)} is always called before
- * {@link #build(ASTNode, URLOutputFilter)}.
+ * fact that {@link #parse(PageInfo)} is always called before
+ * {@link #render(ASTNode, URLOutputFilter)}.
  *
  * @author msw
  */
@@ -21,13 +21,13 @@ public class RawRenderer extends MarkupRenderer<InputStream> {
   private PageInfo _page;
 
   @Override
-  public ASTNode render(final PageInfo page) {
+  public ASTNode parse(final PageInfo page) {
     _page = page;
     return CreoleRenderer.render(page, null, null);
   }
 
   @Override
-  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     return new ByteArrayInputStream(_page.getContent().getBytes(StandardCharsets.UTF_8));
   }
 

@@ -102,13 +102,13 @@ public class SearchIndexBuilder implements Runnable {
     // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
     MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
       @Override
-      public ASTNode render(PageInfo page) throws IOException, PageStoreException {
-        return _renderer.render(page);
+      public ASTNode parse(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.parse(page);
       }
 
       @Override
-      public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
-        return _renderer.build(ast, urlOutputFilter);
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.render(ast, urlOutputFilter);
       }
     };
     LuceneSearcher searcher = new LuceneSearcher(wikiConf.getWikiName(), primarySearchDir, otherSearchDirs, renderer);

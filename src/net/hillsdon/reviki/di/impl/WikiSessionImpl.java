@@ -114,12 +114,12 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // Wrapping to get around _renderer not being initialised yet
     MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
       @Override
-      public ASTNode render(PageInfo page) throws IOException, PageStoreException {
-        return _renderer.render(page);
+      public ASTNode parse(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.parse(page);
       }
 
-      public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
-        return _renderer.build(ast,  urlOutputFilter);
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.render(ast,  urlOutputFilter);
       }
     };
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer));

@@ -31,7 +31,7 @@ public class TestDocbookRenderer extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(String input) throws Exception {
-    InputStream is = _renderer.build(new PageInfoImpl("", "TestPage", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL).get();
+    InputStream is = _renderer.render(new PageInfoImpl("", "TestPage", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL).get();
     String docbook = IOUtils.toString(is);
 
     // Strip off the XML declaration and article tag.

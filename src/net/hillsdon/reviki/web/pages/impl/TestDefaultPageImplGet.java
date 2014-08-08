@@ -190,7 +190,7 @@ public class TestDefaultPageImplGet extends TestCase {
 
   private void expectRenderContent() throws Exception  {
     ASTNode eq = new Page(ImmutableList.of((ASTNode) new Paragraph(new Inline(ImmutableList.of((ASTNode) new Plaintext("Content"))))));
-    assertTrue(_renderer.render(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())).equals(eq));
+    assertTrue(_renderer.parse(new PageInfoImpl("", THE_PAGE.getPath(), "Content", Collections.<String, String>emptyMap())).equals(eq));
   }
 
   private void expectGetIncomingLinks(final String... returnedPages) throws Exception  {

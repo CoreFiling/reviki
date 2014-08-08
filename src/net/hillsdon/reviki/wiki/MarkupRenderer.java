@@ -42,11 +42,11 @@ public abstract class MarkupRenderer<T> {
    * Useful for testing.
    */
   public static final MarkupRenderer<ASTNode> AS_IS = new MarkupRenderer<ASTNode>() {
-    public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
+    public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
       return new Raw(page.getContent());
     }
 
-    public ASTNode build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+    public ASTNode render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
       return ast;
     }
   };
@@ -54,15 +54,15 @@ public abstract class MarkupRenderer<T> {
   /**
    * Render a page to an AST.
    */
-  public abstract ASTNode render(PageInfo page) throws IOException, PageStoreException;
+  public abstract ASTNode parse(PageInfo page) throws IOException, PageStoreException;
 
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public final Optional<T> build(final PageInfo page, final URLOutputFilter urlOutputFilter) {
+  public final Optional<T> render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
     try {
-      ASTNode rendered = render(page);
-      return Optional.of(build(rendered, urlOutputFilter));
+      ASTNode rendered = parse(page);
+      return Optional.of(render(rendered, urlOutputFilter));
     }
 
     catch (IOException e) {
@@ -77,7 +77,7 @@ public abstract class MarkupRenderer<T> {
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public abstract T build(final ASTNode ast, final URLOutputFilter urlOutputFilter);
+  public abstract T render(final ASTNode ast, final URLOutputFilter urlOutputFilter);
 
   /**
    * Return the MIME type of the generated output.

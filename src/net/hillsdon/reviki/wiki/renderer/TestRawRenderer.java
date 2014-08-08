@@ -21,7 +21,7 @@ public class TestRawRenderer extends TestCase {
   /** Check that we get out what we put in. */
   public void testRender() {
     RawRenderer renderer = new RawRenderer();
-    Optional<InputStream> is = renderer.build(_page, URLOutputFilter.NULL);
+    Optional<InputStream> is = renderer.render(_page, URLOutputFilter.NULL);
 
     assertTrue(is.isPresent());
 
@@ -37,7 +37,7 @@ public class TestRawRenderer extends TestCase {
   /** Check that the content type for ConfigCss is special. */
   public void testCssContentType() {
     RawRenderer renderer = new RawRenderer();
-    renderer.render(_css);
+    renderer.parse(_css);
 
     assertTrue(renderer.getContentType().equals("text/css"));
   }
@@ -45,7 +45,7 @@ public class TestRawRenderer extends TestCase {
   /** Check that the content type for non-ConfigCss pages is text. */
   public void testContentType() {
     RawRenderer renderer = new RawRenderer();
-    renderer.render(_page);
+    renderer.parse(_page);
 
     assertTrue(renderer.getContentType().equals("text/plain"));
   }

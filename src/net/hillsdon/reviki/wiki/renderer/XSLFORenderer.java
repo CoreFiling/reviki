@@ -93,12 +93,12 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   }
 
   @Override
-  public ASTNode render(final PageInfo page) throws IOException, PageStoreException {
-    return _docbook.render(page);
+  public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
+    return _docbook.parse(page);
   }
 
   @Override
-  public InputStream build(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String docbook = _docbook.buildString(ast, urlOutputFilter);
 
     try {

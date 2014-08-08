@@ -294,7 +294,7 @@ public class TestDocxRenderer extends TestCase {
   /** Sanity check: check that we actually get output. */
   public void testSanity() {
     Page page = new Page(new ArrayList<ASTNode>());
-    InputStream is = _renderer.build(page, URLOutputFilter.NULL);
+    InputStream is = _renderer.render(page, URLOutputFilter.NULL);
 
     assertNotNull(is);
 

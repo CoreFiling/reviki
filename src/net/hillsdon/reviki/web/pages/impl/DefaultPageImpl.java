@@ -367,8 +367,7 @@ public class DefaultPageImpl implements DefaultPage {
             }
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ASTNode ast = _renderers.getDefaultRenderer().render(pageInfo);
-          String rendered = _renderers.getDefaultRenderer().build(ast, new ResponseSessionURLOutputFilter(request, response));
+          String rendered = _renderers.getDefaultRenderer().render(pageInfo, new ResponseSessionURLOutputFilter(request, response)).get();
           request.setAttribute(ATTR_PREVIEW, rendered);
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
@@ -403,13 +402,12 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (_renderers.hasRenderer(ctypeParam)) {
       MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctypeParam);
-      ASTNode ast = renderer.render(main);
-      InputStream stream = renderer.build(ast, new ResponseSessionURLOutputFilter(request, response));
+      InputStream stream = renderer.render(main, new ResponseSessionURLOutputFilter(request, response)).get();
       return new StreamView(renderer.getContentType(), stream);
     }
     else {
-      ASTNode ast = _renderers.getDefaultRenderer().render(main);
-      String rendered = _renderers.getDefaultRenderer().build(ast, new ResponseSessionURLOutputFilter(request, response));
+      ASTNode ast = _renderers.getDefaultRenderer().parse(main);
+      String rendered = _renderers.getDefaultRenderer().render(ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       return new JspView("ViewPage");
     }

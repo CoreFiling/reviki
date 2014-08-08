@@ -12,8 +12,6 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
@@ -25,7 +23,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  *
  * @author msw
  */
-public class HtmlRenderer extends MarkupRenderer<String> {
+public class HtmlRenderer extends CreoleBasedRenderer<String> {
   /**
    * Most elements have a consistent CSS class. Links and images are an
    * exception (as can be seen in their implementation), as their HTML is
@@ -33,28 +31,12 @@ public class HtmlRenderer extends MarkupRenderer<String> {
    */
   public static final String CSS_CLASS_ATTR = "class='wiki-content'";
 
-  private final PageStore _pageStore;
-
-  private final LinkPartsHandler _linkHandler;
-
-  private final LinkPartsHandler _imageHandler;
-
-  private final Supplier<List<Macro>> _macros;
-
   public HtmlRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    _pageStore = pageStore;
-    _linkHandler = linkHandler;
-    _imageHandler = imageHandler;
-    _macros = macros;
+    super(pageStore, linkHandler, imageHandler, macros);
   }
 
   @Override
-  public ASTNode render(final PageInfo page) {
-    return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
-  }
-
-  @Override
-  public String build(ASTNode ast, URLOutputFilter urlOutputFilter) {
+  public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
     HtmlVisitor visitor = new HtmlVisitor(urlOutputFilter);
     return visitor.visit(ast);
   }
