@@ -46,59 +46,6 @@ public class TestDocxRenderer extends TestCase {
     _renderer = (DocxRenderer) svnrenderer.getRenderers().getRenderer(ViewTypeConstants.CTYPE_DOCX);
   }
 
-  /** Test that we can construct concrete numberings. */
-  public void testConstructNumbering() {
-    Numbering.Num num = DocxVisitor.constructConcreteNumbering(BigInteger.ONE);
-    assertTrue(num.getAbstractNumId().getVal().equals(BigInteger.ONE));
-  }
-
-  /** Test that we can construct abstract numberings. */
-  public void testConstructAbstractNumbering() {
-    BigInteger id = BigInteger.ONE;
-    NumberFormat[] fmats = new NumberFormat[] { NumberFormat.BULLET, NumberFormat.DECIMAL };
-    String[] strs = new String[] { "a", "b", "%C" };
-    Numbering.AbstractNum anum = DocxVisitor.constructAbstractNumbering(id, fmats, strs);
-
-    assertTrue(anum.getAbstractNumId().equals(id));
-
-    // We have 10 levels of indentation
-    assertEquals(10, anum.getLvl().size());
-
-    // Which cycle through the formats and strings
-    BigInteger lastindent = BigInteger.ZERO;
-    for (int i = 0; i < anum.getLvl().size(); i++) {
-      Lvl lvl = anum.getLvl().get(i);
-
-      BigInteger ilvl = BigInteger.valueOf(i);
-      NumberFormat fmat = fmats[i % fmats.length];
-      // C is replaced with the counter value.
-      String str = strs[i % strs.length].replace("C", "" + (i + 1));
-
-      assertTrue(lvl.getIlvl().equals(ilvl));
-      assertTrue(lvl.getNumFmt().getVal().equals(fmat));
-      assertTrue(lvl.getLvlText().getVal().equals(str));
-
-      // Indentation also increases
-      BigInteger indent = lvl.getPPr().getInd().getLeft();
-      assertEquals(-1, lastindent.compareTo(indent));
-
-      lastindent = indent;
-    }
-  }
-
-  /** Test that we can construct numbering levels. */
-  public void testConstructNumberingLevel() {
-    NumberFormat fmat = NumberFormat.CHICAGO;
-    long ilvl = 10;
-    String str = "woo";
-
-    Lvl lvl = DocxVisitor.constructNumberingLevel(fmat, ilvl, str);
-
-    assertTrue(lvl.getIlvl().equals(BigInteger.valueOf(ilvl)));
-    assertTrue(lvl.getNumFmt().getVal().equals(fmat));
-    assertTrue(lvl.getLvlText().getVal().equals(str));
-  }
-
   /** Test that we can construct styles. */
   public void testConstructStyle() {
     String name = "Hello World";

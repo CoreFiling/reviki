@@ -88,12 +88,9 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     public static final String HORIZONTAL_RULE_STYLE = "Horizontal Line";
 
     /** The number style IDs for ordered and unordered lists. */
-    public static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(2);
+    public static final BigInteger ORDERED_LIST_ID = BigInteger.valueOf(1);
 
-    public static final BigInteger UNORDERED_LIST_ID = BigInteger.valueOf(1);
-
-    /** The numbering definitions. */
-    public static final Numbering CUSTOM_NUMBERING;
+    public static final BigInteger UNORDERED_LIST_ID = BigInteger.valueOf(2);
 
     /** Custom styles. */
     public static final List<Style> CUSTOM_STYLES;
@@ -137,34 +134,10 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     protected String _paragraphStyle = null;
 
     /**
-     * Set up numbering and styles
+     * Set up styles
      */
     static {
       ObjectFactory factory = new ObjectFactory();
-
-      /* ***** Lists. */
-      CUSTOM_NUMBERING = factory.createNumbering();
-
-      // Construct the ordered lists
-      NumberFormat[] orderedFmats = new NumberFormat[] { NumberFormat.DECIMAL, NumberFormat.LOWER_LETTER, NumberFormat.LOWER_ROMAN };
-      String[] orderedStrs = new String[] { "%C)" }; // "C" is replaced with the
-                                                     // appropriate number
-                                                     // counter.
-      Numbering.AbstractNum ordered = constructAbstractNumbering(ORDERED_LIST_ID, orderedFmats, orderedStrs);
-      Numbering.Num orderedNum = constructConcreteNumbering(ORDERED_LIST_ID);
-
-      // Construct the unordered lists
-      NumberFormat[] unorderedFmats = new NumberFormat[] { NumberFormat.BULLET };
-      String[] unorderedStrs = new String[] { "•", "◦", "▪" };
-      Numbering.AbstractNum unordered = constructAbstractNumbering(UNORDERED_LIST_ID, unorderedFmats, unorderedStrs);
-      Numbering.Num unorderedNum = constructConcreteNumbering(UNORDERED_LIST_ID);
-
-      // Add the lists to the numbering.
-      CUSTOM_NUMBERING.getAbstractNum().add(ordered);
-      CUSTOM_NUMBERING.getNum().add(orderedNum);
-
-      CUSTOM_NUMBERING.getAbstractNum().add(unordered);
-      CUSTOM_NUMBERING.getNum().add(unorderedNum);
 
       /* ***** Styles. */
       CUSTOM_STYLES = new ArrayList<Style>();
@@ -257,10 +230,10 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       _strike = _factory.createBooleanDefaultTrue();
       _strike.setVal(Boolean.FALSE);
 
-      // Apply the statically-constructed numbering definitions.
+      // Apply the default numbering.
       try {
         NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
-        ndp.setJaxbElement(CUSTOM_NUMBERING);
+        ndp.unmarshalDefaultNumbering();
         _mainPart.addTargetPart(ndp);
       }
       catch (Exception e) {
@@ -269,111 +242,6 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
       // Apply the statically-constructed style definitions.
       _mainPart.getStyleDefinitionsPart().getJaxbElement().getStyle().addAll(CUSTOM_STYLES);
-    }
-
-    /**
-     * Construct a new concrete numbering. A concrete numbering links a
-     * numbering ID to an abstract numbering - which defines what it actually
-     * looks like.
-     *
-     * @param id The ID of the abstract numbering.
-     * @return A new concrete numbering with a matching ID.
-     */
-    protected static Numbering.Num constructConcreteNumbering(final BigInteger id) {
-      ObjectFactory factory = new ObjectFactory();
-      Numbering.Num num = factory.createNumberingNum();
-
-      num.setAbstractNumId(factory.createNumberingNumAbstractNumId());
-      num.getAbstractNumId().setVal(id);
-      num.setNumId(id);
-
-      return num;
-    }
-
-    /**
-     * Construct a new abstract numbering. An abstract numbering defines what
-     * symbols and indentation the various sublists have.
-     *
-     * @param id The ID of the numbering, this is used to relate a paragraph to
-     *          the numbering.
-     * @param fmats Array of number formats to cycle through.
-     * @param strs Array of bullet strings to cycle through. In these strings,
-     *          "C" will be replaced with the appropriate counter number,
-     *          allowing ordered lists to be produced.
-     * @return A new abstract numbering, with up to 10 levels of list nesting.
-     */
-    protected static Numbering.AbstractNum constructAbstractNumbering(final BigInteger id, final NumberFormat[] fmats, final String[] strs) {
-      ObjectFactory factory = new ObjectFactory();
-
-      Numbering.AbstractNum abstractNum = factory.createNumberingAbstractNum();
-      abstractNum.setAbstractNumId(id);
-      abstractNum.setMultiLevelType(factory.createNumberingAbstractNumMultiLevelType());
-      abstractNum.getMultiLevelType().setVal("multilevel");
-
-      // Construct all the numbering levels, cycling through the formats and
-      // display strings.
-      for (int ilvl = 0; ilvl < 10; ilvl++) {
-        long counter = ilvl + 1;
-
-        NumberFormat fmat = fmats[ilvl % fmats.length];
-        String str = strs[ilvl % strs.length];
-
-        Lvl lvl = constructNumberingLevel(fmat, ilvl, str.replace("C", "" + counter));
-        abstractNum.getLvl().add(lvl);
-      }
-
-      return abstractNum;
-    }
-
-    /**
-     * Construct a new numbering level. A numbering level defines the symbol and
-     * indentation to use at this particular nesting, when following its
-     * containing abstract numbering.
-     *
-     * @param fmat The number format.
-     * @param ilvl The indentation level (0-based).
-     * @param str The bullet string.
-     * @return A new numbering level, for this level of indentation.
-     */
-    protected static Lvl constructNumberingLevel(final NumberFormat fmat, final long ilvl, final String str) {
-      ObjectFactory factory = new ObjectFactory();
-
-      Lvl lvl = factory.createLvl();
-
-      // Set the nesting level
-      lvl.setIlvl(BigInteger.valueOf(ilvl));
-
-      // Numbering starts from 1
-      lvl.setStart(factory.createLvlStart());
-      lvl.getStart().setVal(BigInteger.ONE);
-
-      // Set the numbering format
-      lvl.setNumFmt(factory.createNumFmt());
-      lvl.getNumFmt().setVal(fmat);
-
-      // Set the display text
-      lvl.setLvlText(factory.createLvlLvlText());
-      lvl.getLvlText().setVal(str);
-
-      // Set the justification
-      lvl.setLvlJc(factory.createJc());
-      lvl.getLvlJc().setVal(JcEnumeration.LEFT);
-
-      // Set the indentation
-      BigInteger indent = BigInteger.valueOf(360 * (ilvl + 1));
-      BigInteger hanging = BigInteger.valueOf(360);
-      CTTabStop tabstop = factory.createCTTabStop();
-      tabstop.setVal(STTabJc.NUM);
-      tabstop.setPos(indent);
-
-      lvl.setPPr(factory.createPPr());
-      lvl.getPPr().setTabs(factory.createTabs());
-      lvl.getPPr().getTabs().getTab().add(tabstop);
-      lvl.getPPr().setInd(factory.createPPrBaseInd());
-      lvl.getPPr().getInd().setLeft(indent);
-      lvl.getPPr().getInd().setHanging(hanging);
-
-      return lvl;
     }
 
     protected static Style constructStyle(final String name, final String basedOn, final String type, final Optional<JcEnumeration> justification, final Optional<PPrBase.Spacing> spacing, final boolean bold) {
