@@ -383,4 +383,53 @@ public class TestDocxRenderer extends TestCase {
     assertTrue(getRunText(r3).equals("baz"));
     assertTrue(getRunText(r4).equals("bat"));
   }
+
+  /** Test that the style a heading gets is dependent upon the level. */
+  public void testHeadingStyles() {
+    Heading h1 = new Heading(1, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("foo") })));
+    Heading h2 = new Heading(2, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("bar") })));
+    Heading h3 = new Heading(3, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("baz") })));
+    Heading h4 = new Heading(4, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("bat") })));
+    Heading h5 = new Heading(5, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("qux") })));
+    Heading h6 = new Heading(6, new Inline(Arrays.asList(new ASTNode[] { new Plaintext("qix") })));
+
+    Body body = _factory.createBody();
+    _visitor.enterContext(body, true);
+
+    _visitor.visitHeading(h1);
+    _visitor.visitHeading(h2);
+    _visitor.visitHeading(h3);
+    _visitor.visitHeading(h4);
+    _visitor.visitHeading(h5);
+    _visitor.visitHeading(h6);
+
+    assertEquals(6, body.getContent().size());
+
+    for (int i = 0; i < 6; i++) {
+      P header = (P) body.getContent().get(i);
+      String style;
+
+      switch (i) {
+        case 0:
+          style = DocxVisitor.HEADING1_STYLE;
+          break;
+        case 1:
+          style = DocxVisitor.HEADING2_STYLE;
+          break;
+        case 2:
+          style = DocxVisitor.HEADING3_STYLE;
+          break;
+        case 3:
+          style = DocxVisitor.HEADING4_STYLE;
+          break;
+        case 4:
+          style = DocxVisitor.HEADING5_STYLE;
+          break;
+        default:
+          style = DocxVisitor.HEADING6_STYLE;
+      }
+
+      assertTrue(header.getPPr().getPStyle().getVal().equals(DocxVisitor.styleNameToId(style)));
+    }
+  }
 }
