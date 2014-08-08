@@ -105,6 +105,10 @@ public class SimplePageStore extends AbstractPageStore implements CachingPageSto
     throw new UnsupportedOperationException();
   }
 
+  public byte[] attachmentBytes(final PageReference ref, final String attachment, final long revision) throws PageStoreException {
+    throw new UnsupportedOperationException();
+  }
+
   public Collection<PageReference> getChangedBetween(final long start, final long end) {
     throw new UnsupportedOperationException();
   }
