@@ -8,18 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import com.google.common.base.Supplier;
 
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 /**
  * A renderer to XSL-FO, and various formats which can be produced from it. This
@@ -77,10 +71,6 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
     String clazz = XSLFORenderer.class.getResource("XSLFORenderer.class").toString();
     String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
     FOP_DIR = new File(workingdir + "xslfo/fop");
-  }
-
-  public XSLFORenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros, final FoOutput format) throws IOException {
-    this(new DocbookRenderer(pageStore, linkHandler, imageHandler, macros), format);
   }
 
   public XSLFORenderer(final DocbookRenderer docbook) throws IOException {
