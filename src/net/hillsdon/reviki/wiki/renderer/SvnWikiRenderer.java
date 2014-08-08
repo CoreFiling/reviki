@@ -49,7 +49,7 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, raw);
     _registry.addRenderer(ViewTypeConstants.CTYPE_DOCX, docx);
 
-    // XSL-FO renderers need to extract FOP. If that fails, don't add them.
+    // XSL-FO renderers need an exploded war to use FOP. If that's not the case, don't add them.
     try {
       XSLFORenderer xslfo = new XSLFORenderer(docbook);
       XSLFORenderer rtf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.RTF);
