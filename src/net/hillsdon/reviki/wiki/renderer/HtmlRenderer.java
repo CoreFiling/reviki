@@ -59,16 +59,13 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
     /**
      * Render a node with a tag.
      */
-    public String renderTagged(final String tag, final ASTNode node) {
-      // Render the children
-      String inner = visitASTNode(node);
-
+    public String renderTagged(final String tag, final Optional<? extends ASTNode> node) {
       // Render the tag
-      if (inner.equals("")) {
+      if (!node.isPresent()) {
         return "<" + tag + " " + CSS_CLASS_ATTR + " />";
       }
       else {
-        return "<" + tag + " " + CSS_CLASS_ATTR + ">" + inner + "</" + tag + ">";
+        return "<" + tag + " " + CSS_CLASS_ATTR + ">" + visitASTNode(node.get()) + "</" + tag + ">";
       }
     }
 
@@ -114,7 +111,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitBold(final Bold node) {
-      return renderTagged("strong", node);
+      return renderTagged("strong", Optional.of(node));
     }
 
     @Override
@@ -127,12 +124,12 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitHeading(final Heading node) {
-      return renderTagged("h" + node.getLevel(), node);
+      return renderTagged("h" + node.getLevel(), Optional.of(node));
     }
 
     @Override
     public String visitHorizontalRule(final HorizontalRule node) {
-      return renderTagged("hr", node);
+      return renderTagged("hr", Optional.<ASTNode>absent());
     }
 
     @Override
@@ -159,12 +156,12 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitItalic(final Italic node) {
-      return renderTagged("em", node);
+      return renderTagged("em", Optional.of(node));
     }
 
     @Override
     public String visitLinebreak(final Linebreak node) {
-      return renderTagged("br", node);
+      return renderTagged("br", Optional.<ASTNode>absent());
     }
 
     @Override
@@ -191,7 +188,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitListItem(final ListItem node) {
-      return renderTagged("li", node);
+      return renderTagged("li", Optional.of(node));
     }
 
     @Override
@@ -203,28 +200,28 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitOrderedList(final OrderedList node) {
-      return renderTagged("ol", node);
+      return renderTagged("ol", Optional.of(node));
     }
 
     @Override
     public String visitParagraph(final Paragraph node) {
-      return renderTagged("p", node);
+      return renderTagged("p", Optional.of(node));
     }
 
     @Override
     public String visitStrikethrough(final Strikethrough node) {
-      return renderTagged("strike", node);
+      return renderTagged("strike", Optional.of(node));
     }
 
     @Override
     public String visitTable(final Table node) {
-      return renderTagged("table", node);
+      return renderTagged("table", Optional.of(node));
     }
 
     /** Render a table cell with vertical alignment. */
     protected String valign(final String tag, final ASTNode node) {
       if (!isEnabled(TABLE_ALIGNMENT_DIRECTIVE)) {
-        return renderTagged(tag, node);
+        return renderTagged(tag, Optional.of(node));
       }
 
       try {
@@ -236,7 +233,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
       }
       catch (Exception e) {
         System.err.println("Error when handling directive " + TABLE_ALIGNMENT_DIRECTIVE);
-        return renderTagged(tag, node);
+        return renderTagged(tag, Optional.of(node));
       }
     }
 
@@ -252,7 +249,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitTableRow(final TableRow node) {
-      return renderTagged("tr", node);
+      return renderTagged("tr", Optional.of(node));
     }
 
     @Override
@@ -263,7 +260,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitUnorderedList(final UnorderedList node) {
-      return renderTagged("ul", node);
+      return renderTagged("ul", Optional.of(node));
     }
   }
 }
