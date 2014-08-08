@@ -682,7 +682,8 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     @Override
     public InputStream visitLinebreak(final Linebreak node) {
-      commitInline(_factory.createBr());
+      R run = constructRun(false);
+      run.getContent().add(_factory.createBr());
 
       return nullval();
     }
