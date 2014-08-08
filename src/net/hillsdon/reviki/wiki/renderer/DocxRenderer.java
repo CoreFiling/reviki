@@ -180,10 +180,21 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       Style code = constructStyle(CODE_STYLE, TEXT_BODY_STYLE, "paragraph", Optional.<JcEnumeration> absent(), Optional.of(spacing), false);
       Style tableContents = constructStyle(TABLE_CONTENTS_STYLE, TEXT_BODY_STYLE, "paragraph", Optional.<JcEnumeration> absent(), Optional.<PPrBase.Spacing> absent(), false);
       Style tableHeader = constructStyle(TABLE_HEADER_STYLE, TABLE_CONTENTS_STYLE, "paragraph", Optional.of(JcEnumeration.CENTER), Optional.<PPrBase.Spacing> absent(), true);
+      Style horizontalRule = constructStyle(HORIZONTAL_RULE_STYLE, "Normal", "paragraph", Optional.<JcEnumeration> absent(), Optional.<PPrBase.Spacing> absent(), false);
 
       // Set code font
       code.setRPr(factory.createRPr());
       runFont(code.getRPr(), CODE_FONT);
+
+      // Set horizontal rule bottom border
+      CTBorder border = factory.createCTBorder();
+      border.setVal(STBorder.SINGLE);
+      border.setColor("black");
+      border.setSz(BigInteger.valueOf(2));
+
+      horizontalRule.setPPr(factory.createPPr());
+      horizontalRule.getPPr().setPBdr(factory.createPPrBasePBdr());
+      horizontalRule.getPPr().getPBdr().setBottom(border);
 
       // The table style is very different to text styles, so it's just
       // constructed here.
@@ -215,6 +226,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       CUSTOM_STYLES.add(code);
       CUSTOM_STYLES.add(tableContents);
       CUSTOM_STYLES.add(tableHeader);
+      CUSTOM_STYLES.add(horizontalRule);
     }
 
     public DocxVisitor(URLOutputFilter urlOutputFilter) {
