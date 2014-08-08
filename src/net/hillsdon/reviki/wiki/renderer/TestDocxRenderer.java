@@ -432,4 +432,22 @@ public class TestDocxRenderer extends TestCase {
       assertTrue(header.getPPr().getPStyle().getVal().equals(DocxVisitor.styleNameToId(style)));
     }
   }
+
+  /** Test paragraphs contain different runs for different formatting */
+  public void testFormatting() {
+    Inline inlinetxt = new Inline(Arrays.asList(new ASTNode[] { new Plaintext("foo") }));
+    Inline inlinetxt2 = new Inline(Arrays.asList(new ASTNode[] { new Bold(inlinetxt) }));
+    ASTNode[] inline = new ASTNode[] { new Bold(inlinetxt), new Italic(inlinetxt), new Strikethrough(inlinetxt), new Strikethrough(inlinetxt2) };
+    Paragraph paragraph = new Paragraph(new Inline(Arrays.asList(inline)));
+
+    Body body = _factory.createBody();
+    _visitor.enterContext(body, true);
+
+    _visitor.visitParagraph(paragraph);
+
+    assertEquals(1, body.getContent().size());
+
+    P p = (P) body.getContent().get(0);
+    assertEquals(4, p.getContent().size());
+  }
 }
