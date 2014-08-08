@@ -39,7 +39,7 @@ public class TestDocxRenderer extends TestCase {
   private ObjectFactory _factory;
 
   public void setUp() {
-    _visitor = new DocxVisitor(URLOutputFilter.NULL);
+    _visitor = new DocxVisitor(null, null, URLOutputFilter.NULL);
     _factory = new ObjectFactory();
 
     SvnWikiRenderer svnrenderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()));

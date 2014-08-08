@@ -2,13 +2,16 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.commons.io.IOUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -20,7 +23,10 @@ import org.docx4j.wml.*;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
+import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
@@ -40,7 +46,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
   @Override
   public InputStream render(ASTNode ast, URLOutputFilter urlOutputFilter) {
-    DocxVisitor visitor = new DocxVisitor(urlOutputFilter);
+    DocxVisitor visitor = new DocxVisitor(_pageStore, _page, urlOutputFilter);
     return visitor.visit(ast);
   }
 
@@ -94,6 +100,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     /** Custom styles. */
     public static final List<Style> CUSTOM_STYLES;
+
+    /** For looking up attachments. */
+    protected final PageStore _pageStore;
+
+    protected final PageInfo _page;
 
     /** Docx files are arranged into a "package" of smaller xml files. */
     protected final WordprocessingMLPackage _package;
@@ -202,8 +213,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       CUSTOM_STYLES.add(horizontalRule);
     }
 
-    public DocxVisitor(URLOutputFilter urlOutputFilter) {
+    public DocxVisitor(PageStore pageStore, PageInfo page, URLOutputFilter urlOutputFilter) {
       super(urlOutputFilter);
+
+      _pageStore = pageStore;
+      _page = page;
 
       try {
         _package = WordprocessingMLPackage.createPackage();
@@ -523,19 +537,52 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       return nullval();
     }
 
+    protected InputStream imageError(final Image node, final String msg, final Exception exc) {
+      System.err.println(msg);
+      exc.printStackTrace();
+
+      return renderBrokenImage(node);
+    }
+
     @Override
     public InputStream renderImage(final String target, final String title, final Image node) {
       // First we get a relation pointing to the image
       BinaryPartAbstractImage imagePart;
       org.docx4j.dml.wordprocessingDrawing.Inline inline;
+
+      String filename = target.substring(target.lastIndexOf("/") + 1);
+      byte[] bytes;
+
+      // First we need to get the image bytes
       try {
-        imagePart = BinaryPartAbstractImage.createLinkedImagePart(_package, new URL(target));
-        inline = imagePart.createImageInline(target, title, 1, 2, true);
+        // Try to fetch the image from the page store
+        bytes = _pageStore.attachmentBytes(_page, filename, -1);
+      }
+      catch (NotFoundException e) {
+        // Try to fetch it by URL
+        try {
+          bytes = IOUtils.toByteArray(new URL(target).openStream());
+        }
+        catch (MalformedURLException e1) {
+          // This should never happen because we were able to construct the URL
+          // in the first place.
+          return imageError(node, "The impossible happened.", e1);
+        }
+        catch (IOException e1) {
+          return imageError(node, "Failed to retrieve image by URL.", e1);
+        }
+      }
+      catch (PageStoreException e) {
+        return imageError(node, "Failed to fetch file from page store.", e);
+      }
+
+      // Then we embed it into the document
+      try {
+        imagePart = BinaryPartAbstractImage.createImagePart(_package, bytes);
+        inline = imagePart.createImageInline(filename, title, 1, 2, false);
       }
       catch (Exception e) {
-        // This shouldn't happen because we were able to successfully construct
-        // the URL in the first place.
-        return nullval();
+        return imageError(node, "Something went wrong embedding the image.", e);
       }
 
       // Then we add it to the current paragraph.

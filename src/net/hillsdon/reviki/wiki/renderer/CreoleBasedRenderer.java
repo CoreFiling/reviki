@@ -19,13 +19,15 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  */
 public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
 
-  private final PageStore _pageStore;
+  protected final PageStore _pageStore;
 
-  private final LinkPartsHandler _linkHandler;
+  protected final LinkPartsHandler _linkHandler;
 
-  private final LinkPartsHandler _imageHandler;
+  protected final LinkPartsHandler _imageHandler;
 
-  private final Supplier<List<Macro>> _macros;
+  protected final Supplier<List<Macro>> _macros;
+
+  protected PageInfo _page;
 
   public CreoleBasedRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
@@ -36,6 +38,7 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
 
   @Override
   public final ASTNode parse(final PageInfo page) {
-    return CreoleRenderer.render(_pageStore, page, _linkHandler, _imageHandler, _macros);
+    _page = page;
+    return CreoleRenderer.render(_pageStore, _page, _linkHandler, _imageHandler, _macros);
   }
 }
