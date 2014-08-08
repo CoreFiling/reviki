@@ -832,8 +832,8 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     public InputStream visitTextNode(final TextNode node) {
       R run = constructRun(true);
 
-      // Set text
-      runText(run, node.getText());
+      // Docx is linebreak sensitive - despite being an XML-based format.
+      runText(run, node.getText().replace("\r", "").replace("\n", ""));
 
       return nullval();
     }
