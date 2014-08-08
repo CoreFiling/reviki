@@ -187,7 +187,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
 
     System.err.println("Failed to insert image " + imageText);
 
-    return visitTextNode(new Plaintext(imageText));
+    return visitPlaintext(new Plaintext(imageText));
   }
 
   /**
@@ -243,7 +243,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
 
     System.err.println("Failed to insert link " + linkText);
 
-    return visitTextNode(new Plaintext(linkText));
+    return visitPlaintext(new Plaintext(linkText));
   }
 
   /**
