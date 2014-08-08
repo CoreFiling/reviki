@@ -31,4 +31,7 @@ public interface LinkPartsHandler {
 
   /** Get the context for resolving [inter]wiki links. */
   LinkResolutionContext getContext();
+
+  /** Check if an acronym is actually a link. */
+  boolean isAcronymNotLink(PageReference page, LinkParts parts);
 }

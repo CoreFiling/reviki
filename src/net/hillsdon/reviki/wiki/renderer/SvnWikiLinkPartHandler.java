@@ -88,7 +88,8 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     LinkResolutionContext resolver = resolver(page);
     String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
     String clazz = link.getStyleClass(resolver);
-    if (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText())) {
+
+    if (isAcronymNotLink(page, link)) {
       return link.getText();
     }
 
@@ -99,11 +100,17 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   public String handle(PageReference page, LinkParts link, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
     LinkResolutionContext resolver = resolver(page);
     String url = link.getURL(resolver);
-    if (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText())) {
-      return link.getText();
-    }
-
     return urlOutputFilter.filterURL(url);
+  }
+
+  public boolean isAcronymNotLink(PageReference page, LinkParts link) {
+    try {
+      LinkResolutionContext resolver = resolver(page);
+      return (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText()));
+    }
+    catch (Exception e) {
+      return true;
+    }
   }
 
   /**

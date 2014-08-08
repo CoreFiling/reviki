@@ -203,6 +203,11 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
     String title = node.getTitle();
     String target = node.getTarget();
 
+    // Yay, special cases!
+    if (handler.isAcronymNotLink(page, parts)) {
+      return visitPlaintext(new Plaintext(target));
+    }
+
     try {
       return renderLink(handler.handle(page, parts, urlOutputFilter()), title, node);
     }
