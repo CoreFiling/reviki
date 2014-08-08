@@ -244,6 +244,9 @@ public class TestDocxRenderer extends TestCase {
     assertTrue(run.getRPr().getB().isVal());
     assertTrue(run.getRPr().getI().isVal());
     assertFalse(run.getRPr().getStrike().isVal());
+
+    _visitor._italic.setVal(Boolean.FALSE);
+    assertTrue(run.getRPr().getI().isVal());
   }
 
   /** Test that we can set the font of a run. */

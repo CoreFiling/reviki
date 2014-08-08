@@ -564,9 +564,13 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
       if (applyFormatting) {
         run.setRPr(_factory.createRPr());
-        run.getRPr().setB(_bold);
-        run.getRPr().setI(_italic);
-        run.getRPr().setStrike(_strike);
+        run.getRPr().setB(new BooleanDefaultTrue());
+        run.getRPr().setI(new BooleanDefaultTrue());
+        run.getRPr().setStrike(new BooleanDefaultTrue());
+
+        run.getRPr().getB().setVal(_bold.isVal());
+        run.getRPr().getI().setVal(_italic.isVal());
+        run.getRPr().getStrike().setVal(_strike.isVal());
       }
 
       return run;
