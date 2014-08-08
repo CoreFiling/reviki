@@ -73,11 +73,11 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
     FOP_DIR = new File(workingdir + "xslfo/fop");
   }
 
-  public XSLFORenderer(final DocbookRenderer docbook) throws IOException {
+  public XSLFORenderer(final DocbookRenderer docbook) {
     this(docbook, FoOutput.XSLFO);
   }
 
-  public XSLFORenderer(final DocbookRenderer docbook, final FoOutput format) throws IOException {
+  public XSLFORenderer(final DocbookRenderer docbook, final FoOutput format) {
     _docbook = docbook;
     _format = format;
   }
