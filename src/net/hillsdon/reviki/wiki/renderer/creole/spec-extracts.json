@@ -43,10 +43,9 @@
     "output": "<p>This is my text.</p><p>This is more text.</p>"
   },
   {
-    "bug":    "we don't handle line breaks within paragraphs for some reason",
     "name":   "line breaks",
-    "input":  "This is the first line,\\and this is the second.",
-    "output": "<p>This is the first line,<br>and this is the second.</p>"
+    "input":  "This is the first line,\\\\and this is the second.",
+    "output": "<p>This is the first line,<br />and this is the second.</p>"
   },
   {
     "name":   "bulleted list",
