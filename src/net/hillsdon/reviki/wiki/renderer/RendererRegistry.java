@@ -1,7 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map;
 
 import net.hillsdon.reviki.wiki.MarkupRenderer;
@@ -23,7 +23,7 @@ public class RendererRegistry {
    */
   public RendererRegistry(final HtmlRenderer html) {
     _default = html;
-    _renderers = new HashMap<String, MarkupRenderer<InputStream>>();
+    _renderers = new TreeMap<String, MarkupRenderer<InputStream>>();
   }
 
   /** Return the default (HTML) renderer. */
@@ -38,11 +38,11 @@ public class RendererRegistry {
 
   /** Check if we have a stream renderer for the desired ctype. */
   public boolean hasRenderer(final String ctype) {
-    return _renderers.containsKey(ctype);
+    return (ctype == null) ? false : _renderers.containsKey(ctype);
   }
 
   /** Get the stream renderer for this ctype. */
   public MarkupRenderer<InputStream> getRenderer(final String ctype) {
-    return _renderers.get(ctype);
+    return (ctype == null) ? null : _renderers.get(ctype);
   }
 }
