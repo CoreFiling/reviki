@@ -23,9 +23,9 @@ import java.net.URISyntaxException;
  */
 public class InternalLinker {
 
-  private final WikiUrls _wikiUrls;
+  private final SimpleWikiUrls _wikiUrls;
 
-  public InternalLinker(final WikiUrls wikiUrls) {
+  public InternalLinker(final SimpleWikiUrls wikiUrls) {
     _wikiUrls = wikiUrls;
   }
   

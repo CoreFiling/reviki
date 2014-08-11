@@ -15,8 +15,6 @@
  */
 package net.hillsdon.reviki.web.urls;
 
-import java.net.URI;
-
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 
 /**
@@ -28,19 +26,12 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
  *
  * @author mth
  */
-public interface WikiUrls extends ResourceUrls {
+public interface WikiUrls extends ResourceUrls, SimpleWikiUrls {
 
   /**
    * Key for instance of this in the request.
    */
   String KEY = WikiUrls.class.getName();
-
-  /**
-   * Note that if the the returned String is going to be used as a link, it must be encoded
-   * with a {@link URLOutputFilter}.
-   * @return
-   */
-  String pagesRoot();
 
   String pagesRoot(String wikiName);
   
@@ -49,8 +40,6 @@ public interface WikiUrls extends ResourceUrls {
   String page(String wikiName, String pageName, String extraPath, String query, String fragment);
 
   String page(String wikiName, String pageName);
-  
-  URI page(String pageName);
 
   String feed();
 

@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,8 +25,7 @@ import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
+import net.hillsdon.reviki.web.urls.SimpleWikiUrls;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Supplier;
@@ -38,7 +39,25 @@ public abstract class RenderingTest extends TestCase {
   protected Supplier<List<Macro>> macros;
 
   public RenderingTest() {
-    WikiUrls wikiUrls = new ExampleDotComWikiUrls();
+    SimpleWikiUrls wikiUrls = new SimpleWikiUrls() {
+      public String pagesRoot() {
+        return "http://www.example.com/reviki/pages/test-wiki/";
+      }
+
+      public URI page(String pageName) {
+        URI root = URI.create(pagesRoot());
+        try {
+          String path = root.getPath();
+          if (!path.endsWith("/")) {
+            path = path + "/";
+          }
+          return new URI(root.getScheme(), root.getUserInfo(), root.getHost(), root.getPort(), path + pageName, root.getQuery(), root.getFragment());
+        }
+        catch (URISyntaxException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    };
 
     InternalLinker linker = new InternalLinker(wikiUrls);
     InterWikiLinker wikilinker = new InterWikiLinker();
