@@ -22,7 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.DummyPageStore;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.SimpleWikiUrls;
@@ -62,7 +62,7 @@ public abstract class RenderingTest extends TestCase {
     InternalLinker linker = new InternalLinker(wikiUrls);
     InterWikiLinker wikilinker = new InterWikiLinker();
     wikilinker.addWiki("foo", "http://www.example.com/foo/Wiki?%s");
-    pageStore = new SimplePageStore();
+    pageStore = new DummyPageStore();
 
     LinkResolutionContext resolver = new LinkResolutionContext(linker, wikilinker, pageStore);
 
