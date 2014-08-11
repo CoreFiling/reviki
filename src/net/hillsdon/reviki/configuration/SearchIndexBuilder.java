@@ -42,8 +42,8 @@ import net.hillsdon.reviki.wiki.macros.SearchMacro;
 import net.hillsdon.reviki.wiki.plugin.Plugins;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -102,7 +102,7 @@ public class SearchIndexBuilder implements Runnable {
     List<File> otherSearchDirs = wikiConf.getOtherSearchIndexDirectories();
     // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+      public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, urlOutputFilter);
       }
     });

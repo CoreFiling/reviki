@@ -1,26 +1,15 @@
-/**
- * Copyright 2008 Matthew Hillsdon
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
 import java.util.Collections;
 
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.CreoleLinkNode;
+import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
+import net.hillsdon.reviki.wiki.renderer.FakeConfiguration;
+import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 
 import org.codehaus.jackson.JsonParseException;
 
@@ -31,13 +20,17 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
   }
 
   @Override
-  protected String render(final String input) {
-    RenderNode[] inlineLinks = new RenderNode[2];
+  protected String render(final String input) throws Exception {
+    SimplePageStore pages = new SimplePageStore();
+    pages.set(new PageInfoImpl(null, "ExistingPage", "Content", Collections.<String, String>emptyMap()), "", -1, "");
+    pages.set(new PageInfoImpl(null, "ExistingPage1.1", "Content", Collections.<String, String>emptyMap()), "", -1, "");
 
-    inlineLinks[0] = new CreoleLinkNode(linkHandler);
-    inlineLinks[1] = new CreoleImageNode(imageHandler);
-
-    return new CreoleRenderer(CreoleRenderer.NONE, inlineLinks).render(new PageInfoImpl("", "", input, Collections.<String, String>emptyMap()), URLOutputFilter.NULL).toXHTML();
+    return CreoleRenderer.render(
+        pages,
+        new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()),
+        URLOutputFilter.NULL,
+        new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration()),
+        new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pages, new InternalLinker(new ExampleDotComWikiUrls()), new FakeConfiguration())
+        ).toXHTML();
   }
-
 }

@@ -19,19 +19,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.regex.MatchResult;
 
-import org.apache.commons.lang.StringUtils;
-
-public class CreoleLinkContentsSplitter implements LinkContentSplitter {
-
-  public LinkParts split(final MatchResult match) {
-    String in = match.group(1);
-    return split(in);
-  }
-
+public class CreoleLinkContentsSplitter {
   /**
-   * Splits links of the form target or text|target where target is
+   * Splits links where target is
    * 
    * PageName wiki:PageName PageName#fragment wiki:PageName#fragment
    * A String representing an absolute URI scheme://valid/absolute/uri
@@ -41,9 +32,7 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
    * @param in The String to split
    * @return The split LinkParts
    */
-  LinkParts split(final String in) {
-    String target = StringUtils.trimToEmpty(StringUtils.substringBefore(in, "|"));
-    String text = StringUtils.trimToNull(StringUtils.substringAfter(in, "|"));
+  public static LinkParts split(String target, String text) {
     if (target == null) {
       target = "";
     }
@@ -68,9 +57,9 @@ public class CreoleLinkContentsSplitter implements LinkContentSplitter {
     catch (URISyntaxException e) {
       // uri remains null
     }
-	catch (MalformedURLException e) {
- 	   // uri remains null
- 	}
+  catch (MalformedURLException e) {
+     // uri remains null
+  }
 
     if (uri != null) {
       return new LinkParts(text, uri);

@@ -20,8 +20,8 @@ import java.io.IOException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.result.LiteralResultNode;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 
 /**
  * Interface for something that renders wiki markup in some other format.
@@ -34,11 +34,11 @@ public interface MarkupRenderer {
    * Useful for testing.
    */
   MarkupRenderer AS_IS = new MarkupRenderer() {
-    public ResultNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-      return new LiteralResultNode(page.getContent());
+    public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+      return new Raw(page.getContent());
     }
   };
 
-  ResultNode render(PageInfo page, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
+  ASTNode render(PageInfo page, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
 
 }

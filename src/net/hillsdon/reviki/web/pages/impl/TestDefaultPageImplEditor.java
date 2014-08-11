@@ -31,7 +31,8 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.result.ResultNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 
 import org.easymock.EasyMock;
 
@@ -52,7 +53,7 @@ public class TestDefaultPageImplEditor extends TestCase {
   private WikiGraph _graph;
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
-  private ResultNode _resultNode;
+  private ASTNode _resultNode;
 
   private FeedWriter _feedWriter;
   private VersionedPageInfoImpl _pageInfo;
@@ -72,7 +73,7 @@ public class TestDefaultPageImplEditor extends TestCase {
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
     _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
-    _resultNode = createMock(ResultNode.class);
+    _resultNode = new Raw("rendered preview");
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
   }
 
@@ -84,7 +85,6 @@ public class TestDefaultPageImplEditor extends TestCase {
     EasyMock.replay(_diffGenerator);
     EasyMock.replay(_wikiUrls);
     EasyMock.replay(_feedWriter);
-    EasyMock.replay(_resultNode);
   }
 
   public void testInvalidSessionIdPreview() throws Exception {
@@ -121,7 +121,6 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
     expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "new content" + Strings.CRLF, Collections.<String, String>emptyMap())), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
-    expect(_resultNode.toXHTML()).andReturn("rendered preview");
     expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();
     replay();
