@@ -1,0 +1,32 @@
+package net.hillsdon.reviki.wiki.renderer.creole;
+
+import java.io.IOException;
+import java.util.Collections;
+
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+
+import org.codehaus.jackson.JsonParseException;
+
+import com.google.common.base.Optional;
+
+public class TestCoreCreole extends JsonDrivenRenderingTest {
+  public TestCoreCreole() throws JsonParseException, IOException {
+    super(TestCoreCreole.class.getResource("core-creole.json"));
+  }
+
+  @Override
+  protected String render(final String input) throws Exception {
+    SimplePageStore pages = new SimplePageStore();
+    pages.set(new PageInfoImpl(null, "ExistingPage", "Content", Collections.<String, String>emptyMap()), "", -1, "");
+    pages.set(new PageInfoImpl(null, "ExistingPage1.1", "Content", Collections.<String, String>emptyMap()), "", -1, "");
+
+    HtmlRenderer renderer = new HtmlRenderer(pages, linkHandler, imageHandler, macros);
+
+    Optional<String> rendered = renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL);
+
+    return rendered.isPresent() ? rendered.get() : "";
+  }
+}
