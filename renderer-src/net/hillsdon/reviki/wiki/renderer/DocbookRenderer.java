@@ -22,7 +22,7 @@ import org.w3c.dom.Node;
 
 import com.google.common.base.Supplier;
 
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
@@ -38,7 +38,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  * @author msw
  */
 public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
-  public DocbookRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public DocbookRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     super(pageStore, linkHandler, imageHandler, macros);
   }
 

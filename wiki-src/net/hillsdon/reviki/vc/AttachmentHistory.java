@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author mth
  */
-public class AttachmentHistory {
+public class AttachmentHistory implements SimpleAttachmentHistory {
 
   private final List<ChangeInfo> _versionsMostRecentFirst = new ArrayList<ChangeInfo>();
   private final boolean _isAttachmentDeleted;

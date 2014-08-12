@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.base.Supplier;
 
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -19,7 +19,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  */
 public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
 
-  protected final PageStore _pageStore;
+  protected final SimplePageStore _pageStore;
 
   protected final LinkPartsHandler _linkHandler;
 
@@ -29,7 +29,7 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
 
   protected PageInfo _page;
 
-  public CreoleBasedRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public CreoleBasedRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;

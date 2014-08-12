@@ -25,6 +25,7 @@ import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.ContentTypedSink;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.SimpleAttachmentHistory;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
@@ -93,6 +94,10 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
 
   public void attach(final PageReference page, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     getDelegateInternal().attach(page, storeName, baseRevision, in, commitMessage);
+  }
+
+  public Collection<? extends SimpleAttachmentHistory> listAttachments(final PageReference ref) throws PageStoreException {
+    return getDelegateInternal().listAttachments(ref);
   }
 
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {

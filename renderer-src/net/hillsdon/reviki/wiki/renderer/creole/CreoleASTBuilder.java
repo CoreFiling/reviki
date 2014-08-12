@@ -12,10 +12,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.SimpleAttachmentHistory;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
@@ -27,7 +27,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
  */
 public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /** The page store. */
-  private final Optional<PageStore> _store;
+  private final Optional<SimplePageStore> _store;
 
   /** The page being rendered. */
   private final PageInfo _page;
@@ -39,13 +39,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   private final LinkPartsHandler _imageHandler;
 
   /** List of attachments on the page. */
-  private Collection<AttachmentHistory> _attachments = null;
+  private Collection<? extends SimpleAttachmentHistory> _attachments = null;
 
-  public Optional<PageStore> store() {
+  public Optional<SimplePageStore> store() {
     return _store;
   }
 
-  public PageStore unsafeStore() {
+  public SimplePageStore unsafeStore() {
     return _store.get();
   }
 
@@ -77,7 +77,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    * @param page The page being rendered.
    * @param handler The URL renderer
    */
-  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  private CreoleASTBuilder(final Optional<SimplePageStore> store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     _store = store;
     _page = page;
     _linkHandler = linkHandler;
@@ -85,13 +85,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /** Construct a new AST builder with a page store. */
-  public CreoleASTBuilder(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public CreoleASTBuilder(final SimplePageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     this(Optional.of(store), page, linkHandler, imageHandler);
   }
 
   /** Construct a new AST builder without a page store. */
   public CreoleASTBuilder(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    this(Optional.<PageStore> absent(), page, linkHandler, imageHandler);
+    this(Optional.<SimplePageStore> absent(), page, linkHandler, imageHandler);
   }
 
   /**
@@ -357,11 +357,11 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     try {
       // Cache the attachments list
       if (_attachments == null) {
-        _attachments = unsafeStore().attachments(page());
+        _attachments = unsafeStore().listAttachments(page());
       }
 
       // Read through the list.
-      for (AttachmentHistory attachment : _attachments) {
+      for (SimpleAttachmentHistory attachment : _attachments) {
         if (!attachment.isAttachmentDeleted() && attachment.getName().equals(name)) {
           return true;
         }

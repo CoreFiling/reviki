@@ -19,11 +19,7 @@ public class TestCoreCreole extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws Exception {
-    DummyPageStore pages = new DummyPageStore();
-    pages.set(new PageInfoImpl(null, "ExistingPage", "Content", Collections.<String, String>emptyMap()), "", -1, "");
-    pages.set(new PageInfoImpl(null, "ExistingPage1.1", "Content", Collections.<String, String>emptyMap()), "", -1, "");
-
-    HtmlRenderer renderer = new HtmlRenderer(pages, linkHandler, imageHandler, macros);
+    HtmlRenderer renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
 
     Optional<String> rendered = renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL);
 

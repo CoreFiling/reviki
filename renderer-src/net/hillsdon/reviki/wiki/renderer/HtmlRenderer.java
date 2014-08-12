@@ -10,7 +10,7 @@ import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
@@ -31,7 +31,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
    */
   public static final String CSS_CLASS_ATTR = "class='wiki-content'";
 
-  public HtmlRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public HtmlRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     super(pageStore, linkHandler, imageHandler, macros);
   }
 

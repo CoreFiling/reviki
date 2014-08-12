@@ -13,7 +13,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -107,7 +107,7 @@ public class CreoleRenderer {
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode render(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public static ASTNode render(final SimplePageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     CreoleASTBuilder visitor = new Visitor(store, page, linkHandler, imageHandler);
     return renderWithVisitor(visitor, macros);
   }
@@ -119,7 +119,7 @@ public class CreoleRenderer {
   }
 
   /** Render a page with no macros. */
-  public static ASTNode render(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public static ASTNode render(final SimplePageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
     return render(store, page, linkHandler, imageHandler, macros);
   }
@@ -160,7 +160,7 @@ public class CreoleRenderer {
    * @param macros List of macros to apply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public static ASTNode renderPart(final SimplePageStore store, final PageInfo page, final String content, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     CreoleASTBuilder visitor = new Visitor(store, page, linkHandler, imageHandler);
     return renderPartWithVisitor(content, visitor, macros);
   }

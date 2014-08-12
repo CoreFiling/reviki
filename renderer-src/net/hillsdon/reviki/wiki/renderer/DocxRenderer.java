@@ -25,8 +25,8 @@ import com.google.common.base.Supplier;
 
 import net.hillsdon.reviki.vc.NotFoundException;
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
@@ -40,7 +40,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  * @author msw
  */
 public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
-  public DocxRenderer(final PageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+  public DocxRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     super(pageStore, linkHandler, imageHandler, macros);
   }
 
@@ -102,7 +102,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     public static final List<Style> CUSTOM_STYLES;
 
     /** For looking up attachments. */
-    protected final PageStore _pageStore;
+    protected final SimplePageStore _pageStore;
 
     protected final PageInfo _page;
 
@@ -213,7 +213,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       CUSTOM_STYLES.add(horizontalRule);
     }
 
-    public DocxVisitor(PageStore pageStore, PageInfo page, URLOutputFilter urlOutputFilter) {
+    public DocxVisitor(SimplePageStore pageStore, PageInfo page, URLOutputFilter urlOutputFilter) {
       super(urlOutputFilter);
 
       _pageStore = pageStore;

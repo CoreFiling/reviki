@@ -7,7 +7,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
@@ -20,7 +20,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
  * @author msw
  */
 public class Visitor extends CreoleASTBuilder {
-  public Visitor(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public Visitor(final SimplePageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     super(store, page, linkHandler, imageHandler);
   }
 

@@ -18,9 +18,6 @@ package net.hillsdon.reviki.vc;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
-
 
 /**
  * A verson control based store of wiki pages with attachments.
@@ -33,7 +30,7 @@ import java.util.Set;
  *
  * @author mth
  */
-public interface PageStore {
+public interface PageStore extends SimplePageStore {
 
   /**
    * @return The name of the wiki for which this PageStore stores pages.
@@ -44,17 +41,6 @@ public interface PageStore {
    * @return The latest (highest) revision number.
    */
   long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException;
-
-  /**
-   * @return A all pages.
-   */
-  Set<PageReference> list() throws PageStoreException;
-
-  /**
-   * @param page A page name.
-   * @return Whether page exists.
-   */
-  boolean exists(PageReference page) throws PageStoreException;
 
   /**
    * @param limit Maximum number of entries to return.
@@ -195,14 +181,6 @@ public interface PageStore {
    * @throws NotFoundException If the attachment is not present in the given revision.
    */
   void attachment(PageReference ref, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
-
-  /**
-   * @param ref Page.
-   * @param attachment Attachment on that page.
-   * @param revision The revision to fetch, -1 for head.
-   * @throws NotFoundException If the attachment is not present in the given revision.
-   */
-  byte[] attachmentBytes(PageReference ref, String attachment, long revision) throws PageStoreException, NotFoundException;
 
   /**
    * @throws PageStoreInvalidException If the underlying data repository is invalid/not present etc.

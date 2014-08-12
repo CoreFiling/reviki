@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.vc.impl.DummyPageStore;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
@@ -32,7 +32,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 public abstract class RenderingTest extends TestCase {
-  protected PageStore pageStore;
+  protected SimplePageStore pageStore;
 
   protected LinkPartsHandler linkHandler, imageHandler;
 
