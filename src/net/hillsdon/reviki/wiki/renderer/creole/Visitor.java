@@ -180,6 +180,14 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render an anchor.
+   */
+  @Override
+  public ASTNode visitAnchor(AnchorContext ctx) {
+    return new Anchor(ctx.InAnchor().getText());
+  }
+
+  /**
    * Render bold nodes, with error recovery by {@link #renderInline}.
    */
   @Override

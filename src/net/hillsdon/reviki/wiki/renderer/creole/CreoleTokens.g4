@@ -185,6 +185,7 @@ StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
+AnSt  : '[[#' -> mode(ANCHOR) ;
 
 /* ***** Breaks ***** */
 
@@ -252,6 +253,12 @@ InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
 LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+mode ANCHOR;
+
+InAnchor : ~('#'|']')+ ;
+
+AnEnd : ']]' -> mode(DEFAULT_MODE);
 
 mode MACRO;
 
