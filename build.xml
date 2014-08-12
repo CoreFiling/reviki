@@ -76,6 +76,14 @@
   </target>
 
   <target name="compile" depends="init">
+    <java jar="lib/antlr4.jar" dir="src/net/hillsdon/reviki/wiki/renderer/creole" fork="true">
+      <arg value="-package"/>
+      <arg value="net.hillsdon.reviki.wiki.renderer.creole"/>
+      <arg value="-visitor"/>
+      <arg value="Creole.g4"/>
+      <arg value="CreoleTokens.g4"/>
+    </java>
+
     <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.6" source="1.6" debug="true">
       <classpath refid="classpath" />
     </rjavac>
