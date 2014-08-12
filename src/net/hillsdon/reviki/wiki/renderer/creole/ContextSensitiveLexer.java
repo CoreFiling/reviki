@@ -103,6 +103,25 @@ public abstract class ContextSensitiveLexer extends Lexer {
   }
 
   /**
+   * Find the prior character on this line which was not whitespace. Returns
+   * null if there is no such character.
+   */
+  public Character priorNonWS() {
+    Character out = null;
+    int len = getText().length();
+
+    for (int i = 1; true; i++) {
+      Character chr = get(-len - i).charAt(0);
+      if (chr != ' ' && chr != '\t') {
+        out = chr;
+        break;
+      }
+    }
+
+    return out;
+  }
+
+  /**
    * Helper method for {@link #get(int)}, which gets the last character of the
    * token.
    */

@@ -27,9 +27,10 @@ options { superClass=ContextSensitiveLexer; }
   // list tokens to be matched), and breaks out of any formatting we may have
   // going on - which may trigger parser error-correction.
   public void doList(int level) {
+    seek(-1);
+
     listLevel = level;
 
-    seek(-1);
     resetFormatting();
 
     String next1 = get(0);
@@ -236,10 +237,9 @@ fragment UPPER : ('A'..'Z') ;
 fragment LOWER : ('a'..'z') ;
 fragment DIGIT : ('0'..'9') ;
 
-// 'START' matches something which is start-of-line-like. Currently that's only
-// handled by entering a new list level, but it could in principle be more
-// general, replacing the use of 'LINE' entirely.
-fragment START : {start}? | LINE ;
+// 'START' matches something which is start-of-line-like. Currently that's upon
+// entering a list item or table cell
+fragment START : {start}? | {intr && (priorNonWS() == '|' || priorNonWS() == '=')}? | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 
 /* ***** Contextual stuff ***** */

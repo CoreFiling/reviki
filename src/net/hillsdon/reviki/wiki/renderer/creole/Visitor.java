@@ -224,8 +224,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTitlelink(final TitlelinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Link(target, title, page(), urlOutputFilter(), linkHandler());
   }
 
@@ -234,8 +234,8 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitImglink(final ImglinkContext ctx) {
-    String target = (ctx.InLink()    == null) ? ""     : ctx.InLink().getText();
-    String title  = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
+    String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
     return new Image(target, title, page(), urlOutputFilter(), imageHandler());
   }
 
@@ -536,7 +536,12 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTh(final ThContext ctx) {
-    return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    List<ASTNode> inner = new ArrayList<ASTNode>();
+    for (InTableContext itx : ctx.inTable()) {
+      inner.add(visit(itx));
+    }
+
+    return new TableHeaderCell(inner);
   }
 
   /**
@@ -544,7 +549,12 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTd(final TdContext ctx) {
-    return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    List<ASTNode> inner = new ArrayList<ASTNode>();
+    for (InTableContext itx : ctx.inTable()) {
+      inner.add(visit(itx));
+    }
+
+    return new TableCell(inner);
   }
 
   /**
