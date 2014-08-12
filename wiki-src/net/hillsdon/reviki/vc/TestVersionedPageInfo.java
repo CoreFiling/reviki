@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 
-public class TestPageInfo extends TestCase {
+public class TestVersionedPageInfo extends TestCase {
 
   public void testRevisionNameAndIsNew() {
     VersionedPageInfo uncommitted = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, null, null, null, null, null);
