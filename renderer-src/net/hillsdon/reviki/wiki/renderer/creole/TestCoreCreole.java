@@ -3,7 +3,6 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.io.IOException;
 import java.util.Collections;
 
-import net.hillsdon.reviki.vc.impl.DummyPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
