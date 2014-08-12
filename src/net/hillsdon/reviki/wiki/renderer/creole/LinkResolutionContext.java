@@ -31,7 +31,7 @@ public class LinkResolutionContext {
     _page = page;
   }
 
-  public URI resolve(String wiki, String pageName) throws UnknownWikiException, URISyntaxException {
+  public URI resolve(String wiki, String pageName, String revision) throws UnknownWikiException, URISyntaxException {
     if (wiki!=null) {
       return _interWikiLinker.uri(wiki, pageName, null);
     }
@@ -41,7 +41,20 @@ public class LinkResolutionContext {
       }
       pageName = _page.getName();
     }
-    return _internalLinker.uri(pageName);
+
+    URI target = _internalLinker.uri(pageName);
+    if(revision == null) {
+      return target;
+    }
+    else {
+      String oldQuery = target.getQuery();
+      String newQuery = ((oldQuery == null) ? "" : oldQuery + "&") + "revision=" + revision;
+      return new URI(target.getScheme(), target.getUserInfo(), target.getHost(), target.getPort(), target.getPath(), newQuery, target.getFragment());
+    }
+  }
+
+  public URI resolve(String wiki, String pageName) throws UnknownWikiException, URISyntaxException {
+    return resolve(wiki, pageName, null);
   }
 
   public boolean exists(PageReferenceImpl pageReferenceImpl) throws PageStoreException {
