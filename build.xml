@@ -15,6 +15,7 @@
   <property name="version" value="0.4.0" /> 
   <property name="build-details" value="${version} r${buildNumber}" />
   <property name="source" value="src" />   
+  <property name="generated-source" value="src-gen" />
   <property name="web" value="WebContent" />   
   <property name="build-classes" value="ant-build/classes" />   
   <property name="build-web" value="ant-build/web" />   
@@ -62,6 +63,7 @@
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
      <mkdir dir="${release}" />
+     <mkdir dir="${generated-source}" />
   </target>
 
   <target name="clean" description="Clean-up build artifacts">
@@ -71,12 +73,27 @@
     <delete dir="${reports}" />
     <delete dir="${release}" />
     <delete file="${war}"/>
+    <delete dir="${generated-source}" />
     <delete dir="${tomcat}" />
     <!-- We leave the tomcat zip as it is a large download. -->
   </target>
 
-  <target name="compile" depends="init">
-    <rjavac srcdir="${source}" destdir="${build-classes}" fork="yes" target="1.6" source="1.6" debug="true">
+  <target name="generate-sources" depends="init">
+    <java jar="lib/antlr4.jar" dir="src/net/hillsdon/reviki/wiki/renderer/creole" fork="true">
+      <arg value="-o"/>
+      <arg value="${basedir}/${generated-source}/net/hillsdon/reviki/wiki/renderer/creole"/>
+      <arg value="-package"/>
+      <arg value="net.hillsdon.reviki.wiki.renderer.creole"/>
+      <arg value="-visitor"/>
+      <arg value="Creole.g4"/>
+      <arg value="CreoleTokens.g4"/>
+    </java>
+  </target>
+
+  <target name="compile" depends="generate-sources">
+    <rjavac destdir="${build-classes}" fork="yes" target="1.6" source="1.6" debug="true">
+      <src path="${source}"/>
+      <src path="${generated-source}"/>
       <classpath refid="classpath" />
     </rjavac>
     <copy todir="${build-web}">
