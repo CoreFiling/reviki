@@ -46,6 +46,10 @@ public class LinkParts {
     return _text;
   }
 
+  public LinkTarget getTarget() {
+    return _target;
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + Arrays.asList(_text, _target).toString();

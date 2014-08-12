@@ -29,6 +29,8 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
@@ -104,7 +106,8 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
     String clazz = link.getStyleClass(resolver);
     String url = link.getURL(resolver);
-    if (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText())) {
+    LinkTarget target = link.getTarget();
+    if (target instanceof PageLinkTarget && !link.exists(resolver) && WikiWordUtils.isAcronym(((PageLinkTarget)target).getPageName())) {
       return link.getText();
     }
 
