@@ -5,5 +5,8 @@ import java.util.List;
 public class OrderedList extends TaggedNode {
   public OrderedList(final List<ASTNode> children) {
     super("ol", children);
+
+    _isBlock = true;
+    _canContainBlock = true;
   }
 }
