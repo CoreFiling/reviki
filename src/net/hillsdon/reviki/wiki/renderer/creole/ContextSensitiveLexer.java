@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
 /**
@@ -46,6 +47,15 @@ public abstract class ContextSensitiveLexer extends Lexer {
   public ContextSensitiveLexer(final CharStream input) {
     super(input);
     _inlineFormatting = setupFormatting();
+  }
+
+  /** The type of the last token emitted. */
+  protected int priorTokId = -2; // -1 is EOF, everything else is non-negative.
+
+  @Override
+  public void emit(Token token) {
+    priorTokId = token.getType();
+    super.emit(token);
   }
 
   /**
@@ -100,25 +110,6 @@ public abstract class ContextSensitiveLexer extends Lexer {
   public Character priorprior() {
     int len = getText().length() + 1;
     return (_input.index() > len) ? get(-len - 1).charAt(0) : null;
-  }
-
-  /**
-   * Find the prior character on this line which was not whitespace. Returns
-   * null if there is no such character.
-   */
-  public Character priorNonWS() {
-    Character out = null;
-    int len = getText().length();
-
-    for (int i = 1; true; i++) {
-      Character chr = get(-len - i).charAt(0);
-      if (chr != ' ' && chr != '\t') {
-        out = chr;
-        break;
-      }
-    }
-
-    return out;
   }
 
   /**

@@ -1,6 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -536,9 +537,11 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTh(final ThContext ctx) {
-    List<ASTNode> inner = new ArrayList<ASTNode>();
-    for (InTableContext itx : ctx.inTable()) {
-      inner.add(visit(itx));
+    ASTNode inner;
+    if(ctx.inline() == null) {
+      inner = new Inline(Arrays.asList(new ASTNode[] { new Plaintext("") }));
+    } else {
+      inner = visit(ctx.inline());
     }
 
     return new TableHeaderCell(inner);
