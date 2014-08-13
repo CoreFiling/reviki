@@ -5,5 +5,8 @@ import java.util.List;
 public class TableRow extends TaggedNode {
   public TableRow(final List<ASTNode> cells) {
     super("tr", cells);
+
+    _isBlock = true;
+    _canContainBlock = true;
   }
 }
