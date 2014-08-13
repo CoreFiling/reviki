@@ -7,6 +7,7 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.uwyn.jhighlight.renderer.Renderer;
 
 public class Code extends TaggedNode {
@@ -19,7 +20,7 @@ public class Code extends TaggedNode {
   }
 
   @Override
-  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    return this;
+  public List<ASTNode> expandMacrosInt(final Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 }

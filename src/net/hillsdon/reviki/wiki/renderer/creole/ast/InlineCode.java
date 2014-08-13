@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.uwyn.jhighlight.renderer.Renderer;
 
 import net.hillsdon.fij.text.Escape;
@@ -43,7 +44,7 @@ public class InlineCode extends TaggedNode implements BlockableNode<Code> {
   }
 
   @Override
-  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    return this;
+  public List<ASTNode> expandMacrosInt(final Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 }
