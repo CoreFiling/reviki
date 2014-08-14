@@ -106,7 +106,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
         }
       }
 
-      return highlighted.replace("&nbsp;", " ").replace("<br />", "\n");
+      return highlighted.replace("&nbsp;", " ").replace("<br />", "");
     }
 
     @Override
