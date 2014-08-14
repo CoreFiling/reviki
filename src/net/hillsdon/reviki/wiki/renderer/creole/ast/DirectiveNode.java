@@ -64,7 +64,7 @@ public class DirectiveNode extends ASTNode {
   }
 
   @Override
-  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
-    return this;
+  public List<ASTNode> expandMacrosInt(Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 }
