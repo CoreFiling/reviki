@@ -538,15 +538,11 @@ public class Visitor extends CreoleASTBuilder {
   @Override
   public ASTNode visitTh(final ThContext ctx) {
     List<ASTNode> inner = new ArrayList<ASTNode>();
-    for (InTableContext itx : ctx.inTable()) {
-      if (itx == null || visit(itx) == null)
-        continue;
-
-      inner.add(visit(itx));
+    if (ctx.inline() == null) {
+      inner.add(new Inline(Arrays.asList(new ASTNode[] { new Plaintext("") })));
     }
-
-    if (inner.isEmpty()) {
-      inner.add(new Plaintext(""));
+    else {
+      inner.add(visit(ctx.inline()));
     }
 
     return new TableHeaderCell(inner);
