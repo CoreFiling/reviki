@@ -15,6 +15,9 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
+import java.io.InputStream;
+
+import net.hillsdon.reviki.wiki.MarkupRenderer;
 import junit.framework.TestCase;
 
 public class TestRendererRegistry extends TestCase {
@@ -34,5 +37,26 @@ public class TestRendererRegistry extends TestCase {
   public void testGetDefault() {
     assertNotNull(_registry.getDefaultRenderer());
     assertEquals(_default, _registry.getDefaultRenderer());
+  }
+
+  /**
+   * Test that we can insert and retrieve renderers.
+   */
+  public void testRetrieve() {
+    MarkupRenderer<InputStream> renderer = new XSLFORenderer(null);
+    String ctype = "xslfo";
+
+    assertFalse(_registry.hasRenderer(ctype));
+    _registry.addRenderer(ctype, renderer);
+    assertTrue(_registry.hasRenderer(ctype));
+    assertEquals(renderer, _registry.getRenderer(ctype));
+  }
+
+  /**
+   * Test that null ctypes are correctly handled.
+   */
+  public void testNull() {
+    assertFalse(_registry.hasRenderer(null));
+    assertNull(_registry.getRenderer(null));
   }
 }
