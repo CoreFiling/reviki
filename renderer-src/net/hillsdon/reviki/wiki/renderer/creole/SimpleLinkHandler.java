@@ -8,7 +8,7 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
-public class DummyLinkHandler implements LinkPartsHandler {
+public class SimpleLinkHandler implements LinkPartsHandler {
 
   public static final String IMAGE = "<img %sclass='%s' src='%s' alt='%s' />";
 
@@ -18,7 +18,7 @@ public class DummyLinkHandler implements LinkPartsHandler {
 
   private final LinkResolutionContext _context;
   
-  public DummyLinkHandler(final String fmat, final LinkResolutionContext context) {
+  public SimpleLinkHandler(final String fmat, final LinkResolutionContext context) {
     _fmat = fmat;
     _context = context;
   }

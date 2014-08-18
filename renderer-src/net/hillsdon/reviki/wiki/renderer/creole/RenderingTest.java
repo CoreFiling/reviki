@@ -66,8 +66,8 @@ public abstract class RenderingTest extends TestCase {
 
     LinkResolutionContext resolver = new LinkResolutionContext(linker, wikilinker, pageStore);
 
-    linkHandler = new DummyLinkHandler(DummyLinkHandler.ANCHOR, resolver);
-    imageHandler = new DummyLinkHandler(DummyLinkHandler.IMAGE, resolver);
+    linkHandler = new SimpleLinkHandler(SimpleLinkHandler.ANCHOR, resolver);
+    imageHandler = new SimpleLinkHandler(SimpleLinkHandler.IMAGE, resolver);
     macros = Suppliers.ofInstance((List<Macro>) new LinkedList<Macro>());
   }
 }
