@@ -9,15 +9,10 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public class SimpleLinkHandler implements LinkPartsHandler {
-
-  public static final String IMAGE = "<img %sclass='%s' src='%s' alt='%s' />";
-
-  public static final String ANCHOR = "<a %sclass='%s' href='%s'>%s</a>";
-
   private final String _fmat;
 
   private final LinkResolutionContext _context;
-  
+
   public SimpleLinkHandler(final String fmat, final LinkResolutionContext context) {
     _fmat = fmat;
     _context = context;
