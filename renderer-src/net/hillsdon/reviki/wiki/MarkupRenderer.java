@@ -59,11 +59,11 @@ public abstract class MarkupRenderer<T> {
   public abstract ASTNode parse(PageInfo page) throws IOException, PageStoreException;
 
   /**
-   * Like {@link #render(PageInfo)}, but takes the page contents.
+   * Like {@link #render(String, URLOutputFilter)}, but with the null URl output
+   * filter.
    */
   public final Optional<T> render(final String contents) {
-    PageInfo page = new PageInfoImpl("", "", contents, Collections.<String, String> emptyMap());
-    return render(page);
+    return render(contents, URLOutputFilter.NULL);
   }
 
   /**
