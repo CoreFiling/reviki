@@ -3,27 +3,55 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.google.common.base.Function;
+
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.impl.DummyPageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
+import net.hillsdon.reviki.web.urls.SimpleWikiUrls;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public class LinkResolutionContext {
+  /**
+   * For when internal links are relative to some path, and there are no
+   * inter-wiki links.
+   */
+  public static final Function<String, LinkResolutionContext> SIMPLE_LINKS = new Function<String, LinkResolutionContext>() {
+    public LinkResolutionContext apply(String base) {
+      // Have all internal relative links start from /jira/browse/
+      SimpleWikiUrls wikiUrls = SimpleWikiUrls.RELATIVE_TO.apply(base);
+      InternalLinker linker = new InternalLinker(wikiUrls);
+
+      // We know of no other wikis.
+      InterWikiLinker wikilinker = new InterWikiLinker();
+
+      // Or any pages.
+      SimplePageStore pageStore = new DummyPageStore();
+
+      // Finally, construct the resolver.
+      return new LinkResolutionContext(linker, wikilinker, pageStore);
+    }
+  };
+
   private final InternalLinker _internalLinker;
+
   private final SimplePageStore _store;
+
   private final InterWikiLinker _interWikiLinker;
+
   private final PageReference _page;
-  
+
   public LinkResolutionContext(final InternalLinker internalLinker, final InterWikiLinker interWikiLinker, final SimplePageStore store) {
     _internalLinker = internalLinker;
     _interWikiLinker = interWikiLinker;
     _store = store;
     _page = null;
   }
-  
+
   public LinkResolutionContext(final InternalLinker internalLinker, final InterWikiLinker interWikiLinker, final SimplePageStore store, final PageReference page) {
     _internalLinker = internalLinker;
     _interWikiLinker = interWikiLinker;
@@ -32,7 +60,7 @@ public class LinkResolutionContext {
   }
 
   public URI resolve(String wiki, String pageName) throws UnknownWikiException, URISyntaxException {
-    if (wiki!=null) {
+    if (wiki != null) {
       return _interWikiLinker.uri(wiki, pageName, null);
     }
     if (pageName == null) {
