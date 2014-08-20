@@ -137,7 +137,7 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
           // rearrange the document: we compare with the current heading:
           // popping things off the stack and merging them into their parent
           // sections if it's bigger.
-          Integer hdr = new Integer(((Heading) child).getLevel());
+          Integer hdr = Integer.valueOf(((Heading) child).getLevel());
 
           while (!levels.isEmpty() && levels.peek() >= hdr) {
             Element sect = sections.pop();
@@ -156,7 +156,7 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
         // pretend there was a level 1 heading.
         if (sections.empty()) {
           sections.push(_document.createElement("section"));
-          levels.push(new Integer(1));
+          levels.push(Integer.valueOf(1));
         }
 
         // Add everything to the current section.
