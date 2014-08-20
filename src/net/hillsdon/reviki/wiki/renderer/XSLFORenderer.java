@@ -106,7 +106,7 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       OutputStream stdin = process.getOutputStream();
 
       // Write XML to stdin
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin, StandardCharsets.UTF_8));
       writer.write(docbook);
       writer.flush();
       writer.close();
