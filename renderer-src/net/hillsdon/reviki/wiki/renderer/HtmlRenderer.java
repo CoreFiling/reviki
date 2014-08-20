@@ -12,6 +12,7 @@ import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.wiki.renderer.creole.CreoleBasedRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;

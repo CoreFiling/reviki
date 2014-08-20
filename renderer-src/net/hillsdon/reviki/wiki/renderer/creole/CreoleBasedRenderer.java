@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.wiki.renderer;
+package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.List;
 
@@ -7,8 +7,6 @@ import com.google.common.base.Supplier;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
