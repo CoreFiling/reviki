@@ -222,7 +222,7 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   /**
    * Class to hold the context of a list item to render.
    */
-  protected class ListItemContext {
+  protected static final class ListItemContext {
     private final ParserRuleContext _ordered;
 
     private final ParserRuleContext _unordered;

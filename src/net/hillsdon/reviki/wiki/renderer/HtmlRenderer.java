@@ -46,7 +46,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
     return "text/html; charset=utf-8";
   }
 
-  private final class HtmlVisitor extends ASTRenderer<String> {
+  private static final class HtmlVisitor extends ASTRenderer<String> {
     public HtmlVisitor(URLOutputFilter urlOutputFilter) {
       super("", urlOutputFilter);
     }

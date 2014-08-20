@@ -17,7 +17,7 @@ public abstract class ContextSensitiveLexer extends Lexer {
    * italic, where the start and end symbols are the same, and nesting of the
    * same type is not allowed.
    */
-  public class Formatting {
+  public static final class Formatting {
     /** The start/end string. */
     String symbol;
 

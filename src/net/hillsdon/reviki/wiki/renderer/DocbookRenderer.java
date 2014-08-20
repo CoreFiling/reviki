@@ -91,7 +91,7 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
     return document;
   }
 
-  private final class DocbookVisitor extends ASTRenderer<List<Node>> {
+  private static final class DocbookVisitor extends ASTRenderer<List<Node>> {
     private final Document _document;
 
     public DocbookVisitor(final Document document, URLOutputFilter urlOutputFilter) {
