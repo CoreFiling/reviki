@@ -54,7 +54,7 @@ public class DirectiveNode extends ASTNode {
   }
 
   @Override
-  public String toSmallString() {
-    return "";
+  protected void toSmallString(StringBuilder sb) {
+    // Do nothing
   }
 }

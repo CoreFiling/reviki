@@ -147,12 +147,20 @@ public abstract class ASTNode {
    * Elements which are invisible should override this to return the empty
    * string.
    */
-  public String toSmallString() {
-    String out = getClass().getSimpleName();
+  public final String toSmallString() {
+    StringBuilder sb = new StringBuilder();
+    toSmallString(sb);
+    return sb.toString();
+  }
+
+  /**
+   * Efficiently construct a small string representation of the AST.
+   */
+  protected void toSmallString(StringBuilder sb) {
+    sb.append(getClass().getSimpleName());
     for (ASTNode child : getChildren()) {
-      out += child.toSmallString();
+      child.toSmallString(sb);
     }
-    return out;
   }
 
   @Override

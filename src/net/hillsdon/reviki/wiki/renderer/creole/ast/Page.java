@@ -8,11 +8,9 @@ public class Page extends ASTNode {
   }
   
   @Override
-  public String toSmallString() {
-    String out = "";
+  protected void toSmallString(StringBuilder sb) {
     for (ASTNode child : getChildren()) {
-      out += child.toSmallString();
+      child.toSmallString(sb);
     }
-    return out;
   }
 }

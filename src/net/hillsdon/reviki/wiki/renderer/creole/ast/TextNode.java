@@ -71,7 +71,7 @@ public abstract class TextNode extends ASTNode {
   }
 
   @Override
-  public String toSmallString() {
-    return getText();
+  protected void toSmallString(StringBuilder sb) {
+    sb.append(getText());
   }
 }
