@@ -26,6 +26,7 @@ import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleBasedRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -41,6 +42,10 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
   public DocbookRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     super(pageStore, linkHandler, imageHandler, macros);
+  }
+
+  public DocbookRenderer(final LinkResolutionContext resolver) {
+    super(resolver);
   }
 
   @Override

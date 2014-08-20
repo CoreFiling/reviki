@@ -1,8 +1,10 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
@@ -32,6 +34,23 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
     _macros = macros;
+  }
+
+  /**
+   * Construct a renderer from just a resolution context.
+   *
+   * Simple anchors, simple images, no macros.
+   */
+  public CreoleBasedRenderer(final LinkResolutionContext resolver) {
+    // Use the resolver's store.
+    _pageStore = resolver.getPageStore();
+
+    // Render links as links, and images as images.
+    _linkHandler = new SimpleAnchors(resolver);
+    _imageHandler = new SimpleImages(resolver);
+
+    // We have no macros, either.
+    _macros = Suppliers.ofInstance((List<Macro>) new LinkedList<Macro>());
   }
 
   @Override

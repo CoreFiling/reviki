@@ -51,4 +51,8 @@ public class LinkResolutionContext {
   public LinkResolutionContext derive(PageReference page) {
     return new LinkResolutionContext(_internalLinker, _interWikiLinker, _store, page);
   }
+
+  public SimplePageStore getPageStore() {
+    return _store;
+  }
 }

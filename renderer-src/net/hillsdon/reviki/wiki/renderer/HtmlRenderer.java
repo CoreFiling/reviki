@@ -15,6 +15,7 @@ import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleBasedRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -34,6 +35,10 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
   public HtmlRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     super(pageStore, linkHandler, imageHandler, macros);
+  }
+
+  public HtmlRenderer(final LinkResolutionContext resolver) {
+    super(resolver);
   }
 
   @Override
