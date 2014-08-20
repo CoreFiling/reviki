@@ -107,7 +107,7 @@ public class SearchIndexBuilder implements Runnable {
       }
 
       @Override
-      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(ast, urlOutputFilter);
       }
     };

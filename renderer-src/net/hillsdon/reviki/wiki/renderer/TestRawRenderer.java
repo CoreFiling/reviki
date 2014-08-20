@@ -10,7 +10,6 @@ import com.google.common.base.Optional;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import junit.framework.TestCase;
 
 public class TestRawRenderer extends TestCase {
@@ -21,7 +20,7 @@ public class TestRawRenderer extends TestCase {
   /** Check that we get out what we put in. */
   public void testRender() {
     RawRenderer renderer = new RawRenderer();
-    Optional<InputStream> is = renderer.render(_page, URLOutputFilter.NULL);
+    Optional<InputStream> is = renderer.render(_page);
 
     assertTrue(is.isPresent());
 

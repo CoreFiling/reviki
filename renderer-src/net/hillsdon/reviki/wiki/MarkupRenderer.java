@@ -57,6 +57,14 @@ public abstract class MarkupRenderer<T> {
   public abstract ASTNode parse(PageInfo page) throws IOException, PageStoreException;
 
   /**
+   * Like {@link #render(PageInfo, URLOutputFilter)}, but with the null URL
+   * output filter.
+   */
+  public final Optional<T> render(final PageInfo page) {
+    return render(page, URLOutputFilter.NULL);
+  }
+
+  /**
    * Render a page, and then turn it into the desired output type.
    */
   public final Optional<T> render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
@@ -75,9 +83,17 @@ public abstract class MarkupRenderer<T> {
   }
 
   /**
+   * Like {@link #render(ASTNode, URLOutputFilter)}, but with the null URL
+   * output filter.
+   */
+  public final T render(final ASTNode ast) throws IOException, PageStoreException {
+    return render(ast, URLOutputFilter.NULL);
+  }
+
+  /**
    * Render a page, and then turn it into the desired output type.
    */
-  public abstract T render(final ASTNode ast, final URLOutputFilter urlOutputFilter);
+  public abstract T render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
 
   /**
    * Return the MIME type of the generated output.

@@ -234,7 +234,15 @@ public class TestDocxRenderer extends RenderingTest {
   /** Sanity check: check that we actually get output. */
   public void testSanity() {
     Page page = new Page(new ArrayList<ASTNode>());
-    InputStream is = _renderer.render(page, URLOutputFilter.NULL);
+    InputStream is;
+
+    try {
+      is = _renderer.render(page);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      is = null;
+    }
 
     assertNotNull(is);
 

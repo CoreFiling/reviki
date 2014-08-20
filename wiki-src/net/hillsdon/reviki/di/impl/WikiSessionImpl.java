@@ -118,7 +118,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
         return _renderer.parse(page);
       }
 
-      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+      @Override
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(ast,  urlOutputFilter);
       }
     };

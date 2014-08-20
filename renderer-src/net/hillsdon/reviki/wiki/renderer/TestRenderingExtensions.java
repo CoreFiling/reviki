@@ -20,7 +20,6 @@ import java.util.Collections;
 
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.JsonDrivenRenderingTest;
 
 import org.codehaus.jackson.JsonParseException;
@@ -34,7 +33,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
     HtmlRenderer renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
-    return renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL).get();
+    return renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap())).get();
   }
 
 }

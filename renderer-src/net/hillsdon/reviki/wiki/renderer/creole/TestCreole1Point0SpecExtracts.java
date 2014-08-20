@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 
 import org.codehaus.jackson.JsonParseException;
@@ -21,7 +20,7 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
   protected String render(final String input) throws Exception {
     HtmlRenderer renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
 
-    Optional<String> rendered = renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()), URLOutputFilter.NULL);
+    Optional<String> rendered = renderer.render(new PageInfoImpl("", "", input, Collections.<String, String> emptyMap()));
 
     return rendered.isPresent() ? rendered.get() : "";
   }

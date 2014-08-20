@@ -80,7 +80,7 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
   }
 
   @Override
-  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
     MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
     return renderer.render(ast, urlOutputFilter);
   }
