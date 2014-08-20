@@ -349,7 +349,7 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitOlist10(final Olist10Context ctx) {
-    return renderListItem(null, ctx.inList());
+    return renderListItem(Collections.<ParserRuleContext> emptyList(), ctx.inList());
   }
 
   /** See {@link #visitOlist}. */
@@ -421,7 +421,7 @@ public class Visitor extends CreoleASTBuilder {
   /** See {@link #visitOlist}. */
   @Override
   public ASTNode visitUlist10(final Ulist10Context ctx) {
-    return renderListItem(null, ctx.inList());
+    return renderListItem(Collections.<ParserRuleContext> emptyList(), ctx.inList());
   }
 
   /**
