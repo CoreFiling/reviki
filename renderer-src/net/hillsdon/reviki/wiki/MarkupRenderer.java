@@ -16,11 +16,13 @@
 package net.hillsdon.reviki.wiki;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import com.google.common.base.Optional;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
@@ -57,11 +59,28 @@ public abstract class MarkupRenderer<T> {
   public abstract ASTNode parse(PageInfo page) throws IOException, PageStoreException;
 
   /**
+   * Like {@link #render(PageInfo)}, but takes the page contents.
+   */
+  public final Optional<T> render(final String contents) {
+    PageInfo page = new PageInfoImpl("", "", contents, Collections.<String, String> emptyMap());
+    return render(page);
+  }
+
+  /**
    * Like {@link #render(PageInfo, URLOutputFilter)}, but with the null URL
    * output filter.
    */
   public final Optional<T> render(final PageInfo page) {
     return render(page, URLOutputFilter.NULL);
+  }
+
+  /**
+   * Like {@link #render(PageInfo, URLOutputFilter)}, but takes the page
+   * contents.
+   */
+  public final Optional<T> render(final String contents, final URLOutputFilter urlOutputFilter) {
+    PageInfo page = new PageInfoImpl("", "", contents, Collections.<String, String> emptyMap());
+    return render(page, urlOutputFilter);
   }
 
   /**
