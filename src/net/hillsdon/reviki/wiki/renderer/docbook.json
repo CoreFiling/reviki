@@ -68,5 +68,10 @@
     "name":   "Unexpanded macros",
     "input":  "Hello <<world:args>>\n\n<<macro:args2>>",
     "output": "<section>\n<para>Hello <code>&lt;&lt;world:args&gt;&gt;</code>\n</para>\n<programlisting><![CDATA[<<macro:args2>>]]></programlisting>\n</section>"
+  },
+  {
+    "name":   "Anchors",
+    "input":  "An [[#anchor]]",
+    "output": "<section>\n<para>An <anchor xml:id=\"anchor\"/>\n</para>\n</section>"
   }
 ]

@@ -109,11 +109,22 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
 
     @Override
     public List<Node> visitPage(final Page node) {
-      Element article = _document.createElement("article");
+      Element article = renderPageLike("article", node);
+
       article.setAttribute("xmlns", "http://docbook.org/ns/docbook");
       article.setAttribute("xmlns:xl", "http://www.w3.org/1999/xlink");
       article.setAttribute("version", "5.0");
       article.setAttribute("xml:lang", "en");
+
+      return singleton(article);
+    }
+
+    /**
+     * Helper function: render a page-like construct (currently only Page and
+     * Blockquote) with correct nesting of sections.
+     */
+    public Element renderPageLike(String containingElementName, final ASTNode node) {
+      Element container = _document.createElement(containingElementName);
 
       // Stack of sections and subsections. Head of stack is what we're
       // currently rendering to.
@@ -143,7 +154,7 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
             Element sect = sections.pop();
             levels.pop();
 
-            Element parent = sections.isEmpty() ? article : sections.peek();
+            Element parent = sections.isEmpty() ? container : sections.peek();
             parent.appendChild(sect);
           }
 
@@ -168,12 +179,12 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
       // Save the last subsection stack.
       while (!sections.isEmpty()) {
         Element sect = sections.pop();
-        Element parent = sections.isEmpty() ? article : sections.peek();
+        Element parent = sections.isEmpty() ? container : sections.peek();
         parent.appendChild(sect);
       }
 
-      // And we're done.
-      return singleton(article);
+      // And we're done!
+      return container;
     }
 
     /**
@@ -202,6 +213,24 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
       List<Node> out = new ArrayList<Node>();
       out.add(n);
       return out;
+    }
+
+    @Override
+    public List<Node> visitAnchor(Anchor node) {
+      Element anchor = _document.createElement("anchor");
+      anchor.setAttribute("xml:id", node.getAnchor());
+      return singleton(anchor);
+    }
+
+    @Override
+    public List<Node> visitBlockquote(Blockquote node) {
+      // Sadly, Docbook blockquotes cannot contain sections, which is the only
+      // way we can do differing title levels. Thus, we render to a section here
+      // and set the role attribute, hoping that consumers of the document will
+      // respect it.
+      Element out = renderPageLike("section", node);
+      out.setAttribute("role", "blockquote");
+      return singleton(out);
     }
 
     @Override
@@ -340,14 +369,14 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
 
     @Override
     public List<Node> visitTableCell(final TableCell node) {
-      Element out = (Element) wraps("td", node);
+      Element out = wraps("td", node);
       valign(out);
       return singleton(out);
     }
 
     @Override
     public List<Node> visitTableHeaderCell(final TableHeaderCell node) {
-      Element out = (Element) wraps("th", node);
+      Element out = wraps("th", node);
       valign(out);
       return singleton(out);
     }
