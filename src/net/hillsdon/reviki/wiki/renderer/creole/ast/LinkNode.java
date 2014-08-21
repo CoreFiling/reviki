@@ -3,6 +3,7 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 import java.util.List;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
@@ -78,7 +79,7 @@ public abstract class LinkNode extends ASTNode {
   }
 
   @Override
-  public ASTNode expandMacros(Supplier<List<Macro>> macros) {
-    return this;
+  public List<ASTNode> expandMacrosInt(Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 }

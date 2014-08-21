@@ -8,8 +8,8 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 public abstract class ASTVisitor<T> {
   /** Enum of node types. */
   public static enum NodeTypes {
-    ASTNode,
-    BlockableNode, Bold,
+    ASTNode, Anchor,
+    BlockableNode, Blockquote, Bold,
     Code,
     DirectiveNode,
     Heading, HorizontalRule,
@@ -33,6 +33,8 @@ public abstract class ASTVisitor<T> {
   public T visit(final ASTNode node) {
     // This doesn't include the abstract node types, as they can't be instantiated.
     switch(NodeTypes.valueOf(node.getClass().getSimpleName())) {
+      case Anchor:          return visitAnchor((Anchor) node);
+      case Blockquote:      return visitBlockquote((Blockquote) node);
       case Bold:            return visitBold((Bold) node);
       case Code:            return visitCode((Code) node);
       case DirectiveNode:   return visitDirectiveNode((DirectiveNode) node);
@@ -72,7 +74,9 @@ public abstract class ASTVisitor<T> {
   public abstract T visitASTNode(final ASTNode node);
 
   /** Regular nodes. */
+  public T visitAnchor(Anchor node)                         { return visitASTNode(node); }
   public T visitBlockableNode(final BlockableNode node)     { return visitASTNode((ASTNode) node); }
+  public T visitBlockquote(Blockquote node)                 { return visitASTNode(node); }
   public T visitBold(final Bold node)                       { return visitASTNode(node); }
   public T visitCode(final Code node)                       { return visitASTNode(node); }
   public T visitDirectiveNode(final DirectiveNode node)     { return visitASTNode(node); }

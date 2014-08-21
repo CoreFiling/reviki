@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
 /**
@@ -46,6 +47,15 @@ public abstract class ContextSensitiveLexer extends Lexer {
   public ContextSensitiveLexer(final CharStream input) {
     super(input);
     _inlineFormatting = setupFormatting();
+  }
+
+  /** The type of the last token emitted. */
+  protected int priorTokId = -2; // -1 is EOF, everything else is non-negative.
+
+  @Override
+  public void emit(Token token) {
+    priorTokId = token.getType();
+    super.emit(token);
   }
 
   /**

@@ -1,6 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -150,6 +151,14 @@ public class Visitor extends CreoleASTBuilder {
   @Override
   public ASTNode visitRawlink(final RawlinkContext ctx) {
     return new Link(ctx.getText(), ctx.getText(), page(), linkHandler());
+  }
+
+  /**
+   * Render an anchor.
+   */
+  @Override
+  public ASTNode visitAnchor(AnchorContext ctx) {
+    return new Anchor(ctx.InAnchor().getText());
   }
 
   /**
@@ -501,7 +510,15 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTh(final ThContext ctx) {
-    return new TableHeaderCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    ASTNode body;
+    if (ctx.inline() == null) {
+      body = new Inline(Arrays.asList(new ASTNode[] { new Plaintext("") }));
+    }
+    else {
+      body = visit(ctx.inline());
+    }
+
+    return new TableHeaderCell(body);
   }
 
   /**
@@ -509,7 +526,19 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitTd(final TdContext ctx) {
-    return new TableCell((ctx.inline() != null) ? visit(ctx.inline()) : new Plaintext(""));
+    List<ASTNode> inner = new ArrayList<ASTNode>();
+    for (InTableContext itx : ctx.inTable()) {
+      if (itx == null || visit(itx) == null)
+        continue;
+
+      inner.add(visit(itx));
+    }
+
+    if (inner.isEmpty()) {
+      inner.add(new Plaintext(""));
+    }
+
+    return new TableCell(inner);
   }
 
   /**
@@ -527,10 +556,18 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render a blockquote.
+   */
+  @Override
+  public ASTNode visitBlockquote(BlockquoteContext ctx) {
+    return new Blockquote(visit(ctx.creole()));
+  }
+
+  /**
    * Enable a directive.
    */
   @Override
-  public ASTNode visitEnable(final EnableContext ctx) {
+  public ASTNode visitEnable(EnableContext ctx) {
     if (ctx.MacroEndNoArgs() == null) {
       return new DirectiveNode(ctx.MacroName().getText(), true, cutOffEndTag(ctx.MacroEnd(), ">>"));
     }

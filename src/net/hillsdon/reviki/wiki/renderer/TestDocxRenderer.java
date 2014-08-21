@@ -268,8 +268,8 @@ public class TestDocxRenderer extends TestCase {
     List<ASTNode> bat = Arrays.asList(new ASTNode[] { new Plaintext("bat") });
     TableHeaderCell th1 = new TableHeaderCell(new Inline(foo));
     TableHeaderCell th2 = new TableHeaderCell(new Inline(bar));
-    TableCell td1 = new TableCell(new Inline(baz));
-    TableCell td2 = new TableCell(new Inline(bat));
+    TableCell td1 = new TableCell(Arrays.asList(new ASTNode[] { new Inline(baz) }));
+    TableCell td2 = new TableCell(Arrays.asList(new ASTNode[] { new Inline(bat) }));
     TableRow tr1 = new TableRow(Arrays.asList(new ASTNode[] { th1, th2 }));
     TableRow tr2 = new TableRow(Arrays.asList(new ASTNode[] { td1, td2 }));
     Table table = new Table(Arrays.asList(new ASTNode[] { tr1, tr2 }));

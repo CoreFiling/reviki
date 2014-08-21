@@ -27,9 +27,10 @@ options { superClass=ContextSensitiveLexer; }
   // list tokens to be matched), and breaks out of any formatting we may have
   // going on - which may trigger parser error-correction.
   public void doList(int level) {
+    seek(-1);
+
     listLevel = level;
 
-    seek(-1);
     resetFormatting();
 
     String next1 = get(0);
@@ -185,6 +186,7 @@ StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
+AnSt  : '[[#' -> mode(ANCHOR) ;
 
 /* ***** Breaks ***** */
 
@@ -202,19 +204,24 @@ fragment PROTOCOL : ('http' 's'? | 'file' | 'ftp') '://' | 'file:/' | 'mailto:' 
 
 Attachment : UPPER CAMEL '.' ALNUM+ ;
 
-WikiWords : (UPPER (ABBR | CAMEL) | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != ':' && !Character.isLetterOrDigit(prior()) && !(last() == '.' && Character.isLetter(next()))}? {seek(-1);} ;
+WikiWords : (UPPER (ABBR | CAMEL) REVISION? | INTERWIKI ALNUM+) NOTALNUM {prior() == null || prior() != '.' && prior() != ':' && !Character.isLetterOrDigit(prior()) && !(last() == '.' && Character.isLetter(next()))}? {seek(-1);} ;
 
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
 fragment ABBR      : UPPER UPPER+ ;
 fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UPNUM+) ;
+fragment REVISION  : '?revision=' DIGIT+ ;
 
 /* ***** Macros ***** */
 
 MacroSt : '<<' -> mode(MACRO) ;
 
-DirectiveEnable : '<<+' -> mode(MACRO) ;
-
+DirectiveEnable  : '<<+' -> mode(MACRO) ;
 DirectiveDisable : '<<-' -> mode(MACRO) ;
+
+/* ***** Quotes ***** */
+
+BlockquoteSt  : '[<blockquote>]' ;
+BlockquoteEnd : '[</blockquote>]' ;
 
 /* ***** Miscellaneous ***** */
 
@@ -233,10 +240,9 @@ fragment UPPER : ('A'..'Z') ;
 fragment LOWER : ('a'..'z') ;
 fragment DIGIT : ('0'..'9') ;
 
-// 'START' matches something which is start-of-line-like. Currently that's only
-// handled by entering a new list level, but it could in principle be more
-// general, replacing the use of 'LINE' entirely.
-fragment START : {start}? | LINE ;
+// 'START' matches something which is start-of-line-like. Currently that's upon
+// entering a list item or table cell
+fragment START : {start}? | {intr && priorTokId == TdStart}? WS* | LINE ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 
 /* ***** Contextual stuff ***** */
@@ -256,6 +262,12 @@ InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
 LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+mode ANCHOR;
+
+InAnchor : ~('#'|']')+ ;
+
+AnEnd : ']]' -> mode(DEFAULT_MODE);
 
 mode MACRO;
 

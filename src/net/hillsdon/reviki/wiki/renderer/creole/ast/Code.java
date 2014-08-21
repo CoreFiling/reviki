@@ -7,6 +7,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 
 public class Code extends TextNode {
   private final String _contents;
@@ -28,8 +29,8 @@ public class Code extends TextNode {
   }
 
   @Override
-  public ASTNode expandMacros(final Supplier<List<Macro>> macros) {
-    return this;
+  public List<ASTNode> expandMacrosInt(final Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 
   @Override

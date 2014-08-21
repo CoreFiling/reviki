@@ -30,6 +30,8 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
