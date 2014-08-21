@@ -2,7 +2,9 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
@@ -62,11 +64,21 @@ public abstract class ASTNode {
    * Produce a valid XHTML representation (assuming valid implementations of
    * toXHTML for all direct and indirect children) of the node.
    */
-  public String toXHTML() {
+  public final String toXHTML() {
+    return toXHTML(new HashMap<String, List<String>>());
+  }
+
+  /**
+   * Render the node with the given directives (and their arguments) enabled.
+   *
+   * enabledDirectives MUST be mutable.
+   * This method MAY mutate enabledDirectives.
+   */
+  public String toXHTML(Map<String, List<String>> enabledDirectives) {
     String out = "";
 
     for (ASTNode node : getChildren()) {
-      out += node.toXHTML();
+      out += node.toXHTML(enabledDirectives);
     }
 
     return out;

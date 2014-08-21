@@ -23,6 +23,7 @@ block     : heading
           | table
           | code | nowiki
           | blockquote
+          | directive
           | paragraph
           ;
 
@@ -91,6 +92,10 @@ inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unset
 nowiki     : NoWiki EndNoWikiBlock ;
 
 blockquote : BlockquoteSt creole BlockquoteEnd ;
+
+directive  : DirectiveEnable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Enable
+           | DirectiveDisable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Disable
+           ;
 
 /* ***** Inline Elements ***** */
 

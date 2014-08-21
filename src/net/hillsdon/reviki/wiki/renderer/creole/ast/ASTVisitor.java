@@ -11,6 +11,7 @@ public abstract class ASTVisitor<T> {
     ASTNode, Anchor,
     BlockableNode, Blockquote, Bold,
     Code,
+    DirectiveNode,
     Heading, HorizontalRule,
     Image, Inline, InlineCode, Italic,
     Linebreak, Link, LinkNode, ListItem,
@@ -35,6 +36,7 @@ public abstract class ASTVisitor<T> {
       case Blockquote:      return visitBlockquote((Blockquote) node);
       case Bold:            return visitBold((Bold) node);
       case Code:            return visitCode((Code) node);
+      case DirectiveNode:   return visitDirectiveNode((DirectiveNode) node);
       case Heading:         return visitHeading((Heading) node);
       case HorizontalRule:  return visitHorizontalRule((HorizontalRule) node);
       case Image:           return visitImage((Image) node);
@@ -75,6 +77,7 @@ public abstract class ASTVisitor<T> {
   public T visitBlockquote(Blockquote node)           { return visitASTNode(node); }
   public T visitBold(Bold node)                       { return visitASTNode(node); }
   public T visitCode(Code node)                       { return visitASTNode(node); }
+  public T visitDirectiveNode(DirectiveNode node)     { return visitASTNode(node); }
   public T visitHeading(Heading node)                 { return visitASTNode(node); }
   public T visitHorizontalRule(HorizontalRule node)   { return visitASTNode(node); }
   public T visitImage(Image node)                     { return visitASTNode(node); }

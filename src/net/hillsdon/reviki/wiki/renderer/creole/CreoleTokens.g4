@@ -215,6 +215,9 @@ fragment REVISION  : '?revision=' DIGIT+ ;
 
 MacroSt : '<<' -> mode(MACRO) ;
 
+DirectiveEnable  : '<<+' -> mode(MACRO) ;
+DirectiveDisable : '<<-' -> mode(MACRO) ;
+
 /* ***** Quotes ***** */
 
 BlockquoteSt  : '[<blockquote>]' ;

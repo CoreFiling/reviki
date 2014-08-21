@@ -589,4 +589,30 @@ public class Visitor extends CreoleASTBuilder {
   public ASTNode visitBlockquote(BlockquoteContext ctx) {
     return new Blockquote(visit(ctx.creole()));
   }
+
+  /**
+   * Enable a directive.
+   */
+  @Override
+  public ASTNode visitEnable(EnableContext ctx) {
+    if (ctx.MacroEndNoArgs() == null) {
+      return new DirectiveNode(ctx.MacroName().getText(), true, cutOffEndTag(ctx.MacroEnd(), ">>"));
+    }
+    else {
+      return new DirectiveNode(ctx.MacroName().getText(), true);
+    }
+  }
+
+  /**
+   * Disable a directive.
+   */
+  @Override
+  public ASTNode visitDisable(DisableContext ctx) {
+    if (ctx.MacroEndNoArgs() == null) {
+      return new DirectiveNode(ctx.MacroName().getText(), false, cutOffEndTag(ctx.MacroEnd(), ">>"));
+    }
+    else {
+      return new DirectiveNode(ctx.MacroName().getText(), false);
+    }
+  }
 }
