@@ -100,6 +100,11 @@
     "name":   "Blank named link",
     "input":  "[[|]]",
     "output": ""
+  },
+  {
+    "name":   "Formatting inside tables",
+    "input":  "|* Foo\n* Bar\n** Baz|world|{{{look\nsome\ncode}}}|\n|=Table|=header|=cells|",
+    "output": "<table><tr><td><ul><li> Foo\n</li><li> Bar<ul><li> Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
   }
 ]
 
