@@ -551,6 +551,15 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       return tbl;
     }
 
+    /** Insert a blank paragraph to separate two tables. */
+    protected void separateTables() {
+      ContentAccessor container = _blockContexts.peek();
+      int size = container.getContent().size();
+      if (size > 0 && container.getContent().get(size - 1) instanceof Tbl) {
+        commitBlock(_factory.createP());
+      }
+    }
+
     @Override
     public InputStream visitAnchor(Anchor node) {
       // Docx doesn't, as far as I can tell, have a concept analogous to
@@ -605,6 +614,12 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
       // Magical paragraph which makes everything work.
       tcell.getContent().add(_factory.createP());
+
+      // There is a similar problem with tables and blockquotes being adjacent:
+      // if there's nothing between them, libreoffice merges them, and the
+      // blockquote border is used for the table. So if there's a table
+      // immediately before this quote, put in a blank paragraph.
+      separateTables();
 
       // Save everything to the document.
       table.getContent().add(trow);
@@ -828,6 +843,10 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       // Set the style to our custom one.
       table.getTblPr().setTblStyle(_factory.createCTTblPrBaseTblStyle());
       table.getTblPr().getTblStyle().setVal(styleNameToId(TABLE_STYLE));
+
+      // Similarly to table/blockquote adjacency, table/table adjacency is also
+      // bad.
+      separateTables();
 
       return withContext(table, node, true);
     }
