@@ -538,13 +538,19 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       _contexts.peek().getContent().add(o);
     }
 
-    /** Generate a table as wide as the current context allows */
-    protected Tbl fullWidthTable() {
+    /**
+     * Generate a table as wide as the current context allows
+     *
+     * @param offsetR If true, offset from the right side of a blockquote.
+     */
+    protected Tbl fullWidthTable(boolean offsetR) {
+      int offset = (offsetR && _blockquoteLevel > 0) ? (int) Math.round(BLOCKQUOTE_SPACING_HORIZ * 1.5) : 0;
+
       Tbl tbl = _factory.createTbl();
       tbl.setTblPr(_factory.createTblPr());
 
       TblWidth tblwidth = _factory.createTblWidth();
-      tblwidth.setW(BigInteger.valueOf(TABLE_BASE_WIDTH - BLOCKQUOTE_SPACING_HORIZ * _blockquoteLevel));
+      tblwidth.setW(BigInteger.valueOf(TABLE_BASE_WIDTH - BLOCKQUOTE_SPACING_HORIZ * _blockquoteLevel - offset));
       tblwidth.setType("dxa");
       tbl.getTblPr().setTblW(tblwidth);
 
@@ -582,7 +588,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       // work-around. it turns out that by adding an empty paragraph to the
       // contents of the table cell-cum-blockquote, immediately following the
       // table, the problem goes away! I don't know why this is.
-      Tbl table = fullWidthTable();
+      Tbl table = fullWidthTable(false);
 
       // Set the style to our custom one.
       table.getTblPr().setTblStyle(_factory.createCTTblPrBaseTblStyle());
@@ -838,7 +844,7 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     @Override
     public InputStream visitTable(final Table node) {
-      Tbl table = fullWidthTable();
+      Tbl table = fullWidthTable(true);
 
       // Set the style to our custom one.
       table.getTblPr().setTblStyle(_factory.createCTTblPrBaseTblStyle());
