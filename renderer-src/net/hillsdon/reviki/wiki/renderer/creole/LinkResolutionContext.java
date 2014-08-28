@@ -22,7 +22,7 @@ public class LinkResolutionContext {
    */
   public static final Function<String, LinkResolutionContext> SIMPLE_LINKS = new Function<String, LinkResolutionContext>() {
     public LinkResolutionContext apply(String base) {
-      // Have all internal relative links start from /jira/browse/
+      // Have all internal relative links start from the base
       SimpleWikiUrls wikiUrls = SimpleWikiUrls.RELATIVE_TO.apply(base);
       InternalLinker linker = new InternalLinker(wikiUrls);
 
