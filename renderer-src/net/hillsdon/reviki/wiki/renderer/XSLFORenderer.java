@@ -71,8 +71,6 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       props.load(new FileInputStream(workingdir + "WEB-INF/fop.properties"));
     }
     catch (IOException e) {
-      e.printStackTrace();
-
       // Try the system properties
       props = System.getProperties();
     }
