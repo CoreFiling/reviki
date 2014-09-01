@@ -134,12 +134,12 @@
   {
     "name":   "No trailing punctuation in interwiki links",
     "input":  "foo:12-34.",
-    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12-34'>foo:12-34</a>.\n</p>"
+    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12-34'>foo:12-34</a>.</p>"
   },
   {
     "name":   "No trailing punctuation in interwiki links #2",
     "input":  "foo:12.34-",
-    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12.34'>foo:12.34</a>-\n</p>"
+    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12.34'>foo:12.34</a>-</p>"
   }
 ]
 
