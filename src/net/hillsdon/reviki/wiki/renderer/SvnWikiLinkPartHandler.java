@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.wiki.renderer;
 
 import java.net.URISyntaxException;
+
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
@@ -86,8 +87,40 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   }
 
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
-    // Lazily initialise interWikiLinker from configuration. Trying to do this in the constructor causes an exception.
-    if (_configuration != null) {
+    LinkResolutionContext resolver = resolver(page);
+    String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
+    String clazz = link.getStyleClass(resolver);
+
+    if (isAcronymNotLink(page, link)) {
+      return link.getText();
+    }
+
+    String url = handle(page, link, urlOutputFilter);
+    return String.format(_formatString, noFollow, Escape.html(clazz), url, xhtmlContent);
+  }
+
+  public String handle(PageReference page, LinkParts link, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
+    LinkResolutionContext resolver = resolver(page);
+    String url = link.getURL(resolver);
+    return urlOutputFilter.filterURL(url);
+  }
+
+  public boolean isAcronymNotLink(PageReference page, LinkParts link) {
+    try {
+      LinkResolutionContext resolver = resolver(page);
+      return (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText()));
+    }
+    catch (Exception e) {
+      return true;
+    }
+  }
+
+  /**
+   * Lazily initialise interWikiLinker from configuration. Trying to do this in
+   * the constructor causes an exception.
+   */
+  private InterWikiLinker interWikiLinker() {
+    if (_configuration != null && _interWikiLinker == null) {
       try {
         _interWikiLinker = _configuration.getInterWikiLinker();
       }
@@ -96,22 +129,19 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
       }
     }
 
-    LinkResolutionContext resolver;
+    return _interWikiLinker;
+  }
+
+  /**
+   * Produce a page-specific resolver.
+   */
+  private LinkResolutionContext resolver(final PageReference page) {
     if (_linkResolutionContext != null) {
-      resolver = _linkResolutionContext.derive(page);
+      return _linkResolutionContext.derive(page);
     }
     else {
-      resolver = new LinkResolutionContext(_internalLinker, _interWikiLinker, _store, page);
+      return new LinkResolutionContext(_internalLinker, interWikiLinker(), _store, page);
     }
-    String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
-    String clazz = link.getStyleClass(resolver);
-    String url = link.getURL(resolver);
-    LinkTarget target = link.getTarget();
-    if (target instanceof PageLinkTarget && !link.exists(resolver) && WikiWordUtils.isAcronym(((PageLinkTarget)target).getPageName())) {
-      return link.getText();
-    }
-
-    return String.format(_formatString, noFollow, Escape.html(clazz), Escape.html(urlOutputFilter.filterURL(url)), xhtmlContent);
   }
 
 }

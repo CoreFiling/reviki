@@ -29,11 +29,11 @@ public abstract class ContextSensitiveParser extends Parser {
 
   /** Allow breaks in this context. */
   public void allowBreaks() {
-    _breaks.push(new Boolean(true));
+    _breaks.push(Boolean.TRUE);
   }
 
   /** See {@link #setBreaks(boolean)}. */
   protected void disallowBreaks() {
-    _breaks.push(new Boolean(false));
+    _breaks.push(Boolean.FALSE);
   }
 }

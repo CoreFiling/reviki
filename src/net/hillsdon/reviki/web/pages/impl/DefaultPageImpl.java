@@ -63,7 +63,7 @@ import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
-import net.hillsdon.reviki.web.handlers.RawPageView;
+import net.hillsdon.reviki.web.handlers.StreamView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
@@ -72,6 +72,7 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
@@ -164,7 +165,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final CachingPageStore _store;
 
-  private final MarkupRenderer _renderer;
+  private final RendererRegistry _renderers;
 
   private final WikiGraph _graph;
 
@@ -176,14 +177,14 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final MarkupRenderer renderer, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
     _configuration = configuration;
     _store = store;
-    _renderer = renderer;
     _graph = graph;
     _diffGenerator = diffGenerator;
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
+    _renderers = renderers;
   }
 
   public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -227,7 +228,8 @@ public class DefaultPageImpl implements DefaultPage {
       else {
         InputStream in = file.getInputStream();
         try {
-          // get the page from store - needed to get content of the special pages which were not saved yet
+          // get the page from store - needed to get content of the special
+          // pages which were not saved yet
           PageInfo pageInfo = _store.get(page, -1);
           // IE sends the full file path.
           storeAttachment(pageInfo, attachmentName, baseRevision, attachmentMessage, FilenameUtils.getName(file.getName()), in);
@@ -262,7 +264,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     else if (storeName.indexOf('.') == -1) {
       final int indexOfDotInFileName = fileName.indexOf('.');
-      if(indexOfDotInFileName!=-1) {
+      if (indexOfDotInFileName != -1) {
         storeName += fileName.substring(indexOfDotInFileName);
       }
     }
@@ -304,7 +306,7 @@ public class DefaultPageImpl implements DefaultPage {
     Collection<AttachmentHistory> allAttachments = _store.attachments(page);
     Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
     Collection<AttachmentHistory> deletedAttachments = new LinkedList<AttachmentHistory>();
-    for (AttachmentHistory history: allAttachments) {
+    for (AttachmentHistory history : allAttachments) {
       if (history.isAttachmentDeleted()) {
         deletedAttachments.add(history);
       }
@@ -365,8 +367,8 @@ public class DefaultPageImpl implements DefaultPage {
             }
           }));
           request.setAttribute(ATTR_PAGE_INFO, pageInfo);
-          ASTNode rendered = _renderer.render(pageInfo, new ResponseSessionURLOutputFilter(request, response));
-          request.setAttribute(ATTR_PREVIEW, rendered.toXHTML());
+          String rendered = _renderers.getDefaultRenderer().render(pageInfo, new ResponseSessionURLOutputFilter(request, response)).get();
+          request.setAttribute(ATTR_PREVIEW, rendered);
           request.setAttribute(ATTR_MARKED_UP_DIFF, _diffGenerator.getDiffMarkup(oldContent, newContent));
         }
       }
@@ -381,6 +383,8 @@ public class DefaultPageImpl implements DefaultPage {
   public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String revisionParam = request.getParameter(PARAM_REVISION);
     final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
+    final String ctypeParam = request.getParameter(ViewTypeConstants.PARAM_CTYPE);
+
     addBacklinksInformation(request, page);
     final VersionedPageInfo main = pageInfoFromRevisionParam(page, revisionParam, PARAM_REVISION);
     request.setAttribute(ATTR_PAGE_INFO, main);
@@ -396,12 +400,15 @@ public class DefaultPageImpl implements DefaultPage {
       }
       return new JspView("ViewDiff");
     }
-    else if (ViewTypeConstants.is(request, ViewTypeConstants.CTYPE_RAW)) {
-      return new RawPageView(main);
+    else if (_renderers.hasRenderer(ctypeParam)) {
+      MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctypeParam);
+      InputStream stream = renderer.render(main, new ResponseSessionURLOutputFilter(request, response)).get();
+      return new StreamView(renderer.getContentType(), stream);
     }
     else {
-      ASTNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
-      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
+      ASTNode ast = _renderers.getDefaultRenderer().parse(main);
+      String rendered = _renderers.getDefaultRenderer().render(ast, new ResponseSessionURLOutputFilter(request, response));
+      request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       return new JspView("ViewPage");
     }
   }
@@ -578,7 +585,7 @@ public class DefaultPageImpl implements DefaultPage {
     String attrPart = null;
     String valuePart = null;
     Map<String, String> attributes = new LinkedHashMap<String, String>();
-    for(String line: lines){
+    for (String line : lines) {
       line = line.trim();
       matcher = pattern.matcher(line);
       if (matcher.find()) {
@@ -589,7 +596,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     String originalAttributesString = getRequiredString(request, PARAM_ORIGINAL_ATTRIBUTES).trim();
     String[] originalAttrs = originalAttributesString.split("\n");
-    for(String attr: originalAttrs) {
+    for (String attr : originalAttrs) {
       attr = attr.trim();
       if (attr.length() > 0 && !attributes.containsKey(attr)) {
         attributes.put(attr, null);
@@ -611,7 +618,6 @@ public class DefaultPageImpl implements DefaultPage {
     else if (commitMessage == null || commitMessage.trim().length() == 0) {
       commitMessage = ChangeInfo.NO_COMMENT_MESSAGE_TAG;
     }
-    
 
     return (minorEdit ? ChangeInfo.MINOR_EDIT_MESSAGE_TAG : "") + commitMessage + "\n" + _wikiUrls.page(null, page.getName());
   }
@@ -623,6 +629,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   /**
    * Gets the PageInfo from a diff or rev parameter. I.e. "1234" or "PageName.1234"
+   *
    * @param defaultPage The page (used when the parameter does not override the page).
    * @param revisionText The parameter value.
    * @param paramName The name of the parameter for error messages.

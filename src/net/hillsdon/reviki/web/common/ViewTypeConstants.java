@@ -30,27 +30,54 @@ public final class ViewTypeConstants {
    * Given to select a non-default view type.
    */
   public static final String PARAM_CTYPE = "ctype";
-  
+
+  /**
+   * The default view.
+   */
+  public static final String CTYPE_DEFAULT = "default";
+
   /**
    * Plain text.
    */
   public static final String CTYPE_TEXT = "txt";
-  
+
   /**
    * Latest published atom standard.
    */
   public static final String CTYPE_ATOM = "atom";
-  
+
   /**
    * Hmm.  A little dubious.
    */
   public static final String CTYPE_RAW = "raw";
 
+  /**
+   * Docbook XML.
+   */
+  public static final String CTYPE_DOCBOOK = "docbook";
+
+  public static final String CTYPE_XSLFO = "xslfo";
+
+  public static final String CTYPE_RTF = "rtf";
+
+  public static final String CTYPE_PDF = "pdf";
+
+  public static final String CTYPE_PS = "postscript";
+
+  public static final String CTYPE_DOCX = "docx";
+
+  /**
+   * List of ctypes available to regular page views.
+   *
+   * This is used to generate the drop-down list.
+   */
+  public static final String[] CTYPES = { CTYPE_DEFAULT, CTYPE_PDF, CTYPE_DOCX, CTYPE_DOCBOOK, CTYPE_RTF, CTYPE_PS, CTYPE_RAW };
+
   public static boolean is(final HttpServletRequest request, final String type) {
     return type != null && type.equals(request.getParameter(PARAM_CTYPE));
   }
-  
+
   private ViewTypeConstants() {
   }
-  
+
 }

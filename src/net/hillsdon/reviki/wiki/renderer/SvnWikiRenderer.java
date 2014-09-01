@@ -21,35 +21,67 @@ import java.util.List;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Supplier;
 
-public class SvnWikiRenderer implements MarkupRenderer {
-
-  private final Configuration configuration;
-  private final InternalLinker internalLinker;
-  private final SvnWikiLinkPartHandler linkHandler;
-  private final SvnWikiLinkPartHandler imageHandler;
-  private final Supplier<List<Macro>> macros;
-  private final PageStore pageStore;
+public class SvnWikiRenderer extends MarkupRenderer<String> {
+  private final RendererRegistry _registry;
 
   public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
-    this.configuration = configuration;
-    this.internalLinker = internalLinker;
-    this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
-    this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
-    this.macros = macros;
-    this.pageStore = pageStore;
+    final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
+    final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
+
+    HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    DocbookRenderer docbook = new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
+    RawRenderer raw = new RawRenderer();
+    DocxRenderer docx = new DocxRenderer(pageStore, linkHandler, imageHandler, macros);
+
+    _registry = new RendererRegistry(html);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCBOOK, docbook);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, raw);
+    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCX, docx);
+
+    // XSL-FO renderers need an exploded war to use FOP. If that's not the case, don't add them.
+    try {
+      XSLFORenderer xslfo = new XSLFORenderer(docbook);
+      XSLFORenderer rtf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.RTF);
+      XSLFORenderer pdf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PDF);
+      XSLFORenderer ps = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PS);
+
+      _registry.addRenderer(ViewTypeConstants.CTYPE_PDF, pdf);
+      _registry.addRenderer(ViewTypeConstants.CTYPE_PS, ps);
+      _registry.addRenderer(ViewTypeConstants.CTYPE_XSLFO, xslfo);
+      _registry.addRenderer(ViewTypeConstants.CTYPE_RTF, rtf);
+    }
+    catch (Exception e) {
+      System.err.println("Could not instantiate XSLFO renderers: " + e);
+    }
   }
 
-  public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return CreoleRenderer.render(pageStore, page, urlOutputFilter, linkHandler, imageHandler, macros);
+  /**
+   * Return a source of renderers.
+   */
+  public RendererRegistry getRenderers() {
+    return _registry;
+  }
+
+  @Override
+  public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
+    MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
+    return renderer.parse(page);
+  }
+
+  @Override
+  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+    MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
+    return renderer.render(ast, urlOutputFilter);
   }
 }

@@ -1,6 +1,5 @@
 package net.hillsdon.reviki.wiki.renderer.creole;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,16 +11,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 /**
  * Helper class providing some useful functions for walking through the Creole
@@ -41,9 +37,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
 
   /** The URL handler for images. */
   private final LinkPartsHandler _imageHandler;
-
-  /** A final pass over URLs to apply any last-minute changes. */
-  private final URLOutputFilter _urlOutputFilter;
 
   /** List of attachments on the page. */
   private Collection<AttachmentHistory> _attachments = null;
@@ -68,10 +61,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     return _imageHandler;
   }
 
-  public URLOutputFilter urlOutputFilter() {
-    return _urlOutputFilter;
-  }
-
   /**
    * Aggregate results produced by visitChildren. This returns the "right"most
    * non-null result found.
@@ -86,25 +75,23 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    *
    * @param store The page store.
    * @param page The page being rendered.
-   * @param urlOutputFilter The URL post-render processor.
    * @param handler The URL renderer
    */
-  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  private CreoleASTBuilder(final Optional<PageStore> store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     _store = store;
     _page = page;
-    _urlOutputFilter = urlOutputFilter;
     _linkHandler = linkHandler;
     _imageHandler = imageHandler;
   }
 
   /** Construct a new AST builder with a page store. */
-  public CreoleASTBuilder(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    this(Optional.of(store), page, urlOutputFilter, linkHandler, imageHandler);
+  public CreoleASTBuilder(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.of(store), page, linkHandler, imageHandler);
   }
 
   /** Construct a new AST builder without a page store. */
-  public CreoleASTBuilder(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
-    this(Optional.<PageStore> absent(), page, urlOutputFilter, linkHandler, imageHandler);
+  public CreoleASTBuilder(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+    this(Optional.<PageStore> absent(), page, linkHandler, imageHandler);
   }
 
   /**
@@ -127,22 +114,21 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
    */
   protected ASTNode renderInlineMarkup(final Class<? extends ASTNode> type, final String symbol, final String sname, final TerminalNode end, final InlineContext inline) {
     ASTNode inner = (inline != null) ? visit(inline) : new Plaintext("");
+    ASTNode innerNoTrim = (inline != null) ? visitInlineNoTrim(inline) : new Plaintext("");
 
     // If the end tag is missing, undo the error recovery
     if (end == null || ("<missing " + sname + ">").equals(end.getText())) {
-      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol), inner);
-      return new Inline(chunks);
+      return new Inline(ImmutableList.of((ASTNode) new Plaintext(symbol)));
     }
 
     // If the inner text is missing, this is not markup
-    if (inner.toXHTML().equals("")) {
-      List<ASTNode> chunks = ImmutableList.of(new Plaintext(symbol + symbol), inner);
-      return new Inline(chunks);
+    if (innerNoTrim.toSmallString().equals("")) {
+      return new Inline(ImmutableList.of((ASTNode) new Plaintext(symbol + symbol)));
     }
 
     try {
       Constructor<? extends ASTNode> constructor = type.getConstructor(ASTNode.class);
-      return constructor.newInstance(inner);
+      return constructor.newInstance(inner.toSmallString().equals("") ? innerNoTrim : inner);
     }
     catch (Exception e) {
       // Never reached if you pass in correct params
@@ -150,6 +136,74 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
       // would work)
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Trim whitespace of an inline node.
+   */
+  public Inline trimInline(final Inline inline) {
+    List<ASTNode> chunks = new ArrayList<ASTNode>();
+    chunks.addAll(inline.getChildren());
+
+    // Left-trim the first chunk if it's plaintext
+    int sz = chunks.size();
+    if (sz > 0 && chunks.get(0) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(0)).getText().replaceAll("^\\s+", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(0);
+        sz = chunks.size();
+      }
+      else {
+        chunks.set(0, trimmed);
+      }
+    }
+
+    // Right-trim the last chunk if it's plaintext
+    if (sz > 0 && chunks.get(sz - 1) instanceof Plaintext) {
+      Plaintext trimmed = new Plaintext(((Plaintext) chunks.get(sz - 1)).getText().replaceAll("\\s+$", ""));
+
+      if (trimmed.getText().equals("")) {
+        chunks.remove(sz - 1);
+      }
+      else {
+        chunks.set(sz - 1, trimmed);
+      }
+    }
+
+    return new Inline(chunks);
+  }
+
+  /**
+   * Render an inline node with no whitespace trimming.
+   */
+  public Inline visitInlineNoTrim(final InlineContext ctx) {
+    List<ASTNode> chunks = new ArrayList<ASTNode>();
+
+    // Merge adjacent Any nodes into long Plaintext nodes, to give a more useful
+    // AST.
+    ASTNode last = null;
+    for (InlinestepContext itx : ctx.inlinestep()) {
+      ASTNode rendered = visit(itx);
+      if (last == null) {
+        last = rendered;
+      }
+      else {
+        if (last instanceof Plaintext && rendered instanceof Plaintext) {
+          last = ((Plaintext) last).append(((Plaintext) rendered));
+        }
+        else {
+          chunks.add(last);
+          last = rendered;
+        }
+      }
+    }
+
+    if (last != null) {
+      chunks.add(last);
+    }
+
+    return new Inline(chunks);
   }
 
   /**
@@ -166,58 +220,9 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Render an inline piece of code with syntax highlighting.
-   *
-   * @param code The token containing the code
-   * @param end The end marker
-   * @param language The language to use
-   * @return An inline code node with the end token stripped.
-   */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end, final String language) {
-    String code = cutOffEndTag(node, end);
-
-    try {
-      return new InlineCode(code, XhtmlRendererFactory.getRenderer(language));
-    }
-    catch (IOException e) {
-      return new InlineCode(code);
-    }
-  }
-
-  /**
-   * Render some inline code without syntax highlighting.
-   */
-  protected ASTNode renderInlineCode(final TerminalNode node, final String end) {
-    return new InlineCode(cutOffEndTag(node, end));
-  }
-
-  /**
-   * Render a block of code with syntax highlighting. See
-   * {@link #renderInlineCode}.
-   */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end, final String language) {
-    String code = node.getText();
-    code = code.substring(0, code.length() - end.length());
-
-    try {
-      return new Code(code, XhtmlRendererFactory.getRenderer(language));
-    }
-    catch (IOException e) {
-      return new Code(code);
-    }
-  }
-
-  /**
-   * Render a block of code without syntax highlighting.
-   */
-  protected ASTNode renderBlockCode(final TerminalNode node, final String end) {
-    return new Code(cutOffEndTag(node, end));
-  }
-
-  /**
    * Class to hold the context of a list item to render.
    */
-  protected class ListItemContext {
+  protected static final class ListItemContext {
     private final ParserRuleContext _ordered;
 
     private final ParserRuleContext _unordered;
@@ -390,13 +395,13 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
     }
 
     ASTNode head = chunks.get(0);
-    String sep = (numchunks > 1) ? chunks.get(1).toXHTML() : "\r\n";
+    String sep = (numchunks > 1) ? chunks.get(1).toSmallString() : "\r\n";
     List<ASTNode> tail = (numchunks > 1) ? chunks.subList(1, numchunks) : new ArrayList<ASTNode>();
     Paragraph rest = new Paragraph(new Inline(tail));
     List<ASTNode> out = new ArrayList<ASTNode>();
 
     // Drop leading whitespace
-    if (head.toXHTML().matches("^\r?\n$")) {
+    if (head.toSmallString().matches("^\r?\n$")) {
       return expandParagraph(rest, reversed);
     }
 

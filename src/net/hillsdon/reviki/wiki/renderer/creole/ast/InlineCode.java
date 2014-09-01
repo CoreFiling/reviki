@@ -1,50 +1,35 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-import java.io.IOException;
-import java.util.List;
+import com.google.common.base.Optional;
 
-import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
-import com.uwyn.jhighlight.renderer.Renderer;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 
-import net.hillsdon.fij.text.Escape;
-import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+public class InlineCode extends TextNode implements BlockableNode<Code> {
+  private final Optional<Languages> _language;
 
-public class InlineCode extends TaggedNode implements BlockableNode<Code> {
-  private final String _contents;
+  public InlineCode(final String contents, final Languages language) {
+    super(contents, true);
 
-  private final Renderer _highlighter;
+    _language = Optional.of(language);
+  }
 
   public InlineCode(final String contents) {
-    super("code", new Raw(Escape.html(contents)));
+    super(contents, true);
 
-    _contents = contents;
-    _highlighter = null;
-  }
-
-  public InlineCode(final String contents, final Renderer highlighter) throws IOException {
-    super("code", new Raw(highlighter.highlight("", contents, "UTF-8", true).replace("&nbsp;", " ").replace("<br />", "")));
-
-    _contents = contents;
-    _highlighter = highlighter;
-  }
-
-  public Code toBlock() {
-    if (_highlighter == null) {
-      return new Code(_contents);
-    }
-    else {
-      try {
-        return new Code(_contents, _highlighter);
-      }
-      catch (IOException e) {
-        return new Code(_contents);
-      }
-    }
+    _language = Optional.<Languages>absent();
   }
 
   @Override
-  public List<ASTNode> expandMacrosInt(final Supplier<List<Macro>> macros) {
-    return ImmutableList.of((ASTNode) this);
+  public Code toBlock() {
+    if (_language == null) {
+      return new Code(getText());
+    }
+    else {
+      return _language.isPresent() ? new Code(getText(), _language.get()) : new Code(getText());
+    }
+  }
+
+  public Optional<Languages> getLanguage() {
+    return _language;
   }
 }

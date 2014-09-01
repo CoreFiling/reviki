@@ -2,9 +2,9 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.util.List;
 
-public class TableRow extends TaggedNode {
+public class TableRow extends ASTNode {
   public TableRow(final List<ASTNode> cells) {
-    super("tr", cells);
+    super(cells);
 
     _isBlock = true;
     _canContainBlock = true;

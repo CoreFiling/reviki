@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-public class Paragraph extends TaggedNode {
+public class Paragraph extends ASTNode {
   public Paragraph(final ASTNode body) {
-    super("p", body);
+    super(body);
 
     _isBlock = true;
   }

@@ -15,36 +15,36 @@
  */
 package net.hillsdon.reviki.web.handlers;
 
+import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.hillsdon.reviki.vc.VersionedPageInfo;
+import org.apache.commons.io.IOUtils;
+
 import net.hillsdon.reviki.web.common.View;
 
 /**
- * A raw view of a page.
- * 
- * Much improvement needed to avoid mime-type hack... 
- * 
- * @author mth
+ * Render a stream with a given content type.
+ *
+ * @author msw
  */
-public class RawPageView implements View {
-  
-  private final VersionedPageInfo _page;
+public class StreamView implements View {
+  private final String _mimeType;
 
-  public RawPageView(final VersionedPageInfo page) {
-    _page = page;
+  private final InputStream _contents;
+
+  /**
+   * @param mimeType The content type of the page (eg, "application/xml").
+   * @param contents Source of the response body.
+   */
+  public StreamView(final String mimeType, final InputStream contents) {
+    _mimeType = mimeType;
+    _contents = contents;
   }
 
   public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-    // This is a cludge.  We should represent 'special' pages better.
-    if (_page.getPath().equals("ConfigCss")) {
-      response.setContentType("text/css");
-    }
-    else {
-      response.setContentType("text/plain");
-    }
-    response.getWriter().write(_page.getContent());
+    response.setContentType(_mimeType);
+    IOUtils.copy(_contents, response.getOutputStream());
   }
-  
 }

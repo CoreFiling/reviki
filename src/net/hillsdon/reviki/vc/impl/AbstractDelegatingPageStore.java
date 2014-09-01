@@ -103,6 +103,10 @@ public abstract class AbstractDelegatingPageStore extends AbstractPageStore {
     getDelegateInternal().attachment(ref, attachment, revision, sink);
   }
 
+  public byte[] attachmentBytes(final PageReference ref, final String attachment, final long revision) throws PageStoreException {
+    return getDelegateInternal().attachmentBytes(ref, attachment, revision);
+  }
+
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
     return getDelegateInternal().getChangedBetween(start, end);
   }

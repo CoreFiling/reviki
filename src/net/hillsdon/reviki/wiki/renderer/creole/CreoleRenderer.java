@@ -3,10 +3,8 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.ANTLRErrorStrategy;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -16,7 +14,6 @@ import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -27,7 +24,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  */
 public class CreoleRenderer {
   /**
-   * How deep macros will be expanded
+   * How deep macros will be expanded.
    */
   public static final int MACRO_DEPTH_LIMIT = 100;
 
@@ -92,9 +89,9 @@ public class CreoleRenderer {
     ASTNode expanded = rendered;
 
     if (_expansionLimit > 0) {
-      _expansionLimit --;
+      _expansionLimit--;
       expanded = rendered.expandMacros(macros);
-      _expansionLimit ++;
+      _expansionLimit++;
     }
 
     return expanded;
@@ -105,34 +102,32 @@ public class CreoleRenderer {
    *
    * @param store The page store.
    * @param page The page to render.
-   * @param urlOutputFilter Filter to apply to URLs (handling jsessionid values
-   *          etc).
    * @param linkHandler Handler for resolving and rendering links
    * @param imageHandler Handler for resolving and rendering images
    * @param macros List of macros to reply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+  public static ASTNode render(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    CreoleASTBuilder visitor = new Visitor(store, page, linkHandler, imageHandler);
     return renderWithVisitor(visitor, macros);
   }
 
   /** Render a page with no store. */
-  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    CreoleASTBuilder visitor = new Visitor(page, urlOutputFilter, linkHandler, imageHandler);
+  public static ASTNode render(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    CreoleASTBuilder visitor = new Visitor(page, linkHandler, imageHandler);
     return renderWithVisitor(visitor, macros);
   }
 
   /** Render a page with no macros. */
-  public static ASTNode render(final PageStore store, final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  public static ASTNode render(final PageStore store, final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
-    return render(store, page, urlOutputFilter, linkHandler, imageHandler, macros);
+    return render(store, page, linkHandler, imageHandler, macros);
   }
 
-  /** Render a page with no macros or store */
-  public static ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
+  /** Render a page with no macros or store. */
+  public static ASTNode render(final PageInfo page, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler) {
     Supplier<List<Macro>> macros = Suppliers.ofInstance((List<Macro>) new ArrayList<Macro>());
-    return render(page, urlOutputFilter, linkHandler, imageHandler, macros);
+    return render(page, linkHandler, imageHandler, macros);
   }
 
   /**
@@ -160,15 +155,13 @@ public class CreoleRenderer {
    * @param store The page store (may be null).
    * @param page The containing page.
    * @param content The content to render.
-   * @param urlOutputFilter Filter to apply to URLs (handling jsessionid values
-   *          etc).
    * @param linkHandler Handler for resolving and rendering links
    * @param imageHandler Handler for resolving and rendering images
    * @param macros List of macros to apply
    * @return The AST of the page, after macro application.
    */
-  public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final URLOutputFilter urlOutputFilter, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
-    CreoleASTBuilder visitor = new Visitor(store, page, urlOutputFilter, linkHandler, imageHandler);
+  public static ASTNode renderPart(final PageStore store, final PageInfo page, final String content, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    CreoleASTBuilder visitor = new Visitor(store, page, linkHandler, imageHandler);
     return renderPartWithVisitor(content, visitor, macros);
   }
 

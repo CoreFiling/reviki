@@ -1215,3 +1215,21 @@ li.ui-state-active {
   font-weight: bold;
   padding: 2px 5px;
 }
+
+/* List item with ctypes dropdown in */
+li.ctypes {
+  padding-left: 1em;
+}
+
+.ctypes form {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+.ctypes select {
+  padding: 3px;
+  background: #f8f8f8;
+  color: #888;
+  border: 1px solid #D5D5D5;
+}

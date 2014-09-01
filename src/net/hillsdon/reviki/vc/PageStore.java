@@ -197,6 +197,14 @@ public interface PageStore {
   void attachment(PageReference ref, String attachment, long revision, ContentTypedSink sink) throws PageStoreException, NotFoundException;
 
   /**
+   * @param ref Page.
+   * @param attachment Attachment on that page.
+   * @param revision The revision to fetch, -1 for head.
+   * @throws NotFoundException If the attachment is not present in the given revision.
+   */
+  byte[] attachmentBytes(PageReference ref, String attachment, long revision) throws PageStoreException, NotFoundException;
+
+  /**
    * @throws PageStoreInvalidException If the underlying data repository is invalid/not present etc.
    * @throws PageStoreAuthenticationException If we couldn't authenticate (probably a good sign but can't be sure).
    */

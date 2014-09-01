@@ -9,4 +9,11 @@ public class Page extends ASTNode {
     _isBlock = true;
     _canContainBlock = true;
   }
+  
+  @Override
+  protected void toSmallString(StringBuilder sb) {
+    for (ASTNode child : getChildren()) {
+      child.toSmallString(sb);
+    }
+  }
 }

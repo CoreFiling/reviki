@@ -32,7 +32,6 @@ import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.vcintegration.AutoProperiesFromConfigPage;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.RenderedPageFactory;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.graph.WikiGraphImpl;
 import net.hillsdon.reviki.wiki.macros.AttrMacro;
@@ -101,12 +100,18 @@ public class SearchIndexBuilder implements Runnable {
     File primarySearchDir = wikiConf.getSearchIndexDirectory();
     List<File> otherSearchDirs = wikiConf.getOtherSearchIndexDirectories();
     // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
-    RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(page, urlOutputFilter);
+    MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
+      @Override
+      public ASTNode parse(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.parse(page);
       }
-    });
-    LuceneSearcher searcher = new LuceneSearcher(wikiConf.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory);
+
+      @Override
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.render(ast, urlOutputFilter);
+      }
+    };
+    LuceneSearcher searcher = new LuceneSearcher(wikiConf.getWikiName(), primarySearchDir, otherSearchDirs, renderer);
     _searchEngine = new ExternalCommitAwareSearchEngine(searcher);
     long latestRevision = -1;
     try {
