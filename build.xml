@@ -190,6 +190,7 @@
       <classpath>
         <path refid="classpath"/>
         <pathelement location="${build-wiki}"/>
+        <pathelement location="${build-renderer}"/>
       </classpath>
       <formatter type="xml"/>
       <batchtest todir="${reports}">
