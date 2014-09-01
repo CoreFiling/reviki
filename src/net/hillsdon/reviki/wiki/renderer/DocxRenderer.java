@@ -175,6 +175,9 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     /** How many levels of blockquotes we're currently in. */
     protected int _blockquoteLevel = 0;
 
+    /** Whether we're currently rendering a table header cell. */
+    protected boolean _inTableHeader = false;
+
     /**
      * Set up styles
      */
@@ -645,10 +648,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       P code = _factory.createP();
       paraStyle(code, CODE_STYLE);
 
+      enterContext(code, false);
       R run = constructRun(false);
       runText(run, node.getText());
+      exitContext(false);
 
-      code.getContent().add(run);
       commitBlock(code);
 
       return nullval();
@@ -749,6 +753,22 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       drawing.getAnchorOrInline().add(inline);
 
       return nullval();
+    }
+
+    @Override
+    public InputStream visitInline(Inline node) {
+      // If we're in a table cell, we need to produce a containing paragraph
+      boolean inTc = _blockContexts.peek() != null && _blockContexts.peek() instanceof Tc;
+      boolean inPara = _contexts.peek() != null && _contexts.peek() instanceof P && _blockContexts.peek().getContent().contains(_contexts.peek());
+      if (inTc && !inPara && !_inTableHeader) {
+        P para = _factory.createP();
+        paraStyle(para, TABLE_CONTENTS_STYLE);
+
+        return withContext(para, node, false);
+      }
+      else {
+        return super.visitInline(node);
+      }
     }
 
     @Override
@@ -869,14 +889,9 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     @Override
     public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
-      commitBlock(tablecell);
       valign(tablecell);
 
-      P para = _factory.createP();
-      tablecell.getContent().add(para);
-      paraStyle(para, TABLE_CONTENTS_STYLE);
-
-      return withContextSimple(para, node, false);
+      return withContext(tablecell, node, true);
     }
 
     @Override
@@ -889,7 +904,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       tablecell.getContent().add(para);
       paraStyle(para, TABLE_HEADER_STYLE);
 
-      return withContextSimple(para, node, false);
+      _inTableHeader = true;
+      withContextSimple(para, node, false);
+      _inTableHeader = false;
+
+      return nullval();
     }
 
     @Override
