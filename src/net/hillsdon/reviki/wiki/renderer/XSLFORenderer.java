@@ -3,11 +3,13 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -56,21 +58,35 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
   private static final String FOP_JAR = "fop.jar";
 
   /** Path to dependencies of fop. */
-  private static final String FOP_CLASSPATH = ".";
+  private static final String FOP_CLASSPATH;
 
-  /** Relative path to the docbook xsl file. */
-  private static final String XSL_PATH = "../docbook/fo/docbook.xsl";
+  /** Path to the docbook xsl file. */
+  private static final String XSL_PATH;
 
   static {
-    // We find the path to fop by working relatively from the path to the jar:
-    // we can get that by asking the class loaded for the location of this
-    // class, and then trimming off the extra stuff. Then we know that
-    // xslfo/fop is in the same directory as the jar.
-    //
-    // This assumes the war has been exploded.
-    String clazz = XSLFORenderer.class.getResource("XSLFORenderer.class").toString();
-    String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
-    FOP_DIR = new File(workingdir + "xslfo/fop");
+    Properties props = new Properties();
+
+    try {
+      // We find the path to fop by working relatively from the path to the jar:
+      // we can get that by asking the class loaded for the location of this
+      // class, and then trimming off the extra stuff. Then we know that
+      // xslfo/fop is in the same directory as the jar.
+      //
+      // This assumes the war has been exploded.
+      String clazz = XSLFORenderer.class.getResource("XSLFORenderer.class").toString();
+      String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
+      props.load(new FileInputStream(workingdir + "WEB-INF/fop.properties"));
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+
+      // Try the system properties
+      props = System.getProperties();
+    }
+
+    FOP_DIR = new File(props.getProperty("fop.dir"));
+    FOP_CLASSPATH = props.getProperty("fop.classpath", ".");
+    XSL_PATH = props.getProperty("docbook.styledir") + "fo/docbook.xsl";
   }
 
   public XSLFORenderer(final DocbookRenderer docbook) {
