@@ -1,7 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-public class Strikethrough extends TaggedNode {
+public class Strikethrough extends ASTNode {
   public Strikethrough(final ASTNode body) {
-    super("strike", body);
+    super(body);
   }
 }

@@ -8,12 +8,11 @@ import org.apache.commons.logging.LogFactory;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 
-import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleASTBuilder;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
+public class MacroNode extends TextNode implements BlockableNode<MacroNode> {
 
   private static final Log LOG = LogFactory.getLog(MacroNode.class);
 
@@ -24,7 +23,7 @@ public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
   private final CreoleASTBuilder _visitor;
 
   public MacroNode(final String name, final String args, final CreoleASTBuilder visitor, final boolean isBlock) {
-    super(isBlock ? "pre" : "code", new Raw(Escape.html("<<" + name + ":" + args + ">>")));
+    super("<<" + name + ":" + args + ">>", true);
     _name = name;
     _args = args;
     _visitor = visitor;
@@ -78,6 +77,7 @@ public class MacroNode extends TaggedNode implements BlockableNode<MacroNode> {
     return ImmutableList.of((ASTNode) this);
   }
 
+  @Override
   public MacroNode toBlock() {
     return new MacroNode(_name, _args, _visitor, true);
   }

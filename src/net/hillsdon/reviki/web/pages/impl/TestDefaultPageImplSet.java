@@ -44,7 +44,6 @@ import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;

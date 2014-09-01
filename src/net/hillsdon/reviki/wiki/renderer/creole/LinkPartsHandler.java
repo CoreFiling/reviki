@@ -23,7 +23,15 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public interface LinkPartsHandler {
 
+  /** Render a LinkParts to HTML. */
   String handle(PageReference page, String xhtmlContent, LinkParts parts, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
 
+  /** Render a LinkParts to a processed URI. */
+  String handle(PageReference page, LinkParts parts, URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException;
+
+  /** Get the context for resolving [inter]wiki links. */
   LinkResolutionContext getContext();
+
+  /** Check if an acronym is actually a link. */
+  boolean isAcronymNotLink(PageReference page, LinkParts parts);
 }

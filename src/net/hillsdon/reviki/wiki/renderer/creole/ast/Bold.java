@@ -1,7 +1,7 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-public class Bold extends TaggedNode {
+public class Bold extends ASTNode {
   public Bold(final ASTNode body) {
-    super("strong", body);
+    super(body);
   }
 }

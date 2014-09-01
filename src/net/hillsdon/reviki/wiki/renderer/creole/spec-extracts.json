@@ -12,7 +12,7 @@
   {
     "name":   "bold, italics cross lines",
     "input":  "Bold and italics should //be\nable// to cross lines.\n\nBut, should //not be...\n\n...able// to cross paragraphs.",
-    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.</p><p>But, should //not be...</p><p>...able// to cross paragraphs.\n</p>"
+    "output": "<p>Bold and italics should <em>be\nable</em> to cross lines.</p><p>But, should //not be...</p><p>...able// to cross paragraphs.</p>"
   },
   {
     "name":   "bold and italics nested",
@@ -30,7 +30,7 @@
     "comment": "altered from spec as we do parse markup within headings (permitted but not required by the spec)",
     "name":   "headings",
     "input":  "= Level 1 (largest) =\n== Level 2 ==\n=== Level 3 ===\n==== Level 4 ====\n===== Level 5 =====\n====== Level 6 ======\n=== Also level 3\n=== Also level 3 =\n=== Also level 3 ==\n=== **not** //parsed// ===",
-    "output": "<h1> Level 1 (largest)</h1><h2> Level 2</h2><h3> Level 3</h3><h4> Level 4</h4><h5> Level 5</h5><h6> Level 6</h6><h3> Also level 3</h3><h3> Also level 3</h3><h3> Also level 3</h3><h3> <strong>not</strong> <em>parsed</em></h3>"
+    "output": "<h1>Level 1 (largest)</h1><h2>Level 2</h2><h3>Level 3</h3><h4>Level 4</h4><h5>Level 5</h5><h6>Level 6</h6><h3>Also level 3</h3><h3>Also level 3</h3><h3>Also level 3</h3><h3><strong>not</strong> <em>parsed</em></h3>"
   },
   {
     "name":   "linking",
@@ -40,23 +40,22 @@
   {
     "name":   "paragraphs",
     "input":  "This is my text.\n\nThis is more text.",
-    "output": "<p>This is my text.</p><p>This is more text.\n</p>"
+    "output": "<p>This is my text.</p><p>This is more text.</p>"
   },
   {
-    "bug":    "we don't handle line breaks within paragraphs for some reason",
     "name":   "line breaks",
-    "input":  "This is the first line,\\and this is the second.",
-    "output": "<p>This is the first line,<br>and this is the second.</p>"
+    "input":  "This is the first line,\\\\and this is the second.",
+    "output": "<p>This is the first line,<br />and this is the second.</p>"
   },
   {
     "name":   "bulleted list",
     "input":  "* Item 1\n** Item 1.1\n* Item 2",
-    "output": "<ul><li> Item 1\n<ul><li> Item 1.1</li></ul></li><li> Item 2</li></ul>"
+    "output": "<ul><li>Item 1<ul><li>Item 1.1</li></ul></li><li>Item 2</li></ul>"
   },
   {
     "name":   "numbered list",
     "input":  "# Item 1\n## Item 1.1\n# Item 2",
-    "output": "<ol><li> Item 1\n<ol><li> Item 1.1</li></ol></li><li> Item 2</li></ol>"
+    "output": "<ol><li>Item 1<ol><li>Item 1.1</li></ol></li><li>Item 2</li></ol>"
   },
   {
     "name":   "horizontal rule",

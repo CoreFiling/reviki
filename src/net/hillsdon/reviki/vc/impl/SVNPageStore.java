@@ -449,6 +449,14 @@ public class SVNPageStore extends AbstractPageStore {
     _operations.getFile(path, revision, null, out);
   }
 
+  public byte[] attachmentBytes(final PageReference ref, final String attachment, final long revision) throws NotFoundException, PageStoreException {
+    String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    _operations.getFile(path, revision, null, out);
+
+    return out.toByteArray();
+  }
+
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
     List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());

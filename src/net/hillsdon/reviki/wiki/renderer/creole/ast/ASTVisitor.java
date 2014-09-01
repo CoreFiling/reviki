@@ -2,11 +2,11 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 /**
  * Provides a visitor interface to an AST.
- * 
+ *
  * @author msw
  */
 public abstract class ASTVisitor<T> {
-  /** Enum of node types */
+  /** Enum of node types. */
   public static enum NodeTypes {
     ASTNode, Anchor,
     BlockableNode, Blockquote, Bold,
@@ -20,16 +20,17 @@ public abstract class ASTVisitor<T> {
     Page, Paragraph, Plaintext,
     Raw,
     Strikethrough,
-    Table, TableCell, TableHeaderCell, TableRow, TaggedNode, TextNode,
+    Table, TableCell, TableHeaderCell, TableRow, TextNode,
     UnorderedList;
   }
+
   /**
    * Visit an arbitrary AST node. This calls the method visit + classname if it
    * exists, and falls back to visitASTNode if not.
-   * 
+   *
    * @param node The node to visit.
    */
-  public T visit(ASTNode node) {
+  public T visit(final ASTNode node) {
     // This doesn't include the abstract node types, as they can't be instantiated.
     switch(NodeTypes.valueOf(node.getClass().getSimpleName())) {
       case Anchor:          return visitAnchor((Anchor) node);
@@ -67,39 +68,43 @@ public abstract class ASTVisitor<T> {
 
   /**
    * Visit an AST node. This is the one mandatory method of ASTVisitor.
-   * 
+   *
    * @param node The node to visit.
    */
-  public abstract T visitASTNode(ASTNode node);
+  public abstract T visitASTNode(final ASTNode node);
 
-  public T visitAnchor(Anchor node)                   { return visitASTNode(node); }
-  public T visitBlockableNode(BlockableNode node)     { return visitASTNode((ASTNode) node); }
-  public T visitBlockquote(Blockquote node)           { return visitASTNode(node); }
-  public T visitBold(Bold node)                       { return visitASTNode(node); }
-  public T visitCode(Code node)                       { return visitASTNode(node); }
-  public T visitDirectiveNode(DirectiveNode node)     { return visitASTNode(node); }
-  public T visitHeading(Heading node)                 { return visitASTNode(node); }
-  public T visitHorizontalRule(HorizontalRule node)   { return visitASTNode(node); }
-  public T visitImage(Image node)                     { return visitASTNode(node); }
-  public T visitInline(Inline node)                   { return visitASTNode(node); }
-  public T visitInlineCode(InlineCode node)           { return visitASTNode(node); }
-  public T visitItalic(Italic node)                   { return visitASTNode(node); }
-  public T visitLinebreak(Linebreak node)             { return visitASTNode(node); }
-  public T visitLink(Link node)                       { return visitASTNode(node); }
-  public T visitLinkNode(LinkNode node)               { return visitASTNode(node); }
-  public T visitListItem(ListItem node)               { return visitASTNode(node); }
-  public T visitMacroNode(MacroNode node)             { return visitASTNode(node); }
-  public T visitOrderedList(OrderedList node)         { return visitASTNode(node); }
-  public T visitPage(Page node)                       { return visitASTNode(node); }
-  public T visitParagraph(Paragraph node)             { return visitASTNode(node); }
-  public T visitPlaintext(Plaintext node)             { return visitASTNode(node); }
-  public T visitRaw(Raw node)                         { return visitASTNode(node); }
-  public T visitStrikethrough(Strikethrough node)     { return visitASTNode(node); }
-  public T visitTable(Table node)                     { return visitASTNode(node); }
-  public T visitTableCell(TableCell node)             { return visitASTNode(node); }
-  public T visitTableHeaderCell(TableHeaderCell node) { return visitASTNode(node); }
-  public T visitTableRow(TableRow node)               { return visitASTNode(node); }
-  public T visitTaggedNode(TaggedNode node)           { return visitASTNode(node); }
-  public T visitTextNode(TextNode node)               { return visitASTNode(node); }
-  public T visitUnorderedList(UnorderedList node)     { return visitASTNode(node); }
+  /** Regular nodes. */
+  public T visitAnchor(Anchor node)                         { return visitASTNode(node); }
+  public T visitBlockableNode(final BlockableNode node)     { return visitASTNode((ASTNode) node); }
+  public T visitBlockquote(Blockquote node)                 { return visitASTNode(node); }
+  public T visitBold(final Bold node)                       { return visitASTNode(node); }
+  public T visitCode(final Code node)                       { return visitASTNode(node); }
+  public T visitDirectiveNode(final DirectiveNode node)     { return visitASTNode(node); }
+  public T visitHeading(final Heading node)                 { return visitASTNode(node); }
+  public T visitHorizontalRule(final HorizontalRule node)   { return visitASTNode(node); }
+  public T visitInline(final Inline node)                   { return visitASTNode(node); }
+  public T visitInlineCode(final InlineCode node)           { return visitASTNode(node); }
+  public T visitItalic(final Italic node)                   { return visitASTNode(node); }
+  public T visitLinebreak(final Linebreak node)             { return visitASTNode(node); }
+  public T visitListItem(final ListItem node)               { return visitASTNode(node); }
+  public T visitMacroNode(final MacroNode node)             { return visitASTNode(node); }
+  public T visitOrderedList(final OrderedList node)         { return visitASTNode(node); }
+  public T visitPage(final Page node)                       { return visitASTNode(node); }
+  public T visitParagraph(final Paragraph node)             { return visitASTNode(node); }
+  public T visitStrikethrough(final Strikethrough node)     { return visitASTNode(node); }
+  public T visitTable(final Table node)                     { return visitASTNode(node); }
+  public T visitTableCell(final TableCell node)             { return visitASTNode(node); }
+  public T visitTableHeaderCell(final TableHeaderCell node) { return visitASTNode(node); }
+  public T visitTableRow(final TableRow node)               { return visitASTNode(node); }
+  public T visitUnorderedList(final UnorderedList node)     { return visitASTNode(node); }
+
+  // Link nodes.
+  public T visitImage(final Image node)                     { return visitLinkNode(node); }
+  public T visitLink(final Link node)                       { return visitLinkNode(node); }
+  public T visitLinkNode(final LinkNode node)               { return visitASTNode(node);  }
+
+  // Text nodes. */
+  public T visitPlaintext(final Plaintext node)             { return visitTextNode(node); }
+  public T visitRaw(final Raw node)                         { return visitTextNode(node); }
+  public T visitTextNode(final TextNode node)               { return visitASTNode(node);  }
 }

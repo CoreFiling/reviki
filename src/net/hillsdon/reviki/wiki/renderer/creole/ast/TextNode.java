@@ -2,9 +2,11 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
-import java.util.Map;
 
-import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.wiki.renderer.macro.Macro;
+
+import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Abstract class for AST nodes which just contain text.
@@ -21,11 +23,6 @@ public abstract class TextNode extends ASTNode {
     _escape = escape;
   }
 
-  @Override
-  public String toXHTML(Map<String, List<String>> enabledDirectives) {
-    return _escape ? Escape.html(_contents) : _contents;
-  }
-
   /**
    * Get the (unescaped) text contained within this node.
    *
@@ -36,10 +33,17 @@ public abstract class TextNode extends ASTNode {
   }
 
   /**
+   * Get whether the contents should be escaped.
+   */
+  public boolean isEscaped() {
+    return _escape;
+  }
+
+  /**
    * Construct a new TextNode of the same type by appending the text of the
    * follower to this.
    */
-  public TextNode append(String more) {
+  public TextNode append(final String more) {
     String text = _contents + more;
 
     // First try a constructor which just takes a string.
@@ -68,7 +72,17 @@ public abstract class TextNode extends ASTNode {
    * Construct a new TextNode of the same type by appending the text of the
    * follower to this.
    */
-  public TextNode append(TextNode follower) {
+  public TextNode append(final TextNode follower) {
     return append(follower.getText());
+  }
+
+  @Override
+  protected void toSmallString(StringBuilder sb) {
+    sb.append(getText());
+  }
+
+  @Override
+  public List<ASTNode> expandMacrosInt(final Supplier<List<Macro>> macros) {
+    return ImmutableList.of((ASTNode) this);
   }
 }

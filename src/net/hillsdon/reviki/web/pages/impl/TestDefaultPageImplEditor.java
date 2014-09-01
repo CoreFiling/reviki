@@ -4,7 +4,6 @@ package net.hillsdon.reviki.web.pages.impl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.verify;
-import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.eq;
 
 import java.util.Collections;
@@ -27,14 +26,15 @@ import net.hillsdon.reviki.web.common.MockHttpServletRequest;
 import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
 import org.easymock.EasyMock;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author pjt
@@ -49,11 +49,11 @@ public class TestDefaultPageImplEditor extends TestCase {
   private DefaultPageImpl _page;
   private CachingPageStore _store;
   private PageStore _pageStore;
-  private MarkupRenderer _renderer;
+  private HtmlRenderer _renderer;
+  private RendererRegistry _renderers;
   private WikiGraph _graph;
   private DiffGenerator _diffGenerator;
   private WikiUrls _wikiUrls;
-  private ASTNode _resultNode;
 
   private FeedWriter _feedWriter;
   private VersionedPageInfoImpl _pageInfo;
@@ -67,20 +67,23 @@ public class TestDefaultPageImplEditor extends TestCase {
     _store = createMock(CachingPageStore.class);
     _pageStore = createMock(PageStore.class);
     _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
-    _renderer = createMock(MarkupRenderer.class);
+    _renderer = new HtmlRenderer(_pageStore, null, null, null);
+    _renderers = new RendererRegistry(_renderer);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderer, _graph, _diffGenerator, _wikiUrls, _feedWriter);
-    _resultNode = new Raw("rendered preview");
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
+  }
+
+  private ASTNode mkResult(String content) {
+    return new Page(ImmutableList.of((ASTNode) new Paragraph(new Inline(ImmutableList.of((ASTNode) new Plaintext(content))))));
   }
 
   private void replay() {
     EasyMock.replay(_store);
     EasyMock.replay(_pageStore);
-    EasyMock.replay(_renderer);
     EasyMock.replay(_graph);
     EasyMock.replay(_diffGenerator);
     EasyMock.replay(_wikiUrls);
@@ -120,13 +123,11 @@ public class TestDefaultPageImplEditor extends TestCase {
     _request.setAttribute(RequestAttributes.USERNAME, USERNAME);
     _request.setParameter(DefaultPageImpl.SUBMIT_PREVIEW, "");
     _request.setParameter(DefaultPageImpl.PARAM_SESSION_ID, MockHttpServletRequest.MOCK_SESSION_ID);
-    expect(_renderer.render(eq(new PageInfoImpl("", THE_PAGE.getPath(), "new content" + Strings.CRLF, Collections.<String, String>emptyMap())), isA(ResponseSessionURLOutputFilter.class))).andReturn(_resultNode);
+    assertTrue(_renderer.parse(new PageInfoImpl("", THE_PAGE.getPath(), "rendered preview" + Strings.CRLF, Collections.<String, String>emptyMap())).equals(mkResult("rendered preview")));
     expect(_diffGenerator.getDiffMarkup(eq("content"), eq("new content" + Strings.CRLF))).andReturn("rendered diff");
     expectTryToLock();
     replay();
     _page.editor(THE_PAGE, ConsumedPath.EMPTY, _request, _response);
-    final String preview = (String) _request.getAttribute(DefaultPageImpl.ATTR_PREVIEW);
-    assertEquals("rendered preview", preview);
     final String diff = (String) _request.getAttribute(DefaultPageImpl.ATTR_MARKED_UP_DIFF);
     assertEquals("rendered diff", diff);
   }

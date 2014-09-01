@@ -56,8 +56,8 @@ import net.hillsdon.reviki.web.pages.impl.SpecialPagesImpl;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 import net.hillsdon.reviki.web.vcintegration.AutoProperiesFromConfigPage;
@@ -68,7 +68,6 @@ import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManagerImpl;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedPageStore;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.RenderedPageFactory;
 import net.hillsdon.reviki.wiki.feeds.AtomFeedWriter;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
@@ -112,28 +111,29 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     File primarySearchDir = configuration.getSearchIndexDirectory();
     List<File> otherSearchDirs = configuration.getOtherSearchIndexDirectories();
 
-    // The wrapping MarkupRenderer contortion is necessary because we haven't initialised _renderer yet.
-    RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
-      public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(page, urlOutputFilter);
+    // Wrapping to get around _renderer not being initialised yet
+    MarkupRenderer<String> renderer = new MarkupRenderer<String>() {
+      @Override
+      public ASTNode parse(PageInfo page) throws IOException, PageStoreException {
+        return _renderer.parse(page);
       }
-    });
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));
+
+      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) {
+        return _renderer.render(ast,  urlOutputFilter);
+      }
+    };
+    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer));
+
+    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
-
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
     Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     final RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
-    _plugins = new PluginsImpl(pageStore);
-    _searchEngine.setPageStore(pageStore);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
-    autoProperties.setPageStore(cachingPageStore);
-    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
-
-    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     Configuration pageStoreConfiguration = new PageStoreConfiguration(cachingPageStore, applicationUrls);
+    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
         List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new AttrMacro(pageStore)));
@@ -141,6 +141,10 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
         return macros;
       }
     });
+
+    _plugins = new PluginsImpl(pageStore);
+    _searchEngine.setPageStore(pageStore);
+    autoProperties.setPageStore(cachingPageStore);
 
     container.addComponent(tracker);
     container.addComponent(operations);
@@ -151,9 +155,9 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(wikiGraph);
     container.addComponent(Configuration.class, pageStoreConfiguration);
     container.addComponent(internalLinker);
-    container.addComponent(renderedPageFactory);
     container.addComponent(_plugins);
     container.addComponent(_renderer);
+    container.addComponent(_renderer.getRenderers());
     container.addComponent(_searchEngine);
     container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
     container.addComponent(FeedWriter.class, AtomFeedWriter.class);

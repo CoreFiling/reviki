@@ -12,5 +12,5 @@
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit3"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="reviki"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwiki.username=user1 -Dwiki.password=password1 -Dwiki.altusername=user2 -Dwiki.altpassword=password2 -Dwiki.url=http://localhost:8080/reviki -Dwiki.svn=http://localhost/subversion/"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwiki.username=user1 -Dwiki.password=password1 -Dwiki.altusername=user2 -Dwiki.altpassword=password2 -Dwiki.url=http://localhost:8080/reviki -Dwiki.svn=http://localhost/subversion/ -Dfop.dir=/usr/local/bin/ -Dfop.classpath=/usr/local/lib/fop/ -Ddocbook.styledir=/usr/share/sgml/docbook/xsl-stylesheets-1.78.1/"/>
 </launchConfiguration>

@@ -1,8 +1,8 @@
 package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
-public class Blockquote extends TaggedNode {
+public class Blockquote extends ASTNode {
   public Blockquote(final ASTNode quoted) {
-    super("blockquote", quoted);
+    super(quoted);
 
     _isBlock = true;
     _canContainBlock = true;

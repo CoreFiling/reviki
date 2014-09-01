@@ -12,7 +12,7 @@
   {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
-    "output": "<p>Hello <code>//there//</code>.\n</p>"
+    "output": "<p>Hello <code>//there//</code>.</p>"
   },
   {
     "name":   "Unnamed URL",
@@ -102,9 +102,34 @@
     "output": ""
   },
   {
+    "name":   "Unexpanded macro node",
+    "input":  "<<macro:args>>",
+    "output": "<pre>&lt;&lt;macro:args&gt;&gt;</pre>"
+  },
+  {
+    "name":   "Table valignment directive",
+    "input":  "<<+table-alignment:top>>\n\n|=foo|bar|",
+    "output": "<table><tr><th style='vertical-align:top'>foo</th><td style='vertical-align:top'>bar</td></tr></table>"
+  },
+  {
+    "name":   "Broken valignment directive ",
+    "input":  "<<+table-alignment>>\n\n|foo|=bar|",
+    "output": "<table><tr><td>foo</td><th>bar</th></tr></table>"
+  },
+  {
+    "name":   "Directive disabling",
+    "input":  "<<+table-alignment:top>>\n\n|foo|\n\n<<-table-alignment>>\n\n|bar|",
+    "output": "<table><tr><td style='vertical-align:top'>foo</td></tr></table><table><tr><td>bar</td></tr></table>"
+  },
+  {
+    "name":   "Blockquotes",
+    "input":  "[<blockquote>]Quoted text[</blockquote>]",
+    "output": "<blockquote><p>Quoted text</p></blockquote>"
+  },
+  {
     "name":   "Formatting inside tables",
     "input":  "|* Foo\n* Bar\n** Baz|world|{{{look\nsome\ncode}}}|\n|=Table|=header|=cells|",
-    "output": "<table><tr><td><ul><li> Foo\n</li><li> Bar<ul><li> Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
+    "output": "<table><tr><td><ul><li>Foo</li><li>Bar<ul><li>Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
   },
   {
     "name":   "No trailing punctuation in interwiki links",

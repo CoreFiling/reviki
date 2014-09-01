@@ -36,9 +36,10 @@ import net.hillsdon.reviki.search.SearchEngine;
 import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.RenderedPage;
-import net.hillsdon.reviki.wiki.RenderedPageFactory;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTVisitor;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Link;
 
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.lucene.analysis.Analyzer;
@@ -53,7 +54,6 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
@@ -72,6 +72,7 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -112,7 +113,7 @@ public class LuceneSearcher implements SearchEngine {
   private final String _wikiName;
   private final File _dir;
   private final List<File> _otherDirs;
-  private final RenderedPageFactory _renderedPageFactory;
+  private final MarkupRenderer _renderer;
 
   public static String uidFor(final String wiki, final String path) {
     return (wiki==null ? "" : wiki) + "::" + (path==null ? "" : path);
@@ -122,11 +123,11 @@ public class LuceneSearcher implements SearchEngine {
    * @param dir The search index lives here.
    *            If null is passed the search will behave as a null implementation.
    */
-  public LuceneSearcher(final String wikiName, final File dir, final List<File> otherSearchDirs, final RenderedPageFactory renderedPageFactory) {
+  public LuceneSearcher(final String wikiName, final File dir, final List<File> otherSearchDirs, final MarkupRenderer renderer) {
     _wikiName = wikiName;
     _dir = dir;
     _otherDirs = otherSearchDirs;
-    _renderedPageFactory = renderedPageFactory;
+    _renderer = renderer;
   }
 
   private void createIndexIfNecessary() throws IOException {
@@ -163,7 +164,7 @@ public class LuceneSearcher implements SearchEngine {
   }
 
   private Document createWikiPageDocument(final PageInfo page) throws IOException, PageStoreException {
-    RenderedPage renderedPage = _renderedPageFactory.create(page, URLOutputFilter.NULL);
+    ASTNode pageAST = _renderer.parse(page);
     final String path = page.getPath();
     final String wiki = page.getWiki();
     final String content = page.getContent();
@@ -176,7 +177,7 @@ public class LuceneSearcher implements SearchEngine {
     document.add(new Field(FIELD_PATH, path, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_PATH_LOWER, pathLower, Field.Store.YES, Field.Index.UN_TOKENIZED));
     document.add(new Field(FIELD_TITLE_TOKENIZED, title, Field.Store.YES, Field.Index.TOKENIZED));
-    document.add(new Field(FIELD_OUTGOING_LINKS, Joiner.on(" ").join(renderedPage.findOutgoingWikiLinks()), Field.Store.YES, Field.Index.TOKENIZED));
+    document.add(new Field(FIELD_OUTGOING_LINKS, Joiner.on(" ").join(findOutgoingWikiLinks(pageAST)), Field.Store.YES, Field.Index.TOKENIZED));
     // We store the content in order to show matching extracts.
     document.add(new Field(FIELD_CONTENT, content, Field.Store.YES, Field.Index.TOKENIZED));
     // Store the attributes like this, so that we only get matches which are exact
@@ -184,6 +185,43 @@ public class LuceneSearcher implements SearchEngine {
       document.add(new Field(FIELD_ATTRIBUTES, attribute, Field.Store.YES, Field.Index.UN_TOKENIZED));
     }
     return document;
+  }
+
+  private List<String> findOutgoingWikiLinks(ASTNode ast) {
+    return (new Visitor()).visit(ast);
+  }
+
+  private final class Visitor extends ASTVisitor<List<String>> {
+    private static final String NEW_PAGE_CLASS = "new-page";
+    private static final String EXIST_PAGE_CLASS = "existing-page";
+
+    @Override
+    public List<String> visitASTNode(ASTNode node) {
+      List<String> outgoing = new ArrayList<String>();
+
+      for (ASTNode child : node.getChildren()) {
+        outgoing.addAll(visit(child));
+      }
+
+      return outgoing;
+    }
+
+    @Override
+    public List<String> visitLink(Link node) {
+      try {
+        String style = node.getParts().getStyleClass(node.getContext());
+        String href = node.getParts().getURL(node.getContext());
+
+        if (style.equals(NEW_PAGE_CLASS) || style.equals(EXIST_PAGE_CLASS)) {
+          return ImmutableList.of(href.substring(href.lastIndexOf('/') + 1));
+        }
+      }
+      catch (Exception e) {
+        // Ignore the bad link, we only care about links to pages on this wiki.
+      }
+
+      return ImmutableList.of();
+    }
   }
 
   private Document createPropertyDocument(final String property, final String value) {

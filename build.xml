@@ -118,6 +118,7 @@
       <fileset dir="${build-classes}">
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
+         <include name="fop.properties"/>
       </fileset>
     </jar>
   </target>
@@ -229,6 +230,9 @@
       <jvmarg value="-Dwiki.altusername=${wiki.altusername}" />
       <jvmarg value="-Dwiki.altpassword=${wiki.altpassword}" />
       <jvmarg value="-Dwiki.svn=${wiki.svn}" />
+      <jvmarg value="-Dfop.dir=${fop.dir}" />
+      <jvmarg value="-Dfop.classpath=${fop.classpath}" />
+      <jvmarg value="-Ddocbook.styledir=${docbook.styledir}" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
