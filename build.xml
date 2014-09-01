@@ -167,6 +167,7 @@
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-wiki}"/>
+        <pathelement location="${build-renderer}"/>
       </classpath>
     </rjavac>
   </target>
@@ -269,6 +270,7 @@
       <classpath>
         <path refid="classpath"/>
         <pathelement location="${build-wiki}"/>
+        <pathelement location="${build-renderer}"/>
         <pathelement location="${build-webtests}"/>
       </classpath>
       <formatter type="xml"/>
