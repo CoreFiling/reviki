@@ -1,6 +1,45 @@
 Reviki
 
                               Version History
+0.4.0 (2014-09-02)
+------------------
+
+* Improvements to the wiki markup parser [REVIKI-388]:
+
+  + Anchors can now be placed in documents using new [[#AnchorName]] markup.
+    [REVIKI-400]
+
+  + Interwiki links can now contain a "-" character to facilitate
+    inter-operation with systems such as JIRA.
+    [REVIKI-559]
+
+  + Improvements to the parsing of table cells, allowing them to contain lists
+    and also allowing the | character to appear inside a pre-formatted/
+    "no-wiki" block.
+    [REVIKI-341, REVIKI-453]
+
+  + Wiki markup such "no-wiki" blocks can now be used inside list entries.
+    [REVIKI-374, REVIKI-466]
+
+  + Fix handling of pre-formatted ("no-wiki") sections so they now work when
+    used inline at the beginning of a line.
+    [REVIKI-377]
+
+  + Fix handling of inline [<html>] sections.
+    [REVIKI-412]
+
+  + WikiWords can now link to a specific revision of a page by appending
+    ?revision=12345 to the word.
+    [REVIKI-471]
+
+  + Corrected an issue that could prevent links to WikiWords from working
+    if the "named link" syntax was used to alter the link text.
+    [REVIKI-491]
+
+  + mailto: links are now supported.
+    [REVIKI-514]
+
+
 0.3.0 (2014-05-09)
 ------------------
 
