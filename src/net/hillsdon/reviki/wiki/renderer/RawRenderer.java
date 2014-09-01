@@ -2,7 +2,7 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -28,7 +28,12 @@ public class RawRenderer extends MarkupRenderer<InputStream> {
 
   @Override
   public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
-    return new ByteArrayInputStream(_page.getContent().getBytes(StandardCharsets.UTF_8));
+    try {
+      return new ByteArrayInputStream(_page.getContent().getBytes("UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      return new ByteArrayInputStream(_page.getContent().getBytes());
+    }
   }
 
   @Override

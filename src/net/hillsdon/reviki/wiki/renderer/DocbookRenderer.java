@@ -3,7 +3,7 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -45,7 +45,12 @@ public class DocbookRenderer extends CreoleBasedRenderer<InputStream> {
   @Override
   public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     String out = buildString(ast, urlOutputFilter);
-    return new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
+    try {
+      return new ByteArrayInputStream(out.getBytes("UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      return new ByteArrayInputStream(out.getBytes());
+    }
   }
 
   @Override

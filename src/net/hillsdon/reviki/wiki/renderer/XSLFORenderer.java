@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -106,7 +106,13 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       OutputStream stdin = process.getOutputStream();
 
       // Write XML to stdin
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin, StandardCharsets.UTF_8));
+      BufferedWriter writer;
+      try {
+        writer = new BufferedWriter(new OutputStreamWriter(stdin, "UTF-8"));
+      }
+      catch (UnsupportedEncodingException e) {
+        writer = new BufferedWriter(new OutputStreamWriter(stdin));
+      }
       writer.write(docbook);
       writer.flush();
       writer.close();
@@ -115,7 +121,12 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       return stdout;
     }
     catch (Exception e) {
-      return new ByteArrayInputStream(("error " + e).getBytes(StandardCharsets.UTF_8));
+      try {
+        return new ByteArrayInputStream(("error " + e).getBytes("UTF-8"));
+      }
+      catch (UnsupportedEncodingException e2) {
+        return new ByteArrayInputStream(("error " + e).getBytes());
+      }
     }
   }
 
