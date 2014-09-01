@@ -14,14 +14,17 @@
   <property name="buildNumber" value="dev" />   
   <property name="version" value="0.4.1" />
   <property name="build-details" value="${version} r${buildNumber}" />
-  <property name="source" value="src" />   
   <property name="generated-source" value="src-gen" />
+  <property name="wiki-source" value="wiki-src" />
+  <property name="renderer-source" value="renderer-src" />
   <property name="web" value="WebContent" />   
-  <property name="build-classes" value="ant-build/classes" />   
+  <property name="build-wiki" value="ant-build/wiki" />
+  <property name="build-renderer" value="ant-build/renderer" />
   <property name="build-web" value="ant-build/web" />   
   <property name="reports" value="reports" />   
   <property name="release" value="release" />   
   <property name="jar" value="${build-web}/WEB-INF/lib/reviki.jar"/>
+  <property name="rendererJar" value="${build-web}/WEB-INF/lib/reviki-renderer.jar"/>
   <property name="testJar" value="ant-build/reviki-test.jar"/>
   <property name="war" value="${release}/${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
@@ -58,7 +61,8 @@
   <target name="init">
      <get src="${vnu-url}" dest="lib/vnu.jar" usetimestamp="true" />
 
-     <mkdir dir="${build-classes}" />
+     <mkdir dir="${build-wiki}" />
+     <mkdir dir="${build-renderer}" />
      <mkdir dir="${build-web}" />
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
@@ -67,7 +71,8 @@
   </target>
 
   <target name="clean" description="Clean-up build artifacts">
-    <delete dir="${build-classes}" />
+    <delete dir="${build-wiki}" />
+  	<delete dir="${build-renderer}" />
     <delete dir="${build-web}" />
     <delete dir="${build-webtests}" />
     <delete dir="${reports}" />
@@ -79,7 +84,7 @@
   </target>
 
   <target name="generate-sources" depends="init">
-    <java jar="lib/antlr4.jar" dir="src/net/hillsdon/reviki/wiki/renderer/creole" fork="true">
+    <java jar="lib/antlr4.jar" dir="renderer-src/net/hillsdon/reviki/wiki/renderer/creole" fork="true">
       <arg value="-o"/>
       <arg value="${basedir}/${generated-source}/net/hillsdon/reviki/wiki/renderer/creole"/>
       <arg value="-package"/>
@@ -90,11 +95,12 @@
     </java>
   </target>
 
-  <target name="compile" depends="generate-sources">
-    <rjavac destdir="${build-classes}" fork="yes" target="1.6" source="1.6" debug="true">
-      <src path="${source}"/>
-      <src path="${generated-source}"/>
-      <classpath refid="classpath" />
+  <target name="compile-wiki" depends="init, renderer-jar">
+    <rjavac srcdir="${wiki-source}" destdir="${build-wiki}" fork="yes" target="1.6" source="1.6" debug="true">
+      <classpath>
+      	<pathelement path="${rendererJar}"/> 
+      	<path refid="classpath" />
+      </classpath>
     </rjavac>
     <copy todir="${build-web}">
       <fileset dir="${web}">
@@ -102,8 +108,8 @@
       </fileset>
     </copy>
     <replace file="${build-web}/WEB-INF/templates/SiteTemplate.jsp" token="$Version$" value="${build-details}"/>
-    <copy todir="${build-classes}">
-      <fileset dir="${source}">
+    <copy todir="${build-wiki}">
+      <fileset dir="${wiki-source}">
         <include name="**/*.json"/>
         <include name="**/*.jar"/>
         <include name="**/*.xml"/>
@@ -113,9 +119,26 @@
     </copy>
   </target>
 
-  <target name="jar" depends="compile">
+  <target name="compile-renderer" depends="generate-sources">
+    <rjavac destdir="${build-renderer}" fork="yes" target="1.6" source="1.6" debug="true">
+      <src path="${renderer-source}"/>
+      <src path="${generated-source}"/>
+      <classpath refid="classpath" />
+    </rjavac>
+    <copy todir="${build-renderer}">
+      <fileset dir="${renderer-source}">
+        <include name="**/*.json"/>
+        <include name="**/*.jar"/>
+        <include name="**/*.xml"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" depends="compile-wiki, compile-renderer"/>
+
+  <target name="jar" depends="compile-wiki">
     <jar destfile="${jar}">
-      <fileset dir="${build-classes}">
+      <fileset dir="${build-wiki}">
          <include name="**/*.class"/>
          <include name="${prepopulated-pages}"/>
          <include name="fop.properties"/>
@@ -131,23 +154,31 @@
     </jar>
   </target>
 
+  <target name="renderer-jar" depends="compile-renderer">
+    <jar destfile="${rendererJar}">
+      <fileset dir="${build-renderer}">
+         <include name="**/*.class"/>
+      </fileset>
+    </jar>
+  </target>
+
   <target name="functional-tests-compile" depends="compile">
     <rjavac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
       <classpath>
         <path refid="classpath" />
-        <pathelement location="${build-classes}"/>
+        <pathelement location="${build-wiki}"/>
       </classpath>
     </rjavac>
   </target>
 
   <target name="taglib-jar" depends="compile" description="Rebuild the JSP taglib JAR file">
-    <mkdir dir="${build-classes}/META-INF"/>
-    <move file="${build-classes}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-classes}/META-INF/reviki.tld"/>
+    <mkdir dir="${build-wiki}/META-INF"/>
+    <move file="${build-wiki}/net/hillsdon/reviki/web/taglib/reviki.tld" tofile="${build-wiki}/META-INF/reviki.tld"/>
     <jar destfile="WebContent/WEB-INF/lib/reviki-tlds.jar" >
-      <fileset dir="${build-classes}">
+      <fileset dir="${build-wiki}">
         <include name="net/hillsdon/reviki/web/taglib/**/*.class"/>
       </fileset>
-      <metainf dir="${build-classes}/META-INF">
+      <metainf dir="${build-wiki}/META-INF">
         <include name="**/*"/>
       </metainf>
     </jar>
@@ -158,18 +189,18 @@
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
-        <pathelement location="${build-classes}"/>
+        <pathelement location="${build-wiki}"/>
       </classpath>
       <formatter type="xml"/>
       <batchtest todir="${reports}">
-        <fileset dir="${source}">
+        <fileset dir="${wiki-source}">
           <include name="**/Test*.java"/>
         </fileset>
       </batchtest>
     </junit>
   </target>
 
-  <target name="war" depends="jar" description="Build the WAR file">
+  <target name="war" depends="jar, renderer-jar" description="Build the WAR file">
     <war warfile="${war}"
          webxml="${build-web}/WEB-INF/web.xml">
        <fileset dir="${build-web}">
@@ -236,7 +267,7 @@
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
-        <pathelement location="${build-classes}"/>
+        <pathelement location="${build-wiki}"/>
         <pathelement location="${build-webtests}"/>
       </classpath>
       <formatter type="xml"/>
@@ -282,6 +313,7 @@
     </zip>
     <!-- Take a copy of the reviki JARs for building plugins against. -->
     <copy file="${jar}" todir="${release}"/>
+    <copy file="${rendererJar}" todir="${release}"/>
     <copy file="${testJar}" todir="${release}"/>
   </target>
 

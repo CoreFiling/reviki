@@ -21,5 +21,5 @@ def ensure_has_boilerplate(path):
     fout.write(content)
     fout.close()
 
-for dir in ('src', 'webtests'):
+for dir in ('wiki-src', 'renderer-src', 'webtests'):
   os.path.walk(dir, apply_boilerplate, None)
