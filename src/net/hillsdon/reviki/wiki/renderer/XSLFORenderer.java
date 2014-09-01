@@ -77,9 +77,9 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
       props = System.getProperties();
     }
 
-    FOP_DIR = new File(props.getProperty("fop.dir"));
+    FOP_DIR = new File(props.getProperty("fop.dir", "."));
     FOP_CLASSPATH = props.getProperty("fop.classpath", ".");
-    XSL_PATH = props.getProperty("docbook.styledir") + "fo/docbook.xsl";
+    XSL_PATH = props.getProperty("docbook.styledir", "./") + "fo/docbook.xsl";
   }
 
   public XSLFORenderer(final DocbookRenderer docbook) {
