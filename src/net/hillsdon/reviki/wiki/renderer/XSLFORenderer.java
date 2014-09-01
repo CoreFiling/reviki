@@ -22,8 +22,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
  * uses the Docbook renderer as the source, and uses Apache Fop to perform the
  * transformations. As Fop depends on different versions of things to Reviki, it
  * can't easily be linked into the Jar. Thus, it it executed at runtime, as a
- * standalone program, to do what we want. However, this requires the Reviki
- * .war to be exploded.
+ * standalone program, to do what we want.
  *
  * @author msw
  */
@@ -67,12 +66,6 @@ public class XSLFORenderer extends MarkupRenderer<InputStream> {
     Properties props = new Properties();
 
     try {
-      // We find the path to fop by working relatively from the path to the jar:
-      // we can get that by asking the class loaded for the location of this
-      // class, and then trimming off the extra stuff. Then we know that
-      // xslfo/fop is in the same directory as the jar.
-      //
-      // This assumes the war has been exploded.
       String clazz = XSLFORenderer.class.getResource("XSLFORenderer.class").toString();
       String workingdir = clazz.split("file:")[1].split("WEB-INF")[0];
       props.load(new FileInputStream(workingdir + "WEB-INF/fop.properties"));
