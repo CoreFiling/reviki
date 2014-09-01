@@ -66,6 +66,9 @@ public class PageReferenceImpl implements PageReference {
   }
 
   public final String getName() {
+    // This implements SVNPathUtil.tail(_path), to avoid pulling it in as a
+    // dependency.
+
     int index = _path.length() - 1;
     if (index >= 0 && index < _path.length() && _path.charAt(index) == '/') {
       index--;
