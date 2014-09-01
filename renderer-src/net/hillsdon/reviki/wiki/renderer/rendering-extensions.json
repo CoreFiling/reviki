@@ -130,6 +130,16 @@
     "name":   "Formatting inside tables",
     "input":  "|* Foo\n* Bar\n** Baz|world|{{{look\nsome\ncode}}}|\n|=Table|=header|=cells|",
     "output": "<table><tr><td><ul><li>Foo</li><li>Bar<ul><li>Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
+  },
+  {
+    "name":   "No trailing punctuation in interwiki links",
+    "input":  "foo:12-34.",
+    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12-34'>foo:12-34</a>.</p>"
+  },
+  {
+    "name":   "No trailing punctuation in interwiki links #2",
+    "input":  "foo:12.34-",
+    "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12.34'>foo:12.34</a>-</p>"
   }
 ]
 
