@@ -90,6 +90,9 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     public static final String TABLE_CONTENTS_STYLE = "Table Contents";
 
+    /** Style for blockquotes. */
+    public static final String BLOCKQUOTE_STYLE = "Blockquote";
+
     /** Style for block code. */
     public static final String CODE_STYLE = "Preformatted Text";
 
@@ -106,6 +109,31 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     /** Custom styles. */
     public static final List<Style> CUSTOM_STYLES;
+
+    /**
+     * Set the default preferred width of a table to 9638 twentieths of a point
+     * - the width of a page with default margins.
+     *
+     * The default width if unspecified is 0, which is interpreted as
+     * "grow the table until everything fits", as all widths are preferred.
+     * HOWEVER, libreoffice does not cope well with this, producing a table so
+     * wide as to go off the right edge of the page. The weird behaviour doesn't
+     * stop there, though, it's also dependent on units - dxa is the default,
+     * but the results of setting the width to 1 and 1dxa are very different.
+     *
+     * There is a bug report on the libreoffice bugzilla about this, but it's
+     * been open since 2013 with no progress.
+     *
+     * See http://webapp.docx4java.org/OnlineDemo/ecma376/WordML/tblW_2.html for
+     * details on the correct interpretation of width.
+     */
+    public static final int TABLE_BASE_WIDTH = 9638;
+
+    /** Spacing left of blockquotes, used in calculating table widths. */
+    public static final int BLOCKQUOTE_SPACING_HORIZ = 100;
+
+    /** Spacing above and below blockquotes. */
+    public static final int BLOCKQUOTE_SPACING_VERT = 55;
 
     /** For looking up attachments. */
     protected final SimplePageStore _pageStore;
@@ -150,13 +178,19 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     /** Style to apply to all paragraphs, if set. */
     protected String _paragraphStyle = null;
 
+    /** How many levels of blockquotes we're currently in. */
+    protected int _blockquoteLevel = 0;
+
+    /** Whether we're currently rendering a table header cell. */
+    protected boolean _inTableHeader = false;
+
     /**
      * Set up styles
      */
     static {
       ObjectFactory factory = new ObjectFactory();
 
-      /* ***** Styles. */
+      /* ***** Text styles */
       CUSTOM_STYLES = new ArrayList<Style>();
 
       // Spacing for normal text, values from libreoffice
@@ -186,19 +220,8 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       horizontalRule.getPPr().setPBdr(factory.createPPrBasePBdr());
       horizontalRule.getPPr().getPBdr().setBottom(border);
 
-      // The table style is very different to text styles, so it's just
-      // constructed here.
-      Style tblstyle = factory.createStyle();
-
-      tblstyle.setStyleId(styleNameToId(TABLE_STYLE));
-
-      tblstyle.setName(factory.createStyleName());
-      tblstyle.getName().setVal(TABLE_STYLE);
-
-      tblstyle.setBasedOn(factory.createStyleBasedOn());
-      tblstyle.getBasedOn().setVal("TableGrid");
-
-      tblstyle.setTblPr(factory.createCTTblPrBase());
+      /* ***** Table style */
+      Style tblstyle = constructTableStyle(TABLE_STYLE, "TableGrid");
 
       // Set the cell margins
       TblWidth margin = factory.createTblWidth();
@@ -211,9 +234,30 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       tblstyle.getTblPr().getTblCellMar().setLeft(margin);
       tblstyle.getTblPr().getTblCellMar().setRight(margin);
 
-      // Finally, save the styles so they can be added to documents.
+      /* ***** Blockquote style */
+      Style blockQuote = constructTableStyle(BLOCKQUOTE_STYLE, "TableGrid");
+
+      CTBorder thickborder = factory.createCTBorder();
+      thickborder.setVal(STBorder.SINGLE);
+      thickborder.setColor("cccccc");
+      thickborder.setSz(BigInteger.valueOf(24));
+
+      CTBorder noborder = factory.createCTBorder();
+      noborder.setVal(STBorder.NONE);
+
+      blockQuote.getTblPr().setTblBorders(factory.createTblBorders());
+      blockQuote.getTblPr().getTblBorders().setTop(noborder);
+      blockQuote.getTblPr().getTblBorders().setLeft(thickborder);
+      blockQuote.getTblPr().getTblBorders().setBottom(noborder);
+      blockQuote.getTblPr().getTblBorders().setRight(noborder);
+      blockQuote.getTblPr().getTblBorders().setInsideH(noborder);
+      blockQuote.getTblPr().getTblBorders().setInsideV(noborder);
+
+      /* ***** Finally, save the styles so they can be added to documents. */
       CUSTOM_STYLES.add(textBody);
       CUSTOM_STYLES.add(code);
+      CUSTOM_STYLES.add(tblstyle);
+      CUSTOM_STYLES.add(blockQuote);
       CUSTOM_STYLES.add(tableContents);
       CUSTOM_STYLES.add(tableHeader);
       CUSTOM_STYLES.add(horizontalRule);
@@ -295,6 +339,23 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
         style.setRPr(factory.createRPr());
         style.getRPr().setB(new BooleanDefaultTrue());
       }
+
+      return style;
+    }
+
+    protected static Style constructTableStyle(final String name, final String basedOn) {
+      ObjectFactory factory = new ObjectFactory();
+
+      Style style = factory.createStyle();
+      style.setStyleId(styleNameToId(name));
+
+      style.setName(factory.createStyleName());
+      style.getName().setVal(name);
+
+      style.setBasedOn(factory.createStyleBasedOn());
+      style.getBasedOn().setVal(basedOn);
+
+      style.setTblPr(factory.createTblPr());
 
       return style;
     }
@@ -486,6 +547,103 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       _contexts.peek().getContent().add(o);
     }
 
+    /**
+     * Generate a table as wide as the current context allows
+     *
+     * @param offsetR If true, offset from the right side of a blockquote.
+     */
+    protected Tbl fullWidthTable(boolean offsetR) {
+      int offset = (offsetR && _blockquoteLevel > 0) ? (int) Math.round(BLOCKQUOTE_SPACING_HORIZ * 1.5) : 0;
+
+      Tbl tbl = _factory.createTbl();
+      tbl.setTblPr(_factory.createTblPr());
+
+      TblWidth tblwidth = _factory.createTblWidth();
+      tblwidth.setW(BigInteger.valueOf(TABLE_BASE_WIDTH - BLOCKQUOTE_SPACING_HORIZ * _blockquoteLevel - offset));
+      tblwidth.setType("dxa");
+      tbl.getTblPr().setTblW(tblwidth);
+
+      return tbl;
+    }
+
+    /** Insert a blank paragraph to separate two tables. */
+    protected void separateTables() {
+      ContentAccessor container = _blockContexts.peek();
+      int size = container.getContent().size();
+      if (size > 0 && container.getContent().get(size - 1) instanceof Tbl) {
+        commitBlock(_factory.createP());
+      }
+    }
+
+    @Override
+    public InputStream visitAnchor(Anchor node) {
+      // Docx doesn't, as far as I can tell, have a concept analogous to
+      // anchors.
+      return nullval();
+    }
+
+    @Override
+    public InputStream visitBlockquote(Blockquote node) {
+      // Docx is a fickle mistress, lacking so many features that we would
+      // consider sensible, even required, for a document format; however, there
+      // are work-arounds!
+      //
+      // There are no blockquotes. But, they can be emulated by full-width
+      // tables. By setting borders appropriately we can get nice indentation
+      // and make it look like a quote, so in a way, all is good. However, it's
+      // not quite that simple. This may be another libreoffice table quirk, and
+      // I suspect it is, but tables in blockquotes don't quite work right. The
+      // rendering is just completely broken but, like all docx woes, there is a
+      // work-around. it turns out that by adding an empty paragraph to the
+      // contents of the table cell-cum-blockquote, immediately following the
+      // table, the problem goes away! I don't know why this is.
+      Tbl table = fullWidthTable(false);
+
+      // Set the style to our custom one.
+      table.getTblPr().setTblStyle(_factory.createCTTblPrBaseTblStyle());
+      table.getTblPr().getTblStyle().setVal(styleNameToId(BLOCKQUOTE_STYLE));
+
+      // Indent the contents
+      TblWidth vert = _factory.createTblWidth();
+      vert.setW(BigInteger.valueOf(BLOCKQUOTE_SPACING_VERT));
+      vert.setType("dxa");
+
+      TblWidth horiz = _factory.createTblWidth();
+      horiz.setW(BigInteger.valueOf(BLOCKQUOTE_SPACING_HORIZ));
+      horiz.setType("dxa");
+
+      CTTblCellMar tblcellmar = _factory.createCTTblCellMar();
+      table.getTblPr().setTblCellMar(tblcellmar);
+
+      tblcellmar.setLeft(horiz);
+      tblcellmar.setTop(vert);
+      tblcellmar.setBottom(vert);
+
+      // Create the single cell, and render the contents.
+      Tr trow = _factory.createTr();
+      Tc tcell = _factory.createTc();
+
+      _blockquoteLevel++;
+      withContextSimple(tcell, node, true);
+      _blockquoteLevel--;
+
+      // Magical paragraph which makes everything work.
+      tcell.getContent().add(_factory.createP());
+
+      // There is a similar problem with tables and blockquotes being adjacent:
+      // if there's nothing between them, libreoffice merges them, and the
+      // blockquote border is used for the table. So if there's a table
+      // immediately before this quote, put in a blank paragraph.
+      separateTables();
+
+      // Save everything to the document.
+      table.getContent().add(trow);
+      trow.getContent().add(tcell);
+      commitBlock(table);
+
+      return nullval();
+    }
+
     @Override
     public InputStream visitBold(final Bold node) {
       return withFormatting(_bold, node);
@@ -496,10 +654,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       P code = _factory.createP();
       paraStyle(code, CODE_STYLE);
 
+      enterContext(code, false);
       R run = constructRun(false);
       runText(run, node.getText());
+      exitContext(false);
 
-      code.getContent().add(run);
       commitBlock(code);
 
       return nullval();
@@ -603,6 +762,22 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     }
 
     @Override
+    public InputStream visitInline(Inline node) {
+      // If we're in a table cell, we need to produce a containing paragraph
+      boolean inTc = _blockContexts.peek() != null && _blockContexts.peek() instanceof Tc;
+      boolean inPara = _contexts.peek() != null && _contexts.peek() instanceof P && _blockContexts.peek().getContent().contains(_contexts.peek());
+      if (inTc && !inPara && !_inTableHeader) {
+        P para = _factory.createP();
+        paraStyle(para, TABLE_CONTENTS_STYLE);
+
+        return withContext(para, node, false);
+      }
+      else {
+        return super.visitInline(node);
+      }
+    }
+
+    @Override
     public InputStream visitInlineCode(final InlineCode node) {
       R run = constructRun(false);
       run.setRPr(_factory.createRPr());
@@ -695,32 +870,15 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
 
     @Override
     public InputStream visitTable(final Table node) {
-      Tbl table = _factory.createTbl();
+      Tbl table = fullWidthTable(true);
 
       // Set the style to our custom one.
-      table.setTblPr(_factory.createTblPr());
       table.getTblPr().setTblStyle(_factory.createCTTblPrBaseTblStyle());
       table.getTblPr().getTblStyle().setVal(styleNameToId(TABLE_STYLE));
 
-      // Set the preferred width to 9638 twentieths of a point - the width of a
-      // page with default margins.
-      //
-      // The default width if unspecified is 0, which is interpreted as
-      // "grow the table until everything fits", as all widths are preferred.
-      // HOWEVER, libreoffice does not cope well with this, producing a table so
-      // wide as to go off the right edge of the page. The weird behaviour
-      // doesn't stop there, though, it's also dependent on units - dxa is the
-      // default, but the results of setting the width to 1 and 1dxa are very
-      // different.
-      //
-      // There is a bug report on the libreoffice bugzilla about this, but it's
-      // been open since 2013 with no progress.
-      //
-      // See http://webapp.docx4java.org/OnlineDemo/ecma376/WordML/tblW_2.html
-      // for details on the correct interpretation of width.
-      table.getTblPr().setTblW(_factory.createTblWidth());
-      table.getTblPr().getTblW().setW(BigInteger.valueOf(9638));
-      table.getTblPr().getTblW().setType("dxa");
+      // Similarly to table/blockquote adjacency, table/table adjacency is also
+      // bad.
+      separateTables();
 
       return withContext(table, node, true);
     }
@@ -737,14 +895,9 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
     @Override
     public InputStream visitTableCell(final TableCell node) {
       Tc tablecell = _factory.createTc();
-      commitBlock(tablecell);
       valign(tablecell);
 
-      P para = _factory.createP();
-      tablecell.getContent().add(para);
-      paraStyle(para, TABLE_CONTENTS_STYLE);
-
-      return withContextSimple(para, node, false);
+      return withContext(tablecell, node, true);
     }
 
     @Override
@@ -757,7 +910,11 @@ public class DocxRenderer extends CreoleBasedRenderer<InputStream> {
       tablecell.getContent().add(para);
       paraStyle(para, TABLE_HEADER_STYLE);
 
-      return withContextSimple(para, node, false);
+      _inTableHeader = true;
+      withContextSimple(para, node, false);
+      _inTableHeader = false;
+
+      return nullval();
     }
 
     @Override

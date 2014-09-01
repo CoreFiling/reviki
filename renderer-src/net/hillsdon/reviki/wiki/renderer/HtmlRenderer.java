@@ -116,6 +116,16 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
     }
 
     @Override
+    public String visitAnchor(Anchor node) {
+      return String.format("<a %s id=\"%s\"></a>", CSS_CLASS_ATTR, node.getAnchor());
+    }
+
+    @Override
+    public String visitBlockquote(Blockquote node) {
+      return renderTagged("blockquote", Optional.of(node));
+    }
+
+    @Override
     public String visitBold(final Bold node) {
       return renderTagged("strong", Optional.of(node));
     }
@@ -135,7 +145,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitHorizontalRule(final HorizontalRule node) {
-      return renderTagged("hr", Optional.<ASTNode>absent());
+      return renderTagged("hr", Optional.<ASTNode> absent());
     }
 
     @Override
@@ -167,7 +177,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitLinebreak(final Linebreak node) {
-      return renderTagged("br", Optional.<ASTNode>absent());
+      return renderTagged("br", Optional.<ASTNode> absent());
     }
 
     @Override

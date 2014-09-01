@@ -204,7 +204,7 @@ public class TestEditing extends WebTestSupport {
     // Should be a Save button
     assertEquals(1, pageUser1.getByXPath("//button[@name='save']").size());
     // Should be a flash with "lock" in the message
-    assertTrue(getErrorMessage(pageUser1).contains("lock"));
+    assertTrue(getErrorMessage(pageUser1).toLowerCase().contains("lock"));
     // Should be a diff
     assertTrue(pageUser1.getByXPath("//*[@class='diff']").size() > 0);
     // User 2 Save

@@ -26,15 +26,19 @@ public class LinkParts {
 
   private LinkTarget _target;
   
-  public LinkParts(final String text, final String wiki, String pageName, final String fragment, String attachment) {
+  public LinkParts(final String text, final String wiki, String pageName, final String revision, final String fragment, String attachment) {
     _text = text;
     
     if (attachment != null) {
       _target = new AttachmentLinkTarget(wiki, "attachments".equals(pageName) ? null : pageName, attachment);
     }
     else {
-      _target = new PageLinkTarget(wiki, pageName, fragment);
+      _target = new PageLinkTarget(wiki, pageName, revision, fragment);
     }
+  }
+
+  public LinkParts(final String text, final String wiki, String pageName, final String fragment, String attachment) {
+    this(text, wiki, pageName, null, fragment, attachment);
   }
 
   public LinkParts(final String text, final URI uri) {
@@ -44,6 +48,10 @@ public class LinkParts {
 
   public String getText() {
     return _text;
+  }
+
+  public LinkTarget getTarget() {
+    return _target;
   }
 
   @Override

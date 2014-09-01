@@ -13,12 +13,19 @@ public class PageLinkTarget implements LinkTarget {
 
   private String _pageName;
 
+  private String _revision;
+
   private String _fragment;
 
-  public PageLinkTarget(final String wiki, final String pageName, final String fragment) {
+  public PageLinkTarget(final String wiki, final String pageName, final String revision, final String fragment) {
     _wiki = wiki;
     _pageName = pageName;
+    _revision = revision;
     _fragment = fragment;
+  }
+
+  public PageLinkTarget(final String wiki, final String pageName, final String fragment) {
+    this(wiki, pageName, null, fragment);
   }
 
   public String getWiki() {
@@ -74,7 +81,7 @@ public class PageLinkTarget implements LinkTarget {
     if (isDotAttachment(resolver)) {
       return new AttachmentLinkTarget(_wiki, null, _pageName).getURL(resolver);
     }
-    URI uri = resolver.resolve(_wiki, _pageName);
+    URI uri = resolver.resolve(_wiki, _pageName, _revision);
     uri = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), _fragment);
     return uri.toASCIIString();
   }

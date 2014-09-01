@@ -15,13 +15,14 @@ options {
 /* ***** Top level elements ***** */
 
 // A page consists of a sequence of block elements, separated by newlines.
-creole    : (block (LineBreak | ParBreak)*)* EOF ;
+creole    : (block (LineBreak | ParBreak)*)* ;
 
 block     : heading
           | ulist | olist
           | hrule
           | table
           | code | nowiki
+          | blockquote
           | directive
           | paragraph
           ;
@@ -80,13 +81,17 @@ listBlock  : code | nowiki | inline ;
 
 hrule      : Rule ;
 
-table      : {disallowBreaks();} (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? {unsetBreaks();};
+table      : (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? ;
 trow       : tcell+ ;
 tcell      : th | td ;
 th         : ThStart inline? ;
-td         : TdStart inline? ;
+td         : TdStart inTable+ ;
+
+inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
+
+blockquote : BlockquoteSt creole BlockquoteEnd ;
 
 directive  : DirectiveEnable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Enable
            | DirectiveDisable MacroName (MacroSep MacroEnd | MacroEndNoArgs) # Disable
@@ -98,6 +103,7 @@ inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | simpleimg | imglink | wikiwlink | attachment | rawlink
+           | anchor
            | inlinecode | preformat
            | linebreak
            | macro
@@ -123,6 +129,8 @@ wikiwlink  : WikiWords ;
 attachment : Attachment ;
 
 rawlink    : RawUrl ;
+
+anchor     : AnSt InAnchor AnEnd ;
 
 preformat  : NoWiki EndNoWikiInline ;
 
