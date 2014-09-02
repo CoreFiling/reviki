@@ -40,6 +40,14 @@ Reviki
     [REVIKI-514]
 
 
+0.3.1 (2014-06-05)
+------------------
+
+* Fixed an issue introduced in 0.3.0 that prevented the atom view of a page's
+  history from working.
+  [bug 44456]
+
+
 0.3.0 (2014-05-09)
 ------------------
 
