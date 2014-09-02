@@ -118,7 +118,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
    * the constructor causes an exception.
    */
   private InterWikiLinker interWikiLinker() {
-    if (_configuration != null && _interWikiLinker == null) {
+    if (_configuration != null) {
       try {
         _interWikiLinker = _configuration.getInterWikiLinker();
       }
