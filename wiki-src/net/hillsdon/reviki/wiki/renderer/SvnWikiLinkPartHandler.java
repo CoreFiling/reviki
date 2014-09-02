@@ -30,14 +30,12 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
-import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
-import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
-  public static final String IMAGE = "<img %sclass='%s' src='%s' alt='%s' />";
+  public static final String IMAGE = "<img %sclass=\"%s\" src=\"%s\" alt=\"%s\" />";
 
-  public static final String ANCHOR = "<a %sclass='%s' href='%s'>%s</a>";
+  public static final String ANCHOR = "<a %sclass=\"%s\" href=\"%s\">%s</a>";
 
   private final InternalLinker _internalLinker;
 
@@ -88,7 +86,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
     LinkResolutionContext resolver = resolver(page);
-    String noFollow = link.isNoFollow(resolver) ? "rel='nofollow' " : "";
+    String noFollow = link.isNoFollow(resolver) ? "rel=\"nofollow\" " : "";
     String clazz = link.getStyleClass(resolver);
 
     if (isAcronymNotLink(page, link)) {

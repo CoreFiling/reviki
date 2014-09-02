@@ -16,9 +16,11 @@
 package net.hillsdon.reviki.webtests;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 import org.xml.sax.InputSource;
+
 import junit.framework.AssertionFailedError;
 
 import com.gargoylesoftware.htmlunit.Page;
@@ -46,7 +48,10 @@ class ValidateOnContentChange extends WebWindowAdapter {
     // tomcat's default error pages.
     if (content.indexOf("<!DOCTYPE") != -1) {
       try {
-        _validator.validate(new InputSource(response.getContentAsStream()));
+        // The onchange attribute in full pages causes Rhino to blow up with VerifyErrors,
+        // so it needs to be removed before trying to validate the HTML.
+        String in = content.replace("onchange=\"this.form.submit()\"", "");
+        _validator.validate(new InputSource(new StringReader(in)));
       }
       catch (IOException e) {
         throw new RuntimeException(String.format("Failed to read XHTML5 page content: %s", e.getMessage()));
@@ -85,5 +90,4 @@ class ValidateOnContentChange extends WebWindowAdapter {
       }
     }
   }
-
 }

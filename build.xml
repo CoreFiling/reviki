@@ -266,6 +266,8 @@
       <jvmarg value="-Dfop.dir=${fop.dir}" />
       <jvmarg value="-Dfop.classpath=${fop.classpath}" />
       <jvmarg value="-Ddocbook.styledir=${docbook.styledir}" />
+      <jvmarg value="-Xss512k" />
+      <jvmarg value="-XX:ThreadStackSize=2048" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>
