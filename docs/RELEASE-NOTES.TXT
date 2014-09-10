@@ -40,6 +40,14 @@ Reviki
     [REVIKI-514]
 
 
+0.3.2 (2014-06-23)
+------------------
+
+* Fixed an issue introduced in 0.3.0 that causes excessive consumption of
+  CPU and RAM on busy servers.
+  [bug 44604]
+
+
 0.3.1 (2014-06-05)
 ------------------
 
