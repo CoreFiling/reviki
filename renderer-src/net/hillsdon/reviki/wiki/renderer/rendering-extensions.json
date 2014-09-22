@@ -132,6 +132,12 @@
     "output": "<table><tr><td><ul><li>Foo</li><li>Bar<ul><li>Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
   },
   {
+    "name":   "Table alignment",
+    "input":  "|*A|*A\n*B\n*C|\n\n<<+table-alignment: top>>\n|*A|*A\n*B\n*C|\n\n",
+    "output": "<table><tr><td><ul><li>A</li></ul></td><td><ul><li>A\n</li><li>B\n</li><li>C</li></ul></td></tr></table><table><tr><td style='vertical-align:top'><ul><li>A</li></ul></td><td style='vertical-align:top'><ul><li>A\n</li><li>B\n</li><li>C</li></ul></td></tr></table>"
+  },
+
+  {
     "name":   "No trailing punctuation in interwiki links",
     "input":  "foo:12-34.",
     "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?12-34'>foo:12-34</a>.</p>"
