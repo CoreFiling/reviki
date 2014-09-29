@@ -63,10 +63,6 @@ public class LinkParts {
     return _target.exists(linkResolutionContext);
   }
 
-  public boolean isURL() {
-    return _target.isURL();
-  }
-
   public String getStyleClass(LinkResolutionContext linkResolutionContext) {
     return _target.getStyleClass(linkResolutionContext);
   }

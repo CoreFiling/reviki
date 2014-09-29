@@ -6,8 +6,6 @@ import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public interface LinkTarget {
 
-  boolean isURL();
-  
   boolean isNoFollow(LinkResolutionContext linkResolutionContext);
 
   String getStyleClass(LinkResolutionContext linkResolutionContext);

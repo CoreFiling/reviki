@@ -30,10 +30,6 @@ public class AttachmentLinkTarget implements LinkTarget {
     return _attachment;
   }
 
-  public boolean isURL() {
-    return false;
-  }
-  
   public boolean exists(LinkResolutionContext linkResolutionContext) {
     return true;
   }

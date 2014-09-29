@@ -40,10 +40,6 @@ public class PageLinkTarget implements LinkTarget {
     return _fragment;
   }
 
-  public boolean isURL() {
-    return false;
-  }
-  
   public boolean exists(LinkResolutionContext linkResolutionContext) {
     try {
       return _wiki != null || linkResolutionContext.exists(new PageReferenceImpl(_pageName));
