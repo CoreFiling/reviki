@@ -16,27 +16,6 @@ import net.hillsdon.reviki.web.urls.SimpleWikiUrls;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public class LinkResolutionContext {
-  /**
-   * For when internal links are relative to some path, and there are no
-   * inter-wiki links.
-   */
-  public static final Function<String, LinkResolutionContext> SIMPLE_LINKS = new Function<String, LinkResolutionContext>() {
-    public LinkResolutionContext apply(String base) {
-      // Have all internal relative links start from the base
-      SimpleWikiUrls wikiUrls = SimpleWikiUrls.RELATIVE_TO.apply(base);
-      InternalLinker linker = new InternalLinker(wikiUrls);
-
-      // We know of no other wikis.
-      InterWikiLinker wikilinker = new InterWikiLinker();
-
-      // Or any pages.
-      SimplePageStore pageStore = new DummyPageStore();
-
-      // Finally, construct the resolver.
-      return new LinkResolutionContext(linker, wikilinker, pageStore);
-    }
-  };
-
   private final InternalLinker _internalLinker;
 
   private final SimplePageStore _store;
