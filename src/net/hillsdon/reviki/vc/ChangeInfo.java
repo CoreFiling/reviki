@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
+
 /**
  * Describes a change.
  * 
@@ -41,13 +43,13 @@ public class ChangeInfo {
   private final ChangeType _changeType;
   private final String _copiedFrom;
   private final long _copiedFromRevision;
-  private final PageReference _renamedTo;
+  private final PageLinkTarget _renamedTo;
   
   public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision) {
     this(page, name, user, date, revision, commitMessage, kind, changeType, copiedFrom, copiedFromRevision, null);
   }
 
-  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision, PageReference renamedTo) {
+  public ChangeInfo(final String page, final String name, final String user, final Date date, final long revision, final String commitMessage, StoreKind kind, ChangeType changeType, String copiedFrom, long copiedFromRevision, PageLinkTarget renamedTo) {
     _page = page;
     _name = name;
     _user = user;
@@ -140,7 +142,7 @@ public class ChangeInfo {
     return _copiedFromRevision;
   }
   
-  public PageReference getRenamedTo() {
+  public PageLinkTarget getRenamedTo() {
     return _renamedTo;
   }
   

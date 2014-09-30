@@ -15,7 +15,6 @@
  */
 package net.hillsdon.reviki.web.urls;
 
-import net.hillsdon.reviki.configuration.PropertiesDeploymentConfiguration;
 import net.hillsdon.reviki.vc.PageStoreException;
 
 /**

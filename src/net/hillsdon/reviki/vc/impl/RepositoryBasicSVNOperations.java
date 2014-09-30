@@ -39,6 +39,8 @@ import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
+import net.hillsdon.reviki.wiki.renderer.creole.SimplePageLinkTarget;
 
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
@@ -112,14 +114,14 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
   }
 
   @SuppressWarnings("unchecked")
-  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final LogEntryFilter logEntryFilter) {
+  private List<ChangeInfo> logEntryToChangeInfos(final String rootPath, final String loggedPath, final SVNLogEntry entry, final LogEntryFilter logEntryFilter) throws SVNException {
     final String fullLoggedPathFromAppend = SVNPathUtil.append(rootPath, loggedPath);
     final String fullLoggedPath = fixFullLoggedPath(fullLoggedPathFromAppend);
     final List<ChangeInfo> results = new LinkedList<ChangeInfo>();
     for (Map.Entry<String, SVNLogEntryPath> pathEntry : (Iterable<Map.Entry<String, SVNLogEntryPath>>) entry.getChangedPaths().entrySet()) {
       final String changedPath = pathEntry.getKey();
       if (logEntryFilter.accept(fullLoggedPath, pathEntry.getValue())) {
-        ChangeInfo change = classifiedChange(entry, rootPath, changedPath);
+        ChangeInfo change = classifiedChange(_repository, entry, rootPath, changedPath);
         // Might want to put this at a higher level if we can ever do
         // something useful with 'other' changes.
         if (change.getKind() != StoreKind.OTHER) {
@@ -170,7 +172,7 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
 
   private static final Pattern PAGE_PATH = Pattern.compile("[^/]*");
   private static final Pattern ATTACHMENT_PATH = Pattern.compile("([^/]*?)-attachments/(.*)");
-  static ChangeInfo classifiedChange(final SVNLogEntry entry, String rootPath, final String path) {
+  static ChangeInfo classifiedChange(final SVNRepository repository, final SVNLogEntry entry, String rootPath, final String path) throws SVNException {
     StoreKind kind = StoreKind.OTHER;
     // Be sure the root path ends with a slash because the 'path' will always have the slash.
     if (!rootPath.endsWith("/")) {
@@ -195,11 +197,16 @@ public class RepositoryBasicSVNOperations implements BasicSVNOperations {
     Date date = entry.getDate();
     SVNLogEntryPath logForPath = (SVNLogEntryPath) entry.getChangedPaths().get(path);
 
-    PageReference renamedTo = null;
+    PageLinkTarget renamedTo = null;
     for (Object entryPath : entry.getChangedPaths().values()) {
       SVNLogEntryPath logEntryPath = (SVNLogEntryPath) entryPath;
       if (ChangeType.forCode(logEntryPath.getType()).equals(ChangeType.ADDED) && path.equals(logEntryPath.getCopyPath())) {
-        renamedTo = new PageReferenceImpl(logEntryPath.getPath());
+        if (logEntryPath.getPath().startsWith(rootPath)) {
+          renamedTo = new SimplePageLinkTarget(null, new PageReferenceImpl(logEntryPath.getPath()).getName(), null, null);
+        }
+        else {
+          renamedTo = new SVNPathLinkTarget(repository.getRepositoryRoot(false).toString(), logEntryPath.getPath());
+        }
       }
     }
     String copiedFrom = logForPath.getCopyPath();

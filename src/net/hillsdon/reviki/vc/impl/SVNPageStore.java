@@ -57,6 +57,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.SaveException;
 import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
@@ -225,7 +226,7 @@ public class SVNPageStore extends AbstractPageStore {
       String lastChangedAuthor = null;
       Date lastChangedDate = null;
       final ChangeInfo deletingChange = getChangeThatDeleted(ref);
-      PageReference renamedTo = null;
+      PageLinkTarget renamedTo = null;
       if (deletingChange != null) {
         pseudoRevision = VersionedPageInfo.DELETED;
         lastChangedRevision = deletingChange.getRevision();

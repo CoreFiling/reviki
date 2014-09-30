@@ -41,6 +41,8 @@ import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.ApplicationUrlsImpl;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
+import net.hillsdon.reviki.wiki.renderer.FakeConfiguration;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.TaggedNode;
@@ -82,9 +84,10 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
   };
 
   protected LinkPartsHandler linkHandler, imageHandler;
+  protected PageStoreConfiguration config;
 
   @SuppressWarnings("unchecked")
-  public JsonDrivenRenderingTest(final URL url) throws JsonParseException, IOException {
+  public JsonDrivenRenderingTest(final URL url) throws Exception {
     JsonFactory jf = new JsonFactory();
     _tests = (List<Map<String, String>>) new JavaTypeMapper().read(jf.createJsonParser(url));
 
@@ -96,11 +99,10 @@ public abstract class JsonDrivenRenderingTest extends TestCase {
     WikiUrls wikiUrls = urls.get("test");
 
     InternalLinker linker = new InternalLinker(wikiUrls);
-    InterWikiLinker wikilinker = new InterWikiLinker();
-    wikilinker.addWiki("Ohana", "http://wikiohana.net/cgi-bin/wiki.pl/%s");
     PageStore store = new SimplePageStore();
 
-    LinkResolutionContext resolver = new LinkResolutionContext(linker, wikilinker, store);
+    config = new FakeConfiguration("foo", "http://www.example.com/foo/Wiki?");
+    LinkResolutionContext resolver = new LinkResolutionContext(linker, config.getInterWikiLinker(), config, store);
 
     linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, resolver);
     imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, resolver);

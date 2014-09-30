@@ -21,9 +21,9 @@ import java.util.List;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
@@ -33,20 +33,24 @@ import com.google.common.base.Supplier;
 
 public class SvnWikiRenderer implements MarkupRenderer {
 
-  private final Configuration configuration;
+  private final PageStoreConfiguration configuration;
   private final InternalLinker internalLinker;
   private final SvnWikiLinkPartHandler linkHandler;
   private final SvnWikiLinkPartHandler imageHandler;
   private final Supplier<List<Macro>> macros;
   private final PageStore pageStore;
 
-  public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
+  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
     this.configuration = configuration;
     this.internalLinker = internalLinker;
     this.linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     this.imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
     this.macros = macros;
     this.pageStore = pageStore;
+  }
+
+  public SvnWikiLinkPartHandler getLinkPartsHandler() {
+    return linkHandler;
   }
 
   public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {

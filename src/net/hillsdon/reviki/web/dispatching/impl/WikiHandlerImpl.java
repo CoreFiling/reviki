@@ -108,7 +108,7 @@ public class WikiHandlerImpl implements WikiHandler {
         request.setAttribute("internalLinker", _internalLinker);
         request.setAttribute("configuration", _configuration);
         request.setAttribute("pageStore", _cachingPageStore);
-        request.setAttribute("linkResolutionContext", new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _cachingPageStore));
+        request.setAttribute("linkResolutionContext", new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _configuration, _cachingPageStore));
         
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);

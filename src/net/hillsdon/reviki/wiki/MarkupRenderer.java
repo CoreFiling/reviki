@@ -22,6 +22,7 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 
 /**
  * Interface for something that renders wiki markup in some other format.
@@ -37,8 +38,13 @@ public interface MarkupRenderer {
     public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
       return new Raw(page.getContent());
     }
+
+    public LinkPartsHandler getLinkPartsHandler() {
+      return null;
+    }
   };
 
   ASTNode render(PageInfo page, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
 
+  LinkPartsHandler getLinkPartsHandler();
 }

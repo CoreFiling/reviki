@@ -14,10 +14,6 @@ public class ExternalLinkTarget implements LinkTarget {
     return _uri;
   }
 
-  public boolean isURL() {
-    return true;
-  }
-  
   public boolean exists(final LinkResolutionContext resolver) {
     return true;
   }

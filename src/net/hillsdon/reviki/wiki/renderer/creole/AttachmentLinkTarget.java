@@ -18,10 +18,6 @@ public class AttachmentLinkTarget implements LinkTarget {
     _attachment = attachment;
   }
 
-  public String getWiki() {
-    return _wiki;
-  }
-
   public String getPageName() {
     return _pageName;
   }
@@ -30,10 +26,6 @@ public class AttachmentLinkTarget implements LinkTarget {
     return _attachment;
   }
 
-  public boolean isURL() {
-    return false;
-  }
-  
   public boolean exists(LinkResolutionContext linkResolutionContext) {
     return true;
   }

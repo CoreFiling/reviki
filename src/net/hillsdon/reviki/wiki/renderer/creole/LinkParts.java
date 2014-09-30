@@ -33,7 +33,7 @@ public class LinkParts {
       _target = new AttachmentLinkTarget(wiki, "attachments".equals(pageName) ? null : pageName, attachment);
     }
     else {
-      _target = new PageLinkTarget(wiki, pageName, revision, fragment);
+      _target = new SimplePageLinkTarget(wiki, pageName, revision, fragment);
     }
   }
 
@@ -61,10 +61,6 @@ public class LinkParts {
   
   public boolean exists(LinkResolutionContext linkResolutionContext) {
     return _target.exists(linkResolutionContext);
-  }
-
-  public boolean isURL() {
-    return _target.isURL();
   }
 
   public String getStyleClass(LinkResolutionContext linkResolutionContext) {

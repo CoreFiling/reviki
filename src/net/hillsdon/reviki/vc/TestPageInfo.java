@@ -16,8 +16,9 @@
 package net.hillsdon.reviki.vc;
 
 import junit.framework.TestCase;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.SVNPathLinkTarget;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
+import net.hillsdon.reviki.wiki.renderer.creole.SimplePageLinkTarget;
 
 public class TestPageInfo extends TestCase {
 
@@ -32,10 +33,19 @@ public class TestPageInfo extends TestCase {
   }
   
   public void testRenamedPageNameIsRenamed() {
-    VersionedPageInfo renamed = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.RENAMED, 6, null, null, null, null, null, new PageReferenceImpl("/wiki/renamed"));
+    VersionedPageInfo renamed = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.RENAMED, 6, null, null, null, null, null, new SimplePageLinkTarget(null, "renamed", null, null));
     assertEquals(renamed.getRenamedPageName(), "renamed");
     assertTrue(renamed.isNewPage());
     assertTrue(renamed.isRenamed());
+    assertTrue(renamed.isRenamedInThisWiki());
   }
   
+  /** Can we react appropriately to renames into other wikis https://jira.int.corefiling.com/browse/REVIKI-552 */
+  public void testRenamedPageNameIsMovedToOtherWiki() {
+    VersionedPageInfo renamed = new VersionedPageInfoImpl("wiki", "name", "content", VersionedPageInfo.RENAMED, 6, null, null, null, null, null, new SVNPathLinkTarget("http://svn.example.com/svn/", "/some/path/renamed"));
+    assertEquals(renamed.getRenamedPageName(), "renamed");
+    assertTrue(renamed.isNewPage());
+    assertTrue(renamed.isRenamed());
+    assertFalse(renamed.isRenamedInThisWiki());
+  }
 }

@@ -72,6 +72,11 @@ import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
+import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
+import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
@@ -402,23 +407,30 @@ public class DefaultPageImpl implements DefaultPage {
     else {
       ASTNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
+      if (main.isRenamed()) {
+        LinkPartsHandler linkPartsHandler = _renderer.getLinkPartsHandler();
+        try {
+          request.setAttribute("renamedUrl", main.getRenamedUrl(linkPartsHandler.getContext()));
+        }
+        catch (UnknownWikiException ex) {
+          // Page was renamed to a page that doesn't exist in a configured wiki
+        }
+      }
       return new JspView("ViewPage");
     }
   }
 
+
   private String revisionText(final long revision) {
-    if (revision == -1) {
-      return "latest";
+    if (revision < 0 && revision > Integer.MIN_VALUE) {
+      switch ((int) revision) {
+        case -1: return "[latest]";
+        case -2: return "[uncommitted]";
+        case -3: return "[deleted]";
+        case -4: return "[moved]";
+      }
     }
-    else if (revision == -2) {
-      return "uncommitted";
-    }
-    else if (revision == -3) {
-      return "deleted";
-    }
-    else {
-      return "r" + revision;
-    }
+    return "r" + revision;
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {

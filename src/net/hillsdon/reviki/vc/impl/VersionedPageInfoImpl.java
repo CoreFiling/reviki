@@ -15,12 +15,15 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 /**
  * Contents at a particular revision.
@@ -41,13 +44,13 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
   private final String _lockedBy;
   private final String _lockToken;
   private final Date _lockedSince;
-  private PageReference _renamed;
+  private PageLinkTarget _renamed;
 
   public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
     this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince, new LinkedHashMap<String, String>());
   }
 
-  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, PageReference renamed) {
+  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, PageLinkTarget renamed) {
     this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince);
     _renamed = renamed;
   }
@@ -166,8 +169,16 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
   public boolean isRenamed() {
     return _revision == RENAMED;
   }
-  
+
+  public boolean isRenamedInThisWiki() {
+    return isRenamed() && _renamed.isLinkToCurrentWiki();
+  }
+
+  public String getRenamedUrl(LinkResolutionContext linkResolutionContext) throws UnknownWikiException, URISyntaxException {
+    return _renamed.getURL(linkResolutionContext);
+  }
+
   public String getRenamedPageName() {
-    return _renamed.getName();
+    return _renamed.getPageName();
   }
 }
