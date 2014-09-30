@@ -68,12 +68,17 @@
         <div class="row">
           <div class="col-sm-4">
             <div class="well">
-              <c:if test="${not empty renamedUrl}">
-                <a name="renamedTo" href="<c:url value="${renamedUrl}"/>">Renamed to ${sw:urlEncode(pageInfo.renamedPageName)}</a>
-              </c:if>
-              <c:if test="${not pageInfo.renamedInThisWiki}">
-                <p>Page has been moved outside of this wiki.</p>
-              </c:if>
+              <c:choose>
+                <c:when test="${pageInfo.renamedInThisWiki}">
+                  <a name="renamedTo" href="<c:url value="${renamedUrl}"/>">Renamed to ${sw:urlEncode(pageInfo.renamedPageName)}</a>
+                </c:when>
+                <c:otherwise>
+                  <p>Page has been moved outside of this wiki.</p>
+                  <c:if test="${not empty renamedUrl}">
+                    <p><a name="renamedTo" href="<c:url value="${renamedUrl}"/>">Moved to ${sw:urlEncode(pageInfo.renamedPageName)}</a></p>
+                  </c:if>
+                </c:otherwise>
+              </c:choose>
             </div>
           </div>
         </div>
