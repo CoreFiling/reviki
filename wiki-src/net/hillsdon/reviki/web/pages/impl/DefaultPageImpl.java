@@ -428,18 +428,15 @@ public class DefaultPageImpl implements DefaultPage {
   }
 
   private String revisionText(final long revision) {
-    if (revision == -1) {
-      return "latest";
+    if (revision < 0 && revision > Integer.MIN_VALUE) {
+      switch ((int) revision) {
+        case -1: return "[latest]";
+        case -2: return "[uncommitted]";
+        case -3: return "[deleted]";
+        case -4: return "[moved]";
+      }
     }
-    else if (revision == -2) {
-      return "uncommitted";
-    }
-    else if (revision == -3) {
-      return "deleted";
-    }
-    else {
-      return "r" + revision;
-    }
+    return "r" + revision;
   }
 
   private void addBacklinksInformation(final HttpServletRequest request, final PageReference page) throws IOException, QuerySyntaxException, PageStoreException {
