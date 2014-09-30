@@ -15,8 +15,12 @@
  */
 package net.hillsdon.reviki.vc;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Map;
+
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 
 /**
  * Contents at a particular revision.
@@ -46,7 +50,9 @@ public interface VersionedPageInfo extends PageInfo  {
   boolean isNewPage();
   boolean isDeleted();
   boolean isRenamed();
+  boolean isRenamedInThisWiki();
   String getRenamedPageName();
+  String getRenamedUrl(LinkResolutionContext linkResolutionContext) throws UnknownWikiException, URISyntaxException;
 
   VersionedPageInfo withoutLockToken();
 

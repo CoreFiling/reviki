@@ -18,14 +18,117 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
-import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.Configuration;
-import net.hillsdon.reviki.web.urls.InterWikiLinker;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-public class FakeConfiguration implements Configuration {
-  public InterWikiLinker getInterWikiLinker() throws PageStoreException {
-    InterWikiLinker linker = new InterWikiLinker();
-    linker.addWiki("foo", "http://www.example.com/foo/Wiki?%s");
-    return linker;
+import org.tmatesoft.svn.core.SVNURL;
+
+import net.hillsdon.reviki.configuration.WikiConfiguration;
+import net.hillsdon.reviki.vc.impl.SimplePageStore;
+import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
+import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
+
+public class FakeConfiguration extends PageStoreConfiguration {
+  public FakeConfiguration() {
+    this("foo", "http://www.example.com/");
+  }
+
+  public FakeConfiguration(final String wikiName, final String baseUrl) {
+    super(new SimplePageStore(), new ApplicationUrls() {
+      
+      @Override
+      public String resource(String path) {
+        return url("/resources/" + path);
+      }
+      
+      @Override
+      public String url(String relative) {
+        return baseUrl + relative;
+      }
+      
+      @Override
+      public String list() {
+        return url("/list");
+      }
+      
+      @Override
+      public Set<WikiUrls> getAvailableWikiUrls() {
+        return Collections.singleton(get(wikiName));
+      }
+      
+      @Override
+      public WikiUrls get(String name) {
+        return new WikiUrlsImpl(this, new WikiConfiguration() {
+          public void setUrl(String url) throws IllegalArgumentException {
+          }
+          
+          @Override
+          public void setSVNUser(String user) {
+          }
+          
+          @Override
+          public void setSVNPassword(String pass) {
+          }
+          
+          @Override
+          public void save() {
+          }
+          
+          @Override
+          public boolean isEditable() {
+            return false;
+          }
+          
+          @Override
+          public boolean isComplete() {
+            return false;
+          }
+          
+          @Override
+          public String getWikiName() {
+            return wikiName;
+          }
+          
+          @Override
+          public SVNURL getUrl() {
+            return null;
+          }
+          
+          @Override
+          public File getSearchIndexDirectory() {
+            return null;
+          }
+          
+          @Override
+          public String getSVNUser() {
+            return null;
+          }
+          
+          @Override
+          public String getSVNPassword() {
+            return null;
+          }
+          
+          @Override
+          public List<File> getOtherSearchIndexDirectories() {
+            return null;
+          }
+          
+          @Override
+          public String getFixedBaseUrl(String wikiName) {
+            return baseUrl;
+          }
+          
+          @Override
+          public String getFixedBaseUrl() {
+            return baseUrl;
+          }
+        });
+      }
+    });
   }
 }

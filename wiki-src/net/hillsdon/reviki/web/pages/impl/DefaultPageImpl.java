@@ -67,12 +67,17 @@ import net.hillsdon.reviki.web.handlers.StreamView;
 import net.hillsdon.reviki.web.pages.DefaultPage;
 import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
+import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.web.urls.WikiUrls;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
+import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
+import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
 import org.apache.commons.fileupload.FileItem;
@@ -409,6 +414,15 @@ public class DefaultPageImpl implements DefaultPage {
       ASTNode ast = _renderers.getDefaultRenderer().parse(main);
       String rendered = _renderers.getDefaultRenderer().render(ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
+      if (main.isRenamed()) {
+        LinkPartsHandler linkPartsHandler = _renderers.getDefaultRenderer().getLinkPartsHandler();
+        try {
+          request.setAttribute("renamedUrl", main.getRenamedUrl(linkPartsHandler.getContext()));
+        }
+        catch (UnknownWikiException ex) {
+          // Page was renamed to a page that doesn't exist in a configured wiki
+        }
+      }
       return new JspView("ViewPage");
     }
   }

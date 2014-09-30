@@ -56,6 +56,10 @@ public class PageStoreConfiguration implements Configuration {
     return linker;
   }
 
+  public ApplicationUrls getApplicationUrls() {
+    return _applicationUrls;
+  }
+
   private void addSameDeploymentInterWikiLinks(final InterWikiLinker linker) {
     for (WikiUrls urls : _applicationUrls.getAvailableWikiUrls()) {
       linker.addWiki(urls.getWikiName(), urls.interWikiTemplate());

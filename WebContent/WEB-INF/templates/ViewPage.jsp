@@ -65,11 +65,15 @@
 
     <div id="wiki-rendering">
       <c:if test="${pageInfo.renamed}">
-        <c:set var="encodedRenamedPageName" value="${sw:urlEncode(pageInfo.renamedPageName)}"/>
         <div class="row">
           <div class="col-sm-4">
             <div class="well">
-              <a name="renamedTo" href="<c:url value="${encodedRenamedPageName}"/>">Renamed to ${encodedRenamedPageName}</a>
+              <c:if test="${not empty renamedUrl}">
+                <a name="renamedTo" href="<c:url value="${renamedUrl}"/>">Renamed to ${sw:urlEncode(pageInfo.renamedPageName)}</a>
+              </c:if>
+              <c:if test="${not pageInfo.renamedInThisWiki}">
+                <p>Page has been moved outside of this wiki.</p>
+              </c:if>
             </div>
           </div>
         </div>

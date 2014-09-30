@@ -22,11 +22,11 @@ import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
@@ -47,7 +47,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
   private InterWikiLinker _interWikiLinker;
 
-  private final Configuration _configuration;
+  private final PageStoreConfiguration _configuration;
 
   public SvnWikiLinkPartHandler(final String formatString, final LinkResolutionContext parentContext) {
     _formatString = formatString;
@@ -57,7 +57,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _linkResolutionContext = parentContext;
   }
 
-  public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final Configuration configuration) {
+  public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final PageStoreConfiguration configuration) {
     _formatString = formatString;
     _internalLinker = internalLinker;
     _store = store;
@@ -75,12 +75,16 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _interWikiLinker = interWikiLinker;
   }
 
+  public PageStoreConfiguration getConfiguration () {
+    return _configuration;
+  }
+
   public LinkResolutionContext getContext() {
     if (_linkResolutionContext != null) {
       return _linkResolutionContext;
     }
     else {
-      return new LinkResolutionContext(_internalLinker, _interWikiLinker, _store);
+      return new LinkResolutionContext(_internalLinker, _interWikiLinker, _configuration, _store);
     }
   }
 
@@ -138,7 +142,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
       return _linkResolutionContext.derive(page);
     }
     else {
-      return new LinkResolutionContext(_internalLinker, interWikiLinker(), _store, page);
+      return new LinkResolutionContext(_internalLinker, interWikiLinker(), _configuration, _store, page);
     }
   }
 

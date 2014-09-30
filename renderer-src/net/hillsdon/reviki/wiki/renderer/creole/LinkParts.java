@@ -33,7 +33,7 @@ public class LinkParts {
       _target = new AttachmentLinkTarget(wiki, "attachments".equals(pageName) ? null : pageName, attachment);
     }
     else {
-      _target = new PageLinkTarget(wiki, pageName, revision, fragment);
+      _target = new SimplePageLinkTarget(wiki, pageName, revision, fragment);
     }
   }
 

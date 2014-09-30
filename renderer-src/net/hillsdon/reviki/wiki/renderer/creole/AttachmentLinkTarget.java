@@ -18,10 +18,6 @@ public class AttachmentLinkTarget implements LinkTarget {
     _attachment = attachment;
   }
 
-  public String getWiki() {
-    return _wiki;
-  }
-
   public String getPageName() {
     return _pageName;
   }

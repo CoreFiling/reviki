@@ -22,9 +22,9 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
-import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
+import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
@@ -35,7 +35,7 @@ import com.google.common.base.Supplier;
 public class SvnWikiRenderer extends MarkupRenderer<String> {
   private final RendererRegistry _registry;
 
-  public SvnWikiRenderer(final Configuration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
+  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
     final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 

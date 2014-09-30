@@ -58,4 +58,8 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
     _page = page;
     return CreoleRenderer.render(_pageStore, _page, _linkHandler, _imageHandler, _macros);
   }
+
+  public LinkPartsHandler getLinkPartsHandler() {
+    return _linkHandler;
+  }
 }

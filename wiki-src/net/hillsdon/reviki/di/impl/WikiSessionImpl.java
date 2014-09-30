@@ -133,7 +133,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     final RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
-    Configuration pageStoreConfiguration = new PageStoreConfiguration(cachingPageStore, applicationUrls);
+    PageStoreConfiguration pageStoreConfiguration = new PageStoreConfiguration(cachingPageStore, applicationUrls);
     final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
     _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
