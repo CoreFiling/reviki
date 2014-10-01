@@ -79,6 +79,7 @@ import net.hillsdon.reviki.wiki.macros.OutgoingLinksMacro;
 import net.hillsdon.reviki.wiki.macros.SearchMacro;
 import net.hillsdon.reviki.wiki.plugin.PluginsImpl;
 import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
+import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -116,6 +117,10 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     RenderedPageFactory renderedPageFactory = new RenderedPageFactory(new MarkupRenderer() {
       public ASTNode render(final PageInfo page, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
         return _renderer.render(page, urlOutputFilter);
+      }
+
+      public SvnWikiLinkPartHandler getLinkPartsHandler() {
+        return null;
       }
     });
     _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderedPageFactory));

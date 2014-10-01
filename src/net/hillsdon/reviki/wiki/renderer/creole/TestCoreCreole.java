@@ -14,7 +14,7 @@ import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import org.codehaus.jackson.JsonParseException;
 
 public class TestCoreCreole extends JsonDrivenRenderingTest {
-  public TestCoreCreole() throws JsonParseException, IOException {
+  public TestCoreCreole() throws Exception {
     super(TestCoreCreole.class.getResource("core-creole.json"));
   }
 

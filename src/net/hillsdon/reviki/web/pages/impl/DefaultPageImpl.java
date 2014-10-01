@@ -407,7 +407,7 @@ public class DefaultPageImpl implements DefaultPage {
     else {
       ASTNode rendered = _renderer.render(main, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered.toXHTML());
-      if (main.isRenamed()) {
+      if (main.isRenamed() && (_renderer.getLinkPartsHandler() != null)) {
         LinkPartsHandler linkPartsHandler = _renderer.getLinkPartsHandler();
         try {
           request.setAttribute("renamedUrl", main.getRenamedUrl(linkPartsHandler.getContext()));

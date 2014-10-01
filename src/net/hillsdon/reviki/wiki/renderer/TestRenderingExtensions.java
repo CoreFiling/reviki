@@ -33,7 +33,7 @@ import com.google.common.base.Suppliers;
 
 public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
-  public TestRenderingExtensions() throws JsonParseException, IOException {
+  public TestRenderingExtensions() throws Exception {
     super(TestRenderingExtensions.class.getResource("rendering-extensions.json"));
   }
 
