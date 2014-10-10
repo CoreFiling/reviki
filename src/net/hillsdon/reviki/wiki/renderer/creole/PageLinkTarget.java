@@ -66,6 +66,7 @@ public abstract class PageLinkTarget implements LinkTarget {
   }
 
   public String getURL(final LinkResolutionContext resolver) throws URISyntaxException, UnknownWikiException {
+    System.err.println("geURL: " + getPageName() + ", " + getRevision() + ", "+ getFragment());
     if (isDotAttachment(resolver)) {
       return new AttachmentLinkTarget(getWiki(resolver), null, getPageName()).getURL(resolver);
     }
