@@ -100,18 +100,6 @@
     "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Page?revision=1234#anchor'>name</a></p>"
   },
   {
-    "bug":    "unimplemented",
-    "name":   "Nowiki in a table header",
-    "input":  "|={{{|[[|]]}}}|",
-    "output": "<table><tr><th><pre>|[[|]]</pre></th></tr></table>"
-  },
-  {
-    "bug":    "unimplemented",
-    "name":   "Nowiki in a table cell",
-    "input":  "|{{{|[[|]]}}}|",
-    "output": "<table><tr><td><pre>|[[|]]</pre></td></tr></table>"
-  },
-  {
     "name":   "Blank named link",
     "input":  "[[|]]",
     "output": ""
