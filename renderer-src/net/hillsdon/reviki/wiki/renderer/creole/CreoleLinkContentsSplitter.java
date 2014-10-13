@@ -74,6 +74,14 @@ public class CreoleLinkContentsSplitter {
         pageName = parts[1];
       }
 
+      // Split into pageName#fragment
+      parts = pageName.split("#", 2);
+      String fragment = null;
+      if (parts.length == 2) {
+        pageName = parts[0];
+        fragment = parts[1];
+      }
+
       // Split into pageName?revision
       parts = pageName.split("\\?revision=", 2);
       String revision = null;
@@ -81,15 +89,7 @@ public class CreoleLinkContentsSplitter {
         pageName = parts[0];
         revision = parts[1];
       }
-
-      // Split into pageName#fragment
-      parts = (revision == null ? pageName : revision).split("#", 2);
-      String fragment = null;
-      if (parts.length == 2) {
-        pageName = parts[0];
-        fragment = parts[1];
-      }
-      
+ 
       // Split into pageName/attachment
       parts = pageName.split("/", 2);
       String attachment = null;

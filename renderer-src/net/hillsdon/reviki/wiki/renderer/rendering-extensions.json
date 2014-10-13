@@ -95,7 +95,6 @@
     "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Page?revision=1234'>name</a></p>"
   },
   {
-    "bug":    "REVIKI-566",
     "name":   "Link with both",
     "input":  "[[Page?revision=1234#anchor|name]]",
     "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Page?revision=1234#anchor'>name</a></p>"
