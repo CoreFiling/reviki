@@ -26,8 +26,10 @@ import java.util.Set;
 import org.tmatesoft.svn.core.SVNURL;
 
 import net.hillsdon.reviki.configuration.WikiConfiguration;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
+import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
@@ -35,6 +37,14 @@ import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 public class FakeConfiguration extends PageStoreConfiguration {
   public FakeConfiguration() {
     this("foo", "http://www.example.com/");
+  }
+
+  public InterWikiLinker getInterWikiLinker() throws PageStoreException {
+    final InterWikiLinker linker = new InterWikiLinker();
+    for (WikiUrls urls : getApplicationUrls().getAvailableWikiUrls()) {
+      linker.addWiki(urls.getWikiName(), urls.getWiki().getFixedBaseUrl() + "%s");
+    }
+    return linker;
   }
 
   public FakeConfiguration(final String wikiName, final String baseUrl) {

@@ -85,16 +85,20 @@
     "output": "<table><tr><td><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link1'>name1</a><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link2'>name2</a></td></tr></table>"
   },
   {
-    "bug":    "unimplemented",
-    "name":   "Nowiki in a table header",
-    "input":  "|={{{|[[|]]}}}|",
-    "output": "<table><tr><th><pre>|[[|]]</pre></th></tr></table>"
+    "name":   "Link with Anchor",
+    "input":  "[[link#anchor|name]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/link#anchor'>name</a></p>"
   },
   {
-    "bug":    "unimplemented",
-    "name":   "Nowiki in a table cell",
-    "input":  "|{{{|[[|]]}}}|",
-    "output": "<table><tr><td><pre>|[[|]]</pre></td></tr></table>"
+    "name":   "Link with revision",
+    "input":  "[[Page?revision=1234|name]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Page?revision=1234'>name</a></p>"
+  },
+  {
+    "bug":    "REVIKI-566",
+    "name":   "Link with both",
+    "input":  "[[Page?revision=1234#anchor|name]]",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/Page?revision=1234#anchor'>name</a></p>"
   },
   {
     "name":   "Blank named link",
@@ -134,9 +138,8 @@
   {
     "name":   "Table alignment",
     "input":  "|*A|*A\n*B\n*C|\n\n<<+table-alignment: top>>\n|*A|*A\n*B\n*C|\n\n",
-    "output": "<table><tr><td><ul><li>A</li></ul></td><td><ul><li>A\n</li><li>B\n</li><li>C</li></ul></td></tr></table><table><tr><td style='vertical-align:top'><ul><li>A</li></ul></td><td style='vertical-align:top'><ul><li>A\n</li><li>B\n</li><li>C</li></ul></td></tr></table>"
+    "output": "<table><tr><td><ul><li>A</li></ul></td><td><ul><li>A</li><li>B</li><li>C</li></ul></td></tr></table><table><tr><td style='vertical-align:top'><ul><li>A</li></ul></td><td style='vertical-align:top'><ul><li>A</li><li>B</li><li>C</li></ul></td></tr></table>"
   },
-
   {
     "name":   "No trailing punctuation in interwiki links",
     "input":  "foo:12-34.",

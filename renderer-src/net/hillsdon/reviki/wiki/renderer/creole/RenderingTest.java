@@ -21,11 +21,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.vc.impl.DummyPageStore;
-import net.hillsdon.reviki.web.urls.InterWikiLinker;
+import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.SimpleWikiUrls;
+import net.hillsdon.reviki.wiki.renderer.SimpleFakeConfiguration;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Supplier;
@@ -37,6 +39,19 @@ public abstract class RenderingTest extends TestCase {
   protected LinkPartsHandler linkHandler, imageHandler;
 
   protected Supplier<List<Macro>> macros;
+
+  protected LinkResolutionContext makeResolver(final SimpleWikiUrls wikiUrls) {
+    Configuration config = new SimpleFakeConfiguration("foo", "http://www.example.com/foo/Wiki?");
+    InternalLinker linker = new InternalLinker(wikiUrls);
+    pageStore = new DummyPageStore();
+
+    try {
+      return new LinkResolutionContext(linker, config.getInterWikiLinker(), config, pageStore);
+    }
+    catch (PageStoreException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
   public RenderingTest() {
     SimpleWikiUrls wikiUrls = new SimpleWikiUrls() {
@@ -59,13 +74,7 @@ public abstract class RenderingTest extends TestCase {
       }
     };
 
-    InternalLinker linker = new InternalLinker(wikiUrls);
-    InterWikiLinker wikilinker = new InterWikiLinker();
-    wikilinker.addWiki("foo", "http://www.example.com/foo/Wiki?%s");
-    pageStore = new DummyPageStore();
-
-    LinkResolutionContext resolver = new LinkResolutionContext(linker, wikilinker, pageStore);
-
+    LinkResolutionContext resolver =  makeResolver(wikiUrls);
     linkHandler = new SimpleAnchors(resolver);
     imageHandler = new SimpleImages(resolver);
     macros = Suppliers.ofInstance((List<Macro>) new LinkedList<Macro>());
