@@ -1,7 +1,7 @@
 Reviki
 
                               Version History
-0.4.0 (2014-09-02)
+0.4.0 (2014-10-14)
 ------------------
 
 * Improvements to the wiki markup parser [REVIKI-388]:
