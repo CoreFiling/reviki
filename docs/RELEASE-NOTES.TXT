@@ -1,7 +1,7 @@
 Reviki
 
                               Version History
-0.4.0 (2014-09-02)
+0.4.0 (2014-10-14)
 ------------------
 
 * Improvements to the wiki markup parser [REVIKI-388]:
@@ -38,6 +38,10 @@ Reviki
 
   + mailto: links are now supported.
     [REVIKI-514]
+
+* Fix and improve the information provided provided when viewing pages that
+  have been moved outside the wiki's Subversion location.
+  [REVIKI-552, REVIKI-553]
 
 
 0.3.2 (2014-06-23)
