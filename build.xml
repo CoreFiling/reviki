@@ -59,6 +59,7 @@
   </path>    
 
   <target name="init">
+     <tstamp/>
      <get src="${vnu-url}" dest="lib/vnu.jar" usetimestamp="true" />
 
      <mkdir dir="${build-wiki}" />
@@ -155,11 +156,17 @@
   </target>
 
   <target name="renderer-jar" depends="compile-renderer">
-    <jar destfile="${rendererJar}">
+    <!-- Create the manifest -->
+    <manifest file="MANIFEST.MF">
+      <attribute name="Built-By" value="${user.name}"/>
+      <attribute name="Implementation-Version" value="${version}.${buildNumber} ${TODAY}"/>
+    </manifest>
+    <jar destfile="${rendererJar}" manifest="MANIFEST.MF">
       <fileset dir="${build-renderer}">
          <include name="**/*.class"/>
       </fileset>
     </jar>
+    <delete file="MANIFEST.MF"/>
   </target>
 
   <target name="functional-tests-compile" depends="compile">
