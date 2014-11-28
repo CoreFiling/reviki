@@ -162,12 +162,12 @@ Rule : LINE '---' '-'+ {breakOut();} ;
 
 /* ***** Tables ***** */
 
-TdStartLn : LINE '|'+  {intr=true; setType(TdStart);} ;
-ThStartLn : LINE '|'+ '=' {intr=true; setType(ThStart);} ;
+TdStartLn : LINE '|'  {intr=true; setType(TdStart);} ;
+ThStartLn : LINE '|' '=' {intr=true; setType(ThStart);} ;
 
 RowEnd  : '|' WS? LineBreak {intr}? {breakOut();} ;
-TdStart : '|'+  {intr}? {breakOut(); intr=true;} ;
-ThStart : '|'+ '=' {intr}? {breakOut(); intr=true;} ;
+TdStart : '|'  {intr}? {breakOut(); intr=true;} ;
+ThStart : '|' '=' {intr}? {breakOut(); intr=true;} ;
 
 /* ***** Inline Formatting ***** */
 
