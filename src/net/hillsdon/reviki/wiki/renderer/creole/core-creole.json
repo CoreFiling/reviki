@@ -130,6 +130,11 @@
     "output": "<table><tr><td> A </td><td> B </td></tr><tr><td> <em>C</em> </td><td> <strong>D</strong> <br /> E </td></tr></table>"
   },
   {
+    "name":   "Tables issue REVIKI-573",
+    "input":  "|A|B|\n|C||\n|D|E|",
+    "output": "<table><tr><td>A</td><td>B</td></tr><tr><td>C</td><td></td></tr><tr><td>D</td><td>E</td></tr></table>"
+  },
+  {
     "name":   "Raw URL",
     "input":  "http://example.com/examplepage",
     "output": "<p><a class='external' href='http://example.com/examplepage'>http://example.com/examplepage</a></p>"

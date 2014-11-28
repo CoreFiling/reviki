@@ -85,7 +85,7 @@ table      : (trow (RowEnd | LineBreak))* trow (RowEnd | LineBreak)? ;
 trow       : tcell+ ;
 tcell      : th | td ;
 th         : ThStart inline? ;
-td         : TdStart inTable+ ;
+td         : TdStart inTable* ;
 
 inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 
