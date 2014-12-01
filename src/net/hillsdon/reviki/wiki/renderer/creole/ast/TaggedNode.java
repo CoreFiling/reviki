@@ -18,6 +18,11 @@ public abstract class TaggedNode extends ASTNode {
   public static final String CSS_CLASS_ATTR = "class='wiki-content'";
 
   /**
+   * Do we allow self closing tags?
+   */
+  protected boolean _selfClosing = true;
+
+  /**
    * The XHTML tag.
    */
   private final String _tag;
@@ -66,7 +71,7 @@ public abstract class TaggedNode extends ASTNode {
     String inner = innerXHTML(enabledDirectives);
 
     // Render the tag
-    if (inner.equals("")) {
+    if (_selfClosing && "".equals(inner)) {
       return "<" + tag() + " " + CSS_CLASS_ATTR + " />";
     }
     else {

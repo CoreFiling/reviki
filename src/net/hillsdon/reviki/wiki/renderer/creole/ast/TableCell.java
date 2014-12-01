@@ -9,6 +9,7 @@ public class TableCell extends TaggedNode {
 
     _isBlock = true;
     _canContainBlock = true;
+    _selfClosing = false;
   }
 
   @Override
