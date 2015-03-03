@@ -40,30 +40,10 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
     HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
-    DocbookRenderer docbook = new DocbookRenderer(pageStore, linkHandler, imageHandler, macros);
     RawRenderer raw = new RawRenderer();
-    DocxRenderer docx = new DocxRenderer(pageStore, linkHandler, imageHandler, macros);
 
     _registry = new RendererRegistry(html);
-    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCBOOK, docbook);
     _registry.addRenderer(ViewTypeConstants.CTYPE_RAW, raw);
-    _registry.addRenderer(ViewTypeConstants.CTYPE_DOCX, docx);
-
-    // XSL-FO renderers need an exploded war to use FOP. If that's not the case, don't add them.
-    try {
-      XSLFORenderer xslfo = new XSLFORenderer(docbook);
-      XSLFORenderer rtf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.RTF);
-      XSLFORenderer pdf = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PDF);
-      XSLFORenderer ps = new XSLFORenderer(docbook, XSLFORenderer.FoOutput.PS);
-
-      _registry.addRenderer(ViewTypeConstants.CTYPE_PDF, pdf);
-      _registry.addRenderer(ViewTypeConstants.CTYPE_PS, ps);
-      _registry.addRenderer(ViewTypeConstants.CTYPE_XSLFO, xslfo);
-      _registry.addRenderer(ViewTypeConstants.CTYPE_RTF, rtf);
-    }
-    catch (Exception e) {
-      System.err.println("Could not instantiate XSLFO renderers: " + e);
-    }
   }
 
   /**

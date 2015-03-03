@@ -40,23 +40,6 @@
 	      <a name="history" href="<c:url value="${encodedPageName}?history"/>">History</a>
 	    </li>
     </c:if>
-
-    <li class="menu ctypes">
-      <form action="<c:url value="${encodedPageName}"/>" method="get">
-        <select name="ctype" onchange="this.form.submit()">
-          <c:forEach items="${contentTypes}" var="ctype">
-            <c:choose>
-              <c:when test="${ctype eq 'default'}">
-                <option value="${ctype}" selected="selected">${ctype}</option>
-              </c:when>
-              <c:otherwise>
-                <option value="${ctype}">${ctype}</option>
-              </c:otherwise>
-            </c:choose>
-          </c:forEach>
-        </select>
-      </form>
-    </li>
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="sidebar" style="float:right">

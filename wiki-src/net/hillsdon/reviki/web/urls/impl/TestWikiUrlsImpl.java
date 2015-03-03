@@ -18,8 +18,6 @@ package net.hillsdon.reviki.web.urls.impl;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
-
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 

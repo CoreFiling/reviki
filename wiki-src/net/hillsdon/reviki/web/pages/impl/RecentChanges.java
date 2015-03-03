@@ -35,7 +35,6 @@ import net.hillsdon.reviki.web.common.RequestParameterReaders;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.pages.DefaultPage;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 

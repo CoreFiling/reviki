@@ -5,12 +5,3 @@ wiki.password=password1
 wiki.altusername=user2
 wiki.altpassword=password2
 wiki.svn=http\://localhost/svn/
-
-# This is where to find the Apache FOP jar.
-fop.dir=/usr/local/bin
-
-# This is the classpath to use for Apache FOP.
-fop.classpath=/usr/local/lib/fop/
-
-# This is the base directory of the Docbook roundtrip stylesheets.
-docbook.styledir=/usr/share/sgml/docbook/xsl-stylesheets-1.78.1/

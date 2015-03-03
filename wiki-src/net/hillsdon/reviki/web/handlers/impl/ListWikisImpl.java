@@ -31,7 +31,6 @@ import net.hillsdon.reviki.web.common.JspView;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.handlers.ListWikis;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 
 public class ListWikisImpl implements ListWikis {

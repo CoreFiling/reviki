@@ -69,14 +69,11 @@ import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.redirect.RedirectToPageView;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
-import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
-import net.hillsdon.reviki.wiki.renderer.SvnWikiLinkPartHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 

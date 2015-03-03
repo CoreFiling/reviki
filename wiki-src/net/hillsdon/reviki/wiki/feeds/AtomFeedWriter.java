@@ -31,7 +31,6 @@ import javax.xml.transform.stream.StreamResult;
 import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.StoreKind;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 
 import org.xml.sax.Attributes;

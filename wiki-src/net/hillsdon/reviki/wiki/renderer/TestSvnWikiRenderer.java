@@ -1,16 +1,11 @@
 package net.hillsdon.reviki.wiki.renderer;
 
-import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashSet;
-
 import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.impl.SimplePageStore;
-import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.impl.ExampleDotComWikiUrls;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 import junit.framework.TestCase;
 
@@ -38,28 +33,4 @@ public class TestSvnWikiRenderer extends TestCase {
   public void testGetDefault() {
     assertNotNull(_renderers.getDefaultRenderer());
   }
-
-  /**
-   * Test that we can retrieve a renderer for every (visible) ctype (other than
-   * DEFAULT), and they're all different.
-   */
-  public void testCtypeRenderers() {
-    HashSet<MarkupRenderer<InputStream>> seen = new HashSet<MarkupRenderer<InputStream>>();
-
-    for (String ctype : ViewTypeConstants.CTYPES) {
-      if (ctype.equals(ViewTypeConstants.CTYPE_DEFAULT)) {
-        continue;
-      }
-
-      assertTrue("Missing renderer for " + ctype, _renderers.hasRenderer(ctype));
-
-      MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctype);
-      assertNotNull("Null renderer for " + ctype, renderer);
-
-      assertFalse("Duplicate renderer for " + ctype, seen.contains(renderer));
-
-      seen.add(renderer);
-    }
-  }
-
 }
