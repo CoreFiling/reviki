@@ -24,7 +24,6 @@ import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.urls.ApplicationUrls;
-import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.WikiUrlsImpl;
 

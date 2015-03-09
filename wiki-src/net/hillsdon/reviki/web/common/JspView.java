@@ -47,8 +47,6 @@ public class JspView implements View {
       request.setAttribute(ATTR_CSS_URL, request.getContextPath() + "/resources/default-style.css");
     }
 
-    request.setAttribute("contentTypes", ViewTypeConstants.CTYPES);
-
     request.getRequestDispatcher("/WEB-INF/templates/" + _name + ".jsp").include(request, response);
   }
 

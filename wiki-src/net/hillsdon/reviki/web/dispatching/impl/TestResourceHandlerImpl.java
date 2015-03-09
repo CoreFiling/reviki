@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 public class TestResourceHandlerImpl extends TestCase {
 
   private MockHttpServletRequest _request;
-  private ApplicationUrlsImpl _urls;
   private DeploymentConfiguration _deploymentConfiguration;
   private ResourceHandlerImpl _handler;
   private HttpServletResponse _response;
@@ -28,7 +27,7 @@ public class TestResourceHandlerImpl extends TestCase {
     _request.setRequestURI("/reviki/some/page");
     
     _response = null;
-    _urls = new ApplicationUrlsImpl(_request, _deploymentConfiguration);
+    new ApplicationUrlsImpl(_request, _deploymentConfiguration);
     _handler = new ResourceHandlerImpl();
   }
 

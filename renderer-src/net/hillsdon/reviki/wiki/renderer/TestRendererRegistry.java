@@ -43,8 +43,8 @@ public class TestRendererRegistry extends TestCase {
    * Test that we can insert and retrieve renderers.
    */
   public void testRetrieve() {
-    MarkupRenderer<InputStream> renderer = new XSLFORenderer(null);
-    String ctype = "xslfo";
+    MarkupRenderer<InputStream> renderer = new RawRenderer();
+    String ctype = "raw";
 
     assertFalse(_registry.hasRenderer(ctype));
     _registry.addRenderer(ctype, renderer);
