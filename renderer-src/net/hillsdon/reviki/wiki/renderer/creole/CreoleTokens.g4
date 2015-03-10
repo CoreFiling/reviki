@@ -18,6 +18,13 @@ options { superClass=ContextSensitiveLexer; }
     return com.google.common.collect.ImmutableList.of(bold, italic, strike);
   }
 
+  public boolean jiraStyleLinks = false;
+
+  public CreoleTokens(CharStream input, boolean jiraStyleLinks) {
+    this(input);
+    this.jiraStyleLinks = jiraStyleLinks;
+  }
+
   public boolean inHeader = false;
   public boolean start = false;
   public int listLevel = 0;
@@ -187,6 +194,7 @@ StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
 AnSt  : '[[#' -> mode(ANCHOR) ;
+RLiSt : {jiraStyleLinks}? '[' -> mode(RLINK) ;
 
 /* ***** Breaks ***** */
 
@@ -257,12 +265,26 @@ Sep : ' '* '|'+ ' '* -> mode(LINK_END);
 
 InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
+mode RLINK;
+
+RLiEnd : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+RSep : ' '* '|'+ ' '* -> mode(RLINK_END);
+
+RInLink : (~('|'|'\r'|'\n'|']'))+ ;
+
 mode LINK_END;
 
 InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
 LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+mode RLINK_END;
+
+RInLinkEnd : (~('\r'|'\n'|']'))+ ;
+
+RLiEnd2 : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 mode ANCHOR;
 

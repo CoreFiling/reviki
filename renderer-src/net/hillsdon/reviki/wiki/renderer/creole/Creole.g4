@@ -103,6 +103,7 @@ inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | simpleimg | imglink | wikiwlink | attachment | rawlink
+           | rlink | rtitlelink
            | anchor
            | inlinecode | preformat
            | linebreak
@@ -118,7 +119,11 @@ sthrough   : SSt inline? SEnd ;
 
 link       : LiSt InLink LiEnd ;
 
+rlink      : RLiSt RInLink? RLiEnd;
+
 titlelink  : LiSt InLink? Sep InLinkEnd LiEnd2 ;
+
+rtitlelink : RLiSt RInLink? RSep RInLinkEnd? RLiEnd2;
 
 imglink    : ImSt InLink? Sep InLinkEnd ImEnd2 ;
 
