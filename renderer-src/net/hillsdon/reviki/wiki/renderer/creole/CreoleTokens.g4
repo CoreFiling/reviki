@@ -208,7 +208,7 @@ WikiWords : (UPPER (ABBR | CAMEL) REVISION? | INTERWIKI IWTARGET+) NOTALNUM {pri
 
 fragment IWTARGET  : ALNUM (('.' | '-') ALNUM)? ;
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
-fragment ABBR      : UPPER UPPER+ ;
+fragment ABBR      : UPPER (UPNUM | ('-' UPNUM))+ ;
 fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UPNUM+) ;
 fragment REVISION  : '?revision=' DIGIT+ ;
 

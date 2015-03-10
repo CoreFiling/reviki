@@ -104,6 +104,9 @@ public class TestWikiWordUtils extends TestCase {
   public void testIsAcronym() {
     assertTrue(WikiWordUtils.isAcronym("TLA"));
     assertTrue(WikiWordUtils.isAcronym("TLAs"));
+    assertTrue(WikiWordUtils.isAcronym("FOO-1"));
+    assertTrue(WikiWordUtils.isAcronym("FOO-1-BAR-BAZ"));
+    assertFalse(WikiWordUtils.isAcronym("FOO--1"));
     assertFalse(WikiWordUtils.isAcronym("TLAss"));
   }
 
