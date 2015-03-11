@@ -18,6 +18,13 @@ options { superClass=ContextSensitiveLexer; }
     return com.google.common.collect.ImmutableList.of(bold, italic, strike);
   }
 
+  public boolean jiraStyleLinks = false;
+
+  public CreoleTokens(CharStream input, boolean jiraStyleLinks) {
+    this(input);
+    this.jiraStyleLinks = jiraStyleLinks;
+  }
+
   public boolean inHeader = false;
   public boolean start = false;
   public int listLevel = 0;
@@ -187,6 +194,7 @@ StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
 AnSt  : '[[#' -> mode(ANCHOR) ;
+JIRALiSt : {jiraStyleLinks}? '[' -> mode(JIRALINK) ;
 
 /* ***** Breaks ***** */
 
@@ -208,7 +216,7 @@ WikiWords : (UPPER (ABBR | CAMEL) REVISION? | INTERWIKI IWTARGET+) NOTALNUM {pri
 
 fragment IWTARGET  : ALNUM (('.' | '-') ALNUM)? ;
 fragment INTERWIKI : ALPHA ALNUM+ ':' ;
-fragment ABBR      : UPPER UPPER+ ;
+fragment ABBR      : UPPER (UPNUM | ('-' UPNUM))+ ;
 fragment CAMEL     : (LOWNUM* UPNUM ALNUM* LOWER ALNUM* | ALNUM* LOWER ALNUM* UPNUM+) ;
 fragment REVISION  : '?revision=' DIGIT+ ;
 
@@ -257,12 +265,26 @@ Sep : ' '* '|'+ ' '* -> mode(LINK_END);
 
 InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
+mode JIRALINK;
+
+JIRALiEnd : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+JIRASep : ' '* '|'+ ' '* -> mode(JIRALINK_END);
+
+JIRAInLink : (~('|'|'\r'|'\n'|']'))+ ;
+
 mode LINK_END;
 
 InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
 LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+
+mode JIRALINK_END;
+
+JIRAInLinkEnd : (~('\r'|'\n'|']'))+ ;
+
+JIRALiEnd2 : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 mode ANCHOR;
 

@@ -129,7 +129,8 @@ public final class WikiWordUtils {
   }
 
   public static boolean isAcronym(final String pageName) {
-    return pageName != null && pageName.matches("\\p{Lu}+s?");
+    // The acronym regex should be kept in sync with the ABBR rule in the lexer
+    return pageName != null && pageName.matches("\\p{Lu}([\\p{Lu}\\d]|(-[\\p{Lu}\\d]))+s?");
   }
 
 }

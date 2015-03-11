@@ -66,8 +66,8 @@ public class CreoleRenderer {
    * @param reset Whether to reset the expansion limit or not.
    * @return The AST of the page, after macro expansion.
    */
-  private static ASTNode renderInternal(final ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros, final boolean reset) {
-    CreoleTokens lexer = new CreoleTokens(in);
+  private static ASTNode renderInternal(final ANTLRInputStream in, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros, final CreoleTokens lexer, final boolean reset) {
+    lexer.setInputStream(in);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Creole parser = new Creole(tokens);
 
@@ -138,6 +138,18 @@ public class CreoleRenderer {
    * @return The AST of the page, after macro application.
    */
   public static ASTNode renderWithVisitor(final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
+    return renderWithLexer(visitor, new CreoleTokens(null), macros);
+  }
+
+  /**
+   * Render a wiki page.
+   *
+   * @param visitor The AST builder.
+   * @param lexer The CreoleLexer used to tokenize.
+   * @param macros List of macros to apply.
+   * @return The AST of the page, after macro application.
+   */
+  public static ASTNode renderWithLexer(final CreoleASTBuilder visitor, final CreoleTokens lexer, final Supplier<List<Macro>> macros) {
     String contents = visitor.page().getContent();
 
     // The grammar and lexer assume they'll not hit an EOF after various things,
@@ -146,7 +158,7 @@ public class CreoleRenderer {
       contents += "\n";
     }
 
-    return renderInternal(new ANTLRInputStream(contents), visitor, macros, true);
+    return renderInternal(new ANTLRInputStream(contents), visitor, macros, lexer, true);
   }
 
   /**
@@ -174,6 +186,6 @@ public class CreoleRenderer {
    * @return The AST of the page, after macro expansion.
    */
   public static ASTNode renderPartWithVisitor(final String content, final CreoleASTBuilder visitor, final Supplier<List<Macro>> macros) {
-    return renderInternal(new ANTLRInputStream(content), visitor, macros, false);
+    return renderInternal(new ANTLRInputStream(content), visitor, macros, new CreoleTokens(null), false);
   }
 }

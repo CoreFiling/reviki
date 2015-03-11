@@ -194,12 +194,31 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render JIRA style links with no title.
+   */
+  @Override
+  public ASTNode visitJiralink(final JiralinkContext ctx) {
+    String target = (ctx.JIRAInLink() == null) ? "" : ctx.JIRAInLink().getText();
+    return new Link(target, target, page(), linkHandler());
+  }
+
+  /**
    * Render a link node with a title.
    */
   @Override
   public ASTNode visitTitlelink(final TitlelinkContext ctx) {
     String target = (ctx.InLink() == null) ? "" : ctx.InLink().getText();
     String title = (ctx.InLinkEnd() == null) ? target : ctx.InLinkEnd().getText();
+    return new Link(target, title, page(), linkHandler());
+  }
+
+  /**
+   * Render JIRA style link nodes with a title.
+   */
+  @Override
+  public ASTNode visitJiratitlelink(final JiratitlelinkContext ctx) {
+    String target = (ctx.JIRAInLinkEnd() == null) ? "" : ctx.JIRAInLinkEnd().getText();
+    String title = (ctx.JIRAInLink() == null) ? target : ctx.JIRAInLink().getText();
     return new Link(target, title, page(), linkHandler());
   }
 

@@ -193,6 +193,8 @@
 
   <target name="unit-tests" depends="compile" description="Run the unit tests">
     <junit printsummary="yes" fork="true" forkmode="once" haltonfailure="yes">
+      <jvmarg value="-Xss512k" />
+      <jvmarg value="-XX:ThreadStackSize=2048" />
       <formatter type="plain" usefile="false"/>
       <classpath>
         <path refid="classpath"/>

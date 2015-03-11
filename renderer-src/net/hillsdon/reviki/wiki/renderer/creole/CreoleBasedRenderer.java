@@ -54,9 +54,16 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
   }
 
   @Override
-  public final ASTNode parse(final PageInfo page) {
+  public ASTNode parse(final PageInfo page) {
     _page = page;
-    return CreoleRenderer.render(_pageStore, _page, _linkHandler, _imageHandler, _macros);
+    return CreoleRenderer.renderWithVisitor(getVisitor(_page), _macros);
+  }
+
+  /**
+   * Return the Parse tree visitor to be used to render markup
+   */
+  public CreoleASTBuilder getVisitor(final PageInfo page) {
+    return new Visitor(_pageStore, page, _linkHandler, _imageHandler);
   }
 
   public LinkPartsHandler getLinkPartsHandler() {

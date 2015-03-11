@@ -103,6 +103,7 @@ inline     : inlinestep+ ;
 
 inlinestep : bold | italic | sthrough
            | link | titlelink | simpleimg | imglink | wikiwlink | attachment | rawlink
+           | jiralink | jiratitlelink
            | anchor
            | inlinecode | preformat
            | linebreak
@@ -118,7 +119,11 @@ sthrough   : SSt inline? SEnd ;
 
 link       : LiSt InLink LiEnd ;
 
+jiralink   : JIRALiSt JIRAInLink? JIRALiEnd;
+
 titlelink  : LiSt InLink? Sep InLinkEnd LiEnd2 ;
+
+jiratitlelink : JIRALiSt JIRAInLink? JIRASep JIRAInLinkEnd? JIRALiEnd2;
 
 imglink    : ImSt InLink? Sep InLinkEnd ImEnd2 ;
 

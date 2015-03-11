@@ -5,6 +5,21 @@
     "output": "<p><a class='inter-wiki' href='http://www.example.com/foo/Wiki?1234'>foo:1234</a></p>"
   },
   {
+    "name":   "Plain WikiWord",
+    "input":  "WikiWord",
+    "output": "<p><a rel='nofollow' class='new-page' href='http://www.example.com/reviki/pages/test-wiki/WikiWord'>WikiWord</a></p>"
+  },
+  {
+    "name":   "Abbrieviation - page doesn't exist",
+    "input":  "ABC",
+    "output": "<p>ABC</p>"
+  },
+  {
+    "name":   "Abbrieviation with hyphen - page doesn't exist",
+    "input":  "ABC-123",
+    "output": "<p>ABC-123</p>"
+  },
+  {
     "name":   "Raw HTML",
     "input":  "[<html>]\n<div class='unusual'></div>\n[</html>]",
     "output": "\n<div class='unusual'></div>\n"
