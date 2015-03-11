@@ -194,7 +194,7 @@ StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
 LiSt  : '[[' -> mode(LINK) ;
 ImSt  : '{{' -> mode(LINK) ;
 AnSt  : '[[#' -> mode(ANCHOR) ;
-RLiSt : {jiraStyleLinks}? '[' -> mode(RLINK) ;
+JIRALiSt : {jiraStyleLinks}? '[' -> mode(JIRALINK) ;
 
 /* ***** Breaks ***** */
 
@@ -265,13 +265,13 @@ Sep : ' '* '|'+ ' '* -> mode(LINK_END);
 
 InLink : (~('|'|'\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 
-mode RLINK;
+mode JIRALINK;
 
-RLiEnd : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+JIRALiEnd : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
-RSep : ' '* '|'+ ' '* -> mode(RLINK_END);
+JIRASep : ' '* '|'+ ' '* -> mode(JIRALINK_END);
 
-RInLink : (~('|'|'\r'|'\n'|']'))+ ;
+JIRAInLink : (~('|'|'\r'|'\n'|']'))+ ;
 
 mode LINK_END;
 
@@ -280,11 +280,11 @@ InLinkEnd : (~('\r'|'\n'|']'|'}') | (']' ~']' | '}' ~'}'))+ {doLinkEnd();} ;
 LiEnd2 : (']]' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 ImEnd2 : ('}}' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
-mode RLINK_END;
+mode JIRALINK_END;
 
-RInLinkEnd : (~('\r'|'\n'|']'))+ ;
+JIRAInLinkEnd : (~('\r'|'\n'|']'))+ ;
 
-RLiEnd2 : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
+JIRALiEnd2 : (']' | '\r'? '\n') -> mode(DEFAULT_MODE) ;
 
 mode ANCHOR;
 
