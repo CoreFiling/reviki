@@ -22,6 +22,7 @@ block     : heading
           | hrule
           | table
           | code | nowiki
+          | terseblockquote
           | blockquote
           | directive
           | paragraph
@@ -90,6 +91,8 @@ td         : TdStart inTable* ;
 inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 
 nowiki     : NoWiki EndNoWikiBlock ;
+
+terseblockquote : TerseBlockquote creole TerseBlockquote ;
 
 blockquote : BlockquoteSt creole BlockquoteEnd ;
 

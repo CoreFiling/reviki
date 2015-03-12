@@ -232,6 +232,8 @@ DirectiveDisable : '<<-' -> mode(MACRO) ;
 BlockquoteSt  : '[<blockquote>]' ;
 BlockquoteEnd : '[</blockquote>]' ;
 
+TerseBlockquote : '"""' ;
+
 /* ***** Miscellaneous ***** */
 
 Any : ALNUM+ | . ;

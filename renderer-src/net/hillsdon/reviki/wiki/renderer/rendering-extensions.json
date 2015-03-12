@@ -145,6 +145,21 @@
     "output": "<blockquote><p>Quoted text</p></blockquote>"
   },
   {
+    "name":   "Terse Blockquotes",
+    "input":  "\"\"\"Quoted text\"\"\"",
+    "output": "<blockquote><p>Quoted text</p></blockquote>"
+  },
+  {
+    "name":   "Terse Blockquotes subcreole",
+    "input":  "\"\"\"Quoted **text**\"\"\"",
+    "output": "<blockquote><p>Quoted <strong>text</strong></p></blockquote>"
+  },
+  {
+    "name":   "Terse Blockquotes context",
+    "input":  "preparagraph \"\"\"Quoted text\"\"\" postparagraph",
+    "output": "<p>preparagraph</p><blockquote><p>Quoted text</p></blockquote><p>postparagraph</p>"
+  },
+  {
     "name":   "Formatting inside tables",
     "input":  "|* Foo\n* Bar\n** Baz|world|{{{look\nsome\ncode}}}|\n|=Table|=header|=cells|",
     "output": "<table><tr><td><ul><li>Foo</li><li>Bar<ul><li>Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
