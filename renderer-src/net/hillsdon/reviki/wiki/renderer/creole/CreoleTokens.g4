@@ -217,6 +217,10 @@ fragment CODETAGTYPEHTML : CODETAGTYPE | 'html';
 CodeTagStart  : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
 HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
+/* ***** Code formatting ***** */
+
+CodeStart : START '```' .*? LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+
 /* ***** Links ***** */
 
 LiSt  : '[[' -> mode(LINK) ;
@@ -357,8 +361,7 @@ mode NOWIKI_END;
 
 EndNoWiki : '}}}' -> mode(DEFAULT_MODE) ;
 
-
-// ***** CodeTag (old style)
+// ***** CodeTag
 
 mode CODETAG_INLINE;
 
@@ -386,6 +389,16 @@ HtmlInlineAny : INLINE*? '[</html>]' {doEndCodeTag();} ;
 mode HTML_BLOCK;
 
 HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
+
+// ***** Code
+
+mode CODE_BLOCK;
+
+CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
+
+mode CODE_BLOCK_END;
+
+CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;

@@ -253,7 +253,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodetag(final InlinecodetagContext ctx) {
-    return new InlineCode(ctx.CodeTagInlineAny().getText(), Languages.valueOf(findLanguageType(ctx.CodeTagStart())));
+    return new InlineCode(ctx.CodeTagInlineAny().getText(), findLanguageType(ctx.CodeTagStart()));
   }
 
   /**
@@ -442,7 +442,15 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCodetag(final CodetagContext ctx) {
-    return new Code(ctx.CodeTagAny().getText(), Languages.valueOf(findLanguageType(ctx.CodeTagStart())));
+    return new Code(ctx.CodeTagAny().getText(), findLanguageType(ctx.CodeTagStart()));
+  }
+
+  /**
+   * Render a codeblock.
+   */
+  @Override
+  public ASTNode visitCodeblock(final CodeblockContext ctx) {
+    return new Code(ctx.CodeAny().getText(), findLanguageType(ctx.CodeStart()));
   }
 
   /**
