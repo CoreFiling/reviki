@@ -220,11 +220,10 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   }
 
   /**
-   * Find the code type from a CodeStart token
+   * Find the language type from a CodeStart token
    */
-  protected String findCodeType(final TerminalNode node) {
-    String res = node.getText();
-    return res.substring(2, res.length() - 2).toUpperCase().replace("+", "PLUS");
+  protected String findLanguageType(final TerminalNode node) {
+    return node.getText().toUpperCase().replace("+", "PLUS");
   }
 
   /**

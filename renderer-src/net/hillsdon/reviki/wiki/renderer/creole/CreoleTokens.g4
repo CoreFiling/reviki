@@ -88,6 +88,7 @@ options { superClass=ContextSensitiveLexer; }
     String start = "[<";
     String end = ">]";
     codeType = tag.substring(start.length(), tag.length() - end.length());
+    setText(codeType);
     mode(toMode);
   }
   
