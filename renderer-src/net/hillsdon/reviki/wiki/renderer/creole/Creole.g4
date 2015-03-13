@@ -151,9 +151,10 @@ any        : Any | WS | {canBreak()}? LineBreak ;
 /* ***** Syntax Highlighting ***** */
 
 code        : codetag | html | codeblock ;
-inlinecode  : inlinecodetag | inlinehtml ;
+inlinecode  : inlinecodetag | inlinehtml | inlinecodeblock;
 
 codeblock      : CodeStart CodeAny CodeEnd ;
+inlinecodeblock : CodeInlineStart CodeInlineAny CodeInlineEnd ;
 codetag        : CodeTagStart CodeTagAny CodeTagEnd ;
 inlinecodetag  : CodeTagStart CodeTagInlineAny CodeTagEnd ;
 

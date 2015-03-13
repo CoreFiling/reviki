@@ -220,6 +220,7 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 /* ***** Code formatting ***** */
 
 CodeStart : START '```' .*? LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
 
@@ -399,6 +400,11 @@ CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
 mode CODE_BLOCK_END;
 
 CodeEnd : '```' -> mode(DEFAULT_MODE) ;
+
+mode CODE_INLINE;
+
+CodeInlineAny : ~('`' | '\n' | '\r')+ ;
+CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;

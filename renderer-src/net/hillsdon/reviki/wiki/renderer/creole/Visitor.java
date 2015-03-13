@@ -454,6 +454,14 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render an inline codeblock.
+   */
+  @Override
+  public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
+    return new InlineCode(ctx.CodeInlineAny().getText(), Languages.JAVA);
+  }
+
+  /**
    * Render a block of literal, unescaped, HTML.
    */
   @Override
