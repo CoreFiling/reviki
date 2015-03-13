@@ -83,7 +83,7 @@ options { superClass=ContextSensitiveLexer; }
     intr = false;
   }
 
-  public void doCodeStart(int toMode) {
+  public void doCodeTagStart(int toMode) {
     String tag = getText();
     String start = "[<";
     String end = ">]";
@@ -91,13 +91,13 @@ options { superClass=ContextSensitiveLexer; }
     mode(toMode);
   }
   
-  public void doEndCode() {
+  public void doEndCodeTag() {
     String txt = getText();
     String start = "[</";
     String end = ">]";
     if (txt.endsWith(codeType + end)) {
       seek(0 - (start.length() + end.length() + codeType.length()));
-      mode(CODE_END);
+      mode(CODETAG_END);
     } else {
       more();
     }
@@ -210,11 +210,11 @@ Strike : '--' {toggleFormatting(strike, Any);} ;
 
 NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
 
-fragment CODETYPE : 'c++' | 'java' | 'xhtml' | 'xml' ;
-fragment CODETYPEHTML : CODETYPE | 'html';
+fragment CODETAGTYPE : 'c++' | 'java' | 'xhtml' | 'xml' ;
+fragment CODETAGTYPEHTML : CODETAGTYPE | 'html';
 
-CodeStart  : '[<' CODETYPE '>]' {doCodeStart(CODE_INLINE);} ;
-HtmlStart  : '[<html>]' {doCodeStart(HTML_INLINE);} ;
+CodeTagStart  : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
+HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
 /* ***** Links ***** */
 
@@ -357,34 +357,34 @@ mode NOWIKI_END;
 EndNoWiki : '}}}' -> mode(DEFAULT_MODE) ;
 
 
-// ***** Code (old style)
+// ***** CodeTag (old style)
 
-mode CODE_INLINE;
+mode CODETAG_INLINE;
 
-fragment ENDCODE : '[</' CODETYPE '>]' ;
-fragment ENDCODEHTML : '[</' CODETYPEHTML '>]' ;
+fragment ENDCODETAG : '[</' CODETAGTYPE '>]' ;
+fragment ENDCODETAGHTML : '[</' CODETAGTYPEHTML '>]' ;
 
-CodeInline : INLINE -> more ;
-CodeToBlock : TOBLOCK -> mode(CODE_BLOCK), more ;
-CodeInlineAny : INLINE*? '[</' CODETYPE '>]' {doEndCode();} ;
+CodeTagInline : INLINE -> more ;
+CodeTagToBlock : TOBLOCK -> mode(CODETAG_BLOCK), more ;
+CodeTagInlineAny : INLINE*? '[</' CODETAGTYPE '>]' {doEndCodeTag();} ;
 
-mode CODE_BLOCK;
+mode CODETAG_BLOCK;
 
-CodeAny    : .*? ENDCODE {doEndCode();} ;
+CodeTagAny    : .*? ENDCODETAG {doEndCodeTag();} ;
 
-mode CODE_END;
+mode CODETAG_END;
 
-CodeEnd : ENDCODEHTML -> mode(DEFAULT_MODE) ;
+CodeTagEnd : ENDCODETAGHTML -> mode(DEFAULT_MODE) ;
 
 mode HTML_INLINE;
 
 HtmlInline : INLINE -> more ;
 HtmlToBlock : TOBLOCK -> mode(HTML_BLOCK), more ;
-HtmlInlineAny : INLINE*? '[</html>]' {doEndCode();} ;
+HtmlInlineAny : INLINE*? '[</html>]' {doEndCodeTag();} ;
 
 mode HTML_BLOCK;
 
-HtmlAny    : .*? '[</html>]' {doEndCode();} ;
+HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;

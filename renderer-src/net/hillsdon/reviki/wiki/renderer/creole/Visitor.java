@@ -252,8 +252,8 @@ public class Visitor extends CreoleASTBuilder {
    * Render a syntax-highlighted code block.
    */
   @Override
-  public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
-    return new InlineCode(ctx.CodeInlineAny().getText(), Languages.valueOf(findCodeType(ctx.CodeStart())));
+  public ASTNode visitInlinecodetag(final InlinecodetagContext ctx) {
+    return new InlineCode(ctx.CodeTagInlineAny().getText(), Languages.valueOf(findCodeType(ctx.CodeTagStart())));
   }
 
   /**
@@ -441,8 +441,8 @@ public class Visitor extends CreoleASTBuilder {
    * Like {@link #visitInlinecode}, but for blocks.
    */
   @Override
-  public ASTNode visitCodeblock(final CodeblockContext ctx) {
-    return new Code(ctx.CodeAny().getText(), Languages.valueOf(findCodeType(ctx.CodeStart())));
+  public ASTNode visitCodetag(final CodetagContext ctx) {
+    return new Code(ctx.CodeTagAny().getText(), Languages.valueOf(findCodeType(ctx.CodeTagStart())));
   }
 
   /**
