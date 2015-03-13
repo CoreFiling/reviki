@@ -241,23 +241,19 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * Render an inline nowiki node. Due to how the lexer works, the contents
-   * include the ending symbol, which must be chopped off.
-   *
-   * TODO: Improve the tokensiation of this.
+   * Render an inline nowiki node.
    */
   @Override
   public ASTNode visitPreformat(final PreformatContext ctx) {
-    return new InlineCode(cutOffEndTag(ctx.EndNoWikiInline(), "}}}"));
+    return new InlineCode(ctx.NoWikiInlineAny().getText());
   }
 
   /**
-   * Render a syntax-highlighted CPP block. This has the same tokenisation
-   * problem as mentioned in {@link #visitPreformat}.
+   * Render a syntax-highlighted code block.
    */
   @Override
-  public ASTNode visitInlinecpp(final InlinecppContext ctx) {
-    return new InlineCode(cutOffEndTag(ctx.EndCppInline(), "[</c++>]"), Languages.CPLUSPLUS);
+  public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
+    return new InlineCode(ctx.CodeInlineAny().getText(), Languages.valueOf(findCodeType(ctx.CodeStart())));
   }
 
   /**
@@ -265,26 +261,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinehtml(final InlinehtmlContext ctx) {
-    String code = ctx.EndHtmlInline().getText();
-    return new Raw(code.substring(0, code.length() - "[</html>]".length()));
-  }
-
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
-  @Override
-  public ASTNode visitInlinejava(final InlinejavaContext ctx) {
-    return new InlineCode(cutOffEndTag(ctx.EndJavaInline(), "[</java>]"), Languages.JAVA);
-  }
-
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
-  @Override
-  public ASTNode visitInlinexhtml(final InlinexhtmlContext ctx) {
-    return new InlineCode(cutOffEndTag(ctx.EndXhtmlInline(), "[</xhtml>]"), Languages.XHTML);
-  }
-
-  /** See {@link #visitInlinecpp} and {@link #renderInlineCode}. */
-  @Override
-  public ASTNode visitInlinexml(final InlinexmlContext ctx) {
-    return new InlineCode(cutOffEndTag(ctx.EndXmlInline(), "[</xml>]"), Languages.XML);
+    return new Raw(ctx.HtmlInlineAny().getText());
   }
 
   /**
@@ -453,20 +430,19 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
-   * Render a NoWiki block node. This has the same tokenisation problem as
-   * mentioned in {@link #visitPreformat}.
+   * Render a NoWiki block node.
    */
   @Override
   public ASTNode visitNowiki(final NowikiContext ctx) {
-    return new Code(cutOffEndTag(ctx.EndNoWikiBlock(), "}}}"));
+    return new Code(ctx.NoWikiAny().getText());
   }
 
   /**
-   * Like {@link #visitInlinecpp}, but for blocks.
+   * Like {@link #visitInlinecode}, but for blocks.
    */
   @Override
-  public ASTNode visitCpp(final CppContext ctx) {
-    return new Code(cutOffEndTag(ctx.EndCppBlock(), "[</c++>]"), Languages.CPLUSPLUS);
+  public ASTNode visitCodeblock(final CodeblockContext ctx) {
+    return new Code(ctx.CodeAny().getText(), Languages.valueOf(findCodeType(ctx.CodeStart())));
   }
 
   /**
@@ -474,25 +450,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitHtml(final HtmlContext ctx) {
-    return new Raw(cutOffEndTag(ctx.EndHtmlBlock(), "[</html>]"));
-  }
-
-  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
-  @Override
-  public ASTNode visitJava(final JavaContext ctx) {
-    return new Code(cutOffEndTag(ctx.EndJavaBlock(), "[</java>]"), Languages.JAVA);
-  }
-
-  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
-  @Override
-  public ASTNode visitXhtml(final XhtmlContext ctx) {
-    return new Code(cutOffEndTag(ctx.EndXhtmlBlock(), "[</xhtml]"), Languages.XHTML);
-  }
-
-  /** See {@link #visitCpp} and {@link #renderBlockCode}. */
-  @Override
-  public ASTNode visitXml(final XmlContext ctx) {
-    return new Code(cutOffEndTag(ctx.EndXmlBlock(), "[</xml>]"), Languages.XML);
+    return new Raw(ctx.HtmlAny().getText());
   }
 
   /**
