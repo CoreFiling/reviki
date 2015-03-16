@@ -575,6 +575,14 @@ public class Visitor extends CreoleASTBuilder {
   }
 
   /**
+   * Render a terseblockquote.
+   */
+  @Override
+  public ASTNode visitTerseblockquote(TerseblockquoteContext ctx) {
+    return new Blockquote(visit(ctx.creole()));
+  }
+
+  /**
    * Render a blockquote.
    */
   @Override
