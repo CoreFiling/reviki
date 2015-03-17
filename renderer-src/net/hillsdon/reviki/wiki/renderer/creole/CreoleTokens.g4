@@ -20,6 +20,10 @@ options { superClass=ContextSensitiveLexer; }
 
   public boolean jiraStyleLinks = false;
 
+  // track when we are in a terseblock quote so the we match start and
+  // end tokens correctly.
+  public boolean inTerseBlockquote = false;
+
   public CreoleTokens(CharStream input, boolean jiraStyleLinks) {
     this(input);
     this.jiraStyleLinks = jiraStyleLinks;
@@ -232,7 +236,8 @@ DirectiveDisable : '<<-' -> mode(MACRO) ;
 BlockquoteSt  : '[<blockquote>]' ;
 BlockquoteEnd : '[</blockquote>]' ;
 
-TerseBlockquote : '"""' ;
+TerseBlockquoteSt  : {!inTerseBlockquote}? '"""' {inTerseBlockquote = true;};
+TerseBlockquoteEnd : {inTerseBlockquote}? '"""' {inTerseBlockquote = false;};
 
 /* ***** Miscellaneous ***** */
 
