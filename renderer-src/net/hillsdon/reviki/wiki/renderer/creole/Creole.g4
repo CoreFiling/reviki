@@ -92,7 +92,7 @@ inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unset
 
 nowiki     : NoWiki EndNoWikiBlock ;
 
-terseblockquote : TerseBlockquote creole TerseBlockquote ;
+terseblockquote : TerseBlockquoteSt creole TerseBlockquoteEnd ;
 
 blockquote : BlockquoteSt creole BlockquoteEnd ;
 
