@@ -22,6 +22,10 @@ The SVN integration uses svnkit, which is open source software.
 The original software and related information is available at
 http://svnkit.com/
 
+The code highlighting is provided by highlight.js by Ivan Sagalaev.
+The original software and related information is available at
+https://highlightjs.org
+
 The following open source third-party libraries are used for 
 testing (i.e. not part of the WAR file):
 

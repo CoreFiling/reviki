@@ -2,7 +2,6 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import java.util.List;
 
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 import com.google.common.base.Optional;
@@ -12,9 +11,9 @@ import com.google.common.collect.ImmutableList;
 public class Code extends TextNode {
   private final String _contents;
 
-  private final Optional<Languages> _language;
+  private final Optional<String> _language;
 
-  public Code(final String contents, final Languages language) {
+  public Code(final String contents, final String language) {
     super(contents, true);
 
     _contents = contents;
@@ -25,7 +24,7 @@ public class Code extends TextNode {
     super(contents, true);
 
     _contents = contents;
-    _language = Optional.<Languages>absent();
+    _language = Optional.<String>absent();
   }
 
   @Override
@@ -38,7 +37,7 @@ public class Code extends TextNode {
     return _contents;
   }
 
-  public Optional<Languages> getLanguage() {
+  public Optional<String> getLanguage() {
     return _language;
   }
 }

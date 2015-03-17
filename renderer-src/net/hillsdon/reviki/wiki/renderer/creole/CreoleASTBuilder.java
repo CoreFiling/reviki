@@ -18,7 +18,6 @@ import net.hillsdon.reviki.vc.SimpleAttachmentHistory;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 
 /**
  * Helper class providing some useful functions for walking through the Creole
@@ -218,19 +217,6 @@ public abstract class CreoleASTBuilder extends CreoleBaseVisitor<ASTNode> {
   protected String cutOffEndTag(final TerminalNode node, final String end) {
     String res = node.getText().replaceAll("\\s+$", "");
     return res.substring(0, res.length() - end.length());
-  }
-
-  /**
-   * Find the language type from a CodeStart token
-   */
-  protected Languages findLanguageType(final TerminalNode node) {
-    String codeType = node.getText().trim();
-    for (Languages lang : Languages.values()) {
-      if (codeType.equals(lang.toString())) {
-        return lang;
-      }
-    }
-    return Languages.JAVA;
   }
 
   /**

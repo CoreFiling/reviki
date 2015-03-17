@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
 import net.hillsdon.reviki.wiki.renderer.creole.Creole.*;
 
 /**
@@ -253,7 +252,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodetag(final InlinecodetagContext ctx) {
-    return new InlineCode(ctx.CodeTagInlineAny().getText(), findLanguageType(ctx.CodeTagStart()));
+    return new InlineCode(ctx.CodeTagInlineAny().getText(), ctx.CodeTagStart().getText().trim());
   }
 
   /**
@@ -442,7 +441,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCodetag(final CodetagContext ctx) {
-    return new Code(ctx.CodeTagAny().getText(), findLanguageType(ctx.CodeTagStart()));
+    return new Code(ctx.CodeTagAny().getText(), ctx.CodeTagStart().getText().trim());
   }
 
   /**
@@ -450,7 +449,14 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCodeblock(final CodeblockContext ctx) {
-    return new Code(ctx.CodeAny().getText(), findLanguageType(ctx.CodeStart()));
+    // For some reason the codeblock rule matches when the markup has a
+    // trailing CodeStart token // (with no CodeAny or CodeEnd) so check for
+    // null CodeAny before processing.
+    if (ctx.CodeAny() != null) {
+      return new Code(ctx.CodeAny().getText(), ctx.CodeStart().getText().trim());
+    } else {
+      return new Plaintext("```");
+    }
   }
 
   /**
@@ -458,7 +464,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
-    return new InlineCode(ctx.CodeInlineAny().getText(), Languages.JAVA);
+    return new InlineCode(ctx.CodeInlineAny().getText(), "");
   }
 
   /**
