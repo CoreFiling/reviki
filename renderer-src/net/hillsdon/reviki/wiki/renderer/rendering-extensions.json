@@ -25,6 +25,31 @@
     "output": "\n<div class='unusual'></div>\n"
   },
   {
+    "name":   "Block syntax highlighting java hint",
+    "input":  "```java\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
+    "name":   "Block syntax highlighting default, invalid hint",
+    "input":  "```notalang\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code class='notalang'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
+    "name":   "Block syntax highlighting default Java, none specified ",
+    "input":  "```\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
+    "name":   "Inline syntax highlighting",
+    "input":  "Some text `System.out.print(\"Hello, \");` end text",
+    "output": "<p>Some text <code class='wiki-content inline'>System.out.print(&quot;Hello, &quot;);</code> end text</p>"
+  },
+  {
+    "name":   "Inline syntax highlighting, ended by newline",
+    "input":  "Some text `System.out.print(\"Hello, \");\nend text",
+    "output": "<p>Some text <code class='wiki-content inline'>System.out.print(&quot;Hello, &quot;);</code>end text</p>"
+  },
+  {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
     "output": "<p>Hello <code>//there//</code>.</p>"

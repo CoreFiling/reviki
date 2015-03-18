@@ -18,21 +18,6 @@ import com.google.common.base.Optional;
  * @author msw
  */
 public abstract class ASTRenderer<T> extends ASTVisitor<T> {
-  /** Languages available for syntax highlighting. */
-  public static enum Languages {
-    CPLUSPLUS("c++"), JAVA("java"), XHTML("xhtml"), XML("xml");
-
-    private final String _name;
-
-    private Languages(final String name) {
-      _name = name;
-    }
-
-    public String toString() {
-      return _name;
-    }
-  }
-
   /** Directives (and arguments) active at this time. */
   private final Map<String, List<String>> _enabledDirectives;
 

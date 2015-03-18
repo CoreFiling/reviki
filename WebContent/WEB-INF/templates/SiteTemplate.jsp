@@ -22,6 +22,8 @@
     <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="highlight-default.css"/>" media="all" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="highlight-cfl.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
   <!--[if lt IE 9]>
@@ -34,10 +36,15 @@
   <script type="text/javascript" src="<sw:resourceUrl path="jquery.textchange.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="common.js"/>"></script>
   <script type="text/javascript" src="<sw:resourceUrl path="bootstrap.min.js"/>"></script>
+  <script type="text/javascript" src="<sw:resourceUrl path="highlight.pack.js"/>"></script>
   <script type="text/javascript">
     reviki.SEARCH_URL = "<sw:wikiUrl page="FindPage"/>";
+    hljs.initHighlightingOnLoad();
     $(function() {
     	$(".nojs").removeClass("nojs");
+      $('code.inline').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
     });
   </script>
 </head>

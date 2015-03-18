@@ -24,6 +24,8 @@ options { superClass=ContextSensitiveLexer; }
   // end tokens correctly.
   public boolean inTerseBlockquote = false;
 
+  public String codeType;
+
   public CreoleTokens(CharStream input, boolean jiraStyleLinks) {
     this(input);
     this.jiraStyleLinks = jiraStyleLinks;
@@ -79,6 +81,27 @@ options { superClass=ContextSensitiveLexer; }
     listLevel = 0;
     inHeader = false;
     intr = false;
+  }
+
+  public void doCodeTagStart(int toMode) {
+    String tag = getText();
+    String start = "[<";
+    String end = ">]";
+    codeType = tag.substring(start.length(), tag.length() - end.length());
+    setText(codeType);
+    mode(toMode);
+  }
+  
+  public void doEndCodeTag() {
+    String txt = getText();
+    String start = "[</";
+    String end = ">]";
+    if (txt.endsWith(codeType + end)) {
+      seek(0 - (start.length() + end.length() + codeType.length()));
+      mode(CODETAG_END);
+    } else {
+      more();
+    }
   }
 
   // Determine which tokens can, at this stage, break out of any inline
@@ -187,11 +210,17 @@ Italic : '//' {prior() == null || (prior() != ':' || !Character.isLetterOrDigit(
 Strike : '--' {toggleFormatting(strike, Any);} ;
 
 NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
-StartCpp   : '[<c++>]'   -> mode(CPP_INLINE) ;
-StartHtml  : '[<html>]'  -> mode(HTML_INLINE) ;
-StartJava  : '[<java>]'  -> mode(JAVA_INLINE) ;
-StartXhtml : '[<xhtml>]' -> mode(XHTML_INLINE) ;
-StartXml   : '[<xml>]'   -> mode(XML_INLINE) ;
+
+fragment CODETAGTYPE : 'c++' | 'java' | 'xhtml' | 'xml' ;
+fragment CODETAGTYPEHTML : CODETAGTYPE | 'html';
+
+CodeTagStart  : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
+HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
+
+/* ***** Code formatting ***** */
+
+CodeStart : START '```' .*? LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
 
@@ -319,81 +348,63 @@ mode NOWIKI_INLINE;
 
 fragment INLINE  : ~('\r'|'\n') ;
 fragment BLOCK   : . ;
-fragment TOBLOCK : ('\r'|'\n') ;
+fragment TOBLOCK : {_input.LA(1) == '\r' || _input.LA(1) == '\n'}? ;
 
 NoWikiInline    : INLINE -> more ;
 NoWikiToBlock   : TOBLOCK -> mode(NOWIKI_BLOCK), more ;
-EndNoWikiInline : '}}}' ~'}'  {seek(-1);} -> mode(DEFAULT_MODE) ;
+NoWikiInlineAny : INLINE*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
 mode NOWIKI_BLOCK;
 
-NoWikiAny      : BLOCK -> more ;
-EndNoWikiBlock : (~' ' '}}}' | ' }}}' '\r'? '\n' {seek(-1);}) -> mode(DEFAULT_MODE) ;
+NoWikiAny      : .*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
-// ***** C++
+mode NOWIKI_END;
 
-mode CPP_INLINE;
+EndNoWiki : '}}}' -> mode(DEFAULT_MODE) ;
 
-CppInline    : INLINE -> more ;
-CppToBlock   : TOBLOCK -> mode(CPP_BLOCK), more ;
-EndCppInline : '[</c++>]' -> mode(DEFAULT_MODE) ;
+// ***** CodeTag
 
-mode CPP_BLOCK;
+mode CODETAG_INLINE;
 
-CppAny      : BLOCK -> more ;
-EndCppBlock : ~' ' '[</c++>]' -> mode(DEFAULT_MODE) ;
+fragment ENDCODETAG : '[</' CODETAGTYPE '>]' ;
+fragment ENDCODETAGHTML : '[</' CODETAGTYPEHTML '>]' ;
 
-// ***** HTML
+CodeTagInline : INLINE -> more ;
+CodeTagToBlock : TOBLOCK -> mode(CODETAG_BLOCK), more ;
+CodeTagInlineAny : INLINE*? '[</' CODETAGTYPE '>]' {doEndCodeTag();} ;
+
+mode CODETAG_BLOCK;
+
+CodeTagAny    : .*? ENDCODETAG {doEndCodeTag();} ;
+
+mode CODETAG_END;
+
+CodeTagEnd : ENDCODETAGHTML -> mode(DEFAULT_MODE) ;
 
 mode HTML_INLINE;
 
-HtmlInline    : INLINE -> more ;
-HtmlToBlock   : TOBLOCK -> mode(HTML_BLOCK), more ;
-EndHtmlInline : '[</html>]'-> mode(DEFAULT_MODE) ;
+HtmlInline : INLINE -> more ;
+HtmlToBlock : TOBLOCK -> mode(HTML_BLOCK), more ;
+HtmlInlineAny : INLINE*? '[</html>]' {doEndCodeTag();} ;
 
 mode HTML_BLOCK;
 
-HtmlAny      : BLOCK -> more ;
-EndHtmlBlock : ~' ' '[</html>]' -> mode(DEFAULT_MODE) ;
+HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
 
-// ***** Java
+// ***** Code
 
-mode JAVA_INLINE;
+mode CODE_BLOCK;
 
-JavaInline    : INLINE -> more ;
-JavaToBlock   : TOBLOCK -> mode(JAVA_BLOCK), more ;
-EndJavaInline : '[</java>]'-> mode(DEFAULT_MODE) ;
+CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
 
-mode JAVA_BLOCK;
+mode CODE_BLOCK_END;
 
-JavaAny      : BLOCK -> more ;
-EndJavaBlock : ~' ' '[</java>]' -> mode(DEFAULT_MODE) ;
+CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 
-// ***** XHTML
+mode CODE_INLINE;
 
-mode XHTML_INLINE;
-
-XhtmlInline    : INLINE -> more ;
-XhtmlToBlock   : TOBLOCK -> mode(XHTML_BLOCK), more ;
-EndXhtmlInline : '[</xhtml>]' -> mode(DEFAULT_MODE) ;
-
-mode XHTML_BLOCK;
-
-XhtmlAny      : BLOCK -> more ;
-EndXhtmlBlock : ~' ' '[</xhtml>]' -> mode(DEFAULT_MODE) ;
-
-// ***** XML
-
-mode XML_INLINE;
-
-XmlInline    : INLINE -> more ;
-XmlToBlock   : TOBLOCK -> mode(XML_BLOCK), more ;
-EndXmlInline : '[</xml>]' -> mode(DEFAULT_MODE) ;
-
-mode XML_BLOCK;
-
-XmlAny      : BLOCK -> more ;
-EndXmlBlock : ~' ' '[</xml>]' -> mode(DEFAULT_MODE) ;
+CodeInlineAny : ~('`' | '\n' | '\r')+ ;
+CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;

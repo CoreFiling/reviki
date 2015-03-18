@@ -1,13 +1,9 @@
 package net.hillsdon.reviki.wiki.renderer;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
-import com.uwyn.jhighlight.renderer.Renderer;
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
-
 import net.hillsdon.fij.text.Escape;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
@@ -75,44 +71,19 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
       }
     }
 
-    /**
-     * Render some syntax-highlighted code.
-     */
-    public String highlight(final String code, final Optional<Languages> language) {
-      Renderer highlighter = null;
-      if (language.isPresent()) {
-        String lang = null;
-        switch (language.get()) {
-          case CPLUSPLUS:
-            lang = XhtmlRendererFactory.CPLUSPLUS;
-            break;
-          case JAVA:
-            lang = XhtmlRendererFactory.JAVA;
-            break;
-          case XHTML:
-            lang = XhtmlRendererFactory.XHTML;
-            break;
-          case XML:
-            lang = XhtmlRendererFactory.XML;
-            break;
-        }
-        highlighter = XhtmlRendererFactory.getRenderer(lang);
-      }
 
-      String highlighted = null;
-      if (highlighter == null) {
-        highlighted = Escape.html(code);
+    /**
+    * Render some syntax-highlighted code.
+    */
+    public String highlight(final String code, final String language) {
+      String codetag;
+      if (language.isEmpty()) {
+        codetag = "<code>";
       }
       else {
-        try {
-          highlighted = highlighter.highlight("", code, "UTF-8", true);
-        }
-        catch (IOException e) {
-          highlighted = Escape.html(code);
-        }
+        codetag = String.format("<code class='%s'>", language);
       }
-
-      return highlighted.replace("&nbsp;", " ").replace("<br />", "");
+      return String.format("%s%s</code>", codetag, code);
     }
 
     @Override
@@ -132,8 +103,14 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitCode(final Code node) {
+      Optional<String> lang = node.getLanguage();
+      String code = Escape.html(node.getText());
       String out = "<pre " + CSS_CLASS_ATTR + ">";
-      out += highlight(node.getText(), node.getLanguage());
+      if (lang.isPresent()) {
+        out += highlight(code, lang.get());
+      } else {
+        out += code;
+      }
       out += "</pre>";
       return out;
     }
@@ -164,8 +141,13 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitInlineCode(final InlineCode node) {
-      String out = "<code " + CSS_CLASS_ATTR + ">";
-      out += highlight(node.getText(), node.getLanguage());
+      String out = "";
+      if (node.getLanguage().isPresent()) {
+        out += "<code class='wiki-content inline'>";
+      } else {
+        out += "<code " + CSS_CLASS_ATTR + ">";
+      }
+      out += Escape.html(node.getText());
       out += "</code>";
       return out;
     }

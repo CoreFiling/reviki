@@ -2,12 +2,10 @@ package net.hillsdon.reviki.wiki.renderer.creole.ast;
 
 import com.google.common.base.Optional;
 
-import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer.Languages;
-
 public class InlineCode extends TextNode implements BlockableNode<Code> {
-  private final Optional<Languages> _language;
+  private final Optional<String> _language;
 
-  public InlineCode(final String contents, final Languages language) {
+  public InlineCode(final String contents, final String language) {
     super(contents, true);
 
     _language = Optional.of(language);
@@ -16,7 +14,7 @@ public class InlineCode extends TextNode implements BlockableNode<Code> {
   public InlineCode(final String contents) {
     super(contents, true);
 
-    _language = Optional.<Languages>absent();
+    _language = Optional.<String>absent();
   }
 
   public Code toBlock() {
@@ -28,7 +26,7 @@ public class InlineCode extends TextNode implements BlockableNode<Code> {
     }
   }
 
-  public Optional<Languages> getLanguage() {
+  public Optional<String> getLanguage() {
     return _language;
   }
 }

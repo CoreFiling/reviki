@@ -90,7 +90,7 @@ td         : TdStart inTable* ;
 
 inTable    : {disallowBreaks();} (ulist | olist | code | nowiki | inline) {unsetBreaks();} ;
 
-nowiki     : NoWiki EndNoWikiBlock ;
+nowiki     : NoWiki NoWikiAny EndNoWiki ;
 
 terseblockquote : TerseBlockquoteSt creole TerseBlockquoteEnd ;
 
@@ -140,7 +140,7 @@ rawlink    : RawUrl ;
 
 anchor     : AnSt InAnchor AnEnd ;
 
-preformat  : NoWiki EndNoWikiInline ;
+preformat  : NoWiki NoWikiInlineAny EndNoWiki ;
 
 linebreak  : ({canBreak()}? LineBreak)? InlineBrk LineBreak? ;
 
@@ -150,20 +150,13 @@ any        : Any | WS | {canBreak()}? LineBreak ;
 
 /* ***** Syntax Highlighting ***** */
 
-code        : cpp       | html       | java       | xhtml       | xml ;
-inlinecode  : inlinecpp | inlinehtml | inlinejava | inlinexhtml | inlinexml ;
+code        : codetag | html | codeblock ;
+inlinecode  : inlinecodetag | inlinehtml | inlinecodeblock;
 
-cpp         : StartCpp EndCppBlock ;
-inlinecpp   : StartCpp EndCppInline ;
+codeblock      : CodeStart CodeAny CodeEnd ;
+inlinecodeblock : CodeInlineStart CodeInlineAny CodeInlineEnd ;
+codetag        : CodeTagStart CodeTagAny CodeTagEnd ;
+inlinecodetag  : CodeTagStart CodeTagInlineAny CodeTagEnd ;
 
-html        : StartHtml EndHtmlBlock ;
-inlinehtml  : StartHtml EndHtmlInline ;
-
-java        : StartJava EndJavaBlock ;
-inlinejava  : StartJava EndJavaInline ;
-
-xhtml       : StartXhtml EndXhtmlBlock ;
-inlinexhtml : StartXhtml EndXhtmlInline ;
-
-xml         : StartXml EndXmlBlock ;
-inlinexml   : StartXml EndXmlInline ;
+html        : HtmlStart HtmlAny CodeTagEnd ;
+inlinehtml  : HtmlStart HtmlInlineAny CodeTagEnd ;
