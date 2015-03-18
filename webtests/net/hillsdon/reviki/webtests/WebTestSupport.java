@@ -106,7 +106,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected String getErrorMessage(final HtmlPage page) throws Exception {
-    return ((DomText) page.getByXPath("id('flash')/p/text()").iterator().next()).asText().trim();
+    return ((DomText) page.getByXPath("id('flash')/div/text()").iterator().next()).asText().trim();
   }
 
   protected String getAltUsername() {

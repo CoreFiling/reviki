@@ -50,10 +50,10 @@
 </head>
 <body>
   <c:if test="${not empty flash}">
-    <div id="flash">
-      <p>
-        <c:out value="${flash}"/>
-      </p>
+    <div class="container-fluid" id="flash">
+      <div class="alert alert-warning" role="alert">
+         <c:out value="${flash}"/>
+      </div>
     </div>
   </c:if>
   <c:if test="${wikiIsValid != null and wikiIsValid}">
