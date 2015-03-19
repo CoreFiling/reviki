@@ -50,6 +50,21 @@
     "output": "<p>Some text <code class='wiki-content inline'>System.out.print(&quot;Hello, &quot;);</code>end text</p>"
   },
   {
+    "name":   "Inline syntax highlighting at beginning of line with no other content",
+    "input":  "`System.out.print(\"Hello, \");`",
+    "output": "<p><code class='wiki-content inline'>System.out.print(&quot;Hello, &quot;);</code></p>"
+  },
+  {
+    "name":   "Inline syntax highlighting empty",
+    "input":  "``",
+    "output": ""
+  },
+  {
+    "name":   "Inline syntax highlighting single followed by newline",
+    "input":  "`\n",
+    "output": ""
+  },
+  {
     "name":   "Image link vs no wiki",
     "input":  "Hello {{{//there//}}}.",
     "output": "<p>Hello <code>//there//</code>.</p>"

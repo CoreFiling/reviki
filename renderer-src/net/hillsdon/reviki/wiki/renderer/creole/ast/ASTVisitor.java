@@ -10,7 +10,7 @@ public abstract class ASTVisitor<T> {
   public static enum NodeTypes {
     ASTNode, Anchor,
     BlockableNode, Blockquote, Bold,
-    Code,
+    Code, Nowiki, InlineNowiki,
     DirectiveNode,
     Heading, HorizontalRule,
     Image, Inline, InlineCode, Italic,
@@ -37,12 +37,14 @@ public abstract class ASTVisitor<T> {
       case Blockquote:      return visitBlockquote((Blockquote) node);
       case Bold:            return visitBold((Bold) node);
       case Code:            return visitCode((Code) node);
+      case Nowiki:          return visitNowiki((Nowiki) node);
       case DirectiveNode:   return visitDirectiveNode((DirectiveNode) node);
       case Heading:         return visitHeading((Heading) node);
       case HorizontalRule:  return visitHorizontalRule((HorizontalRule) node);
       case Image:           return visitImage((Image) node);
       case Inline:          return visitInline((Inline) node);
       case InlineCode:      return visitInlineCode((InlineCode) node);
+      case InlineNowiki:    return visitInlineNowiki((InlineNowiki) node);
       case Italic:          return visitItalic((Italic) node);
       case Linebreak:       return visitLinebreak((Linebreak) node);
       case Link:            return visitLink((Link) node);
@@ -79,11 +81,13 @@ public abstract class ASTVisitor<T> {
   public T visitBlockquote(Blockquote node)                 { return visitASTNode(node); }
   public T visitBold(final Bold node)                       { return visitASTNode(node); }
   public T visitCode(final Code node)                       { return visitASTNode(node); }
+  public T visitNowiki(final Nowiki node)                   { return visitASTNode(node); }
   public T visitDirectiveNode(final DirectiveNode node)     { return visitASTNode(node); }
   public T visitHeading(final Heading node)                 { return visitASTNode(node); }
   public T visitHorizontalRule(final HorizontalRule node)   { return visitASTNode(node); }
   public T visitInline(final Inline node)                   { return visitASTNode(node); }
   public T visitInlineCode(final InlineCode node)           { return visitASTNode(node); }
+  public T visitInlineNowiki(final InlineNowiki node)       { return visitASTNode(node); }
   public T visitItalic(final Italic node)                   { return visitASTNode(node); }
   public T visitLinebreak(final Linebreak node)             { return visitASTNode(node); }
   public T visitListItem(final ListItem node)               { return visitASTNode(node); }

@@ -244,7 +244,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitPreformat(final PreformatContext ctx) {
-    return new InlineCode(ctx.NoWikiInlineAny().getText());
+    return new InlineNowiki(ctx.NoWikiInlineAny().getText());
   }
 
   /**
@@ -433,7 +433,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitNowiki(final NowikiContext ctx) {
-    return new Code(ctx.NoWikiAny().getText());
+    return new Nowiki(ctx.NoWikiAny().getText());
   }
 
   /**
@@ -464,7 +464,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
-    return new InlineCode(ctx.CodeInlineAny().getText(), "");
+    return new InlineCode(ctx.CodeInlineAny().getText());
   }
 
   /**

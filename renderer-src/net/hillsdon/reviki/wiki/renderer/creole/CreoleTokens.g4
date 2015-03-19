@@ -403,7 +403,10 @@ CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 
 mode CODE_INLINE;
 
-CodeInlineAny : ~('`' | '\n' | '\r')+ ;
+CodeInlineAny : .*? ('`' | LineBreak) {seek(-1);} -> mode(CODE_INLINE_END) ;
+
+mode CODE_INLINE_END;
+
 CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
