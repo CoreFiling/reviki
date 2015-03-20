@@ -30,6 +30,16 @@
     "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
   },
   {
+    "name":   "Block syntax highlighting java trailing space",
+    "input":  "```java  \nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
+    "name":   "Block syntax highlighting java leading space",
+    "input":  " ```java  \nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
     "name":   "Block syntax highlighting default, invalid hint",
     "input":  "```notalang\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
     "output": "<pre><code class='notalang'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
@@ -38,6 +48,11 @@
     "name":   "Block syntax highlighting default Java, none specified ",
     "input":  "```\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
     "output": "<pre><code>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
+    "name":   "Block syntax highlighting incomplete",
+    "input":  "```java System.out.print(\"Hello, \");\n```\nbar\n```",
+    "output": "<p>```java System.out.print(&quot;Hello, &quot;);</p><pre><code>bar\n</code></pre>"
   },
   {
     "name":   "Inline syntax highlighting",

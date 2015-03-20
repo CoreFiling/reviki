@@ -449,14 +449,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCodeblock(final CodeblockContext ctx) {
-    // For some reason the codeblock rule matches when the markup has a
-    // trailing CodeStart token // (with no CodeAny or CodeEnd) so check for
-    // null CodeAny before processing.
-    if (ctx.CodeAny() != null) {
-      return new Code(ctx.CodeAny().getText(), ctx.CodeStart().getText().trim());
-    } else {
-      return new Plaintext("```");
-    }
+    return new Code(ctx.CodeAny().getText(), ctx.CodeStart().getText().trim());
   }
 
   /**

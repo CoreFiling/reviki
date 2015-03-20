@@ -219,7 +219,13 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
 /* ***** Code formatting ***** */
 
-CodeStart : START '```' .*? LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+// The rules match in this order: CodeStartEOF, CodeStart, NoCodeStart, CodeInlineStart
+
+// Ignore codeblocks that start immediately before EOF
+CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> more ;
+
+CodeStart : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+NoCodeStart: '```' -> type(Any);
 CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
@@ -395,11 +401,22 @@ HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
 
 mode CODE_BLOCK;
 
+// CodeNoEnd will match only if there is no terminating
+// code token (```).
 CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
+CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+
+mode CODE_BLOCK_EOF;
+
+CodeToEof : .* EOF {seek(-1);} -> type(CodeAny), mode(CODE_BLOCK_EOF_END);
 
 mode CODE_BLOCK_END;
 
 CodeEnd : '```' -> mode(DEFAULT_MODE) ;
+
+mode CODE_BLOCK_EOF_END;
+
+CodeEofEnd : . -> type(CodeEnd), mode(DEFAULT_MODE);
 
 mode CODE_INLINE;
 
