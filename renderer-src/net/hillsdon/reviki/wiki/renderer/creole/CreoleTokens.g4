@@ -222,7 +222,7 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 // The rules match in this order: CodeStartEOF, CodeStart, NoCodeStart, CodeInlineStart
 
 // Ignore codeblocks that start immediately before EOF
-CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> more ;
+CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
 
 CodeStart : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
 NoCodeStart: '```' -> type(Any);
