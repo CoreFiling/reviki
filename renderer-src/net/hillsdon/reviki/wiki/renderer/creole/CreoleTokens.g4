@@ -408,7 +408,7 @@ CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
 
 mode CODE_BLOCK_EOF;
 
-CodeToEof : .* EOF {seek(-1);} -> type(CodeAny), mode(CODE_BLOCK_EOF_END);
+CodeToEof : .*? EOF {seek(-1);} -> type(CodeAny), mode(CODE_BLOCK_EOF_END);
 
 mode CODE_BLOCK_END;
 
