@@ -104,6 +104,12 @@ options { superClass=ContextSensitiveLexer; }
     }
   }
 
+  public void doStartCodeLine() {
+    String startTag = "```";
+    seek(0 - (getText().length() - (getText().indexOf(startTag) + startTag.length()))); 
+    setText("");
+  }
+
   // Determine which tokens can, at this stage, break out of any inline
   // formatting.
   public java.util.List<String> thisKillsTheFormatting() {
@@ -218,8 +224,12 @@ CodeTagStart : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
 HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
 /* ***** Code formatting ***** */
+// The rules match in this order: CodeBlockLine, CodeStartEOF, CodeStart, NoCodeStart, CodeInlineStart
 
-// The rules match in this order: CodeStartEOF, CodeStart, NoCodeStart, CodeInlineStart
+// We accept inline codeblocks without language hints.
+// (LineBreak EOF?)? ensures that this rule matches before CodeStartEOF or CodeStart
+// We strip off the initial ``` and whitespace before processing as a CODE_BLOCK
+CodeBlockLine : WS* '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
 
 // Ignore codeblocks that start immediately before EOF
 CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
