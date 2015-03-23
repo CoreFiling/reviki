@@ -209,12 +209,12 @@ Bold   : '**' {toggleFormatting(bold, Any);} ;
 Italic : '//' {prior() == null || (prior() != ':' || !Character.isLetterOrDigit(priorprior()))}? {toggleFormatting(italic, Any);} ;
 Strike : '--' {toggleFormatting(strike, Any);} ;
 
-NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
+NoWiki : '{{{' -> mode(NOWIKI_INLINE) ;
 
 fragment CODETAGTYPE : 'c++' | 'java' | 'xhtml' | 'xml' ;
 fragment CODETAGTYPEHTML : CODETAGTYPE | 'html';
 
-CodeTagStart  : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
+CodeTagStart : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
 HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
 /* ***** Code formatting ***** */
@@ -225,7 +225,7 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
 
 CodeStart : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
-NoCodeStart: '```' -> type(Any);
+NoCodeStart: '```' -> type(Any) ;
 CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
@@ -362,7 +362,7 @@ NoWikiInlineAny : INLINE*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
 mode NOWIKI_BLOCK;
 
-NoWikiAny      : .*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
+NoWikiAny : .*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
 mode NOWIKI_END;
 
@@ -381,7 +381,7 @@ CodeTagInlineAny : INLINE*? '[</' CODETAGTYPE '>]' {doEndCodeTag();} ;
 
 mode CODETAG_BLOCK;
 
-CodeTagAny    : .*? ENDCODETAG {doEndCodeTag();} ;
+CodeTagAny : .*? ENDCODETAG {doEndCodeTag();} ;
 
 mode CODETAG_END;
 
@@ -395,7 +395,7 @@ HtmlInlineAny : INLINE*? '[</html>]' {doEndCodeTag();} ;
 
 mode HTML_BLOCK;
 
-HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
+HtmlAny : .*? '[</html>]' {doEndCodeTag();} ;
 
 // ***** Code
 
