@@ -229,12 +229,12 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 // We accept inline codeblocks without language hints.
 // (LineBreak EOF?)? ensures that this rule matches before CodeStartEOF or CodeStart
 // We strip off the initial ``` and whitespace before processing as a CODE_BLOCK
-CodeBlockLine : WS* '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
+CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
 
 // Ignore codeblocks that start immediately before EOF
-CodeStartEOF : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
+CodeStartEOF : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
 
-CodeStart : WS* '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
 NoCodeStart: '```' -> type(Any) ;
 CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 

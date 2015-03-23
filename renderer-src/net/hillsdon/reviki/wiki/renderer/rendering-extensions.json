@@ -65,6 +65,11 @@
     "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
   },
   {
+    "name":   "Block syntax highlighting java not at start of line",
+    "input":  "some other text ```java  \nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<p>some other text ```java  \nSystem.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n```</p>"
+  },
+  {
     "name":   "Block syntax highlighting default, invalid hint",
     "input":  "```notalang\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
     "output": "<pre><code class='notalang'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
