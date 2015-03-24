@@ -43,7 +43,7 @@ public class InterWikiLinker {
    * @param pageName Page name/
    * @return A link.
    * @throws UnknownWikiException If wikiName is unknown.
-   * @throws URISyntaxException 
+   * @throws URISyntaxException
    * @see #addWiki(String, String)
    */
   public URI uri(final String wikiName, final String pageName, final String fragment) throws UnknownWikiException, URISyntaxException {
@@ -53,15 +53,13 @@ public class InterWikiLinker {
     }
     // Sigh - format strings and otherwise-encoded URIs don't mix
     final URI template = new URI(formatString.replace("%s", "%25s"));
-    
+
     // Replace occurrances of %s (now %25s) on a per-component basis since they have different encoding.
     // If the template has a fragment it is:
     //  replaced with the specified fragment if it doesn't contain %s
     //  %s replaced with fragment if specified
     //  %s replaced with pageName if fragment isn't specified
     //  otherwise left alone
-    final String newPath = template.getPath() != null ? template.getPath().replace("%s", pageName) : null;
-    final String newQuery = template.getQuery() != null ? template.getQuery().replace("%s", pageName) : null;
     String newFragment = template.getFragment();
     if (newFragment != null && newFragment.contains("%s")) {
       if (fragment != null) {
@@ -76,8 +74,17 @@ public class InterWikiLinker {
         newFragment = fragment;
       }
     }
-    
-    return new URI(template.getScheme(), template.getUserInfo(), template.getHost(), template.getPort(), newPath, newQuery, newFragment);
+
+    // Opaque URIs (eg mailto:) only have scheme, scheme specific part and fragment components
+    if (template.isOpaque()) {
+      final String newSsp = template.getSchemeSpecificPart() != null ? template.getSchemeSpecificPart().replace("%s", pageName) : null;
+      return new URI(template.getScheme(), newSsp, newFragment);
+    }
+    else {
+      final String newPath = template.getPath() != null ? template.getPath().replace("%s", pageName) : null;
+      final String newQuery = template.getQuery() != null ? template.getQuery().replace("%s", pageName) : null;
+      return new URI(template.getScheme(), template.getUserInfo(), template.getHost(), template.getPort(), newPath, newQuery, newFragment);
+    }
   }
 
   /**
