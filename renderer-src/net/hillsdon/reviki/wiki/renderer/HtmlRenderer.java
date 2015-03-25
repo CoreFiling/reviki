@@ -81,7 +81,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
         codetag = "<code>";
       }
       else {
-        codetag = String.format("<code class='%s'>", language);
+        codetag = String.format("<code class='%s'>", Escape.html(language));
       }
       return String.format("%s%s</code>", codetag, code);
     }
@@ -148,7 +148,7 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
     public String visitInlineCode(final InlineCode node) {
       String codeClass;
       if (node.getLanguage().isPresent() && !node.getLanguage().get().isEmpty()) {
-        codeClass = " " + node.getLanguage().get();
+        codeClass = " " + Escape.html(node.getLanguage().get());
       }
       else {
         codeClass = "";
