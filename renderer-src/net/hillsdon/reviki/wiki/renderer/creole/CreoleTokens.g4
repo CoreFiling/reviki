@@ -104,6 +104,12 @@ options { superClass=ContextSensitiveLexer; }
     }
   }
 
+  public void doStartCodeLine() {
+    String startTag = "```";
+    seek(0 - (getText().length() - (getText().indexOf(startTag) + startTag.length()))); 
+    setText("");
+  }
+
   // Determine which tokens can, at this stage, break out of any inline
   // formatting.
   public java.util.List<String> thisKillsTheFormatting() {
@@ -209,17 +215,27 @@ Bold   : '**' {toggleFormatting(bold, Any);} ;
 Italic : '//' {prior() == null || (prior() != ':' || !Character.isLetterOrDigit(priorprior()))}? {toggleFormatting(italic, Any);} ;
 Strike : '--' {toggleFormatting(strike, Any);} ;
 
-NoWiki     : '{{{'       -> mode(NOWIKI_INLINE) ;
+NoWiki : '{{{' -> mode(NOWIKI_INLINE) ;
 
 fragment CODETAGTYPE : 'c++' | 'java' | 'xhtml' | 'xml' ;
 fragment CODETAGTYPEHTML : CODETAGTYPE | 'html';
 
-CodeTagStart  : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
+CodeTagStart : '[<' CODETAGTYPE '>]' {doCodeTagStart(CODETAG_INLINE);} ;
 HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 
 /* ***** Code formatting ***** */
+// The rules match in this order: CodeBlockLine, CodeStartEOF, CodeStart, NoCodeStart, CodeInlineStart
 
-CodeStart : START '```' .*? LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+// We accept inline codeblocks without language hints.
+// (LineBreak EOF?)? ensures that this rule matches before CodeStartEOF or CodeStart
+// We strip off the initial ``` and whitespace before processing as a CODE_BLOCK
+CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
+
+// Ignore codeblocks that start immediately before EOF
+CodeStartEOF : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
+
+CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+NoCodeStart: '```' -> type(Any) ;
 CodeInlineStart : '`' -> mode(CODE_INLINE) ;
 
 /* ***** Links ***** */
@@ -356,7 +372,7 @@ NoWikiInlineAny : INLINE*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
 mode NOWIKI_BLOCK;
 
-NoWikiAny      : .*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
+NoWikiAny : .*? '}}}' {seek(-3);} -> mode(NOWIKI_END);
 
 mode NOWIKI_END;
 
@@ -375,7 +391,7 @@ CodeTagInlineAny : INLINE*? '[</' CODETAGTYPE '>]' {doEndCodeTag();} ;
 
 mode CODETAG_BLOCK;
 
-CodeTagAny    : .*? ENDCODETAG {doEndCodeTag();} ;
+CodeTagAny : .*? ENDCODETAG {doEndCodeTag();} ;
 
 mode CODETAG_END;
 
@@ -389,21 +405,35 @@ HtmlInlineAny : INLINE*? '[</html>]' {doEndCodeTag();} ;
 
 mode HTML_BLOCK;
 
-HtmlAny    : .*? '[</html>]' {doEndCodeTag();} ;
+HtmlAny : .*? '[</html>]' {doEndCodeTag();} ;
 
 // ***** Code
 
 mode CODE_BLOCK;
 
+// CodeNoEnd will match only if there is no terminating
+// code token (```).
 CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
+CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+
+mode CODE_BLOCK_EOF;
+
+CodeToEof : .*? EOF {seek(-1);} -> type(CodeAny), mode(CODE_BLOCK_EOF_END);
 
 mode CODE_BLOCK_END;
 
 CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 
+mode CODE_BLOCK_EOF_END;
+
+CodeEofEnd : . -> type(CodeEnd), mode(DEFAULT_MODE);
+
 mode CODE_INLINE;
 
-CodeInlineAny : ~('`' | '\n' | '\r')+ ;
+CodeInlineAny : .*? ('`' | LineBreak) {seek(-1);} -> mode(CODE_INLINE_END) ;
+
+mode CODE_INLINE_END;
+
 CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.

@@ -244,7 +244,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitPreformat(final PreformatContext ctx) {
-    return new InlineCode(ctx.NoWikiInlineAny().getText());
+    return new InlineNowiki(ctx.NoWikiInlineAny().getText());
   }
 
   /**
@@ -433,7 +433,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitNowiki(final NowikiContext ctx) {
-    return new Code(ctx.NoWikiAny().getText());
+    return new Nowiki(ctx.NoWikiAny().getText());
   }
 
   /**
@@ -449,14 +449,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitCodeblock(final CodeblockContext ctx) {
-    // For some reason the codeblock rule matches when the markup has a
-    // trailing CodeStart token // (with no CodeAny or CodeEnd) so check for
-    // null CodeAny before processing.
-    if (ctx.CodeAny() != null) {
-      return new Code(ctx.CodeAny().getText(), ctx.CodeStart().getText().trim());
-    } else {
-      return new Plaintext("```");
-    }
+    return new Code(ctx.CodeAny().getText(), ctx.CodeStart().getText().trim());
   }
 
   /**
@@ -464,7 +457,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
-    return new InlineCode(ctx.CodeInlineAny().getText(), "");
+    return new InlineCode(ctx.CodeInlineAny().getText());
   }
 
   /**

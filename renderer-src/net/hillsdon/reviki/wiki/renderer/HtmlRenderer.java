@@ -116,6 +116,11 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
     }
 
     @Override
+    public String visitNowiki(final Nowiki node) {
+      return String.format("<pre %s>%s</pre>", CSS_CLASS_ATTR, Escape.html(node.getText()));
+    }
+
+    @Override
     public String visitHeading(final Heading node) {
       return renderTagged("h" + node.getLevel(), Optional.of(node));
     }
@@ -141,15 +146,19 @@ public class HtmlRenderer extends CreoleBasedRenderer<String> {
 
     @Override
     public String visitInlineCode(final InlineCode node) {
-      String out = "";
-      if (node.getLanguage().isPresent()) {
-        out += "<code class='wiki-content inline'>";
-      } else {
-        out += "<code " + CSS_CLASS_ATTR + ">";
+      String codeClass;
+      if (node.getLanguage().isPresent() && !node.getLanguage().get().isEmpty()) {
+        codeClass = " " + node.getLanguage().get();
       }
-      out += Escape.html(node.getText());
-      out += "</code>";
-      return out;
+      else {
+        codeClass = "";
+      }
+      return String.format("<code class='wiki-content inline%s'>%s</code>", codeClass, Escape.html(node.getText()));
+    }
+
+    @Override
+    public String visitInlineNowiki(final InlineNowiki node) {
+      return String.format("<code>%s</code>", Escape.html(node.getText()));
     }
 
     @Override

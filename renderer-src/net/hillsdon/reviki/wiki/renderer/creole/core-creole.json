@@ -294,7 +294,7 @@
   {
     "name":   "Inline syntax highlighting",
     "input":  "Look at this [<java>]System.out.println(\"code!\");[</java>]",
-    "output": "<p>Look at this <code class='wiki-content inline'>System.out.println(&quot;code!&quot;);</code></p>"
+    "output": "<p>Look at this <code class='wiki-content inline java'>System.out.println(&quot;code!&quot;);</code></p>"
   },
   {
     "name":   "Block syntax highlighting",
