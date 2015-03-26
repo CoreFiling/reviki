@@ -22,7 +22,7 @@
     <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
-  <link rel="stylesheet" href="<sw:resourceUrl path="highlight-default.css"/>" media="all" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="highlight.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="highlight-cfl.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
