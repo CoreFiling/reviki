@@ -30,6 +30,11 @@
     "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
   },
   {
+    "name":   "Block syntax highlighting escape hint",
+    "input":  "```j\"ava\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```",
+    "output": "<pre><code class='j&quot;ava'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre>"
+  },
+  {
     "name":   "Block syntax highlighting java hint, no final newline",
     "input":  "```java\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");```",
     "output": "<pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);</code></pre>"
