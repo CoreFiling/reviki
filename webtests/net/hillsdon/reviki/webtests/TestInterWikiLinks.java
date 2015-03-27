@@ -34,6 +34,16 @@ public class TestInterWikiLinks extends WebTestSupport {
   }
   
   /**
+   * Test an interwiki link mapping with an opaque URI
+   */
+  public void testOpaque() throws Exception {
+    editWikiPage("ConfigInterWikiLinks", "bar mailto:%25s@example.com", "", "Link mapping.", null);
+    HtmlPage page = editWikiPage(uniqueWikiPageName("InterWikiLinkOpaqueTest"), "bar:test", "", "Add inter-wiki links.", true);
+    HtmlAnchor link = page.getAnchorByHref("mailto:test@example.com");
+    assertEquals("bar:test", link.asText());
+  }
+
+  /**
    * Add many interiki links to a page and test the render time.
    */
   public void testRenderTiming() throws Exception {
