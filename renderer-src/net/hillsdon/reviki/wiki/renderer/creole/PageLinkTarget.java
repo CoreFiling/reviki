@@ -14,7 +14,7 @@ public abstract class PageLinkTarget implements LinkTarget {
   }
 
   public abstract boolean isLinkToCurrentWiki();
-  
+
   protected abstract String getWiki(LinkResolutionContext linkResolutionContext) throws UnknownWikiException;
 
   public abstract String getPageName();
@@ -41,7 +41,7 @@ public abstract class PageLinkTarget implements LinkTarget {
         return new AttachmentLinkTarget(getWiki(resolver), null, getPageName()).isNoFollow(resolver);
       }
       catch (UnknownWikiException ex) {
-        return true; 
+        return true;
       }
     }
     return isLinkToCurrentWiki() && !exists(resolver);
@@ -59,7 +59,7 @@ public abstract class PageLinkTarget implements LinkTarget {
     if (!isLinkToCurrentWiki()) {
       return "inter-wiki";
     }
-    
+
     final boolean exists = !isLinkToCurrentWiki() || exists(resolver);
 
     return exists ? "existing-page" : "new-page";
@@ -70,7 +70,15 @@ public abstract class PageLinkTarget implements LinkTarget {
       return new AttachmentLinkTarget(getWiki(resolver), null, getPageName()).getURL(resolver);
     }
     URI uri = resolver.resolve(getWiki(resolver), getPageName(), getRevision());
-    uri = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), getFragment());
+
+    // uri could be an opaque URI (eg a URI with mailto: scheme)
+    if (uri.isOpaque()) {
+      uri = new URI(uri.getScheme(), uri.getSchemeSpecificPart(), getFragment());
+    }
+    else {
+      uri = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), getFragment());
+    }
+
     return uri.toASCIIString();
   }
 }
