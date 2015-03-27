@@ -236,7 +236,7 @@ CodeStartEOF : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> typ
 
 CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
 NoCodeStart: '```' -> type(Any) ;
-CodeInlineStart : '`' -> mode(CODE_INLINE) ;
+CodeInlineStart : '`' ~('\r' | '\n')+? '`' {setText(getText().substring(1, getText().length() - 1));} ;
 
 /* ***** Links ***** */
 
@@ -427,14 +427,6 @@ CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 mode CODE_BLOCK_EOF_END;
 
 CodeEofEnd : . -> type(CodeEnd), mode(DEFAULT_MODE);
-
-mode CODE_INLINE;
-
-CodeInlineAny : .*? ('`' | LineBreak) {seek(-1);} -> mode(CODE_INLINE_END) ;
-
-mode CODE_INLINE_END;
-
-CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;

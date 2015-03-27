@@ -97,7 +97,7 @@
   {
     "name":   "Inline syntax highlighting, ended by newline",
     "input":  "Some text `System.out.print(\"Hello, \");\nend text",
-    "output": "<p>Some text <code class='wiki-content inline'>System.out.print(&quot;Hello, &quot;);</code>end text</p>"
+    "output": "<p>Some text `System.out.print(&quot;Hello, &quot;);\nend text</p>"
   },
   {
     "name":   "Inline syntax highlighting at beginning of line with no other content",
@@ -107,12 +107,12 @@
   {
     "name":   "Inline syntax highlighting empty",
     "input":  "``",
-    "output": ""
+    "output": "<p>``</p>"
   },
   {
     "name":   "Inline syntax highlighting single followed by newline",
     "input":  "`\n",
-    "output": ""
+    "output": "<p>`</p>"
   },
   {
     "name":   "Image link vs no wiki",
