@@ -91,6 +91,16 @@ options { superClass=ContextSensitiveLexer; }
     setText(codeType);
     mode(toMode);
   }
+
+  public void doCodeStart() {
+    if (findBeforeVerbatim("```", "\\Z", true, true, false, false)) {
+      setText(getText().trim().substring(3));
+      mode(CODE_BLOCK);
+    }
+    else {
+      setType(Any);
+    }
+  }
   
   public void doEndCodeTag() {
     String txt = getText();
@@ -229,12 +239,12 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 // We accept inline codeblocks without language hints.
 // (LineBreak EOF?)? ensures that this rule matches before CodeStartEOF or CodeStart
 // We strip off the initial ``` and whitespace before processing as a CODE_BLOCK
-CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
+CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK_INLINE), type(CodeStart);
 
 // Ignore codeblocks that start immediately before EOF
 CodeStartEOF : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
 
-CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {doCodeStart();} ;
 NoCodeStart: '```' -> type(Any) ;
 CodeInlineStart : '`' ~('\r' | '\n')+? '`' {setText(getText().substring(1, getText().length() - 1));} ;
 
@@ -411,10 +421,22 @@ HtmlAny : .*? '[</html>]' {doEndCodeTag();} ;
 
 mode CODE_BLOCK;
 
+// CodeInternal will match only if there if the codeblock is immediately
+// terminated
+CodeAnyEmpty : WS* '```' {seek(-3);} -> type(CodeAny), mode(CODE_BLOCK_END) ;
+CodeInternal : . -> mode(CODE_BLOCK_INTERNAL), more ;
+
+mode CODE_BLOCK_INTERNAL;
+
+CodeAny : .*? LineBreak WS* '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
+CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+
+mode CODE_BLOCK_INLINE;
+
 // CodeNoEnd will match only if there is no terminating
 // code token (```).
-CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
-CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+CodeAnyInline : .*? '```' {seek(-3);} -> type(CodeAny), mode(CODE_BLOCK_END) ;
+CodeEofInline : . -> mode(CODE_BLOCK_EOF), more ;
 
 mode CODE_BLOCK_EOF;
 

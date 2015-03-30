@@ -140,6 +140,23 @@ public abstract class ContextSensitiveLexer extends Lexer {
    *         failure.
    */
   public boolean findBefore(final String target, final String limit) {
+    return findBeforeVerbatim(target, limit, false, false, true, true);
+  }
+
+  /**
+   * Reads ahead in the input stream (as far as it needs) to see if the given
+   * target string occurs before the given limit string.
+   *
+   * @param target The string being sought out.
+   * @param limit The "failure" string to match.
+   * @param targetAtStart The target must appear at the start of a line.
+   * @param ignoreWhitespaceAtStart Ignore whitespace at the start of a line when matching the target.
+   * @param skipLinks Set to true to not search for target inside links
+   * @param eofIsFail Set to true to count EOF as a failure
+   * @return True if and only if the target string occurs before the limit
+   *         string in the rest of the input stream.
+   */
+  public boolean findBeforeVerbatim(final String target, final String limit, final boolean targetAtStart, final boolean ignoreWhitespaceAtStart, final boolean skipLinks, final boolean eofIsFail) {
     int ilen = _input.size() - _input.index();
     int tlen = target.length();
     int llen = limit.length();
@@ -148,29 +165,34 @@ public abstract class ContextSensitiveLexer extends Lexer {
     boolean start = false;
 
     for (int i = 0; i < ilen - tlen; i++) {
-      // Fast-forward the input stream over links, as special tokenisation rules
-      // apply there
-      String next = get(i, 2);
-      if (next.equals("[[") || next.equals("{{")) {
-        inlink = true;
-      }
-
-      if (inlink) {
-        if (next.equals("]]") || next.equals("}}")) {
-          inlink = false;
+      if (skipLinks) {
+        // Fast-forward the input stream over links, as special tokenisation rules
+        // apply there
+        String next = get(i, 2);
+        if (next.equals("[[") || next.equals("{{")) {
+          inlink = true;
         }
-        else {
-          continue;
+
+        if (inlink) {
+          if (next.equals("]]") || next.equals("}}")) {
+            inlink = false;
+          }
+          else {
+            continue;
+          }
         }
       }
 
       // Keep track of whether we're at the start of a line or not.
       if (get(i).equals("\n") || start) {
         start = get(i).trim().equals("");
+        if (ignoreWhitespaceAtStart) {
+          continue;
+        }
       }
 
       // See if we have a match for either string.
-      if (target.equals(get(i, tlen))) {
+      if ((!targetAtStart || start) && target.equals(get(i, tlen))) {
         // Special case for italics: the "//" in "://" is not an italic symbol.
         if (target.equals("//")) {
           String before = get(i - 2, 2);
@@ -186,13 +208,16 @@ public abstract class ContextSensitiveLexer extends Lexer {
         if (limit.startsWith("\\L") && start && limit.substring(2).equals(get(i + 1, llen - 2))) {
           break;
         }
+        else if (limit.equals("\\Z") && (i == _input.size() - 1)) {
+          break;
+        }
         else if (limit.equals(get(i, llen))) {
           break;
         }
       }
     }
 
-    return false;
+    return !eofIsFail;
   }
 
   /**
