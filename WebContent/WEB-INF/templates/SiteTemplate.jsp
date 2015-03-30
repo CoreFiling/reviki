@@ -22,7 +22,7 @@
     <link rel="search" href="<sw:wikiUrl page="FindPage" extraPath="/opensearch.xml"/>" type="application/opensearchdescription+xml" title="Wiki Search" />
   </c:if>
   <link rel="stylesheet" href="<sw:resourceUrl path="bootstrap.css"/>" media="all" type="text/css" />
-  <link rel="stylesheet" href="<sw:resourceUrl path="highlight-default.css"/>" media="all" type="text/css" />
+  <link rel="stylesheet" href="<sw:resourceUrl path="highlight.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="highlight-cfl.css"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<c:url value="${cssUrl}"/>" media="all" type="text/css" />
   <link rel="stylesheet" href="<sw:resourceUrl path="themes/reviki-flat/reviki-flat.css"/>" media="screen" type="text/css" />
@@ -50,10 +50,10 @@
 </head>
 <body>
   <c:if test="${not empty flash}">
-    <div id="flash">
-      <p>
-        <c:out value="${flash}"/>
-      </p>
+    <div class="container-fluid" id="flash">
+      <div class="alert alert-warning" role="alert">
+         <c:out value="${flash}"/>
+      </div>
     </div>
   </c:if>
   <c:if test="${wikiIsValid != null and wikiIsValid}">
