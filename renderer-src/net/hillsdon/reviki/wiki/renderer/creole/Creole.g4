@@ -154,7 +154,7 @@ code        : codetag | html | codeblock ;
 inlinecode  : inlinecodetag | inlinehtml | inlinecodeblock;
 
 codeblock      : CodeStart CodeAny CodeEnd ;
-inlinecodeblock : CodeInlineStart CodeInlineAny CodeInlineEnd ;
+inlinecodeblock : CodeInlineStart ;
 codetag        : CodeTagStart CodeTagAny CodeTagEnd ;
 inlinecodetag  : CodeTagStart CodeTagInlineAny CodeTagEnd ;
 

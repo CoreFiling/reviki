@@ -457,7 +457,7 @@ public class Visitor extends CreoleASTBuilder {
    */
   @Override
   public ASTNode visitInlinecodeblock(final InlinecodeblockContext ctx) {
-    return new InlineCode(ctx.CodeInlineAny().getText());
+    return new InlineCode(ctx.CodeInlineStart().getText());
   }
 
   /**

@@ -91,6 +91,16 @@ options { superClass=ContextSensitiveLexer; }
     setText(codeType);
     mode(toMode);
   }
+
+  public void doCodeStart() {
+    if (findBeforeVerbatim("```", "\\Z", true, true, false, false)) {
+      setText(getText().trim().substring(3));
+      mode(CODE_BLOCK);
+    }
+    else {
+      setType(Any);
+    }
+  }
   
   public void doEndCodeTag() {
     String txt = getText();
@@ -229,14 +239,14 @@ HtmlStart  : '[<html>]' {doCodeTagStart(HTML_INLINE);} ;
 // We accept inline codeblocks without language hints.
 // (LineBreak EOF?)? ensures that this rule matches before CodeStartEOF or CodeStart
 // We strip off the initial ``` and whitespace before processing as a CODE_BLOCK
-CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK), type(CodeStart);
+CodeBlockLine : (START | WS*) '```' ~('\n' | '\r')* '```' WS* (LineBreak EOF?)? {doStartCodeLine();} -> mode(CODE_BLOCK_INLINE), type(CodeStart);
 
 // Ignore codeblocks that start immediately before EOF
 CodeStartEOF : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak EOF -> type(Any) ;
 
-CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {setText(getText().trim().substring(3));} -> mode(CODE_BLOCK) ;
+CodeStart : START '```' ~(' ' | '\t' | '\r' | '\n')* WS* LineBreak {doCodeStart();} ;
 NoCodeStart: '```' -> type(Any) ;
-CodeInlineStart : '`' -> mode(CODE_INLINE) ;
+CodeInlineStart : '`' ~('\r' | '\n')+? '`' {setText(getText().substring(1, getText().length() - 1));} ;
 
 /* ***** Links ***** */
 
@@ -303,7 +313,7 @@ fragment DIGIT : ('0'..'9') ;
 
 // 'START' matches something which is start-of-line-like. Currently that's upon
 // entering a list item or table cell
-fragment START : {start}? | {intr && priorTokId == TdStart}? WS* | LINE ;
+fragment START : {start}? | {intr && priorTokId == TdStart}? WS* | LINE | {priorTokId == TerseBlockquoteSt}? WS* ;
 fragment LINE  : {getCharPositionInLine()==0}? (' '|'\t')*;
 
 /* ***** Contextual stuff ***** */
@@ -411,10 +421,22 @@ HtmlAny : .*? '[</html>]' {doEndCodeTag();} ;
 
 mode CODE_BLOCK;
 
+// CodeInternal will match only if there if the codeblock is immediately
+// terminated
+CodeAnyEmpty : WS* '```' {seek(-3);} -> type(CodeAny), mode(CODE_BLOCK_END) ;
+CodeInternal : . -> mode(CODE_BLOCK_INTERNAL), more ;
+
+mode CODE_BLOCK_INTERNAL;
+
+CodeAny : .*? LineBreak WS* '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
+CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+
+mode CODE_BLOCK_INLINE;
+
 // CodeNoEnd will match only if there is no terminating
 // code token (```).
-CodeAny : .*? '```' {seek(-3);} -> mode(CODE_BLOCK_END) ;
-CodeEof : . -> mode(CODE_BLOCK_EOF), more ;
+CodeAnyInline : .*? '```' {seek(-3);} -> type(CodeAny), mode(CODE_BLOCK_END) ;
+CodeEofInline : . -> mode(CODE_BLOCK_EOF), more ;
 
 mode CODE_BLOCK_EOF;
 
@@ -427,14 +449,6 @@ CodeEnd : '```' -> mode(DEFAULT_MODE) ;
 mode CODE_BLOCK_EOF_END;
 
 CodeEofEnd : . -> type(CodeEnd), mode(DEFAULT_MODE);
-
-mode CODE_INLINE;
-
-CodeInlineAny : .*? ('`' | LineBreak) {seek(-1);} -> mode(CODE_INLINE_END) ;
-
-mode CODE_INLINE_END;
-
-CodeInlineEnd : ('`' | LineBreak) -> mode(DEFAULT_MODE) ;
 
 // Helper token types, not directly matched, but seta s the type of other tokens.
 mode HELPERS;
