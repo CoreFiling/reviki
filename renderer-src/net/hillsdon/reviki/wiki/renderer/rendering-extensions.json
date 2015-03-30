@@ -255,6 +255,16 @@
     "output": "<blockquote><p>first</p></blockquote><blockquote><p>second</p></blockquote>"
   },
   {
+    "name":   "Terse Blockquotes - list on first line",
+    "input":  "\"\"\"*a\n*b\"\"\"",
+    "output": "<blockquote><ul><li>a</li><li>b</li></ul></blockquote>"
+  },
+  {
+    "name":   "Terse Blockquotes - code start on first line",
+    "input":  "\"\"\"```java\nSystem.out.print(\"Hello, \");\nSystem.out.println(\"world!\");\n```\n\"\"\"",
+    "output": "<blockquote><pre><code class='java'>System.out.print(&quot;Hello, &quot;);\nSystem.out.println(&quot;world!&quot;);\n</code></pre></blockquote>"
+  },
+  {
     "name":   "Formatting inside tables",
     "input":  "|* Foo\n* Bar\n** Baz|world|{{{look\nsome\ncode}}}|\n|=Table|=header|=cells|",
     "output": "<table><tr><td><ul><li>Foo</li><li>Bar<ul><li>Baz</li></ul></li></ul></td><td>world</td><td><pre>look\nsome\ncode</pre></td></tr><tr><th>Table</th><th>header</th><th>cells</th></tr></table>"
