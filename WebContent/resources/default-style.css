@@ -168,8 +168,9 @@ div#MarkupHelp table {
   margin-bottom: 0; border-top: 3px solid #999; border-left: 3px solid #999;
   border-right: 3px solid #BBB; border-bottom: 3px solid #BBB
 }
+
 div#MarkupHelp td {
-  font-size: 80%; padding: 0.2em; margin: 0; border: 1px solid #999; border-width: 1px 0 1px 0;
+  font-size: 80%; padding: 0.3em; margin: 0; border: 1px solid #999; border-width: 1px 0 1px 0;
   vertical-align: top; white-space: nowrap;
 }
 div#MarkupHelp td.arrow {
@@ -189,6 +190,8 @@ div#MarkupHelp p {
 #MarkupHelp table {
   border-spacing: 0;
   border-collapse: separate;
+  float: left;
+  margin-right: 15px;
 }
 
 @media print {
