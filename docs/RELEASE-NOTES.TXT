@@ -1,6 +1,29 @@
 Reviki
 
                               Version History
+0.5.0 (2015-04-02)
+------------------
+
+* Introduced new wiki syntax:
+
+  + Triple double quotes (""") can be used to mark up block quotations.
+    [REVIKI-569]
+
+  + Back-ticks can be used to mark up sections of code.  Triple back-ticks
+    (```) are used for blocks of code and may contain a language hint.
+    Single back-ticks may be used for inline code.
+    [REVIKI-587]
+
+* Fixed an issue that prevented opaque URIs (e.g. mailto: links) from working
+  as the target of inter-wiki links.
+  [REVIKI-602]
+
+* Added support for single square bracket (confluence style) links to the
+  renderer.  These are not enabled in Reviki, but may be enabled by systems
+  embedding the Reviki renderer (e.g. the JIRA plugin).
+  [REVIKI-592, REVIKI-599]
+
+
 0.4.0 (2014-10-14)
 ------------------
 
