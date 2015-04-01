@@ -24,6 +24,18 @@ Reviki
   [REVIKI-592, REVIKI-599]
 
 
+0.4.1 (2014-12-05)
+------------------
+
+* Fixed an issue introduced in 0.4.0 that prevented completely empty table
+  cells ("||") from being parsed correctly.
+  [REVIKI-573]
+
+* Fixed an issue that meant reviki always used the obsolete SSLv3 protocol 
+  when using HTTPS to communicate with the SVN server.
+  [REVIKI-570]
+
+
 0.4.0 (2014-10-14)
 ------------------
 
