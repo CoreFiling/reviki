@@ -183,6 +183,10 @@ div#MarkupHelp p {
   font-size: 70%;
 }
 
+div.markup_table {
+  height: 35em;
+}
+
 #MarkupHelp td {
   padding: 0;
 }
@@ -192,6 +196,7 @@ div#MarkupHelp p {
   border-collapse: separate;
   float: left;
   margin-right: 15px;
+  height: 100%;
 }
 
 @media print {
