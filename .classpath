@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-fileupload-1.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/diff_match_patch.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jhighlight-1.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jstl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/lucene-core-2.2.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/lucene-highlighter-2.2.0.jar"/>
