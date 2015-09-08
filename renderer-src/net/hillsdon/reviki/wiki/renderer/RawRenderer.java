@@ -7,8 +7,8 @@ import java.io.UnsupportedEncodingException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
-import net.hillsdon.reviki.wiki.renderer.creole.CreoleRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 
 /**
  * A basic renderer which just turns its input into a stream. This exploits the
@@ -23,7 +23,7 @@ public class RawRenderer extends MarkupRenderer<InputStream> {
   @Override
   public ASTNode parse(final PageInfo page) {
     _page = page;
-    return CreoleRenderer.render(page, null, null);
+    return new Raw(page.getContent());
   }
 
   @Override
