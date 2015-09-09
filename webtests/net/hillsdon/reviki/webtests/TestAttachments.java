@@ -61,7 +61,7 @@ public class TestAttachments extends WebTestSupport {
     TextPage attachment = (TextPage) link.click();
     return attachment.getContent().trim();
   }
-  
+
   public void testGetAttachmentWithNoResults() {
     final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     ChangeInfo ci = new ChangeInfo("k", "k", "k", new java.util.Date(), 10000, "ro", StoreKind.ATTACHMENT, null, null, 1221221);
@@ -158,7 +158,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
   }
-  
+
   @SuppressWarnings("unchecked")
   public void testUploadRenameAndDeleteAttachment() throws Exception {
     // https://bugs.corefiling.com/show_bug.cgi?id=13574
@@ -190,7 +190,7 @@ public class TestAttachments extends WebTestSupport {
     List<HtmlDeletedText> previousRevisions = (List<HtmlDeletedText>) attachments.getByXPath("//span[substring(text(), 1, 8)='file.txt']");
     assertEquals(1, previousRevisions.size());
   }
-  
+
   public void testAttachmentsPageContainsHeader() throws Exception {
     // https://jira.int.corefiling.com/browse/REVIKI-642
     // Check that the header page was added for the attachements page

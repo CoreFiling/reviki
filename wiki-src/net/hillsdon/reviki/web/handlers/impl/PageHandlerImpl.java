@@ -137,7 +137,7 @@ public class PageHandlerImpl implements PageHandler {
           addSideBarEtcToRequest(request, response);
         }
         return page.get(pageReference, path, request, response);
-      }     
+      }
     }
   }
 

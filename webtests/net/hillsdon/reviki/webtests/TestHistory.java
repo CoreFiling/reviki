@@ -67,7 +67,7 @@ public class TestHistory extends WebTestSupport {
     assertEquals(1, divs.size());
 
   }
-  
+
   public void testHistoryPageContainsHeader() throws Exception {
     // https://jira.int.corefiling.com/browse/REVIKI-642
     // Check that the header page was added for the history page
@@ -84,7 +84,7 @@ public class TestHistory extends WebTestSupport {
       editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
     }
   }
-  
+
   public void testAtom() throws Exception {
     // https://bugs.corefiling.com/show_bug.cgi?id=44456
     String pageName = uniqueWikiPageName("HistoryAtomTest");
