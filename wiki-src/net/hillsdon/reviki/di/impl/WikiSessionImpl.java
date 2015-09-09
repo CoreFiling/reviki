@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.hillsdon.reviki.configuration.DeploymentConfiguration;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.di.WikiSession;
+import net.hillsdon.reviki.search.impl.BasicAuthAwareSearchEngine;
 import net.hillsdon.reviki.search.impl.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.impl.LuceneSearcher;
 import net.hillsdon.reviki.vc.PageInfo;
@@ -90,8 +92,6 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
   private SvnWikiRenderer _renderer;
   private PluginsImpl _plugins;
 
-  private ExternalCommitAwareSearchEngine _searchEngine;
-
   public WikiSessionImpl(final ApplicationSessionImpl parent, final WikiConfiguration configuration) {
     super(parent, configuration);
   }
@@ -123,30 +123,33 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
         return _renderer.render(ast,  urlOutputFilter);
       }
     };
-    _searchEngine = new ExternalCommitAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer));
 
-    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
+    WikiUrls wikiUrls = container.getComponent(WikiUrls.class);
+    InternalLinker internalLinker = new InternalLinker(wikiUrls);
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
+    BasicAuthAwareSearchEngine authSearch = new BasicAuthAwareSearchEngine(new LuceneSearcher(configuration.getWikiName(), primarySearchDir, otherSearchDirs, renderer), getParentContainer().getComponent(DeploymentConfiguration.class));
+    final ExternalCommitAwareSearchEngine searchEngine = new ExternalCommitAwareSearchEngine(authSearch);
     DeletedRevisionTracker tracker = new InMemoryDeletedRevisionTracker();
-    Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), _searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
+    Supplier<PageStore> pageStoreFactory = new PerRequestPageStoreFactory(configuration.getWikiName(), searchEngine, tracker, operations, autoPropertiesApplier, new FixedMimeIdentifier());
     final RequestScopedPageStore pageStore = new RequestScopedPageStore(pageStoreFactory);
     ConfigPageCachingPageStore cachingPageStore = new ConfigPageCachingPageStore(pageStore);
     PageStoreConfiguration pageStoreConfiguration = new PageStoreConfiguration(cachingPageStore, applicationUrls);
-    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, _searchEngine);
+    final WikiGraph wikiGraph = new WikiGraphImpl(cachingPageStore, searchEngine);
     _renderer = new SvnWikiRenderer(pageStoreConfiguration, pageStore, internalLinker, new Supplier<List<Macro>>() {
       public List<Macro> get() {
-        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(_searchEngine), new AttrMacro(pageStore)));
+        List<Macro> macros = new ArrayList<Macro>(Arrays.<Macro>asList(new IncomingLinksMacro(wikiGraph), new OutgoingLinksMacro(wikiGraph), new SearchMacro(searchEngine), new AttrMacro(pageStore)));
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }
     });
 
     _plugins = new PluginsImpl(pageStore);
-    _searchEngine.setPageStore(pageStore);
+    searchEngine.setPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
 
+    container.addComponent(authSearch.getRequestLifecycleAware()); // This needs adding so that RequestLifecycleAwareness works, but it shouldn't show up as the search engine
     container.addComponent(tracker);
     container.addComponent(operations);
     container.addComponent(PageStore.class, pageStore);
@@ -159,7 +162,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     container.addComponent(_plugins);
     container.addComponent(_renderer);
     container.addComponent(_renderer.getRenderers());
-    container.addComponent(_searchEngine);
+    container.addComponent(searchEngine);
     container.addComponent(DiffGenerator.class, DiffGeneratorImpl.class);
     container.addComponent(FeedWriter.class, AtomFeedWriter.class);
 
@@ -178,7 +181,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     // Allow plugin classes to depend on the core wiki API.
     _plugins.addPluginAccessibleComponent(pageStore);
     _plugins.addPluginAccessibleComponent(wikiGraph);
-    _plugins.addPluginAccessibleComponent(_searchEngine);
+    _plugins.addPluginAccessibleComponent(searchEngine);
 
     container.addComponent(ChangeNotificationDispatcherImpl.class);
 
