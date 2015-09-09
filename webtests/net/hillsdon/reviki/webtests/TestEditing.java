@@ -18,6 +18,8 @@ package net.hillsdon.reviki.webtests;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import net.hillsdon.reviki.vc.PageReference;
+
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -27,6 +29,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
+
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 
 public class TestEditing extends WebTestSupport {
 
@@ -77,6 +81,23 @@ public class TestEditing extends WebTestSupport {
     edited = editWikiPage(name, "Initial Status: <<attr:status>>", "", "", false);
     assertTrue(edited.asText().contains("Initial Status:"));
     assertFalse(edited.asText().contains("Initial Status: completed"));
+  }
+  
+  public void testEditPageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the edit page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("EditPageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage editPage = clickEditLink(edited);
+      assertTrue(editPage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
   }
   
   public void testPreviewDiffBug() throws Exception {

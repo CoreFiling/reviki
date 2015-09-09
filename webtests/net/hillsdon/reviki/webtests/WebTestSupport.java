@@ -292,5 +292,9 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage getWikiList() throws IOException {
     return getWebPage("list");
   }
+  
+  protected HtmlPage clickHistoryLink(final HtmlPage page) throws IOException {
+    return (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
+  }
 
 }
