@@ -87,19 +87,24 @@ public class BasicAuthAwareSearchEngine implements SearchEngine {
         final SearchMatch match = (SearchMatch) o;
         Boolean accessOk = wikiAccessOkCache.get(match.getWiki());
         if (accessOk == null) {
+          // Determine if the user is allowed access to the matched wiki, based on:
+          // * Whether or not a username and password are required to index the wiki, if not then assume everyone is allowed access 
+          // * If a username is required then determine if the current user has access.  This is slower, hence the short circuit described in the first point.
           try {
             WikiConfiguration configuration = _config.getConfiguration(match.getWiki());
-            RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), new AutoPropertiesApplierImpl(new AutoProperties() {
-              public Map<String, String> read() {
-                return new LinkedHashMap<String, String>();
+            if (!"".equals(configuration.getSVNUser())) {
+              RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), new AutoPropertiesApplierImpl(new AutoProperties() {
+                public Map<String, String> read() {
+                  return new LinkedHashMap<String, String>();
+                }
+              })));
+              operations.create(_request.get());
+              try {
+                operations.checkPath(match.getPage(), -1);
               }
-            })));
-            operations.create(_request.get());
-            try {
-              operations.checkPath(match.getPage(), -1);
-            }
-            finally {
-              operations.destroy();
+              finally {
+                operations.destroy();
+              }
             }
             accessOk = true;
           }
