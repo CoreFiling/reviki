@@ -15,9 +15,12 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 import static net.hillsdon.reviki.webtests.TestAttachments.getTextAttachmentAtEndOfLink;
 
 import java.util.List;
+
+import net.hillsdon.reviki.vc.PageReference;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -63,14 +66,14 @@ public class TestRename extends AddWikiWebTestSupport {
     assertSearchDoesNotFindPage(page, fromPageName);
     editWikiPage(fromPageName, "This checks old page is new.", "", "Whatever", true);
   }
-  
+
   @SuppressWarnings("unchecked")
   public void testRenameCommitMessage() throws Exception {
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     String toPageName = uniqueWikiPageName("RenameTestTo");
     HtmlPage page = editWikiPage(fromPageName, "Catchy tunes", "", "Whatever", true);
     page = renamePage(fromPageName, toPageName);
-    
+
     HtmlPage history = (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
     List<HtmlTableRow> historyRows = (List<HtmlTableRow>) history.getByXPath("//tr[td]");
     assertEquals(3, historyRows.size());
@@ -83,15 +86,32 @@ public class TestRename extends AddWikiWebTestSupport {
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     String toPageName = uniqueWikiPageName("RenameTestTo");
     editWikiPage(fromPageName, "Catchy tunes", "", "Whatever", true);
-    
+
     renamePage(fromPageName, toPageName);
     HtmlPage fromPage = getWikiPage(fromPageName);
-    
+
     assertTrue(fromPage.asText().contains(toPageName));
-    
+
     // If fromPage is subsequently edited then we no longer show the notification
     fromPage = editWikiPage(fromPageName, "another edit", "", "Whatever", false);
     assertFalse(fromPage.asText().contains(toPageName));
+  }
+
+  public void testRenamePageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the rename page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("RenamePageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage renamePage = (HtmlPage) edited.getAnchorByName("rename").click();
+      assertTrue(renamePage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
   }
 
   private static final String DIRECTORY2 = "doesNotExist2";
@@ -104,7 +124,7 @@ public class TestRename extends AddWikiWebTestSupport {
       removeDir(repository.getCommitEditor("Removing test directory", null), DIRECTORY2);
     }
   }
-  
+
   protected void createOurDirectory2(final ISVNEditor editor) {
     try {
       editor.openRoot(-1);
@@ -129,13 +149,13 @@ public class TestRename extends AddWikiWebTestSupport {
     final String wikiName2 = "uniqueWiki" + uniqueName();
     createOurDirectory2(_repository.getCommitEditor("Creating test directory", null));
     addWiki(wikiName2, DIRECTORY2);
-    
+
     String fromPageName = uniqueWikiPageName("RenameTestFrom");
     editWikiPage(getWebPage("pages/" + wikiName1 + "/" + fromPageName), "Catchy tunes", "", "Whatever", null);
-    
+
     // Now move the wiki page
     String toPageName = uniqueWikiPageName("RenameTestTo");
-    ISVNEditor editor = _repository.getCommitEditor("Move wiki page", null);    
+    ISVNEditor editor = _repository.getCommitEditor("Move wiki page", null);
     try {
       editor.openRoot(-1);
       editor.openDir(DIRECTORY2, -1);
@@ -152,7 +172,7 @@ public class TestRename extends AddWikiWebTestSupport {
     HtmlPage fromPage = getWebPage("pages/" + wikiName1 + "/" + fromPageName);
     HtmlPage toPage = getWebPage("pages/" + wikiName2 + "/" + toPageName);
     assertTrue(toPage.asText(), toPage.asText().contains("Catchy tunes")); // Check we really did move the page
-    
+
     assertTrue(fromPage.asText(), fromPage.asText().contains("Page has been moved outside of this wiki"));
     assertTrue(fromPage.asText(), fromPage.asText().contains(toPageName));
   }

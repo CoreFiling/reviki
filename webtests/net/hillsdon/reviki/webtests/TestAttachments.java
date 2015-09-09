@@ -16,6 +16,7 @@
 package net.hillsdon.reviki.webtests;
 
 import static net.hillsdon.reviki.web.pages.impl.DefaultPageImpl.ERROR_NO_FILE;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,9 +27,11 @@ import java.util.Map;
 
 import net.hillsdon.reviki.vc.AttachmentHistory;
 import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.StoreKind;
 
 import org.apache.commons.io.IOUtils;
+
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -58,7 +61,7 @@ public class TestAttachments extends WebTestSupport {
     TextPage attachment = (TextPage) link.click();
     return attachment.getContent().trim();
   }
-  
+
   public void testGetAttachmentWithNoResults() {
     final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
     ChangeInfo ci = new ChangeInfo("k", "k", "k", new java.util.Date(), 10000, "ro", StoreKind.ATTACHMENT, null, null, 1221221);
@@ -155,7 +158,7 @@ public class TestAttachments extends WebTestSupport {
     HtmlAnchor previousRevision = (HtmlAnchor) attachments.getByXPath("//a[contains(@href, '?revision')]").get(0);
     assertEquals("File 1.", getTextAttachmentAtEndOfLink(previousRevision));
   }
-  
+
   @SuppressWarnings("unchecked")
   public void testUploadRenameAndDeleteAttachment() throws Exception {
     // https://bugs.corefiling.com/show_bug.cgi?id=13574
@@ -186,6 +189,23 @@ public class TestAttachments extends WebTestSupport {
     // Previous version should still be available
     List<HtmlDeletedText> previousRevisions = (List<HtmlDeletedText>) attachments.getByXPath("//span[substring(text(), 1, 8)='file.txt']");
     assertEquals(1, previousRevisions.size());
+  }
+
+  public void testAttachmentsPageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the attachements page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("AttachmentPageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage attachmentsPage = clickAttachmentsLink(edited, name);
+      assertTrue(attachmentsPage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
   }
 
   public void testUploadAttachmentWithDefaultMessage() throws Exception {

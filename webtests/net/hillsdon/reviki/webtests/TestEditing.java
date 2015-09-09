@@ -18,6 +18,8 @@ package net.hillsdon.reviki.webtests;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import net.hillsdon.reviki.vc.PageReference;
+
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -27,6 +29,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
+
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 
 public class TestEditing extends WebTestSupport {
 
@@ -78,7 +82,24 @@ public class TestEditing extends WebTestSupport {
     assertTrue(edited.asText().contains("Initial Status:"));
     assertFalse(edited.asText().contains("Initial Status: completed"));
   }
-  
+
+  public void testEditPageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the edit page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("EditPageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage editPage = clickEditLink(edited);
+      assertTrue(editPage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
+  }
+
   public void testPreviewDiffBug() throws Exception {
     // https://bugs.corefiling.com/show_bug.cgi?id=13510
     // Old versions of the diff_match_patch package have a bug in the diff_cleanupSemantic method
@@ -86,19 +107,19 @@ public class TestEditing extends WebTestSupport {
     String name = uniqueWikiPageName("PreviewPageTest");
     String content = "=" + NEWLINE_TEXTAREA + "This is a lis of things that someone be doing if" + NEWLINE_TEXTAREA + "===Wiki" + NEWLINE_TEXTAREA;
     String newContent = "||" + NEWLINE_TEXTAREA + "==";
-    
+
     HtmlPage edited = editWikiPage(name, content, "", "", true);
     HtmlPage editPage = clickEditLink(edited);
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     HtmlTextArea contentArea = form.getTextAreaByName("content");
     contentArea.setText(newContent);
     editPage = (HtmlPage) form.getButtonByName("preview").click();
-    
+
     form = editPage.getFormByName(ID_EDIT_FORM);
     contentArea = form.getTextAreaByName("content");
     assertEquals(newContent + NEWLINE_TEXTAREA, contentArea.getText());
   }
-  
+
   public void testPreview() throws Exception {
     String name = uniqueWikiPageName("PreviewPageTest");
     HtmlPage editPage = clickEditLink(getWikiPage(name));

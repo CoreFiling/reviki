@@ -136,7 +136,7 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage getWebPage(final String path) throws IOException {
     return (HtmlPage) _client.getPage(getUrl(path));
   }
-  
+
   protected XmlPage getXmlPage(final String path) throws IOException {
     return (XmlPage) _client.getPage(getUrl(path));
   }
@@ -149,7 +149,7 @@ public abstract class WebTestSupport extends TestCase {
   protected HtmlPage getWikiPage(final String name) throws IOException {
     return getWebPage("pages/test/" + URIUtil.encodeWithinPath(name));
   }
-  
+
   protected XmlPage getHistoryAtomFeed(final String name) throws IOException {
     return getXmlPage("pages/test/" + URIUtil.encodeWithinPath(name) + "?history&ctype=atom");
   }
@@ -291,6 +291,10 @@ public abstract class WebTestSupport extends TestCase {
 
   protected HtmlPage getWikiList() throws IOException {
     return getWebPage("list");
+  }
+
+  protected HtmlPage clickHistoryLink(final HtmlPage page) throws IOException {
+    return (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
   }
 
 }

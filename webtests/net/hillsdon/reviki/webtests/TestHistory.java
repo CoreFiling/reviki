@@ -15,7 +15,11 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
+
 import java.util.List;
+
+import net.hillsdon.reviki.vc.PageReference;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomText;
@@ -36,7 +40,7 @@ public class TestHistory extends WebTestSupport {
     String pageName = uniqueWikiPageName("HistoryTest");
     HtmlPage page = editWikiPage(pageName, "Initial content", "", "", true);
     page = editWikiPage(pageName, "Altered content", "", "s/Initial/Altered", false);
-    HtmlPage history = (HtmlPage) ((HtmlAnchor) page.getByXPath("//a[@name='history']").iterator().next()).click();
+    HtmlPage history = clickHistoryLink(page);
     List<HtmlTableRow> historyRows = (List<HtmlTableRow>) history.getByXPath("//tr[td]");
     assertEquals(3, historyRows.size());
     HtmlTableRow altered = historyRows.get(1);
@@ -63,7 +67,24 @@ public class TestHistory extends WebTestSupport {
     assertEquals(1, divs.size());
 
   }
-  
+
+  public void testHistoryPageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the history page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("EditPageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage historyPage = clickHistoryLink(edited);
+      assertTrue(historyPage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
+  }
+
   public void testAtom() throws Exception {
     // https://bugs.corefiling.com/show_bug.cgi?id=44456
     String pageName = uniqueWikiPageName("HistoryAtomTest");
