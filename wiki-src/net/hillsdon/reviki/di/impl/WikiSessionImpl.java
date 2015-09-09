@@ -124,8 +124,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
       }
     };
 
-    WikiUrls wikiUrls = container.getComponent(WikiUrls.class);
-    InternalLinker internalLinker = new InternalLinker(wikiUrls);
+    InternalLinker internalLinker = new InternalLinker(container.getComponent(WikiUrls.class));
     AutoProperiesFromConfigPage autoProperties = new AutoProperiesFromConfigPage();
     AutoPropertiesApplier autoPropertiesApplier = new AutoPropertiesApplierImpl(autoProperties);
     RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), autoPropertiesApplier));
