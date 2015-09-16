@@ -62,13 +62,7 @@
         <div class="row col-md-12">
           <div class="navbar-header">
             <div class="navbar-brand">
-              <c:set var="brandTitle">
-                <c:choose>
-                  <c:when test="${not empty renderedHeader}">${renderedHeader}</c:when>
-                  <c:otherwise>${renderedHeader}</c:otherwise>
-                </c:choose>
-              </c:set>
-              ${brandTitle}
+              ${renderedHeader}
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
