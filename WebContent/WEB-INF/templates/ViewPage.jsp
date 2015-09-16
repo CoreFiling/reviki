@@ -43,7 +43,7 @@
   </tiles:putAttribute>
   <tiles:putAttribute name="content">
     <div id="sidebar" style="float:right">
-      ${renderedSideBar}
+      ${complementaryContent.renderedSideBar}
     </div>
 
     <div id="wiki-rendering">
