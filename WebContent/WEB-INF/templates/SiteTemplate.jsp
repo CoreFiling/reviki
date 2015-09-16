@@ -62,7 +62,7 @@
         <div class="row col-md-12">
           <div class="navbar-header">
             <div class="navbar-brand">
-              ${renderedHeader}
+              ${complementaryContent.renderedHeader}
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
@@ -112,7 +112,7 @@
           </div>
           <div class="panel-footer">
             <div id="footer" class="auxillary">
-              ${renderedFooter}
+              ${complementaryContent.renderedFooter}
               <p id="build-details">Version $Version$.</p>
             </div>
             <tiles:insertAttribute name="content-controls" ignore="true"/>

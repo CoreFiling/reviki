@@ -15,23 +15,18 @@
  */
 package net.hillsdon.reviki.web.dispatching.impl;
 
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.COMPLIMENTARY_CONTENT_PAGES;
-
-import java.io.IOException;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.vc.ChangeNotificationDispatcher;
-import net.hillsdon.reviki.vc.VersionedPageInfo;
-import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
-import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
+import net.hillsdon.reviki.web.common.ComplementaryPageRenderer;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.dispatching.ResourceHandler;
@@ -40,7 +35,6 @@ import net.hillsdon.reviki.web.handlers.PageHandler;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.WikiUrls;
-import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
 import net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAwareManager;
 import net.hillsdon.reviki.wiki.MarkupRenderer;
@@ -104,19 +98,19 @@ public class WikiHandlerImpl implements WikiHandler {
       public View handle(ConsumedPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setAttribute(WikiUrls.KEY, _wikiUrls);
         request.setAttribute(JspView.ATTR_CSS_URL, _internalLinker.uri(BuiltInPageReferences.CONFIG_CSS.getPath(), "ctype=raw").toASCIIString());
-        
+
         // Used for resolving links in the context of this request
         request.setAttribute("internalLinker", _internalLinker);
         request.setAttribute("configuration", _configuration);
         request.setAttribute("pageStore", _cachingPageStore);
         request.setAttribute("linkResolutionContext", new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _configuration, _cachingPageStore));
-        
+
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);
         }
 
         _syncUpdater.sync();
-        addSideBarEtcToRequest(request, response);
+        request.setAttribute("complementaryContent", new ComplementaryPageRenderer(request, response, _renderer, _cachingPageStore));
         return _pageHandler.handle(path, request, response);
       }
     });
@@ -140,14 +134,6 @@ public class WikiHandlerImpl implements WikiHandler {
         request.setAttribute(ATTRIBUTE_WIKI_IS_VALID, false);
         throw ex;
       }
-    }
-  }
-
-  private void addSideBarEtcToRequest(final HttpServletRequest request, final HttpServletResponse response) throws PageStoreException, IOException {
-    for (PageReference ref : COMPLIMENTARY_CONTENT_PAGES) {
-      final String requestVarName = "rendered" + ref.getPath().substring("Config".length());
-      VersionedPageInfo page = _cachingPageStore.get(ref, -1);
-      request.setAttribute(requestVarName, _renderer.render(page, new ResponseSessionURLOutputFilter(request, response)).get());
     }
   }
 
