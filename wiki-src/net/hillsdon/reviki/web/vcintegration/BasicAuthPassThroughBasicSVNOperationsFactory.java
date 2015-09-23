@@ -83,6 +83,9 @@ public class BasicAuthPassThroughBasicSVNOperationsFactory implements BasicSVNOp
   private final AutoPropertiesApplier _autoPropertiesApplier;
 
   public BasicAuthPassThroughBasicSVNOperationsFactory(final SVNURL url, final AutoPropertiesApplier autoPropertiesApplier) {
+    if (null == url) {
+      throw new IllegalArgumentException("url can not be null");
+    }
     _url = url;
     _autoPropertiesApplier = autoPropertiesApplier;
   }

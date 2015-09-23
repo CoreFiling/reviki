@@ -19,8 +19,11 @@ public class PageStoreAuthenticationException extends PageStoreException {
 
   private static final long serialVersionUID = 1L;
 
-  public PageStoreAuthenticationException(Throwable cause) {
+  public PageStoreAuthenticationException(final Throwable cause) {
     super(cause);
   }
 
+  public PageStoreAuthenticationException(final String message) {
+    super(message);
+  }
 }

@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.search.impl;
 
+import static net.hillsdon.reviki.web.common.ViewTypeConstants.CTYPE_TEXT;
+
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -33,6 +35,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
+import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.vcintegration.BasicAuthPassThroughBasicSVNOperationsFactory;
 import net.hillsdon.reviki.web.vcintegration.RequestLifecycleAware;
 import net.hillsdon.reviki.web.vcintegration.RequestScopedThreadLocalBasicSVNOperations;
@@ -77,9 +80,28 @@ public class BasicAuthAwareSearchEngine implements SearchEngine {
     _delegate.index(page, buildingIndex);
   }
 
+  public boolean isRestrictedWiki(final WikiConfiguration wiki) {
+    return !(null == wiki.getSVNUser() || "".equals(wiki.getSVNUser()));
+  }
+
   public Set<SearchMatch> search(final String query, final boolean provideExtracts, boolean singleWiki) throws IOException, QuerySyntaxException, PageStoreException {
-	  final Map<String, Boolean> wikiAccessOkCache = new LinkedHashMap<String, Boolean>();
-    Set<SearchMatch> results = new LinkedHashSet<SearchMatch>(); 
+    // Assuming that there are any restricted wikis configured then to avoid leaking any information we must either:
+    // 1) Silently drop restricted results, or
+    // 2) Ask the user to log in whether or not their query results in hits to a restricted wiki.
+    // We implement option 1 for CTYPE_TEXT requests and option 2 otherwise.
+    if ((_request.get().getHeader("Authorization") == null)
+        && !ViewTypeConstants.is(_request.get(), CTYPE_TEXT)) {
+      for (WikiConfiguration wiki: _config.getWikis()) {
+        if (isRestrictedWiki(wiki)) {
+          throw new PageStoreAuthenticationException("Log in to obtain search results");
+        }
+      }
+    }
+    if ("force".equals(_request.get().getParameter("login"))) {
+      throw new PageStoreAuthenticationException("Log in to obtain search results"); 
+    }
+    final Map<String, Boolean> wikiAccessOkCache = new LinkedHashMap<String, Boolean>();
+	  Set<SearchMatch> results = new LinkedHashSet<SearchMatch>();
     results.addAll(_delegate.search(query, provideExtracts, singleWiki));
     CollectionUtils.filter(results, new Predicate() {
       @Override
@@ -92,7 +114,7 @@ public class BasicAuthAwareSearchEngine implements SearchEngine {
           // * If a username is required then determine if the current user has access.  This is slower, hence the short circuit described in the first point.
           try {
             WikiConfiguration configuration = _config.getConfiguration(match.getWiki());
-            if (!"".equals(configuration.getSVNUser())) {
+            if (isRestrictedWiki(configuration)) {
               RequestScopedThreadLocalBasicSVNOperations operations = new RequestScopedThreadLocalBasicSVNOperations(new BasicAuthPassThroughBasicSVNOperationsFactory(configuration.getUrl(), new AutoPropertiesApplierImpl(new AutoProperties() {
                 public Map<String, String> read() {
                   return new LinkedHashMap<String, String>();

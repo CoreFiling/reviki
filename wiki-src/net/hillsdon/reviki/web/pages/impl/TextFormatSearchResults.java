@@ -24,6 +24,7 @@ import net.hillsdon.reviki.search.SearchMatch;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
+import org.apache.commons.httpclient.util.URIUtil;
 
 /**
  * Currently used by the JavaScript to display the autocomplete search box.
@@ -67,6 +68,9 @@ public class TextFormatSearchResults implements View {
         }
         writer.println(s.toString());
       }
+    }
+    if (request.getHeader("Authorization") == null) {
+      writer.println("Not logged in;Log in to see all results;" + getUrlForPage(request, null, "FindPage") + "?login=force&query=" + URIUtil.encodeWithinQuery(request.getParameter("query")));
     }
   }
 

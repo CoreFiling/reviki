@@ -86,4 +86,8 @@ public class SearchMatch {
     return _page.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return "[SearchMatch:" + _wiki + ":" + _page + "]";
+  }
 }
