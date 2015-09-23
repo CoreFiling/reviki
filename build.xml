@@ -12,7 +12,7 @@
   </presetdef>
 
   <property name="buildNumber" value="dev" />   
-  <property name="version" value="0.5.0" />
+  <property name="version" value="0.6.0" />
   <property name="build-details" value="${version} r${buildNumber}" />
   <property name="generated-source" value="src-gen" />
   <property name="wiki-source" value="wiki-src" />
@@ -32,8 +32,8 @@
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat.version" value="6.0.41"/>
-  <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
+  <property name="tomcat.version" value="7.0.64"/>
+  <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-7/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
 
   <!-- The VNU jar at this URL is repackaged with jarjar to avoid contributing conflicting versions of embedded libraries to other parts of the build. -->
   <property name="vnu-url" value="https://github.com/paulcadman/build/releases/download/20140424/vnu-20140424-jarjar.jar"/>

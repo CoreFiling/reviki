@@ -1,6 +1,23 @@
 Reviki
 
                               Version History
+0.6.0 (2015-09-24)
+------------------
+
+* Fixed an issue that allowed search results to leak information from private
+  wikis (those where the user's SVN credentials would not give them access to
+  the pages).
+  [REVIKI-523]
+
+* Fixed an issue that prevented search from returning results from multiple
+  wikis if the page names matched each other.
+  [REVIKI-647]
+
+* Improved performance by reducing unnecessary parsing of wiki pages
+  when responding to requests that don't need it.
+  [REVIKI-640]
+
+
 0.5.0 (2015-04-02)
 ------------------
 
