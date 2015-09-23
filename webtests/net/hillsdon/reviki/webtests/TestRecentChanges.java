@@ -45,7 +45,7 @@ public class TestRecentChanges extends WebTestSupport {
     assertEquals(first.asText(), createdSecond);
     assertEquals(second.asText(), createdFirst);
 
-    String descriptionOfChange = format("Bump %s up to top.", createdFirst);
+    String descriptionOfChange = String.format("Bump %s up to top.", createdFirst);
     editWikiPage(createdFirst, "Different content", "", descriptionOfChange, false);
     links = getRecentChangesLinks();
     first = links.next();
