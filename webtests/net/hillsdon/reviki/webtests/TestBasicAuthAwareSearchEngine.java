@@ -284,7 +284,7 @@ public class TestBasicAuthAwareSearchEngine extends TestCase {
   public void testResultsWithAuth() throws Exception {
     BasicAuthAwareSearchEngine se = new BasicAuthAwareSearchEngine(_searcher, _config);
 
-    Set<SearchMatch> both = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
+    Set<SearchMatch> both = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME2, PAGE_THE_NAME2, null)));
 
     startRequest(se.getRequestLifecycleAware(), ViewTypeConstants.CTYPE_TEXT, true);
     try {
