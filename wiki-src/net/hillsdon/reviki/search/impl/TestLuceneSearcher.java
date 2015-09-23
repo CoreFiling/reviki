@@ -226,13 +226,22 @@ public class TestLuceneSearcher extends TestCase {
   }
 
   public void testMultiWiki() throws Exception {
-    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME2, null)));
+    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME2, PAGE_THE_NAME2, null)));
     _searcher.index(new PageInfoImpl(WIKI_NAME, PAGE_THE_NAME, "some content", Collections.<String, String>emptyMap()), true);
     _searcher2.index(new PageInfoImpl(WIKI_NAME2, PAGE_THE_NAME2, "some other content", Collections.<String, String>emptyMap()), true);
     assertEquals(expected, _searcher.search("some or content", false, false));
     assertEquals(expected, _searcher2.search("some or content", false, false));
   }
 
+  public void testMultiWikiSamePageName() throws Exception {
+    Set<SearchMatch> expected = unmodifiableSet(ImmutableSet.of(new SearchMatch(true, WIKI_NAME, PAGE_THE_NAME, null), new SearchMatch(true, WIKI_NAME2, PAGE_THE_NAME, null)));
+    assertEquals(2, expected.size()); // Important sanity check: https://jira.int.corefiling.com/browse/REVIKI-647
+    _searcher.index(new PageInfoImpl(WIKI_NAME, PAGE_THE_NAME, "some content", Collections.<String, String>emptyMap()), true);
+    _searcher2.index(new PageInfoImpl(WIKI_NAME2, PAGE_THE_NAME, "some other content", Collections.<String, String>emptyMap()), true);
+    assertEquals(expected, _searcher.search("some or content", false, false));
+    assertEquals(expected, _searcher2.search("some or content", false, false));
+  }
+  
   public void testMultiWikiOrder() throws Exception {
     _searcher.index(new PageInfoImpl(WIKI_NAME, PAGE_THE_NAME, "some content", Collections.<String, String>emptyMap()), true);
     _searcher2.index(new PageInfoImpl(WIKI_NAME2, PAGE_THE_NAME2, "some other content", Collections.<String, String>emptyMap()), true);

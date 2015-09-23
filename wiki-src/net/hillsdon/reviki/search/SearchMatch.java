@@ -76,7 +76,8 @@ public class SearchMatch {
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof SearchMatch) {
-      return _page.equals(((SearchMatch) obj)._page);
+      SearchMatch other = (SearchMatch) obj;
+      return _page.equals(other._page) && (_wiki.equals(other._wiki));
     }
     return false;
   }
