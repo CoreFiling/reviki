@@ -15,9 +15,12 @@
  */
 package net.hillsdon.reviki.webtests;
 
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 import static net.hillsdon.reviki.webtests.TestAttachments.getTextAttachmentAtEndOfLink;
 
 import java.util.List;
+
+import net.hillsdon.reviki.vc.PageReference;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -92,6 +95,23 @@ public class TestRename extends AddWikiWebTestSupport {
     // If fromPage is subsequently edited then we no longer show the notification
     fromPage = editWikiPage(fromPageName, "another edit", "", "Whatever", false);
     assertFalse(fromPage.asText().contains(toPageName));
+  }
+  
+  public void testRenamePageContainsHeader() throws Exception {
+    // https://jira.int.corefiling.com/browse/REVIKI-642
+    // Check that the header page was added for the rename page
+    final PageReference headerPage = PAGE_HEADER;
+    final String expect = "T" + System.currentTimeMillis() + headerPage.getPath().toLowerCase();
+    editWikiPage(headerPage.getPath(), expect, "", "Some new content", null);
+    try {
+      String name = uniqueWikiPageName("RenamePageHeaderTest");
+      HtmlPage edited = editWikiPage(name, "some content", "", "", true);
+      HtmlPage renamePage = (HtmlPage) edited.getAnchorByName("rename").click();
+      assertTrue(renamePage.asText().contains(expect));
+    }
+    finally {
+      editWikiPage(headerPage.getPath(), "", "", "Tidying", null);
+    }
   }
 
   private static final String DIRECTORY2 = "doesNotExist2";
