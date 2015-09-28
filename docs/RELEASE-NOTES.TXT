@@ -1,7 +1,7 @@
 Reviki
 
                               Version History
-0.6.0 (2015-09-24)
+0.6.0 (2015-09-28)
 ------------------
 
 * Fixed an issue that allowed search results to leak information from private
