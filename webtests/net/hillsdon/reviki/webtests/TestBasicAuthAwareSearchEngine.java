@@ -249,7 +249,10 @@ public class TestBasicAuthAwareSearchEngine extends TestCase {
     _searcher2.index(new PageInfoImpl(WIKI_NAME2, PAGE_THE_NAME2, "some other content", Collections.<String, String>emptyMap()), true);
   }
 
-  /** Without auth text results should filter out wiki2 */
+  /**
+   * Without auth text results should filter out wiki2.
+   * This behaviour is important, scripts may rely on these results (e.g. https://svn-dev.int.corefiling.com/svn/usr/js/scripts/weekly-report.py ).
+   */
   public void testTextResultNoAuth() throws Exception {
     BasicAuthAwareSearchEngine se = new BasicAuthAwareSearchEngine(_searcher, _config);
 
