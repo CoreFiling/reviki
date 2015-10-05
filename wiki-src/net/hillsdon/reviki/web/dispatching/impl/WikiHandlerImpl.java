@@ -26,6 +26,7 @@ import net.hillsdon.reviki.vc.PageStoreInvalidException;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.web.common.ConsumedPath;
 import net.hillsdon.reviki.web.common.JspView;
+import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.ComplementaryPageRenderer;
 import net.hillsdon.reviki.web.common.RequestHandler;
 import net.hillsdon.reviki.web.common.View;
@@ -103,7 +104,7 @@ public class WikiHandlerImpl implements WikiHandler {
         request.setAttribute("internalLinker", _internalLinker);
         request.setAttribute("configuration", _configuration);
         request.setAttribute("pageStore", _cachingPageStore);
-        request.setAttribute("linkResolutionContext", new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _configuration, _cachingPageStore));
+        request.setAttribute(RequestAttributes.LINK_RESOLUTION_CONTEXT, new LinkResolutionContext(_internalLinker, _configuration.getInterWikiLinker(), _configuration, _cachingPageStore));
 
         if ("resources".equals(path.peek())) {
           return _resources.handle(path.consume(), request, response);

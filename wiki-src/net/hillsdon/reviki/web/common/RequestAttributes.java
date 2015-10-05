@@ -23,6 +23,8 @@ public final class RequestAttributes {
    */
   public static final String USERNAME = "username";
 
+  public static final String LINK_RESOLUTION_CONTEXT = "linkResolutionContext";
+
   private RequestAttributes() {
   }
   

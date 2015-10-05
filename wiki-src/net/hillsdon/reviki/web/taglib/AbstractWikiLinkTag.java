@@ -23,6 +23,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.impl.ResponseSessionURLOutputFilter;
@@ -76,7 +77,7 @@ public abstract class AbstractWikiLinkTag extends TagSupport {
 
   public int doStartTag() throws JspException {
     try {
-      LinkResolutionContext resolver = (LinkResolutionContext) pageContext.getRequest().getAttribute("linkResolutionContext");
+      LinkResolutionContext resolver = (LinkResolutionContext) pageContext.getRequest().getAttribute(RequestAttributes.LINK_RESOLUTION_CONTEXT);
 
       final HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
       if (resolver != null) {
