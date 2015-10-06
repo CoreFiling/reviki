@@ -89,7 +89,9 @@ public class BasicAuthAwareSearchEngine implements SearchEngine {
     // 1) Silently drop restricted results, or
     // 2) Ask the user to log in whether or not their query results in hits to a restricted wiki.
     // We implement option 1 for CTYPE_TEXT requests and option 2 otherwise.
+    // None of this applies if the search is restricted to a single wiki (i.e. the current wiki, which occurs when using the SearchMacro, https://jira.int.corefiling.com/browse/REVIKI-654)
     if ((_request.get().getHeader("Authorization") == null)
+        && !singleWiki
         && !ViewTypeConstants.is(_request.get(), CTYPE_TEXT)) {
       for (WikiConfiguration wiki: _config.getWikis()) {
         if (isRestrictedWiki(wiki)) {

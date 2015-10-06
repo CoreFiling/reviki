@@ -340,6 +340,18 @@ public class TestBasicAuthAwareSearchEngine extends RequestLifecycleTest {
     }
   }
 
+  /** Without auth normal results can be returned if restricted to the current wiki (https://jira.int.corefiling.com/browse/REVIKI-654) */
+  public void testDefaultResultsNoAuthSingleWiki() throws Exception {
+    BasicAuthAwareSearchEngine se = new BasicAuthAwareSearchEngine(_searcher, _config);
+
+    startRequest(se.getRequestLifecycleAware(), ViewTypeConstants.CTYPE_DEFAULT, false);
+    try {
+      assertEquals(JUST_THE_PAGE, se.search("content", false, true));
+    }
+    finally {
+      se.getRequestLifecycleAware().destroy();
+    }
+  }
 
   /** With auth both results should appear in the results for all CTYPEs. */
   public void testResultsWithAuth() throws Exception {
