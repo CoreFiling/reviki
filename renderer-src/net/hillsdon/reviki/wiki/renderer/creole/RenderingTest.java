@@ -36,6 +36,8 @@ import com.google.common.base.Suppliers;
 public abstract class RenderingTest extends TestCase {
   protected SimplePageStore pageStore;
 
+  protected LinkResolutionContext resolver;
+
   protected LinkPartsHandler linkHandler, imageHandler;
 
   protected Supplier<List<Macro>> macros;
@@ -74,7 +76,7 @@ public abstract class RenderingTest extends TestCase {
       }
     };
 
-    LinkResolutionContext resolver =  makeResolver(wikiUrls);
+    resolver =  makeResolver(wikiUrls);
     linkHandler = new SimpleAnchors(resolver);
     imageHandler = new SimpleImages(resolver);
     macros = Suppliers.ofInstance((List<Macro>) new LinkedList<Macro>());

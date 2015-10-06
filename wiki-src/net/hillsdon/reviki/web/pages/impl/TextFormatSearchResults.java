@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.hillsdon.reviki.search.SearchMatch;
+import net.hillsdon.reviki.web.common.RequestAttributes;
 import net.hillsdon.reviki.web.common.View;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
@@ -42,15 +43,13 @@ public class TextFormatSearchResults implements View {
   }
   
   private static String getUrlForPage(final HttpServletRequest request, final String wiki, final String page) throws Exception {
-    LinkResolutionContext resolver = (LinkResolutionContext) request.getAttribute("linkResolutionContext");
+    LinkResolutionContext resolver = (LinkResolutionContext) request.getAttribute(RequestAttributes.LINK_RESOLUTION_CONTEXT);
     return resolver.resolve(wiki, page).toString();
   }
 
-  public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  public void render(final HttpServletRequest request, final PrintWriter writer) throws Exception {
     String wiki;
     String page;
-    response.setContentType("text/plain");
-    PrintWriter writer = response.getWriter();
     for (SearchMatch matcher : _results) {
       wiki = matcher.getWiki();
       page = matcher.getPage();
@@ -70,8 +69,13 @@ public class TextFormatSearchResults implements View {
       }
     }
     if (request.getHeader("Authorization") == null) {
-      writer.println("Not logged in;Log in to see all results;" + getUrlForPage(request, null, "FindPage") + "?login=force&query=" + URIUtil.encodeWithinQuery(request.getParameter("query")));
+      writer.println("Not logged in;Log in to see all results;" + getUrlForPage(request, null, "FindPage") + "?query=" + URIUtil.encodeWithinQuery(request.getParameter("query")));
     }
+  }
+
+  public void render(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    response.setContentType("text/plain");
+    render(request, response.getWriter());
   }
 
 }

@@ -97,9 +97,6 @@ public class BasicAuthAwareSearchEngine implements SearchEngine {
         }
       }
     }
-    if ("force".equals(_request.get().getParameter("login"))) {
-      throw new PageStoreAuthenticationException("Log in to obtain search results"); 
-    }
     final Map<String, Boolean> wikiAccessOkCache = new LinkedHashMap<String, Boolean>();
 	  Set<SearchMatch> results = new LinkedHashSet<SearchMatch>();
     results.addAll(_delegate.search(query, provideExtracts, singleWiki));
