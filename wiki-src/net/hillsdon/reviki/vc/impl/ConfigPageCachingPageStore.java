@@ -15,9 +15,16 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeSubscriber;
 import net.hillsdon.reviki.vc.InterveningCommitException;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
@@ -33,7 +40,9 @@ import net.hillsdon.reviki.vc.PageStoreException;
  *
  * @author mth
  */
-public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implements CachingPageStore {
+public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implements CachingPageStore, ChangeSubscriber {
+  private static final Log LOG = LogFactory.getLog(ConfigPageCachingPageStore.class);
+  private long _lowestUnsyncedRevision = Integer.MAX_VALUE; // When the cache is empty nothing is unsynced
 
   private static final String CONFIG_PREFIX = "Config";
   private final ConcurrentMap<PageReference, VersionedPageInfo> _cache = new ConcurrentHashMap<PageReference, VersionedPageInfo>();
@@ -48,11 +57,23 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
       return super.get(ref, revision);
     }
 
-    // Note the map may be replaced by another thread so we don't reget the page from the cache.
     VersionedPageInfo pageInfo = _cache.get(ref);
-    if (pageInfo == null || pageInfo.isLocked() ) {
+    if (pageInfo == null) {
       pageInfo = super.get(ref, revision);
-      _cache.put(ref, pageInfo);
+      // NB. revision is one of -1, -2, -3, -4. See VersionedPageInfoImpl
+      synchronized (this) {
+        long pageRev = pageInfo.getRevision();
+        // If pageRev is one of -2, -3 -4 (see VersionedPageInfoImpl)
+        // then the default version of the ConfigPage is used. i.e
+        // it is not fetched from SVN so there's no need to cache it.
+        if (pageRev > -1) {
+          _cache.put(ref, pageInfo);
+          LOG.debug("Caching: " + ref.getPath() + " Revision: " + Long.toString(pageRev));
+          if (pageRev <= _lowestUnsyncedRevision) {
+            _lowestUnsyncedRevision = pageRev + 1;
+          }
+        }
+      }
     }
     return pageInfo;
   }
@@ -77,7 +98,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
   public PageStore getUnderlying() {
     return getDelegate();
   }
-  
+
   public void expire(final PageReference ref) {
     _cache.remove(ref);
   }
@@ -92,4 +113,17 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
     return _cache.containsKey(ref);
   }
 
+  @Override
+  public long getHighestSyncedRevision() throws IOException {
+    return _lowestUnsyncedRevision - 1;
+  }
+
+  @Override
+  public synchronized void handleChanges(long upto, List<ChangeInfo> chronological) throws PageStoreException, IOException {
+    for (ChangeInfo change: chronological) {
+      PageReference pr = new PageReferenceImpl(change.getPage());
+      expire(pr);
+      _lowestUnsyncedRevision = change.getRevision() + 1;
+    }
+  }
 }
