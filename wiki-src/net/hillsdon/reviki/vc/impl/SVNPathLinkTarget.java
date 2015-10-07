@@ -1,5 +1,6 @@
 package net.hillsdon.reviki.vc.impl;
 
+import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.web.urls.impl.PageStoreConfiguration;
@@ -21,13 +22,17 @@ public class SVNPathLinkTarget extends PageLinkTarget {
   }
 
   @Override
-  protected String getWiki(LinkResolutionContext linkResolutionContext) throws UnknownWikiException {
-    if (linkResolutionContext.getConfiguration() instanceof PageStoreConfiguration) {
+  protected String getWiki(LinkResolutionContext resolver) throws UnknownWikiException {
+    return getWiki(resolver.getConfiguration());
+  }
+
+  private String getWiki(Configuration config) throws UnknownWikiException {
+    if (config instanceof PageStoreConfiguration) {
       String url = _repositoryURL + _path;
       if (_repositoryURL.endsWith("/") && _path.startsWith("/")) {
         url = _repositoryURL + _path.substring(1);
       }
-      PageStoreConfiguration configuration = (PageStoreConfiguration) linkResolutionContext.getConfiguration();
+      PageStoreConfiguration configuration = (PageStoreConfiguration) config;
       for (WikiUrls wiki: configuration.getApplicationUrls().getAvailableWikiUrls()) {
         String wikiUrl = wiki.getWiki().getUrl().toString();
         if (!wikiUrl.endsWith("/")) {
