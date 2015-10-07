@@ -75,13 +75,13 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   }
 
   public String handle(final PageReference page, final String xhtmlContent, final LinkParts link, final URLOutputFilter urlOutputFilter) throws URISyntaxException, UnknownWikiException {
-    LinkResolutionContext resolver = resolver(page);
-    String noFollow = link.isNoFollow(resolver) ? "rel=\"nofollow\" " : "";
-    String clazz = link.getStyleClass(resolver);
-
     if (isAcronymNotLink(link)) {
       return link.getText();
     }
+
+    LinkResolutionContext resolver = resolver(page);
+    String noFollow = link.isNoFollow(resolver) ? "rel=\"nofollow\" " : "";
+    String clazz = link.getStyleClass(resolver);
 
     String url = handle(page, link, urlOutputFilter);
     return String.format(_formatString, noFollow, Escape.html(clazz), url, xhtmlContent);
