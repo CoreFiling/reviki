@@ -79,7 +79,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     String noFollow = link.isNoFollow(resolver) ? "rel=\"nofollow\" " : "";
     String clazz = link.getStyleClass(resolver);
 
-    if (isAcronymNotLink(page, link)) {
+    if (isAcronymNotLink(link)) {
       return link.getText();
     }
 
@@ -93,7 +93,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     return urlOutputFilter.filterURL(url);
   }
 
-  public boolean isAcronymNotLink(PageReference page, LinkParts link) {
+  public boolean isAcronymNotLink(LinkParts link) {
     try {
       return (!link.getTarget().exists(_store) && WikiWordUtils.isAcronym(link.getText()));
     }

@@ -23,7 +23,7 @@ public class SimpleLinkHandler implements LinkPartsHandler {
     String noFollow = parts.isNoFollow(resolver) ? "rel='nofollow' " : "";
     String clazz = parts.getStyleClass(resolver);
 
-    if (isAcronymNotLink(page, parts)) {
+    if (isAcronymNotLink(parts)) {
       return parts.getText();
     }
 
@@ -41,7 +41,7 @@ public class SimpleLinkHandler implements LinkPartsHandler {
     return _context;
   }
 
-  public boolean isAcronymNotLink(PageReference page, LinkParts parts) {
+  public boolean isAcronymNotLink(LinkParts parts) {
     return WikiWordUtils.isAcronym(parts.getText());
   }
 

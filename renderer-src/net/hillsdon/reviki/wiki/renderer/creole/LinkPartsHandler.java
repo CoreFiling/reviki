@@ -33,5 +33,5 @@ public interface LinkPartsHandler {
   LinkResolutionContext getContext();
 
   /** Check if an acronym is actually a link. */
-  boolean isAcronymNotLink(PageReference page, LinkParts parts);
+  boolean isAcronymNotLink(LinkParts parts);
 }

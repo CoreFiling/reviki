@@ -189,7 +189,7 @@ public abstract class ASTRenderer<T> extends ASTVisitor<T> {
     String target = node.getTarget();
 
     // Yay, special cases!
-    if (handler.isAcronymNotLink(page, parts)) {
+    if (handler.isAcronymNotLink(parts)) {
       return visitPlaintext(new Plaintext(target));
     }
 
