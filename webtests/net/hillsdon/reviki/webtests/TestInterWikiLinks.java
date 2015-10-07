@@ -55,7 +55,8 @@ public class TestInterWikiLinks extends WebTestSupport {
     String pageName = uniqueWikiPageName("ConfigInterWikiLinkTest");
     editWikiPage(pageName, content, "", "Add inter-wiki links.", true);
 
-    assertTrue(wikiPageFetchTime(pageName, 3) < 1000);
+    long fetchTime = wikiPageFetchTime(pageName, 3);
+    assertTrue("Fetch time should be less than 1s (was: " + fetchTime + "ms)", fetchTime < 1000);
   }
 
   /**
