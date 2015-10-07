@@ -3,6 +3,7 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public class AttachmentLinkTarget implements LinkTarget {
@@ -26,7 +27,7 @@ public class AttachmentLinkTarget implements LinkTarget {
     return _attachment;
   }
 
-  public boolean exists(LinkResolutionContext linkResolutionContext) {
+  public boolean exists(SimplePageStore store) {
     return true;
   }
   

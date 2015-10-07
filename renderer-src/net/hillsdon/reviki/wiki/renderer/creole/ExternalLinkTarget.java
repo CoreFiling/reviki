@@ -2,6 +2,8 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.net.URI;
 
+import net.hillsdon.reviki.vc.SimplePageStore;
+
 public class ExternalLinkTarget implements LinkTarget {
   
   private URI _uri;
@@ -14,7 +16,7 @@ public class ExternalLinkTarget implements LinkTarget {
     return _uri;
   }
 
-  public boolean exists(final LinkResolutionContext resolver) {
+  public boolean exists(final SimplePageStore resolver) {
     return true;
   }
   

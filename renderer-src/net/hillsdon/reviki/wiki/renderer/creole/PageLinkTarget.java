@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
@@ -15,7 +16,7 @@ public abstract class PageLinkTarget implements LinkTarget {
 
   public abstract boolean isLinkToCurrentWiki();
 
-  protected abstract String getWiki(LinkResolutionContext linkResolutionContext) throws UnknownWikiException;
+  protected abstract String getWiki(LinkResolutionContext resolver) throws UnknownWikiException;
 
   public abstract String getPageName();
 
@@ -23,16 +24,16 @@ public abstract class PageLinkTarget implements LinkTarget {
 
   protected abstract String getFragment();
 
-  public boolean exists(LinkResolutionContext linkResolutionContext) {
+  public boolean exists(SimplePageStore store) {
     try {
-      return !isLinkToCurrentWiki() || linkResolutionContext.exists(new PageReferenceImpl(getPageName()));
+      return !isLinkToCurrentWiki() || store.exists(new PageReferenceImpl(getPageName()));
     }
     catch (PageStoreException e) {
       throw new RuntimeException(e);
     }
   }
   private boolean isDotAttachment(LinkResolutionContext resolver) {
-    return getPageName().contains(".") && !exists(resolver);
+    return getPageName().contains(".") && !exists(resolver.getPageStore());
   }
 
   public boolean isNoFollow(LinkResolutionContext resolver) {
@@ -44,7 +45,7 @@ public abstract class PageLinkTarget implements LinkTarget {
         return true;
       }
     }
-    return isLinkToCurrentWiki() && !exists(resolver);
+    return isLinkToCurrentWiki() && !exists(resolver.getPageStore());
   }
 
   public String getStyleClass(LinkResolutionContext resolver) {
@@ -60,7 +61,7 @@ public abstract class PageLinkTarget implements LinkTarget {
       return "inter-wiki";
     }
 
-    final boolean exists = !isLinkToCurrentWiki() || exists(resolver);
+    final boolean exists = !isLinkToCurrentWiki() || exists(resolver.getPageStore());
 
     return exists ? "existing-page" : "new-page";
   }

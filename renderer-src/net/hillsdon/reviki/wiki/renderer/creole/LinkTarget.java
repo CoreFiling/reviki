@@ -2,6 +2,7 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.net.URISyntaxException;
 
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
 
 public interface LinkTarget {
@@ -12,6 +13,6 @@ public interface LinkTarget {
 
   String getURL(LinkResolutionContext linkResolutionContext) throws URISyntaxException, UnknownWikiException;
 
-  boolean exists(LinkResolutionContext linkResolutionContext);
+  boolean exists(SimplePageStore store);
 
 }

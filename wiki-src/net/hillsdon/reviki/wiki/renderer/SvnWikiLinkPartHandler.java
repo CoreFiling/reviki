@@ -95,8 +95,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
   public boolean isAcronymNotLink(PageReference page, LinkParts link) {
     try {
-      LinkResolutionContext resolver = resolver(page);
-      return (!link.exists(resolver) && WikiWordUtils.isAcronym(link.getText()));
+      return (!link.getTarget().exists(_store) && WikiWordUtils.isAcronym(link.getText()));
     }
     catch (Exception e) {
       return true;

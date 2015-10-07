@@ -58,10 +58,6 @@ public class LinkParts {
   public String toString() {
     return getClass().getSimpleName() + Arrays.asList(_text, _target).toString();
   }
-  
-  public boolean exists(LinkResolutionContext linkResolutionContext) {
-    return _target.exists(linkResolutionContext);
-  }
 
   public String getStyleClass(LinkResolutionContext linkResolutionContext) {
     return _target.getStyleClass(linkResolutionContext);
