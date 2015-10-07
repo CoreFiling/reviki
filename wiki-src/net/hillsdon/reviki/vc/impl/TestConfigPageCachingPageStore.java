@@ -75,20 +75,20 @@ public class TestConfigPageCachingPageStore extends TestCase {
     assertTrue(afterExpire.getContent().equals(lockedPage.getContent()));
   }
 
-  public void testSpecialRevisionIsNotCached() throws Exception {
+  public void testSpecialRevisionIsCached() throws Exception {
     PageInfo page = new PageInfoImpl(null, "ConfigFoo", "Hey there", Collections.<String, String>emptyMap());
     ConfigPageCachingPageStore store = new ConfigPageCachingPageStore(new SimplePageStore());
 
-    // This should not cache the page
+    // Cache the page
     VersionedPageInfo uncommittedPage = store.get(page, -1);
 
     // Sanity check the uncommmitted revision
     assertTrue(uncommittedPage.getRevision() == -2L);
 
-    // Store the page, we should retrieve page from the cache.
-    store.getUnderlying().set(page, "", 1, "Initial commit");
-    VersionedPageInfo cachedPage = store.get(page, -1);
-    assertTrue(cachedPage.getContent().equals(page.getContent()));
+    assertTrue(store.isCached(uncommittedPage));
+
+    // Check that the highestSyncedRevision was not set to the internal revision
+    assertTrue(store.getHighestSyncedRevision() > 0);
   }
 
   public void testChangesExpireCache() throws Exception {
