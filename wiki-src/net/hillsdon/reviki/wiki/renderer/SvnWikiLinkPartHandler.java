@@ -65,16 +65,6 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _linkResolutionContext = null;
   }
 
-  public SvnWikiLinkPartHandler(final String formatString, final PageStore store, final InternalLinker internalLinker, final InterWikiLinker interWikiLinker) {
-    _formatString = formatString;
-    _internalLinker = internalLinker;
-    _store = store;
-    _configuration = null;
-    _linkResolutionContext = null;
-
-    _interWikiLinker = interWikiLinker;
-  }
-
   public PageStoreConfiguration getConfiguration () {
     return _configuration;
   }
