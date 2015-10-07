@@ -22,6 +22,7 @@ import net.hillsdon.reviki.text.WikiWordUtils;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.Configuration;
 import net.hillsdon.reviki.web.urls.InterWikiLinker;
 import net.hillsdon.reviki.web.urls.InternalLinker;
@@ -41,7 +42,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
 
   private final String _formatString;
 
-  private final PageStore _store;
+  private final SimplePageStore _store;
 
   private final LinkResolutionContext _linkResolutionContext;
 
@@ -52,7 +53,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
   public SvnWikiLinkPartHandler(final String formatString, final LinkResolutionContext parentContext) {
     _formatString = formatString;
     _internalLinker = null;
-    _store = null;
+    _store = parentContext.getPageStore();
     _configuration = null;
     _linkResolutionContext = parentContext;
   }
