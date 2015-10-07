@@ -65,7 +65,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
     _linkResolutionContext = null;
   }
 
-  public PageStoreConfiguration getConfiguration () {
+  public PageStoreConfiguration getConfiguration() {
     return _configuration;
   }
 
