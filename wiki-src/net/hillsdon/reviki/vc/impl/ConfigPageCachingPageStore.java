@@ -63,15 +63,11 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
       // NB. revision is one of -1, -2, -3, -4. See VersionedPageInfoImpl
       synchronized (this) {
         long pageRev = pageInfo.getRevision();
-        // If pageRev is one of -2, -3 -4 (see VersionedPageInfoImpl)
-        // then the default version of the ConfigPage is used. i.e
-        // it is not fetched from SVN so there's no need to cache it.
-        if (pageRev > -1) {
-          _cache.put(ref, pageInfo);
-          LOG.debug("Caching: " + ref.getPath() + " Revision: " + Long.toString(pageRev));
-          if (pageRev <= _lowestUnsyncedRevision) {
-            _lowestUnsyncedRevision = pageRev + 1;
-          }
+        LOG.debug("Caching: " + ref.getPath() + " Revision: " + Long.toString(pageRev));
+        _cache.put(ref, pageInfo);
+        // Do not record reviki internal revisions (one of -1. -2. -3. -4 see VersionedPageInfoImpl).
+        if (pageRev >= 0 && pageRev <= _lowestUnsyncedRevision) {
+          _lowestUnsyncedRevision = pageRev + 1;
         }
       }
     }
