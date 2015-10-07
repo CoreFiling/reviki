@@ -8,6 +8,11 @@ Reviki
   if a configuration page, especially ConfigInterWikiLinks, was locked.
   [REVIKI-651]
 
+* Fixed an issue that prevented Reviki from noticing changes to configuration
+  pages if they were made directly to the repository rather than through the
+  Reviki web interface.
+  [REVIKI-563]
+
 * Fixed an issue that meant that the "Log in to see all results" link added
   to the type-ahead box in Reviki 0.6.0 couldn't actually be used to log in.
   [REVIKI-653]
@@ -15,7 +20,6 @@ Reviki
 * Fixed a regression introduced in Reviki 0.6.0 that prevented search macros
   in pages from being rendered if the user viewing the page was not logged in.
   [REVIKI-654]
-
 
 0.6.0 (2015-09-28)
 ------------------
