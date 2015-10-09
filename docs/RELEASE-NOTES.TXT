@@ -1,7 +1,7 @@
 Reviki
 
                               Version History
-0.6.1 (2015-10-08)
+0.6.1 (2015-10-09)
 ------------------
 
 * Fixed a performance issue that could result in very slow rendering of pages
@@ -14,7 +14,7 @@ Reviki
   [REVIKI-563]
 
 * Fixed an issue that meant that the "Log in to see all results" link added
-  to the type-ahead box in Reviki 0.6.0 couldn't actually be used to log in.
+  to the type-ahead box in Reviki 0.6.0 could not actually be used to log in.
   [REVIKI-653]
 
 * Fixed a regression introduced in Reviki 0.6.0 that prevented search macros
@@ -34,7 +34,7 @@ Reviki
   [REVIKI-647]
 
 * Improved performance by reducing unnecessary parsing of wiki pages
-  when responding to requests that don't need it.
+  when responding to requests that do not need it.
   [REVIKI-640]
 
 
