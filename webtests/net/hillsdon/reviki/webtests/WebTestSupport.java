@@ -281,7 +281,7 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
-    assertSearchFindsPageUsingQuery(page, name, query);
+    assertSearchFindsPageUsingQuery("test", page, name, query);
   }
 
   protected void assertSearchFindsPageUsingQuery(final String wikiName, final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
