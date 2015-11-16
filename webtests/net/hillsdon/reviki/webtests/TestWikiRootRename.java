@@ -12,6 +12,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
+import net.hillsdon.reviki.text.WikiWordUtils;
+
 /**
  * https://bugs.corefiling.com/show_bug.cgi?id=5912 
  * This test shares a lot of code with TestConfigSvn.
@@ -72,6 +74,10 @@ public class TestWikiRootRename extends AddWikiWebTestSupport {
     assertTrue(allPages.getTitleText().endsWith("All Pages"));
     HtmlAnchor link = getAnchorByHrefContains(allPages, BASE_URL + "/pages/" + wikiName2 + "/OtherPage");
     assertEquals("OtherPage", link.asText());
+
+    // Otherpage should be found by the search
+    HtmlPage otherPageCopy = getWebPage("pages/" + wikiName2 + "/OtherPage");
+    assertSearchFindsPageUsingQuery(wikiName2, otherPageCopy, "OtherPage", "another");
 
     // Now edit it again
     final String text3 = "Some more stuff";

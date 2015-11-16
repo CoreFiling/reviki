@@ -281,8 +281,12 @@ public abstract class WebTestSupport extends TestCase {
   }
 
   protected void assertSearchFindsPageUsingQuery(final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
+    assertSearchFindsPageUsingQuery(page, name, query);
+  }
+
+  protected void assertSearchFindsPageUsingQuery(final String wikiName, final HtmlPage page, final String name, final String query) throws IOException, JaxenException {
     HtmlPage results = search(page, query);
-    getAnchorByHrefContains(results, BASE_URL + "/pages/test/" + name);
+    getAnchorByHrefContains(results, BASE_URL + "/pages/" + wikiName + "/" + name);
   }
 
   protected void assertSearchDoesNotFindPage(final HtmlPage start, final String pageName) throws IOException {

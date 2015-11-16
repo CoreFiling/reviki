@@ -4,25 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
 import javax.servlet.ServletContext;
 
 import net.hillsdon.reviki.search.impl.ExternalCommitAwareSearchEngine;
 import net.hillsdon.reviki.search.impl.LuceneSearcher;
-import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.StoreKind;
 import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
-import net.hillsdon.reviki.vc.impl.LogEntryFilter;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.RepositoryBasicSVNOperations;
 import net.hillsdon.reviki.vc.impl.SVNPageStore;
 import net.hillsdon.reviki.web.urls.InternalLinker;
@@ -44,6 +38,8 @@ import net.hillsdon.reviki.wiki.renderer.SvnWikiRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
@@ -53,6 +49,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import com.google.common.base.Supplier;
 
 public class SearchIndexBuilder implements Runnable {
+  private static final Log LOG = LogFactory.getLog(SearchIndexBuilder.class);
 
   private SvnWikiRenderer _renderer;
   private ExternalCommitAwareSearchEngine _searchEngine;
@@ -142,17 +139,16 @@ public class SearchIndexBuilder implements Runnable {
 
       latestRevision = operations.getLatestRevision();
       long latestIndexed = searcher.getHighestIndexedRevision();
+      LOG.debug(wikiName + " revision " + latestRevision + " (latest indexed " + latestIndexed + ")");
+      // if latest indexed == 0 shortcut to do latest rev of each page
+      // also seen latest indexed == -1
+      // or if the number of revs to index is greater than the number of pages??
+      // Would need to base the second one on the filtered log, the rev numbers would include far too much that's outside the wiki.
       if (latestIndexed < latestRevision) {
+        long start = System.currentTimeMillis();
         searcher.setIndexBeingBuilt(true);
-        List<ChangeInfo> logs = operations.log("", -1, LogEntryFilter.DESCENDANTS, true, latestIndexed + 1, latestRevision);
+        final Collection<PageReference> minimized = store.getChangedBetween(latestIndexed + 1, latestRevision);
 
-        final Set<PageReference> minimized = new LinkedHashSet<PageReference>();
-        for (ChangeInfo change : logs) {
-          if(_shuttingDown) return;
-          if (change.getKind() == StoreKind.PAGE) {
-            minimized.add(new PageReferenceImpl(change.getPage()));
-          }
-        }
         for (PageReference page : minimized) {
           try {
             if(_shuttingDown) return;
@@ -168,6 +164,7 @@ public class SearchIndexBuilder implements Runnable {
             e.printStackTrace();
           }
         }
+        LOG.debug("indexed in " + (System.currentTimeMillis() - start) + "ms");
       }
     }
 

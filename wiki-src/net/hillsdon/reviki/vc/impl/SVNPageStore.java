@@ -459,7 +459,7 @@ public class SVNPageStore extends AbstractPageStore {
   }
 
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
-    List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.DESCENDANTS, true, start, end);
+    List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.DESCENDANTS, false, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
     for (ChangeInfo info : log) {
       if (info.getKind() == StoreKind.PAGE) {
