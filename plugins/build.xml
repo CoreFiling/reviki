@@ -46,6 +46,25 @@
     </jar>
   </target>
 
+  <target name="include">
+    <delete dir="include/build"/>
+    <mkdir dir="include/build"/>
+    <javac srcdir="include/src"
+           destdir="include/build"
+           source="1.6"
+           target="1.6">
+      <classpath refid="classpath" />
+    </javac>
+    <jar destfile="include/include.jar" >
+      <fileset dir="include/build">
+        <include name="**/*"/>
+      </fileset>
+      <manifest>
+        <attribute name="Plugin-Contributions" value="net.hillsdon.reviki.plugins.IncludeHtmlMacro"/>
+      </manifest>
+    </jar>
+  </target>
+
   <target name="test-plugin-dependency">
     <delete dir="test-plugin-dependency/build"/>
     <mkdir dir="test-plugin-dependency/build"/>
