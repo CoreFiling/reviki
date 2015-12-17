@@ -26,7 +26,6 @@ public class IncludeHtmlMacro implements Macro {
     String inputLine;
     while ((inputLine = in.readLine()) != null) {
       output.append(inputLine);
-      output.append('\n');
     }
     in.close();
 
