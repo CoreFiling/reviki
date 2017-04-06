@@ -32,7 +32,7 @@
   <property name="source-webtests" value="webtests" />   
   <property name="build-webtests" value="ant-build/webtests" />   
   <property name="tomcat" value="tomcat"/>
-  <property name="tomcat.version" value="7.0.64"/>
+  <property name="tomcat.version" value="7.0.77"/>
   <property name="tomcat-url" value="http://mirror.ox.ac.uk/sites/rsync.apache.org/tomcat/tomcat-7/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip"/>
 
   <!-- The VNU jar at this URL is repackaged with jarjar to avoid contributing conflicting versions of embedded libraries to other parts of the build. -->
