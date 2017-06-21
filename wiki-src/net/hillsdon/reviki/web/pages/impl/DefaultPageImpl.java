@@ -37,6 +37,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
+
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
@@ -77,17 +88,6 @@ import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-
 public class DefaultPageImpl implements DefaultPage {
 
   public static final String ATTR_PREVIEW = "preview";
@@ -121,6 +121,8 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String PARAM_COMMIT_MESSAGE = "description";
 
   public static final String PARAM_MINOR_EDIT = "minorEdit";
+
+  public static final String PARAM_IS_MARKDOWN = "isMarkdown";
 
   public static final String PARAM_DIFF_REVISION = "diff";
 
@@ -189,6 +191,7 @@ public class DefaultPageImpl implements DefaultPage {
     _renderers = renderers;
   }
 
+  @Override
   public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
@@ -275,6 +278,7 @@ public class DefaultPageImpl implements DefaultPage {
     _store.attach(page, storeName, baseRevision, in, message);
   }
 
+  @Override
   public View deleteAttachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreAuthenticationException, PageStoreException {
     final String attachmentName = path.next();
     final long baseRevision = -1;
@@ -282,20 +286,25 @@ public class DefaultPageImpl implements DefaultPage {
     return new RedirectToPageView(_wikiUrls, page, "/attachments/");
   }
 
+  @Override
   public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
     return new View() {
+      @Override
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
         _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
+          @Override
           public void setContentType(final String contentType) {
             response.setContentType(contentType);
           }
 
+          @Override
           public void setFileName(final String name) {
             final String quoteEscapedAttachmentName = attachmentName.replace("\\", "\\\\").replace("\"", "\\\"");
             response.setHeader("Content-Disposition", "inline; filename=\"" + quoteEscapedAttachmentName + "\"");
           }
 
+          @Override
           public OutputStream stream() throws IOException {
             return response.getOutputStream();
           }
@@ -304,6 +313,7 @@ public class DefaultPageImpl implements DefaultPage {
     };
   }
 
+  @Override
   public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     Collection<AttachmentHistory> allAttachments = _store.attachments(page);
     Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
@@ -336,6 +346,7 @@ public class DefaultPageImpl implements DefaultPage {
     return requestedSessionId != null && postedSessionId != null && postedSessionId.equals(requestedSessionId) && request.isRequestedSessionIdValid();
   }
 
+  @Override
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
@@ -361,6 +372,7 @@ public class DefaultPageImpl implements DefaultPage {
           final String newContent = getContent(request);
           pageInfo = pageInfo.withAlternativeContent(newContent);
           pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+            @Override
             public boolean apply(final String value) {
               if (value == null) {
                 return false;
@@ -382,6 +394,7 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_SESSION_ID, request.getSession().getId());
   }
 
+  @Override
   public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String revisionParam = request.getParameter(PARAM_REVISION);
     final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
@@ -446,6 +459,7 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_BACKLINKS, pageNames);
   }
 
+  @Override
   public View history(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
@@ -456,6 +470,7 @@ public class DefaultPageImpl implements DefaultPage {
     return new JspView("History");
   }
 
+  @Override
   public View set(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean hasSaveParam = request.getParameter(SUBMIT_SAVE) != null;
     final boolean hasCopyParam = request.getParameter(SUBMIT_COPY) != null;
@@ -566,6 +581,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+      @Override
       public boolean apply(final String value) {
         if (value == null) {
           return false;
@@ -609,6 +625,13 @@ public class DefaultPageImpl implements DefaultPage {
       if (attr.length() > 0 && !attributes.containsKey(attr)) {
         attributes.put(attr, null);
       }
+    }
+    boolean isMarkdown = request.getParameter(PARAM_IS_MARKDOWN) != null;
+    if (attributes.containsKey("markdown") && !isMarkdown) {
+      attributes.put("markdown", null);
+    }
+    if (isMarkdown) {
+      attributes.put("markdown", "true");
     }
     return attributes;
   }

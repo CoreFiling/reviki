@@ -1,11 +1,13 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <script type="text/javascript" src="<sw:resourceUrl path="sisyphus.min.js"/>"></script>
+    <c:set var="isMarkdown" value="${not empty originalAttributes['markdown']}"/>
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
@@ -76,6 +78,16 @@
       </div><!--form-group-->
 
       <div class="form-group">
+      	<div class="row">
+          <div class="col-sm-10 col-sm-offset-1">
+            <div class="checkbox">
+              <label>
+                <input name="isMarkdown" type="checkbox" <c:if test="${isMarkdown}">checked="checked"</c:if>/>
+                Markdown
+              </label>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div class="col-sm-4 col-sm-offset-1 col-md-4 col-md-offset-1">
             <c:choose>

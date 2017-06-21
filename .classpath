@@ -30,6 +30,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-api-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-core-2.0.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-jsp-2.0.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commonmark-0.9.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/xpathcontext.jar"/>
 	<classpathentry kind="lib" path="lib/js-1.6R5.jar"/>
@@ -69,5 +70,10 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/vnu.jar"/>
 	<classpathentry kind="lib" path="lib/antlr4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_45-x86_64">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

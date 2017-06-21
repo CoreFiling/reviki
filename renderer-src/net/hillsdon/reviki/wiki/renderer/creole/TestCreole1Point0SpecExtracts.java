@@ -2,7 +2,7 @@ package net.hillsdon.reviki.wiki.renderer.creole;
 
 import java.io.IOException;
 
-import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RevikiRenderer;
 
 import org.codehaus.jackson.JsonParseException;
 
@@ -16,7 +16,7 @@ public class TestCreole1Point0SpecExtracts extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws Exception {
-    HtmlRenderer renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    RevikiRenderer renderer = new RevikiRenderer(pageStore, linkHandler, imageHandler, macros);
 
     Optional<String> rendered = renderer.render(input);
 

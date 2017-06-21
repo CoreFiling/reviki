@@ -1,0 +1,7 @@
+/src-gen/
+/ant-build/
+/release/
+/reports/
+
+# Pulled in by the ant build
+/lib/vnu.jar
