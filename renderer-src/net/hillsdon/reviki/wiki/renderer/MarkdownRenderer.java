@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.commonmark.Extension;
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.HtmlInline;
 import org.commonmark.node.Image;
@@ -16,11 +22,16 @@ import org.commonmark.node.Link;
 import org.commonmark.node.Node;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.AttributeProvider;
+import org.commonmark.renderer.html.AttributeProviderContext;
+import org.commonmark.renderer.html.AttributeProviderFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -34,7 +45,6 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
 import net.hillsdon.reviki.wiki.renderer.creole.SimpleAnchors;
 import net.hillsdon.reviki.wiki.renderer.creole.SimpleImages;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class MarkdownRenderer extends HtmlRenderer {
@@ -43,10 +53,6 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private static final Pattern MACRO_REGEX = Pattern.compile("\\[(search):([^\\]]*)\\]");
 
-  private Node _document;
-
-  private PageInfo _page;
-
   private final SimplePageStore _pageStore;
 
   private final LinkPartsHandler _linkHandler;
@@ -54,6 +60,8 @@ public class MarkdownRenderer extends HtmlRenderer {
   private final LinkPartsHandler _imageHandler;
 
   private final Supplier<List<Macro>> _macros;
+
+  private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create());
 
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
@@ -76,17 +84,67 @@ public class MarkdownRenderer extends HtmlRenderer {
 
 	@Override
 	public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
-    Parser parser = Parser.builder().build();
-	  _document = parser.parse(page.getContent());
-	  _page = page;
-	  return new Raw("");
+    Parser parser = Parser.builder().extensions(_extensions).build();
+	  Node document = parser.parse(page.getContent());
+	  return new MarkdownNode(page, document);
 	}
 
   @Override
 	public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    _document.accept(new MarkdownVisitor(_page, urlOutputFilter));
-    return org.commonmark.renderer.html.HtmlRenderer.builder().build().render(_document);
+    if (ast instanceof MarkdownNode) {
+      final MarkdownNode node = (MarkdownNode) ast;
+      node.getMarkdownNode().accept(new MarkdownVisitor(node.getPage(), urlOutputFilter));
+      return org.commonmark.renderer.html.HtmlRenderer.builder()
+            .attributeProviderFactory(MarkdownAttributeProvider.factory())
+            .extensions(_extensions)
+          .build()
+          .render(node.getMarkdownNode());
+    }
+    return "ERROR: Unexpected node type " + ast.getClass().getName();
 	}
+
+  private static class MarkdownNode extends ASTNode {
+
+    private final PageInfo _page;
+    private final Node _markdownNode;
+
+    public MarkdownNode(final PageInfo page, final Node markdownNode) {
+      _page = page;
+      _markdownNode = markdownNode;
+    }
+
+    public PageInfo getPage() {
+      return _page;
+    }
+
+    public Node getMarkdownNode() {
+      return _markdownNode;
+    }
+
+  }
+
+  private static class MarkdownAttributeProvider implements AttributeProvider {
+    private static final Set<String> WIKI_CONTENT_TAGS = ImmutableSet.of("table", "tr", "th", "td");
+
+    @Override
+    public void setAttributes(final Node node, final String tagName, final Map<String, String> attributes) {
+      if (WIKI_CONTENT_TAGS.contains(tagName.toLowerCase(Locale.ENGLISH))) {
+        attributes.put("class", "wiki-content");
+      }
+      if ("table".equalsIgnoreCase(tagName)) {
+        attributes.put("style", "margin: 10px 0px");
+      }
+    }
+
+    public static AttributeProviderFactory factory() {
+      return new AttributeProviderFactory() {
+        @Override
+        public AttributeProvider create(final AttributeProviderContext context) {
+          return new MarkdownAttributeProvider();
+        }
+      };
+    }
+  }
 
   private class MarkdownVisitor extends AbstractVisitor {
 

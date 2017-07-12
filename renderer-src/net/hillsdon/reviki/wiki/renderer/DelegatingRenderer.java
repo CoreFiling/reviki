@@ -18,8 +18,6 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class DelegatingRenderer extends HtmlRenderer {
 
-  private PageInfo _page;
-
   private final Map<SyntaxFormats, HtmlRenderer> _renderers;
 
   public DelegatingRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
@@ -36,27 +34,58 @@ public class DelegatingRenderer extends HtmlRenderer {
 
   @Override
   public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
-    _page = page;
-    return getRenderer().parse(page);
+    return new DelegatingNode(getRenderer(page).parse(page), page);
   }
 
   @Override
   public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return getRenderer().render(ast, urlOutputFilter);
+    return getRenderer(getPage(ast)).render(getNode(getNode(ast)), urlOutputFilter);
+  }
+
+  private final class DelegatingNode extends ASTNode {
+    private final ASTNode _node;
+    private final PageInfo _page;
+
+    public DelegatingNode(final ASTNode node, final PageInfo page) {
+      _node = node;
+      _page = page;
+    }
+
+    public ASTNode getNode() {
+      return _node;
+    }
+
+    public PageInfo getPage() {
+      return _page;
+    }
   }
 
   @Override
   public LinkPartsHandler getLinkPartsHandler() {
-    return getRenderer().getLinkPartsHandler();
+    return getRenderer(null).getLinkPartsHandler();
   }
 
-  private HtmlRenderer getRenderer() {
-    return _renderers.get(getSyntax());
+  private PageInfo getPage(final ASTNode ast) {
+    if (ast instanceof DelegatingNode) {
+      return ((DelegatingNode) ast).getPage();
+    }
+    return null;
   }
 
-  private SyntaxFormats getSyntax() {
-    if (_page != null && _page.getAttributes().containsKey("syntax")) {
-      SyntaxFormats format = SyntaxFormats.fromValue(_page.getAttributes().get("syntax"));
+  private ASTNode getNode(final ASTNode ast) {
+    if (ast instanceof DelegatingNode) {
+      return ((DelegatingNode) ast).getNode();
+    }
+    return ast;
+  }
+
+  private HtmlRenderer getRenderer(final PageInfo page) {
+    return _renderers.get(getSyntax(page));
+  }
+
+  private SyntaxFormats getSyntax(final PageInfo page) {
+    if (page != null && page.getAttributes().containsKey("syntax")) {
+      SyntaxFormats format = SyntaxFormats.fromValue(page.getAttributes().get("syntax"));
       if (format != null) {
         return format;
       }
