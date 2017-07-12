@@ -2,19 +2,25 @@ package net.hillsdon.reviki.wiki.renderer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.commonmark.node.AbstractVisitor;
+import org.commonmark.node.HtmlInline;
 import org.commonmark.node.Image;
 import org.commonmark.node.Link;
 import org.commonmark.node.Node;
-import org.commonmark.node.StrongEmphasis;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -26,11 +32,14 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
 import net.hillsdon.reviki.wiki.renderer.creole.SimpleAnchors;
+import net.hillsdon.reviki.wiki.renderer.creole.SimpleImages;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class MarkdownRenderer extends HtmlRenderer {
+
+  private static final Log LOG = LogFactory.getLog(MarkdownRenderer.class);
 
   private static final Pattern MACRO_REGEX = Pattern.compile("\\[(search):([^\\]]*)\\]");
 
@@ -38,14 +47,26 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private PageInfo _page;
 
+  private final SimplePageStore _pageStore;
+
   private final LinkPartsHandler _linkHandler;
 
+  private final LinkPartsHandler _imageHandler;
+
+  private final Supplier<List<Macro>> _macros;
+
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
+    _pageStore = pageStore;
     _linkHandler = linkHandler;
+    _imageHandler = imageHandler;
+    _macros = macros;
   }
 
   public MarkdownRenderer(final LinkResolutionContext resolver) {
+    _pageStore = resolver.getPageStore();
     _linkHandler = new SimpleAnchors(resolver);
+    _imageHandler = new SimpleImages(resolver);
+    _macros = Suppliers.ofInstance((List<Macro>) new LinkedList<Macro>());
   }
 
   @Override
@@ -106,19 +127,16 @@ public class MarkdownRenderer extends HtmlRenderer {
       Matcher regex = MACRO_REGEX.matcher(textNode.getLiteral());
       int start = 0;
       while (regex.find(start)) {
-        if (regex.start() > start) {
-          textNode.insertBefore(new Text(textNode.getLiteral().substring(start, regex.start())));
+        Optional<? extends Node> newNode = handleMacro(regex.group(1), regex.group(2));
+        if (newNode.isPresent()) {
+          if (regex.start() > start) {
+            textNode.insertBefore(new Text(textNode.getLiteral().substring(start, regex.start())));
+          }
+
+          textNode.insertBefore(newNode.get());
+
+          start = regex.end();
         }
-
-        String macroType = regex.group(1);
-        String macroArgument = regex.group(2);
-
-        StrongEmphasis strong = new StrongEmphasis();
-        strong.appendChild(new Text("Warning: macros have not been implemented yet"));
-        textNode.insertBefore(strong);
-        // TODO: handle macros
-
-        start = regex.end();
       }
       if (start == textNode.getLiteral().length()) {
         textNode.unlink();
@@ -126,6 +144,42 @@ public class MarkdownRenderer extends HtmlRenderer {
       if (start > 0) {
         textNode.setLiteral(textNode.getLiteral().substring(start));
       }
+    }
+
+    private Optional<? extends Node> handleMacro(final String macroName, final String macroArgs) {
+      try {
+        for (Macro macro : _macros.get()) {
+          if (macro.getName().equals(macroName)) {
+            String content = macro.handle(_page, macroArgs);
+
+            switch (macro.getResultFormat()) {
+              case XHTML:
+                return Optional.of(htmlNode(content));
+              case WIKI:
+                RevikiRenderer reviki = new RevikiRenderer(_pageStore, _linkHandler, _imageHandler, _macros);
+                Optional<String> html = reviki.render(content, _urlOutputFilter);
+                return html.transform(new Function<String, Node>() {
+                  @Override
+                  public Node apply(final String t) {
+                    return htmlNode(t);
+                  }
+                });
+              default:
+                return Optional.of(new Text(content));
+            }
+          }
+        }
+      }
+      catch (Exception e) {
+        LOG.error("Error handling macro on: " + _page.getPath(), e);
+      }
+      return Optional.absent();
+    }
+
+    private HtmlInline htmlNode(final String content) {
+      final HtmlInline node = new HtmlInline();
+      node.setLiteral(content);
+      return node;
     }
 
     private String resolveUrlToPage(final String url) {
