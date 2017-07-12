@@ -13,7 +13,6 @@ import org.commonmark.node.Node;
 import org.commonmark.node.StrongEmphasis;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
 
 import com.google.common.base.Supplier;
 
@@ -22,7 +21,6 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.SimplePageStore;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.web.urls.UnknownWikiException;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.CreoleLinkContentsSplitter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
@@ -32,14 +30,15 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-public class MarkdownRenderer extends MarkupRenderer<String> {
+public class MarkdownRenderer extends HtmlRenderer {
 
   private static final Pattern MACRO_REGEX = Pattern.compile("\\[(search):([^\\]]*)\\]");
 
   private Node _document;
 
-  private final LinkPartsHandler _linkHandler;
   private PageInfo _page;
+
+  private final LinkPartsHandler _linkHandler;
 
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _linkHandler = linkHandler;
@@ -65,12 +64,8 @@ public class MarkdownRenderer extends MarkupRenderer<String> {
   @Override
 	public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
     _document.accept(new MarkdownVisitor(_page, urlOutputFilter));
-    return HtmlRenderer.builder().build().render(_document);
+    return org.commonmark.renderer.html.HtmlRenderer.builder().build().render(_document);
 	}
-
-  public LinkPartsHandler getLinkPartsHandler() {
-    return _linkHandler;
-  }
 
   private class MarkdownVisitor extends AbstractVisitor {
 
@@ -147,5 +142,10 @@ public class MarkdownRenderer extends MarkupRenderer<String> {
       return null;
     }
 
+  }
+
+  @Override
+  public LinkPartsHandler getLinkPartsHandler() {
+    return _linkHandler;
   }
 }

@@ -7,7 +7,8 @@
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <script type="text/javascript" src="<sw:resourceUrl path="sisyphus.min.js"/>"></script>
-    <c:set var="isMarkdown" value="${not empty originalAttributes['markdown']}"/>
+    <c:set var="syntax" value="${pageInfo.attributes['syntax']}"/>
+
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
@@ -45,6 +46,18 @@
     </c:if>
 
     <form class="form" role="form" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" method="post">
+   	  <div class="row form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-offset-1 col-sm-1 control-label" for="syntax">Syntax:</label>
+          <div class="col-sm-2">
+            <select id="syntax" class="form-control" name="syntax">
+              <option value="reviki" <c:if test="${syntax == 'reviki'}">selected </c:if>>Reviki</option>
+      	    <option value="markdown" <c:if test="${syntax == 'markdown'}">selected </c:if>>Markdown</option>
+            </select>
+          </div><!--col-->
+        </div><!--form-group-->
+      </div><!--row-->
+
       <div class="form-group">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
@@ -78,16 +91,6 @@
       </div><!--form-group-->
 
       <div class="form-group">
-      	<div class="row">
-          <div class="col-sm-10 col-sm-offset-1">
-            <div class="checkbox">
-              <label>
-                <input name="isMarkdown" type="checkbox" <c:if test="${isMarkdown}">checked="checked"</c:if>/>
-                Markdown
-              </label>
-            </div>
-          </div>
-        </div>
         <div class="row">
           <div class="col-sm-4 col-sm-offset-1 col-md-4 col-md-offset-1">
             <c:choose>

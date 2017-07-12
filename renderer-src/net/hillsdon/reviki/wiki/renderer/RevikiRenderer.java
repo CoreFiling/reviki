@@ -47,7 +47,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  *
  * @author msw
  */
-public class RevikiRenderer extends CreoleBasedRenderer<String> {
+public class RevikiRenderer extends CreoleBasedRenderer {
   /**
    * Most elements have a consistent CSS class. Links and images are an
    * exception (as can be seen in their implementation), as their HTML is

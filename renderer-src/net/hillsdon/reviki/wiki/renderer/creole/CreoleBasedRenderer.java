@@ -8,7 +8,7 @@ import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -17,7 +17,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  *
  * @author msw
  */
-public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
+public abstract class CreoleBasedRenderer extends HtmlRenderer {
 
   protected final SimplePageStore _pageStore;
 

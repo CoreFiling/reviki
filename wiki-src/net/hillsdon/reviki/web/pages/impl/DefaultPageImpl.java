@@ -122,7 +122,7 @@ public class DefaultPageImpl implements DefaultPage {
 
   public static final String PARAM_MINOR_EDIT = "minorEdit";
 
-  public static final String PARAM_IS_MARKDOWN = "isMarkdown";
+  public static final String PARAM_SYNTAX = "syntax";
 
   public static final String PARAM_DIFF_REVISION = "diff";
 
@@ -626,13 +626,7 @@ public class DefaultPageImpl implements DefaultPage {
         attributes.put(attr, null);
       }
     }
-    boolean isMarkdown = request.getParameter(PARAM_IS_MARKDOWN) != null;
-    if (attributes.containsKey("markdown") && !isMarkdown) {
-      attributes.put("markdown", null);
-    }
-    if (isMarkdown) {
-      attributes.put("markdown", "true");
-    }
+    attributes.put("syntax", request.getParameter(PARAM_SYNTAX));
     return attributes;
   }
 

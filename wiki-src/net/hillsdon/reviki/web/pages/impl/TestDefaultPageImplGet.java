@@ -46,7 +46,7 @@ import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.DelegatingRenderer;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
@@ -65,7 +65,7 @@ public class TestDefaultPageImplGet extends TestCase {
   private static final PageReference THE_PAGE = new PageReferenceImpl("ThePage");
 
   private CachingPageStore _store;
-  private HtmlRenderer _renderer;
+  private DelegatingRenderer _renderer;
   private RendererRegistry _renderers;
   private WikiGraph _graph;
   private MockHttpServletRequest _request;
@@ -81,7 +81,7 @@ public class TestDefaultPageImplGet extends TestCase {
     _request = new MockHttpServletRequest();
     _response = null;
     _store = createMock(CachingPageStore.class);
-    _renderer = new HtmlRenderer(_store, null, null, null);
+    _renderer = new DelegatingRenderer(_store, null, null, null);
     _renderers = new RendererRegistry(_renderer);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);

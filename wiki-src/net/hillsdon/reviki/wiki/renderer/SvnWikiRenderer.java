@@ -18,6 +18,8 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Supplier;
+
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
@@ -30,8 +32,6 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-import com.google.common.base.Supplier;
-
 public class SvnWikiRenderer extends MarkupRenderer<String> {
   private final RendererRegistry _registry;
 
@@ -39,7 +39,7 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
-    HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros);
     RawRenderer raw = new RawRenderer();
 
     _registry = new RendererRegistry(html);

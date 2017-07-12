@@ -13,7 +13,7 @@ import net.hillsdon.reviki.wiki.MarkupRenderer;
  */
 public class RendererRegistry {
   /** The default (HTML) renderer. */
-  private final HtmlRenderer _default;
+  private final DelegatingRenderer _default;
 
   /** Renderers which produce a stream of output. */
   private final Map<String, MarkupRenderer<InputStream>> _renderers;
@@ -21,13 +21,13 @@ public class RendererRegistry {
   /**
    * @param html The default HTML renderer.
    */
-  public RendererRegistry(final HtmlRenderer html) {
+  public RendererRegistry(final DelegatingRenderer html) {
     _default = html;
     _renderers = new TreeMap<String, MarkupRenderer<InputStream>>();
   }
 
   /** Return the default (HTML) renderer. */
-  public HtmlRenderer getDefaultRenderer() {
+  public DelegatingRenderer getDefaultRenderer() {
     return _default;
   }
 

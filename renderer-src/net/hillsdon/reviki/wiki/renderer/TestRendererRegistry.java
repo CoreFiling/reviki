@@ -22,12 +22,12 @@ import junit.framework.TestCase;
 
 public class TestRendererRegistry extends TestCase {
 
-  private HtmlRenderer _default;
+  private DelegatingRenderer _default;
 
   private RendererRegistry _registry;
 
   public void setUp() {
-    _default = new HtmlRenderer(null, null, null, null);
+    _default = new DelegatingRenderer(null, null, null, null);
     _registry = new RendererRegistry(_default);
   }
 
