@@ -19,6 +19,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 public class DelegatingRenderer extends HtmlRenderer {
 
   private final Map<SyntaxFormats, HtmlRenderer> _renderers;
+  private PageInfo _page;
 
   public DelegatingRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _renderers = new LinkedHashMap<SyntaxFormats, HtmlRenderer>();
@@ -34,58 +35,27 @@ public class DelegatingRenderer extends HtmlRenderer {
 
   @Override
   public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
-    return new DelegatingNode(getRenderer(page).parse(page), page);
+    _page = page;
+    return getRenderer().parse(page);
   }
 
   @Override
   public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return getRenderer(getPage(ast)).render(getNode(getNode(ast)), urlOutputFilter);
-  }
-
-  private final class DelegatingNode extends ASTNode {
-    private final ASTNode _node;
-    private final PageInfo _page;
-
-    public DelegatingNode(final ASTNode node, final PageInfo page) {
-      _node = node;
-      _page = page;
-    }
-
-    public ASTNode getNode() {
-      return _node;
-    }
-
-    public PageInfo getPage() {
-      return _page;
-    }
+    return getRenderer().render(ast, urlOutputFilter);
   }
 
   @Override
   public LinkPartsHandler getLinkPartsHandler() {
-    return getRenderer(null).getLinkPartsHandler();
+    return getRenderer().getLinkPartsHandler();
   }
 
-  private PageInfo getPage(final ASTNode ast) {
-    if (ast instanceof DelegatingNode) {
-      return ((DelegatingNode) ast).getPage();
-    }
-    return null;
+  private HtmlRenderer getRenderer() {
+    return _renderers.get(getSyntax());
   }
 
-  private ASTNode getNode(final ASTNode ast) {
-    if (ast instanceof DelegatingNode) {
-      return ((DelegatingNode) ast).getNode();
-    }
-    return ast;
-  }
-
-  private HtmlRenderer getRenderer(final PageInfo page) {
-    return _renderers.get(getSyntax(page));
-  }
-
-  private SyntaxFormats getSyntax(final PageInfo page) {
-    if (page != null && page.getAttributes().containsKey("syntax")) {
-      SyntaxFormats format = SyntaxFormats.fromValue(page.getAttributes().get("syntax"));
+  private SyntaxFormats getSyntax() {
+    if (_page != null && _page.getAttributes().containsKey("syntax")) {
+      SyntaxFormats format = SyntaxFormats.fromValue(_page.getAttributes().get("syntax"));
       if (format != null) {
         return format;
       }

@@ -45,6 +45,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkTarget;
 import net.hillsdon.reviki.wiki.renderer.creole.SimpleAnchors;
 import net.hillsdon.reviki.wiki.renderer.creole.SimpleImages;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
 public class MarkdownRenderer extends HtmlRenderer {
@@ -62,6 +63,10 @@ public class MarkdownRenderer extends HtmlRenderer {
   private final Supplier<List<Macro>> _macros;
 
   private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create());
+
+  private Node _document;
+
+  private PageInfo _page;
 
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
@@ -85,43 +90,20 @@ public class MarkdownRenderer extends HtmlRenderer {
 	@Override
 	public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
     Parser parser = Parser.builder().extensions(_extensions).build();
-	  Node document = parser.parse(page.getContent());
-	  return new MarkdownNode(page, document);
+	  _document = parser.parse(page.getContent());
+	  _page = page;
+	  return new Raw("");
 	}
 
   @Override
 	public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    if (ast instanceof MarkdownNode) {
-      final MarkdownNode node = (MarkdownNode) ast;
-      node.getMarkdownNode().accept(new MarkdownVisitor(node.getPage(), urlOutputFilter));
-      return org.commonmark.renderer.html.HtmlRenderer.builder()
-            .attributeProviderFactory(MarkdownAttributeProvider.factory())
-            .extensions(_extensions)
-          .build()
-          .render(node.getMarkdownNode());
-    }
-    return "ERROR: Unexpected node type " + ast.getClass().getName();
+    _document.accept(new MarkdownVisitor(_page, urlOutputFilter));
+    return org.commonmark.renderer.html.HtmlRenderer.builder()
+          .attributeProviderFactory(MarkdownAttributeProvider.factory())
+          .extensions(_extensions)
+        .build()
+        .render(_document);
 	}
-
-  private static class MarkdownNode extends ASTNode {
-
-    private final PageInfo _page;
-    private final Node _markdownNode;
-
-    public MarkdownNode(final PageInfo page, final Node markdownNode) {
-      _page = page;
-      _markdownNode = markdownNode;
-    }
-
-    public PageInfo getPage() {
-      return _page;
-    }
-
-    public Node getMarkdownNode() {
-      return _markdownNode;
-    }
-
-  }
 
   private static class MarkdownAttributeProvider implements AttributeProvider {
     private static final Set<String> WIKI_CONTENT_TAGS = ImmutableSet.of("table", "tr", "th", "td");
