@@ -19,7 +19,6 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 public class DelegatingRenderer extends HtmlRenderer {
 
   private final Map<SyntaxFormats, HtmlRenderer> _renderers;
-  private PageInfo _page;
 
   public DelegatingRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _renderers = new LinkedHashMap<SyntaxFormats, HtmlRenderer>();
@@ -35,27 +34,26 @@ public class DelegatingRenderer extends HtmlRenderer {
 
   @Override
   public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
-    _page = page;
-    return getRenderer().parse(page);
+    return getRenderer(page).parse(page);
   }
 
   @Override
-  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    return getRenderer().render(ast, urlOutputFilter);
+  public String render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    return getRenderer(page).render(page, ast, urlOutputFilter);
   }
 
   @Override
   public LinkPartsHandler getLinkPartsHandler() {
-    return getRenderer().getLinkPartsHandler();
+    return getRenderer(null).getLinkPartsHandler();
   }
 
-  private HtmlRenderer getRenderer() {
-    return _renderers.get(getSyntax());
+  private HtmlRenderer getRenderer(final PageInfo page) {
+    return _renderers.get(getSyntax(page));
   }
 
-  private SyntaxFormats getSyntax() {
-    if (_page != null && _page.getAttributes().containsKey("syntax")) {
-      SyntaxFormats format = SyntaxFormats.fromValue(_page.getAttributes().get("syntax"));
+  private SyntaxFormats getSyntax(final PageInfo page) {
+    if (page != null && page.getAttributes().containsKey("syntax")) {
+      SyntaxFormats format = SyntaxFormats.fromValue(page.getAttributes().get("syntax"));
       if (format != null) {
         return format;
       }

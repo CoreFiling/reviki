@@ -64,10 +64,6 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create());
 
-  private Node _document;
-
-  private PageInfo _page;
-
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
@@ -83,26 +79,25 @@ public class MarkdownRenderer extends HtmlRenderer {
   }
 
   @Override
-  public String getContentType() {
+  public String getContentType(final PageInfo page) {
     return "text/html; charset=utf-8";
   }
 
 	@Override
 	public ASTNode parse(final PageInfo page) throws IOException, PageStoreException {
-    Parser parser = Parser.builder().extensions(_extensions).build();
-	  _document = parser.parse(page.getContent());
-	  _page = page;
 	  return new Raw("");
 	}
 
   @Override
-	public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-    _document.accept(new MarkdownVisitor(_page, urlOutputFilter));
+	public String render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+    Parser parser = Parser.builder().extensions(_extensions).build();
+    Node document = parser.parse(page.getContent());
+    document.accept(new MarkdownVisitor(page, urlOutputFilter));
     return org.commonmark.renderer.html.HtmlRenderer.builder()
           .attributeProviderFactory(MarkdownAttributeProvider.factory())
           .extensions(_extensions)
         .build()
-        .render(_document);
+        .render(document);
 	}
 
   private static class MarkdownAttributeProvider implements AttributeProvider {

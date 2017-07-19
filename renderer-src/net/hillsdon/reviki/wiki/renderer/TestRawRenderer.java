@@ -36,16 +36,14 @@ public class TestRawRenderer extends TestCase {
   /** Check that the content type for ConfigCss is special. */
   public void testCssContentType() {
     RawRenderer renderer = new RawRenderer();
-    renderer.parse(_css);
 
-    assertTrue(renderer.getContentType().equals("text/css"));
+    assertTrue(renderer.getContentType(_css).equals("text/css"));
   }
 
   /** Check that the content type for non-ConfigCss pages is text. */
   public void testContentType() {
     RawRenderer renderer = new RawRenderer();
-    renderer.parse(_page);
 
-    assertTrue(renderer.getContentType().equals("text/plain"));
+    assertTrue(renderer.getContentType(_page).equals("text/plain"));
   }
 }

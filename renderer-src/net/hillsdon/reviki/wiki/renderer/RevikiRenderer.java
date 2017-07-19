@@ -64,13 +64,13 @@ public class RevikiRenderer extends CreoleBasedRenderer {
   }
 
   @Override
-  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public String render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     HtmlVisitor visitor = new HtmlVisitor(urlOutputFilter);
     return visitor.visit(ast);
   }
 
   @Override
-  public String getContentType() {
+  public String getContentType(final PageInfo page) {
     return "text/html; charset=utf-8";
   }
 

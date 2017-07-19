@@ -18,28 +18,26 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.Raw;
  * @author msw
  */
 public class RawRenderer extends MarkupRenderer<InputStream> {
-  private PageInfo _page;
 
   @Override
   public ASTNode parse(final PageInfo page) {
-    _page = page;
     return new Raw(page.getContent());
   }
 
   @Override
-  public InputStream render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+  public InputStream render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) {
     try {
-      return new ByteArrayInputStream(_page.getContent().getBytes("UTF-8"));
+      return new ByteArrayInputStream(page.getContent().getBytes("UTF-8"));
     }
     catch (UnsupportedEncodingException e) {
-      return new ByteArrayInputStream(_page.getContent().getBytes());
+      return new ByteArrayInputStream(page.getContent().getBytes());
     }
   }
 
   @Override
-  public String getContentType() {
+  public String getContentType(final PageInfo page) {
     // This is a cludge. We should represent 'special' pages better.
-    if (_page.getPath().equals("ConfigCss")) {
+    if (page.getPath().equals("ConfigCss")) {
       return "text/css";
     }
     else {

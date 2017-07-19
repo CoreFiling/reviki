@@ -418,11 +418,11 @@ public class DefaultPageImpl implements DefaultPage {
     else if (_renderers.hasRenderer(ctypeParam)) {
       MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctypeParam);
       InputStream stream = renderer.render(main, new ResponseSessionURLOutputFilter(request, response)).get();
-      return new StreamView(renderer.getContentType(), stream);
+      return new StreamView(renderer.getContentType(main), stream);
     }
     else {
       ASTNode ast = _renderers.getDefaultRenderer().parse(main);
-      String rendered = _renderers.getDefaultRenderer().render(ast, new ResponseSessionURLOutputFilter(request, response));
+      String rendered = _renderers.getDefaultRenderer().render(main, ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       if (main.isRenamed()) {
         LinkPartsHandler linkPartsHandler = _renderers.getDefaultRenderer().getLinkPartsHandler();

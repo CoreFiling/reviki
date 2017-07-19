@@ -27,8 +27,6 @@ public abstract class CreoleBasedRenderer extends HtmlRenderer {
 
   protected final Supplier<List<Macro>> _macros;
 
-  protected PageInfo _page;
-
   public CreoleBasedRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
     _linkHandler = linkHandler;
@@ -55,8 +53,7 @@ public abstract class CreoleBasedRenderer extends HtmlRenderer {
 
   @Override
   public ASTNode parse(final PageInfo page) {
-    _page = page;
-    return CreoleRenderer.renderWithVisitor(getVisitor(_page), _macros);
+    return CreoleRenderer.renderWithVisitor(getVisitor(page), _macros);
   }
 
   /**
