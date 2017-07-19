@@ -83,8 +83,17 @@ public class Converter {
 
 	public static void main(final String[] args) throws IOException {
 	  InputStream stream = System.in;
-	  if (args.length > 0) {
-      stream = new FileInputStream(args[0]);
+	  if (args.length == 1) {
+	    if (!args[0].equals("-")) {
+	      stream = new FileInputStream(args[0]);
+	    }
+	  }
+	  else {
+	    System.out.println("Usage: java -jar reviki-converter.jar <input_file | - >");
+	    System.out.println();
+	    System.out.println("  input_file  : reviki formatted file to convert");
+	    System.out.println("                use '-' to read from stdin");
+	    System.exit(1);
 	  }
 
 	  String reviki = IOUtils.readLines(stream).stream().collect(Collectors.joining("\n"));
