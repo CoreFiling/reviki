@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import net.hillsdon.fij.text.Escape;
@@ -32,6 +33,7 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkParts;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.Visitor;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Blockquote;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Bold;
@@ -49,6 +51,10 @@ import net.hillsdon.reviki.wiki.renderer.creole.ast.OrderedList;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Paragraph;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Plaintext;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Strikethrough;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.Table;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.TableCell;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.TableHeaderCell;
+import net.hillsdon.reviki.wiki.renderer.creole.ast.TableRow;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.TextNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.UnorderedList;
 
@@ -129,6 +135,7 @@ public class Converter {
     System.out.println(new ASTRenderer<String>("", URLOutputFilter.NULL) {
       int _listLevel = -1;
       ListType _listType = ListType.NONE;
+      private boolean _isFirstRow;
 
       @Override
       protected String combine(final String x1, final String x2) {
@@ -142,7 +149,7 @@ public class Converter {
 
       @Override
       public String visitLinebreak(final Linebreak node) {
-        return "\n\n";
+        return "<br>";
       }
 
       @Override
@@ -252,6 +259,54 @@ public class Converter {
       @Override
       public String visitInlineNowiki(final InlineNowiki node) {
         return "`" + node.getText() + "`";
+      }
+
+      @Override
+      public String visitTable(final Table node) {
+        if (node.getChildren().isEmpty() || node.getChildren().get(0).getChildren().size() == 0) {
+          // I don't think this is possible, but just in case
+          return "";
+        }
+        StringBuilder table = new StringBuilder();
+        int columns = node.getChildren().get(0).getChildren().size();
+
+        _isFirstRow = true;
+        table.append(visit(node.getChildren().get(0)));
+        _isFirstRow = false;
+
+        table.append("\n");
+        table.append("|" + Strings.repeat("---|", columns - 1) + "---|\n");
+
+        for (ASTNode childNode : node.getChildren().subList(1, node.getChildren().size())) {
+          table.append(visit(childNode));
+          table.append("\n");
+        }
+        table.append("\n");
+        return table.toString();
+      }
+
+      @Override
+      public String visitTableRow(final TableRow node) {
+        StringBuilder row = new StringBuilder();
+        for (ASTNode cellNode : node.getChildren()) {
+          row.append("| " + visit(cellNode) + " ");
+        }
+        row.append("|");
+        return row.toString();
+      }
+
+      @Override
+      public String visitTableHeaderCell(final TableHeaderCell node) {
+        if (_isFirstRow) {
+          return visitASTNode(node);
+        }
+        // Hack to sort of support row headers.
+        return "**" + visitASTNode(node) + "**";
+      }
+
+      @Override
+      public String visitTableCell(final TableCell node) {
+        return visitASTNode(node);
       }
 
     }.visit(visitor.visit(tree.get())));
