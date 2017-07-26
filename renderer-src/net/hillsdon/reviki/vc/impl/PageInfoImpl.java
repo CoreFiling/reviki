@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.SyntaxFormats;
 
 public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
 
@@ -12,34 +13,52 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   private final Map<String, String> _attributes;
 
   // For testing purposes.
-  public PageInfoImpl(String path) {
+  public PageInfoImpl(final String path) {
     this("", path, "", Collections.<String, String>emptyMap());
   }
 
-  public PageInfoImpl(String wiki, String path, String content, Map<String, String> attributes) {
+  public PageInfoImpl(final String wiki, final String path, final String content, final Map<String, String> attributes) {
     super(path);
     _wiki = wiki;
     _content = content;
     _attributes = attributes;
   }
 
+  @Override
   public String getWiki() {
     return _wiki;
   }
 
+  @Override
   public String getContent() {
     return _content;
   }
 
+  @Override
   public Map<String, String> getAttributes() {
     return _attributes;
   }
 
-  public PageInfo withAlternativeContent(String content) {
+  @Override
+  public SyntaxFormats getSyntax() {
+    String syntax = getAttributes().get("syntax");
+    if (syntax != null) {
+      SyntaxFormats format = SyntaxFormats.fromValue(syntax);
+      if (format != null) {
+        return format;
+      }
+    }
+    // TODO: Wiki default
+    return SyntaxFormats.REVIKI;
+  }
+
+  @Override
+  public PageInfo withAlternativeContent(final String content) {
     return new PageInfoImpl(_wiki, super.getPath(), content, _attributes);
   }
 
-  public PageInfo withAlternativeAttributes(Map<String, String> attributes) {
+  @Override
+  public PageInfo withAlternativeAttributes(final Map<String, String> attributes) {
     return new PageInfoImpl(_wiki, super.getPath(), _content, attributes);
   }
 }

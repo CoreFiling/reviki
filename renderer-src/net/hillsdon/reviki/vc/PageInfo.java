@@ -14,4 +14,6 @@ public interface PageInfo extends PageReference {
 
   PageInfo withAlternativeAttributes(Map<String, String> attributes);
 
+  SyntaxFormats getSyntax();
+
 }

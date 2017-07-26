@@ -1,4 +1,4 @@
-package net.hillsdon.reviki.wiki.renderer;
+package net.hillsdon.reviki.vc;
 
 import java.util.Locale;
 

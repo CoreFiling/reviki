@@ -10,6 +10,7 @@ import com.google.common.base.Supplier;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.SimplePageStore;
+import net.hillsdon.reviki.vc.SyntaxFormats;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
@@ -52,13 +53,10 @@ public class DelegatingRenderer extends HtmlRenderer {
   }
 
   private SyntaxFormats getSyntax(final PageInfo page) {
-    if (page != null && page.getAttributes().containsKey("syntax")) {
-      SyntaxFormats format = SyntaxFormats.fromValue(page.getAttributes().get("syntax"));
-      if (format != null) {
-        return format;
-      }
+    if (page != null) {
+      return page.getSyntax();
     }
-    // TODO: Wiki default
+    // Fallback for no page - we can't really do any better
     return SyntaxFormats.REVIKI;
   }
 
