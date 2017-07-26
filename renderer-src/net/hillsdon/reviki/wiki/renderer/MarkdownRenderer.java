@@ -62,7 +62,7 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private final Supplier<List<Macro>> _macros;
 
-  private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create());
+  private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create(), MultilineQuoteExtension.create());
 
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
