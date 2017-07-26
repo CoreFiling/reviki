@@ -15,6 +15,7 @@ import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.RepositoryBasicSVNOperations;
@@ -135,7 +136,8 @@ public class SearchIndexBuilder implements Runnable {
           macros.addAll(_plugins.getImplementations(Macro.class));
           return macros;
         }
-      });
+      },
+      new AutoPropertiesApplierImpl(autoProperties));
 
       latestRevision = operations.getLatestRevision();
       long latestIndexed = searcher.getHighestIndexedRevision();

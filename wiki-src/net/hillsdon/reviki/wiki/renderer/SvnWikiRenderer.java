@@ -23,6 +23,7 @@ import com.google.common.base.Supplier;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -35,11 +36,11 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 public class SvnWikiRenderer extends MarkupRenderer<String> {
   private final RendererRegistry _registry;
 
-  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
+  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros, final AutoPropertiesApplier propsApplier) {
     final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
-    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros);
+    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros, propsApplier);
     RawRenderer raw = new RawRenderer();
 
     _registry = new RendererRegistry(html);

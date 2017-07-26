@@ -2,6 +2,7 @@ package net.hillsdon.reviki.vc.impl;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SyntaxFormats;
@@ -40,7 +41,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   @Override
-  public SyntaxFormats getSyntax() {
+  public SyntaxFormats getSyntax(final AutoPropertiesApplier propsApplier) {
     String syntax = getAttributes().get("syntax");
     if (syntax != null) {
       SyntaxFormats format = SyntaxFormats.fromValue(syntax);
@@ -48,7 +49,14 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
         return format;
       }
     }
-    // TODO: Wiki default
+    if (propsApplier != null) {
+      propsApplier.read();
+      for (Entry<String, String> entry : propsApplier.apply(getName()).entrySet()) {
+        if ("reviki:syntax".equals(entry.getKey())) {
+          return SyntaxFormats.valueOf(entry.getValue());
+        }
+      }
+    }
     return SyntaxFormats.REVIKI;
   }
 

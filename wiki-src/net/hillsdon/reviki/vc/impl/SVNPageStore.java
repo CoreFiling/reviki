@@ -400,7 +400,7 @@ public class SVNPageStore extends AbstractPageStore {
 
         if (addLinkToPage) {
           final boolean isImage = _mimeIdentifier.isImage(storeName);
-          final String link = getLink(versionedPageInfo.getSyntax(), storeName, isImage);
+          final String link = getLink(versionedPageInfo.getSyntax(_autoPropertiesApplier), storeName, isImage);
           final String newContent = versionedPageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
 
           commitEditor.openDir(SVNPathUtil.removeTail(pageRef.getPath()), -1);

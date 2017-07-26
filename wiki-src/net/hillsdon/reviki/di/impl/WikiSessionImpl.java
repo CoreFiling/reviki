@@ -142,7 +142,7 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }
-    });
+    }, autoPropertiesApplier);
 
     _plugins = new PluginsImpl(pageStore);
     searchEngine.setPageStore(pageStore);

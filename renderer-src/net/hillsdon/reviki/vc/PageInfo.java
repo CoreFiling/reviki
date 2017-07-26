@@ -2,6 +2,8 @@ package net.hillsdon.reviki.vc;
 
 import java.util.Map;
 
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+
 public interface PageInfo extends PageReference {
 
   String getWiki();
@@ -14,6 +16,6 @@ public interface PageInfo extends PageReference {
 
   PageInfo withAlternativeAttributes(Map<String, String> attributes);
 
-  SyntaxFormats getSyntax();
+  SyntaxFormats getSyntax(AutoPropertiesApplier propsApplier);
 
 }

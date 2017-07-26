@@ -27,7 +27,7 @@ public class TestRendererRegistry extends TestCase {
   private RendererRegistry _registry;
 
   public void setUp() {
-    _default = new DelegatingRenderer(null, null, null, null);
+    _default = new DelegatingRenderer(null, null, null, null, null);
     _registry = new RendererRegistry(_default);
   }
 

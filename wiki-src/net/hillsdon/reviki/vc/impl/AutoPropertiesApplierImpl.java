@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.hillsdon.reviki.vc.AutoProperties;
-import net.hillsdon.reviki.vc.PageStoreException;
 
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 
@@ -60,7 +59,7 @@ public class AutoPropertiesApplierImpl implements AutoPropertiesApplier {
     _autoprops = autoprops;
   }
 
-  public void read() throws PageStoreException {
+  public void read() {
     _current = _autoprops.read();
   }
   
