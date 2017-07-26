@@ -356,7 +356,7 @@ public class DefaultPageImpl implements DefaultPage {
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
-    request.setAttribute(ATTR_DEFAULT_SYNTAX, pageInfo.getSyntax(_propsApplier));
+    request.setAttribute(ATTR_DEFAULT_SYNTAX, pageInfo.getSyntax(_propsApplier).value());
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     copySessionIdAsAttribute(request);

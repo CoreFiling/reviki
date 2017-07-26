@@ -7,7 +7,14 @@
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <script type="text/javascript" src="<sw:resourceUrl path="sisyphus.min.js"/>"></script>
-    <c:set var="syntax" value="${pageInfo.attributes['syntax']}"/>
+    <c:choose>
+      <c:when test="${not empty pageInfo.attributes['syntax']}">
+        <c:set var="syntax" value="${pageInfo.attributes['syntax']}"/>
+      </c:when>
+      <c:otherwise>
+        <c:set var="syntax" value="${defaultSyntax}"/>
+      </c:otherwise>
+    </c:choose>
 
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
