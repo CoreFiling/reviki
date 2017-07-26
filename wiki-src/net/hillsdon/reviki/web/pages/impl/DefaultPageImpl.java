@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
@@ -181,7 +183,9 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  private final AutoPropertiesApplier _propsApplier;
+
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter, final AutoPropertiesApplier propsApplier) {
     _configuration = configuration;
     _store = store;
     _graph = graph;
@@ -189,6 +193,7 @@ public class DefaultPageImpl implements DefaultPage {
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
     _renderers = renderers;
+    _propsApplier = propsApplier;
   }
 
   @Override
@@ -350,6 +355,9 @@ public class DefaultPageImpl implements DefaultPage {
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    if (pageInfo.isNewPage()) {
+      pageInfo = pageInfo.withAlternativeAttributes(autoPropsForPage(pageInfo));
+    }
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     copySessionIdAsAttribute(request);
@@ -388,6 +396,18 @@ public class DefaultPageImpl implements DefaultPage {
       }
       return new JspView("EditPage");
     }
+  }
+
+  private Map<String, String> autoPropsForPage(final VersionedPageInfo pageInfo) throws PageStoreException {
+    Map<String, String> attributes = Maps.newLinkedHashMap();
+    _propsApplier.read();
+    Map<String, String> autoProps = _propsApplier.apply(pageInfo.getName());
+    for (Entry<String, String> entry : autoProps.entrySet()) {
+      if (entry.getKey().startsWith("reviki:")) {
+        attributes.put(entry.getKey().split(":", 2)[1], entry.getValue());
+      }
+    }
+    return attributes;
   }
 
   private void copySessionIdAsAttribute(final HttpServletRequest request) {

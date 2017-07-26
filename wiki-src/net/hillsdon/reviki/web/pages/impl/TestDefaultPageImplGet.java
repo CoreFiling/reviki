@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
@@ -76,6 +77,8 @@ public class TestDefaultPageImplGet extends TestCase {
 
   private FeedWriter _feedWriter;
 
+  private AutoPropertiesApplier _propsApplier;
+
   @Override
   protected void setUp() throws Exception {
     _request = new MockHttpServletRequest();
@@ -87,7 +90,8 @@ public class TestDefaultPageImplGet extends TestCase {
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _propsApplier = createMock(AutoPropertiesApplier.class);
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter, _propsApplier);
   }
 
   /**

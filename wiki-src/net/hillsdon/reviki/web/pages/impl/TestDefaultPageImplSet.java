@@ -33,6 +33,7 @@ import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
@@ -71,6 +72,7 @@ public class TestDefaultPageImplSet extends TestCase {
   private HttpServletResponse _response;
   private VersionedPageInfoImpl _pageInfo;
   private Object[] _allMocks;
+  private AutoPropertiesApplier _propsApplier;
 
   @Override
   protected void setUp() throws Exception {
@@ -78,12 +80,13 @@ public class TestDefaultPageImplSet extends TestCase {
     _diffGenerator = createMock(DiffGenerator.class);
     _store = createMock(CachingPageStore.class);
     _storeUnder = createMock(PageStore.class);
+    _propsApplier = createMock(AutoPropertiesApplier.class);
     _wikiUrls = new ExampleDotComWikiUrls();
-    _page = new DefaultPageImpl(null, _store, null, null, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, null, null, _diffGenerator, _wikiUrls, _feedWriter, _propsApplier);
     _request = new MockHttpServletRequest();
     _response = null;
     _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", OLD_CONTENT, 0, 0, "user", new Date(), null, null, null);
-    _allMocks = new Object[] { _feedWriter, _diffGenerator, _store, _storeUnder};
+    _allMocks = new Object[] { _feedWriter, _diffGenerator, _store, _storeUnder, _propsApplier};
   }
 
   private void verify() {

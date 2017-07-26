@@ -148,6 +148,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
     searchEngine.setPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
 
+    container.addComponent(autoPropertiesApplier);
+
     container.addComponent(authSearch.getRequestLifecycleAware()); // This needs adding so that RequestLifecycleAwareness works, but it shouldn't show up as the search engine
     container.addComponent(tracker);
     container.addComponent(operations);

@@ -16,6 +16,7 @@ import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
@@ -57,6 +58,7 @@ public class TestDefaultPageImplEditor extends TestCase {
 
   private FeedWriter _feedWriter;
   private VersionedPageInfoImpl _pageInfo;
+  private AutoPropertiesApplier _propsApplier;
 
   private static final String USERNAME = "user";
 
@@ -73,7 +75,8 @@ public class TestDefaultPageImplEditor extends TestCase {
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _propsApplier = createMock(AutoPropertiesApplier.class);
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter, _propsApplier);
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
   }
 
