@@ -53,7 +53,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
       propsApplier.read();
       for (Entry<String, String> entry : propsApplier.apply(getName()).entrySet()) {
         if ("reviki:syntax".equals(entry.getKey())) {
-          return SyntaxFormats.valueOf(entry.getValue());
+          return SyntaxFormats.fromValue(entry.getValue());
         }
       }
     }
