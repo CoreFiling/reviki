@@ -59,7 +59,7 @@
           <div class="col-sm-2">
             <select id="syntax" class="form-control" name="syntax">
               <option value="reviki" <c:if test="${syntax == 'reviki'}">selected </c:if>>Reviki</option>
-      	    <option value="markdown" <c:if test="${syntax == 'markdown'}">selected </c:if>>Markdown</option>
+      	      <option value="markdown" <c:if test="${syntax == 'markdown'}">selected </c:if>>Markdown</option>
             </select>
           </div><!--col-->
         </div><!--form-group-->
@@ -151,9 +151,35 @@
       </script>
     </c:if>
     <div class="row">
-      <div class="col-sm-10 col-sm-offset-1">
+      <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-reviki" style="display: none">
         <jsp:include page="cheatsheet.html"></jsp:include>
       </div><!--col-->
+      <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-markdown" style="display: none">
+        <div id="MarkupHelp">
+          <h3>Cheatsheet</h3>
+          <div>
+            All the core Markdown spec, as well tables from GFM.
+            See <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">this markdown cheatsheet</a> for reference.
+          </div>
+          <div>
+            An additional syntax for block quotes is also supported:
+            <pre>>>>
+Place your quote here.
+
+It can be multilined *and* have markdown syntax.
+>>></pre>
+          </div>
+        </div>
+      </div><!--col-->
     </div><!--row-->
+    <script type='text/javascript'>
+    function syntaxChanged() {
+      var selectedSyntax = $("#syntax option:selected").val();
+      $("#cheatsheet-reviki").css("display", selectedSyntax == "reviki" ? "block" : "none");
+      $("#cheatsheet-markdown").css("display", selectedSyntax == "markdown" ? "block" : "none");
+    }
+    syntaxChanged();
+    $("#syntax").change(syntaxChanged);
+    </script>
   </tiles:putAttribute>
 </tiles:insertTemplate>
