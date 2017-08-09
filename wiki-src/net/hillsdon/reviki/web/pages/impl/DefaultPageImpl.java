@@ -64,6 +64,7 @@ import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
@@ -356,7 +357,7 @@ public class DefaultPageImpl implements DefaultPage {
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
-    request.setAttribute(ATTR_DEFAULT_SYNTAX, pageInfo.getSyntax(_propsApplier).value());
+    request.setAttribute(ATTR_DEFAULT_SYNTAX, pageInfo.getSyntax(AutoPropertiesApplierImpl.syntaxForFilename(_propsApplier)).value());
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     copySessionIdAsAttribute(request);

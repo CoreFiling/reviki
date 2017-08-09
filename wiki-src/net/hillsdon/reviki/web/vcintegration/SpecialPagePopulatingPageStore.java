@@ -16,13 +16,13 @@
 package net.hillsdon.reviki.web.vcintegration;
 
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_AUTO_PROPERTIES;
+import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_ICONS;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_INTER_WIKI_LINKS;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_PLUGINS;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FOOTER;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_FRONT_PAGE;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_HEADER;
 import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.PAGE_SIDEBAR;
-import static net.hillsdon.reviki.web.vcintegration.BuiltInPageReferences.CONFIG_ICONS;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,20 +30,21 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.google.common.base.Optional;
-
-import net.hillsdon.reviki.vc.VersionedPageInfo;
-import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStore;
-import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
-import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
-import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
-import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.google.common.base.Optional;
+
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStore;
+import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
+import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
+import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
 
 /**
  * Returns default FrontPage etc if there isn't one in the repository.
@@ -93,7 +94,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
   private Optional<String> getPropulatedText(final PageReference ref, final VersionedPageInfo page) throws IOException {
     if (SPECIAL_PAGES_WITH_PER_FORMAT_CONTENT.contains(ref)) {
-      return Optional.of(IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath() + "." + page.getSyntax(_autoProps).value()), "UTF-8"));
+      return Optional.of(IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath() + "." + page.getSyntax(AutoPropertiesApplierImpl.syntaxForFilename(_autoProps)).value()), "UTF-8"));
     }
     if (SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
       return Optional.of(IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8"));

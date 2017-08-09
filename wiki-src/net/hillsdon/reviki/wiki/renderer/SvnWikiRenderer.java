@@ -24,6 +24,7 @@ import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -40,7 +41,7 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
     final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
-    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros, propsApplier);
+    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros, AutoPropertiesApplierImpl.syntaxForFilename(propsApplier));
     RawRenderer raw = new RawRenderer();
 
     _registry = new RendererRegistry(html);

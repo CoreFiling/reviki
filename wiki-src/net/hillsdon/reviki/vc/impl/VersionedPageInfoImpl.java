@@ -46,16 +46,16 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
   private final Date _lockedSince;
   private PageLinkTarget _renamed;
 
-  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince) {
+  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, final Date lockedSince) {
     this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince, new LinkedHashMap<String, String>());
   }
 
-  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, PageLinkTarget renamed) {
+  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, final Date lockedSince, final PageLinkTarget renamed) {
     this(wiki, path, content, revision, lastChangedRevision, lastChangedAuthor, lastChangedDate, lockedBy, lockToken, lockedSince);
     _renamed = renamed;
   }
 
-  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, Date lockedSince, Map<String, String> attributes) {
+  public VersionedPageInfoImpl(final String wiki, final String path, final String content, final long revision, final long lastChangedRevision, final String lastChangedAuthor, final Date lastChangedDate, final String lockedBy, final String lockToken, final Date lockedSince, final Map<String, String> attributes) {
     super(wiki, path, content, attributes);
     _revision = revision;
     _lastChangedRevision = lastChangedRevision;
@@ -66,7 +66,7 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
     _lockedSince = lockedSince;
   }
 
-  public VersionedPageInfoImpl(final VersionedPageInfo pageInfo, String content) {
+  public VersionedPageInfoImpl(final VersionedPageInfo pageInfo, final String content) {
     super(pageInfo.getWiki(), pageInfo.getPath(), content, pageInfo.getAttributes());
     _revision = pageInfo.getRevision();
     _lastChangedRevision = pageInfo.getLastChangedRevision();
@@ -77,7 +77,7 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
     _lockedSince = pageInfo.getLockedSince();
   }
 
-  public VersionedPageInfoImpl(final VersionedPageInfo pageInfo, Map<String, String> attributes) {
+  public VersionedPageInfoImpl(final VersionedPageInfo pageInfo, final Map<String, String> attributes) {
     super(pageInfo.getWiki(), pageInfo.getPath(), pageInfo.getContent(), attributes);
     _revision = pageInfo.getRevision();
     _lastChangedRevision = pageInfo.getLastChangedRevision();
@@ -88,10 +88,12 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
     _lockedSince = pageInfo.getLockedSince();
   }
 
+  @Override
   public long getRevision() {
     return _revision;
   }
 
+  @Override
   public String getRevisionName() {
     if (isNewPage()) {
       return "New";
@@ -99,30 +101,37 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
     return "r" + getLastChangedRevision();
   }
 
+  @Override
   public String getLockedBy() {
     return _lockedBy;
   }
 
+  @Override
   public boolean isLocked() {
     return _lockedBy != null;
   }
 
+  @Override
   public String getLockToken() {
     return _lockToken;
   }
 
+  @Override
   public Date getLockedSince() {
     return _lockedSince;
   }
 
+  @Override
   public boolean isNewPage() {
     return _revision == UNCOMMITTED || _revision == DELETED || _revision == RENAMED;
   }
 
+  @Override
   public boolean isDeleted() {
     return _revision == DELETED || _revision == RENAMED;
   }
 
+  @Override
   public boolean isNewOrLockedByUser(final String user) {
     return isNewPage() || isLockedByUser(user);
   }
@@ -132,26 +141,32 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
     return lockedBy != null && lockedBy.equals(user);
   }
 
+  @Override
   public long getLastChangedRevision() {
     return _lastChangedRevision;
   }
 
+  @Override
   public String getLastChangedUser() {
     return _lastChangedAuthor;
   }
 
+  @Override
   public Date getLastChangedDate() {
     return _lastChangedDate;
   }
 
+  @Override
   public VersionedPageInfo withAlternativeContent(final String content) {
     return new VersionedPageInfoImpl(this, content);
   }
 
+  @Override
   public VersionedPageInfo withAlternativeAttributes(final Map<String, String> attributes) {
     return new VersionedPageInfoImpl(this, attributes);
   }
 
+  @Override
   public VersionedPageInfo withoutLockToken() {
     return new VersionedPageInfoImpl(
       super.getWiki(),
@@ -165,19 +180,23 @@ public class VersionedPageInfoImpl extends PageInfoImpl implements VersionedPage
       "",
       _lockedSince);
   }
-  
+
+  @Override
   public boolean isRenamed() {
     return _revision == RENAMED;
   }
 
+  @Override
   public boolean isRenamedInThisWiki() {
     return isRenamed() && _renamed.isLinkToCurrentWiki();
   }
 
-  public String getRenamedUrl(LinkResolutionContext linkResolutionContext) throws UnknownWikiException, URISyntaxException {
+  @Override
+  public String getRenamedUrl(final LinkResolutionContext linkResolutionContext) throws UnknownWikiException, URISyntaxException {
     return _renamed.getURL(linkResolutionContext);
   }
 
+  @Override
   public String getRenamedPageName() {
     return _renamed.getPageName();
   }

@@ -2,7 +2,8 @@ package net.hillsdon.reviki.vc.impl;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
+
+import com.google.common.base.Function;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SyntaxFormats;
@@ -41,26 +42,6 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   @Override
-  public SyntaxFormats getSyntax(final AutoPropertiesApplier propsApplier) {
-    String syntax = getAttributes().get("syntax");
-    if (syntax != null) {
-      SyntaxFormats format = SyntaxFormats.fromValue(syntax);
-      if (format != null) {
-        return format;
-      }
-    }
-    if (propsApplier != null) {
-      propsApplier.read();
-      for (Entry<String, String> entry : propsApplier.apply(getName()).entrySet()) {
-        if ("reviki:syntax".equals(entry.getKey())) {
-          return SyntaxFormats.fromValue(entry.getValue());
-        }
-      }
-    }
-    return SyntaxFormats.REVIKI;
-  }
-
-  @Override
   public PageInfo withAlternativeContent(final String content) {
     return new PageInfoImpl(_wiki, super.getPath(), content, _attributes);
   }
@@ -68,5 +49,25 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   @Override
   public PageInfo withAlternativeAttributes(final Map<String, String> attributes) {
     return new PageInfoImpl(_wiki, super.getPath(), _content, attributes);
+  }
+
+  @Override
+  public SyntaxFormats getSyntax(final Function<String, String> defaultSyntax) {
+    String syntax = getAttributes().get("syntax");
+    if (syntax != null) {
+      SyntaxFormats format = SyntaxFormats.fromValue(syntax);
+      if (format != null) {
+        return format;
+      }
+    }
+    if (defaultSyntax != null) {
+      return SyntaxFormats.fromValue(defaultSyntax.apply(super.getPath()));
+//      for (Entry<String, String> entry : propsApplier.apply(getName()).entrySet()) {
+//        if ("reviki:syntax".equals(entry.getKey())) {
+//          return SyntaxFormats.fromValue(entry.getValue());
+//        }
+//      }
+    }
+    return SyntaxFormats.REVIKI;
   }
 }
