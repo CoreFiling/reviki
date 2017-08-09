@@ -359,7 +359,7 @@ public class SVNPageStore extends AbstractPageStore {
   private String getLink(final SyntaxFormats syntax, final String destination, final boolean isImage) {
     switch (syntax) {
       case MARKDOWN:
-        return (isImage ? "!" : "") + "[attachments/" + destination + "](" + destination + ")";
+        return (isImage ? "!" : "") + "[" + destination + "](attachments/" + destination.replace(" ", "%20") + ")";
       case REVIKI:
       default:
         return (isImage ? "{{" : "[[") + "attachments/" + destination + "|" + destination + (isImage ? "}}" : "]]");
