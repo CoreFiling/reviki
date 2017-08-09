@@ -31,6 +31,7 @@ import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.web.vcintegration.SpecialPagePopulatingPageStore;
 
 
 /**
@@ -53,7 +54,7 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
 
   @Override
   public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
-    if (revision >= 0 || !isConfigPage(ref.getPath())) {
+    if (revision >= 0 || !isCacheableConfigPage(ref.getPath())) {
       return super.get(ref, revision);
     }
 
@@ -76,16 +77,17 @@ public class ConfigPageCachingPageStore extends SimpleDelegatingPageStore implem
 
   @Override
   public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
-    if (isConfigPage(page.getName())) {
+    if (isCacheableConfigPage(page.getName())) {
       _cache.remove(page);
     }
     return super.set(page, lockToken, baseRevision, commitMessage);
   }
 
-  static boolean isConfigPage(final String pageName) {
+  static boolean isCacheableConfigPage(final String pageName) {
     return pageName.startsWith(CONFIG_PREFIX)
            && pageName.length() > CONFIG_PREFIX.length()
-           && Character.isUpperCase(pageName.charAt(CONFIG_PREFIX.length()));
+           && Character.isUpperCase(pageName.charAt(CONFIG_PREFIX.length()))
+           && !SpecialPagePopulatingPageStore.SPECIAL_PAGES_WITH_PER_FORMAT_CONTENT.contains(new PageReferenceImpl(pageName));
   }
 
   /**

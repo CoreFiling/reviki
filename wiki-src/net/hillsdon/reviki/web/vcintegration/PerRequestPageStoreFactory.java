@@ -46,7 +46,7 @@ public class PerRequestPageStoreFactory implements Supplier<PageStore> {
   }
 
   public PageStore get() {
-    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_wiki, _tracker, _operations, _autoPropertiesApplier, _mimeIdentifier))));
+    return new SearchIndexPopulatingPageStore(_indexer, new PageListCachingPageStore(new SpecialPagePopulatingPageStore(new SVNPageStore(_wiki, _tracker, _operations, _autoPropertiesApplier, _mimeIdentifier), _autoPropertiesApplier)));
   }
 
 }

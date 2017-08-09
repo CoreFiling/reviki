@@ -30,11 +30,14 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
 import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.impl.VersionedPageInfoImpl;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.vc.impl.SimpleDelegatingPageStore;
 
@@ -51,17 +54,19 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
 
 
   private static final Log LOG = LogFactory.getLog(SpecialPagePopulatingPageStore.class);
-  private static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
+  public static final Collection<PageReference> SPECIAL_PAGES_WITH_PER_FORMAT_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       PAGE_FRONT_PAGE,
+      PAGE_SIDEBAR
+   ));
+  public static final Collection<PageReference> SPECIAL_PAGES_WITH_CONTENT = new LinkedHashSet<PageReference>(Arrays.asList(
       new PageReferenceImpl("FindPage"),
       new PageReferenceImpl("ConfigCss"),
-      PAGE_SIDEBAR,
       CONFIG_PLUGINS,
       CONFIG_AUTO_PROPERTIES,
       CONFIG_INTER_WIKI_LINKS,
       CONFIG_ICONS
    ));
-  private static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
+  public static final Collection<PageReference> SPECIAL_PAGES_WITHOUT_CONTENT = Arrays.asList(
       new PageReferenceImpl("AllPages"),
       new PageReferenceImpl("ConfigSvnLocation"),
       new PageReferenceImpl("OrphanedPages"),
@@ -70,23 +75,39 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
       PAGE_FOOTER
     );
 
-  public SpecialPagePopulatingPageStore(final PageStore delegate) {
+  private final AutoPropertiesApplier _autoProps;
+
+  public SpecialPagePopulatingPageStore(final PageStore delegate, final AutoPropertiesApplier autoProps) {
     super(delegate);
+    _autoProps = autoProps;
   }
 
   @Override
   public Set<PageReference> list() throws PageStoreException {
     Set<PageReference> list = super.list();
+    list.addAll(SPECIAL_PAGES_WITH_PER_FORMAT_CONTENT);
     list.addAll(SPECIAL_PAGES_WITH_CONTENT);
     list.addAll(SPECIAL_PAGES_WITHOUT_CONTENT);
     return list;
   }
 
+  private Optional<String> getPropulatedText(final PageReference ref, final VersionedPageInfo page) throws IOException {
+    if (SPECIAL_PAGES_WITH_PER_FORMAT_CONTENT.contains(ref)) {
+      return Optional.of(IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath() + "." + page.getSyntax(_autoProps).value()), "UTF-8"));
+    }
+    if (SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
+      return Optional.of(IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8"));
+    }
+    return Optional.absent();
+  }
+
   private VersionedPageInfo withContentIfSpecialAndNew(final PageReference ref, VersionedPageInfo page) throws PageStoreException {
     try {
-      if (page.isNewPage() && SPECIAL_PAGES_WITH_CONTENT.contains(ref)) {
-        String text = IOUtils.toString(getClass().getResourceAsStream("prepopulated/" + page.getPath()), "UTF-8");
-        page = new VersionedPageInfoImpl(getWiki(), page.getPath(), text, VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
+      if (page.isNewPage()) {
+        Optional<String> text = getPropulatedText(ref, page);
+        if (text.isPresent()) {
+          page = new VersionedPageInfoImpl(getWiki(), page.getPath(), text.get(), VersionedPageInfo.UNCOMMITTED, VersionedPageInfo.UNCOMMITTED, page.getLastChangedUser(), page.getLastChangedDate(), page.getLockedBy(), page.getLockToken(), page.getLockedSince());
+        }
       }
     }
     catch (IOException ex) {
@@ -95,6 +116,7 @@ public class SpecialPagePopulatingPageStore extends SimpleDelegatingPageStore {
     return page;
   }
 
+  @Override
   public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     VersionedPageInfo page = super.get(ref, revision);
     page = withContentIfSpecialAndNew(ref, page);
