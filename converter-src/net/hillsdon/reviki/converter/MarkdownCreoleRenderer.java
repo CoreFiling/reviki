@@ -62,7 +62,7 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitHeading(final Heading node) {
-    return StringUtils.repeat("#", node.getLevel()) + " " + visitASTNode(node) + "\n\n";
+    return ensureNewLinesAfter(StringUtils.repeat("#", node.getLevel()) + " " + visitASTNode(node), 2);
   }
 
   @Override
@@ -77,19 +77,23 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitParagraph(final Paragraph node) {
-    return visitASTNode(node) + "\n\n";
+    return ensureNewLinesAfter(visitASTNode(node), 2);
   }
 
   @Override
   public String visitListItem(final ListItem node) {
+    return ensureNewLineAfter(padLines(visitASTNode(node), listItemPrefix(), false));
+  }
+
+  private String listItemPrefix() {
     if (_listTypes.isEmpty()) {
       throw new IllegalStateException("Unexpected list item outside of a list");
     }
     switch (_listTypes.peek()) {
       case ORDERED:
-        return StringUtils.repeat("    ", _listTypes.size() - 1) + "1. " + visitASTNode(node) + "\n";
+        return "1.  ";
       case UNORDERED:
-        return StringUtils.repeat("    ", _listTypes.size() - 1) + "* " + visitASTNode(node) + "\n";
+        return "*   ";
       default:
         // Bad enum value
         throw new IllegalStateException("Invalid list type");
@@ -98,16 +102,18 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitOrderedList(final OrderedList node) {
-    _listTypes.push(ListType.ORDERED);
-    String str = visitASTNode(node) + "\n";
-    _listTypes.pop();
-    return str;
+    return visitList(node, ListType.ORDERED);
   }
 
   @Override
   public String visitUnorderedList(final UnorderedList node) {
-    _listTypes.push(ListType.UNORDERED);
-    String str = visitASTNode(node) + "\n";
+    return visitList(node, ListType.UNORDERED);
+  }
+
+  private String visitList(final ASTNode node, final ListType type) {
+    boolean nested = !_listTypes.isEmpty();
+    _listTypes.push(type);
+    String str = (nested ? "\n" : "") + visitASTNode(node) + (nested ? "" : "\n");
     _listTypes.pop();
     return str;
   }
@@ -146,7 +152,7 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitCode(final Code node) {
-    return "```" + node.getLanguage().or("") + "\n" + node.getText() + "\n```\n";
+    return "```" + node.getLanguage().or("") + "\n" + ensureNewLineAfter(node.getText()) + "```\n";
   }
 
   @Override
@@ -162,17 +168,12 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitBlockquote(final Blockquote node) {
-    return Joiner.on("\n").join(Iterables.transform(Arrays.asList(visitASTNode(node).split("\n")), new Function<String, String>() {
-      @Override
-      public String apply(final String line) {
-        return "> " + line;
-      }
-    }));
+    return ensureNewLinesAfter(padLines(visitASTNode(node), "> ", true), 2);
   }
 
   @Override
   public String visitNowiki(final Nowiki node) {
-    return "```\n" + node.getText() + "\n```\n";
+    return "```\n" + ensureNewLineAfter(node.getText()) + "```\n";
   }
 
   @Override
@@ -193,12 +194,10 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
     table.append(visit(node.getChildren().get(0)));
     _isFirstRow = false;
 
-    table.append("\n");
     table.append("|" + Strings.repeat("---|", columns - 1) + "---|\n");
 
     for (ASTNode childNode : node.getChildren().subList(1, node.getChildren().size())) {
       table.append(visit(childNode));
-      table.append("\n");
     }
     table.append("\n");
     return table.toString();
@@ -210,7 +209,7 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
     for (ASTNode cellNode : node.getChildren()) {
       row.append("| " + visit(cellNode) + " ");
     }
-    row.append("|");
+    row.append("|\n");
     return row.toString();
   }
 
@@ -226,5 +225,27 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
   @Override
   public String visitTableCell(final TableCell node) {
     return visitASTNode(node);
+  }
+
+  private String padLines(final String text, final String prefix, final boolean allLines) {
+    return Joiner.on("\n").join(Iterables.transform(Arrays.asList(text.split("\n")), new Function<String, String>() {
+      private boolean _firstLine = true;
+      @Override
+      public String apply(final String line) {
+        if (allLines || _firstLine) {
+          _firstLine = false;
+          return prefix + line;
+        }
+        return StringUtils.repeat(" ", prefix.length()) + line;
+      }
+    }));
+  }
+
+  private String ensureNewLineAfter(final String text) {
+    return ensureNewLinesAfter(text, 1);
+  }
+
+  private String ensureNewLinesAfter(final String text, final int count) {
+    return StringUtils.stripEnd(text, "\n") + StringUtils.repeat("\n", count);
   }
 }

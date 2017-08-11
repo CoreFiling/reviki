@@ -88,7 +88,7 @@ public class Converter {
 	  Converter converter = new Converter(stream);
 	  ByteArrayOutputStream baos = new ByteArrayOutputStream();
     converter.writeTo(baos);
-    System.out.println(baos.toString("UTF-8"));
+    System.out.print(baos.toString("UTF-8"));
   }
 
 }
