@@ -155,7 +155,7 @@
         <jsp:include page="cheatsheet.html"></jsp:include>
       </div><!--col-->
       <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-markdown" style="display: none">
-        <div id="MarkupHelp">
+        <div class="markup_help">
           <h3>Cheatsheet</h3>
           <div>
             All the core Markdown spec, as well tables from GFM.
