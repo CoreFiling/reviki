@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.commonmark.Extension;
+import org.commonmark.ext.autolink.AutolinkExtension;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.AbstractVisitor;
@@ -62,7 +63,11 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private final Supplier<List<Macro>> _macros;
 
-  private final List<Extension> _extensions = ImmutableList.of(TablesExtension.create(), StrikethroughExtension.create(), MultilineQuoteExtension.create());
+  private final List<Extension> _extensions = ImmutableList.of(
+      TablesExtension.create(),
+      StrikethroughExtension.create(),
+      AutolinkExtension.create(),
+      MultilineQuoteExtension.create());
 
   public MarkdownRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;

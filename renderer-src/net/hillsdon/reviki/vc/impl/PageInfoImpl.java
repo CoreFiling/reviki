@@ -62,11 +62,6 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
     }
     if (defaultSyntax != null) {
       return SyntaxFormats.fromValue(defaultSyntax.apply(super.getPath()));
-//      for (Entry<String, String> entry : propsApplier.apply(getName()).entrySet()) {
-//        if ("reviki:syntax".equals(entry.getKey())) {
-//          return SyntaxFormats.fromValue(entry.getValue());
-//        }
-//      }
     }
     return SyntaxFormats.REVIKI;
   }

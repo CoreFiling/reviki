@@ -100,6 +100,10 @@ public class AutoPropertiesApplierImpl implements AutoPropertiesApplier {
     return new Function<String, String>() {
       @Override
       public String apply(final String filename) {
+        if (propsApplier == null) {
+          // This will only happen in tests.
+          return "reviki";
+        }
         propsApplier.read();
         return propsApplier.apply(filename).get("reviki:syntax");
       }
