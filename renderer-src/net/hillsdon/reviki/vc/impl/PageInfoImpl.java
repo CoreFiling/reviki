@@ -61,7 +61,10 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
       }
     }
     if (defaultSyntax != null) {
-      return SyntaxFormats.fromValue(defaultSyntax.apply(super.getPath()));
+      syntax = defaultSyntax.apply(super.getPath());
+      if (syntax != null) {
+        return SyntaxFormats.fromValue(syntax);
+      }
     }
     return SyntaxFormats.REVIKI;
   }
