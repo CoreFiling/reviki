@@ -154,7 +154,7 @@ public class TestEditing extends WebTestSupport {
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     HtmlTextArea attributes = form.getTextAreaByName("attributes");
     String expectedContent = "SomeContent";
-    String expectedAttributes = "\"text\" = \"" + expectedContent + "\"";
+    String expectedAttributes = "\"text\" = \"" + expectedContent + "\"\n\"syntax\" = \"reviki\"";
     attributes.setText(expectedAttributes);
     HtmlTextArea content = form.getTextAreaByName("content");
     String expectedContentSource = "<<attr:text>>";
