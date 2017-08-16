@@ -58,8 +58,8 @@
           <label class="col-sm-offset-1 col-sm-1 control-label" for="syntax">Syntax:</label>
           <div class="col-sm-2">
             <select id="syntax" class="form-control" name="syntax">
-              <option value="reviki" <c:if test="${syntax == 'reviki'}">selected </c:if>>Reviki</option>
-      	      <option value="markdown" <c:if test="${syntax == 'markdown'}">selected </c:if>>Markdown</option>
+              <option value="reviki" <c:if test="${syntax == 'reviki'}">selected="selected"</c:if>>Reviki</option>
+      	      <option value="markdown" <c:if test="${syntax == 'markdown'}">selected="selected"</c:if>>Markdown</option>
             </select>
           </div><!--col-->
         </div><!--form-group-->
