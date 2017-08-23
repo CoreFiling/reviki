@@ -17,18 +17,15 @@
   <property name="generated-source" value="src-gen" />
   <property name="wiki-source" value="wiki-src" />
   <property name="renderer-source" value="renderer-src" />
-  <property name="converter-source" value="converter-src" />
   <property name="web" value="WebContent" />   
   <property name="build-wiki" value="ant-build/wiki" />
   <property name="build-renderer" value="ant-build/renderer" />
   <property name="build-web" value="ant-build/web" />   
-  <property name="build-converter" value="ant-build/converter" />
   <property name="reports" value="reports" />   
   <property name="release" value="release" />   
   <property name="jar" value="${build-web}/WEB-INF/lib/reviki.jar"/>
   <property name="rendererJar" value="${build-web}/WEB-INF/lib/reviki-renderer.jar"/>
   <property name="testJar" value="ant-build/reviki-test.jar"/>
-  <property name="converterJar" value="ant-build/reviki-converter.jar" />
   <property name="war" value="${release}/${ant.project.name}.war" />   
   <property name="prepopulated-pages" value="net/hillsdon/reviki/web/vcintegration/prepopulated/**"/>
 
@@ -68,7 +65,6 @@
      <mkdir dir="${build-wiki}" />
      <mkdir dir="${build-renderer}" />
      <mkdir dir="${build-web}" />
-     <mkdir dir="${build-converter}" />
      <mkdir dir="${build-webtests}" />
      <mkdir dir="${reports}" />
      <mkdir dir="${release}" />
@@ -79,7 +75,6 @@
     <delete dir="${build-wiki}" />
   	<delete dir="${build-renderer}" />
     <delete dir="${build-web}" />
-    <delete dir="${build-converter}" />
     <delete dir="${build-webtests}" />
     <delete dir="${reports}" />
     <delete dir="${release}" />
@@ -125,16 +120,6 @@
     </copy>
   </target>
 
-  <target name="compile-converter" depends="init, renderer-jar">
-    <mkdir dir="${build-converter}"/>
-    <rjavac srcdir="${converter-source}" destdir="${build-converter}" fork="yes" target="1.6" source="1.6" debug="true">
-      <classpath>
-        <pathelement path="${rendererJar}"/> 
-        <path refid="classpath" />
-      </classpath>
-    </rjavac>
-  </target>
-
   <target name="compile-renderer" depends="generate-sources">
     <rjavac destdir="${build-renderer}" fork="yes" target="1.6" source="1.6" debug="true">
       <src path="${renderer-source}"/>
@@ -151,25 +136,6 @@
   </target>
 
   <target name="compile" depends="compile-wiki, compile-renderer"/>
-
-  <target name="converter-jar" depends="compile-converter">
-    <jar destfile="${converterJar}.tmp" duplicate="preserve">
-      <fileset dir="${build-converter}">
-        <include name="**/*.class"/>
-      </fileset>
-      <zipgroupfileset dir="${web}/WEB-INF/lib" includes="*.jar" />
-      <zipgroupfileset file="${rendererJar}" />
-    </jar>
-    <jar destfile="${converterJar}">
-      <zipfileset src="${converterJar}.tmp" excludes="META-INF/*.SF,META-INF/*.DSA,META-INF/*.RS"/>
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Version" value="${version}.${buildNumber} ${TODAY}"/>
-        <attribute name="Main-Class" value="net.hillsdon.reviki.converter.Converter" />
-      </manifest>
-    </jar>
-    <delete file="${converterJar}.tmp" />
-  </target>
 
   <target name="jar" depends="compile-wiki">
     <jar destfile="${jar}">
