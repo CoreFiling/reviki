@@ -2,18 +2,19 @@ package net.hillsdon.reviki.converter;
 
 import java.util.Arrays;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import net.hillsdon.fij.text.Escape;
+import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
-import net.hillsdon.reviki.wiki.renderer.creole.ExternalLinkTarget;
+import net.hillsdon.reviki.wiki.renderer.creole.LinkResolutionContext;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.Blockquote;
@@ -46,13 +47,13 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
     UNORDERED
   }
 
-  private static final Pattern JIRA_LINK = Pattern.compile("[A-Z]{2,}-[0-9]+");
-
   private final Stack<ListType> _listTypes = new Stack<MarkdownCreoleRenderer.ListType>();
   private boolean _isFirstRow;
+  private final LinkResolutionContext _linkResolutionContext;
 
-  public MarkdownCreoleRenderer() {
+  public MarkdownCreoleRenderer(final LinkResolutionContext linkResolutionContext) {
     super("", URLOutputFilter.NULL);
+    _linkResolutionContext = linkResolutionContext;
   }
 
   @Override
@@ -120,13 +121,14 @@ class MarkdownCreoleRenderer extends ASTRenderer<String> {
 
   @Override
   public String visitLink(final Link node) {
-    if (JIRA_LINK.matcher(node.getTarget()).matches()) {
-      return "[" + node.getTitle() + "](https://jira.int.corefiling.com/browse/" + node.getTarget() + ")";
+    try {
+      LinkResolutionContext context = _linkResolutionContext.derive(new PageReferenceImpl("foo"));
+      return "[" + Optional.fromNullable(node.getTitle()).or("") + "](" + node.getParts().getURL(context) + ")";
     }
-    if (node.getParts().getTarget() instanceof ExternalLinkTarget) {
-      return "[" + node.getTitle() + "](" + node.getTarget() + ")";
+    catch (Exception e) {
+      // Fall through to return text.
+      // This is horrid but it's what real Reviki does to handle non-existent internal pages.
     }
-    // Possibly wiki link of some sort so just print the text
     return node.getTitle() == null ? node.getTarget() : node.getTitle();
   }
 

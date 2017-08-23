@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ProxyInputStream;
 
 import com.google.common.base.Function;
@@ -51,7 +52,7 @@ public class Converter {
 
 	  MarkdownConverter converter = new MarkdownConverter();
 	  for (InputStream stream : streams) {
-      System.out.print(converter.convert(stream));
+      System.out.print(converter.convert(IOUtils.toString(stream, "UTF-8")));
       System.out.println("-----");
 	  }
   }
