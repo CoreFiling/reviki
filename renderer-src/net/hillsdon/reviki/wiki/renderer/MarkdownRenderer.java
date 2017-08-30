@@ -53,7 +53,7 @@ public class MarkdownRenderer extends HtmlRenderer {
 
   private static final Log LOG = LogFactory.getLog(MarkdownRenderer.class);
 
-  private static final Pattern MACRO_REGEX = Pattern.compile("\\[(search):([^\\]]*)\\]");
+  private static final Pattern MACRO_REGEX = Pattern.compile("\\[([^:\\]]+)(?::([^\\]]*))?\\]");
 
   private final SimplePageStore _pageStore;
 
@@ -166,7 +166,8 @@ public class MarkdownRenderer extends HtmlRenderer {
     public void visit(final Text textNode) {
       Matcher regex = MACRO_REGEX.matcher(textNode.getLiteral());
       int start = 0;
-      while (regex.find(start)) {
+      int searchStart = 0;
+      while (regex.find(searchStart)) {
         Optional<? extends Node> newNode = handleMacro(regex.group(1), regex.group(2));
         if (newNode.isPresent()) {
           if (regex.start() > start) {
@@ -174,9 +175,9 @@ public class MarkdownRenderer extends HtmlRenderer {
           }
 
           textNode.insertBefore(newNode.get());
-
           start = regex.end();
         }
+        searchStart = regex.end();
       }
       if (start == textNode.getLiteral().length()) {
         textNode.unlink();
@@ -218,7 +219,7 @@ public class MarkdownRenderer extends HtmlRenderer {
 
     private HtmlInline htmlNode(final String content) {
       final HtmlInline node = new HtmlInline();
-      node.setLiteral(content);
+      node.setLiteral(content.replaceFirst("^<p " + RevikiRenderer.CSS_CLASS_ATTR + ">(.*)</p>$", "$1"));
       return node;
     }
 
