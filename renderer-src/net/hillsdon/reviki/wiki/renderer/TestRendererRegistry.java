@@ -15,10 +15,10 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
-import java.io.InputStream;
-
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import junit.framework.TestCase;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
+
+import java.io.InputStream;
 
 public class TestRendererRegistry extends TestCase {
 
