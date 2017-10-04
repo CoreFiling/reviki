@@ -1,5 +1,5 @@
 [ConfigSideBar](ConfigSideBar)
 
 [ConfigHeader](ConfigHeader)
-<br>
+<br />
 [ConfigFooter](ConfigFooter)

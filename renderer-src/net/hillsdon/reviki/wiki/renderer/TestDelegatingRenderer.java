@@ -44,7 +44,7 @@ public class TestDelegatingRenderer extends RenderingTest {
   }
 
   private String render(final String path, final String content, final String syntax) {
-    final Map<String, String> attributes = syntax == null ? Collections.<String, String>emptyMap() : Collections.singletonMap("reviki:syntax", syntax);
+    final Map<String, String> attributes = syntax == null ? Collections.<String, String>emptyMap() : Collections.singletonMap("syntax", syntax);
     String output = _renderer.render(new PageInfoImpl("", path, content, attributes)).get();
     return output.replaceFirst("\\s*class='wiki-content'\\s*", "").replaceAll("\n", "");
   }
