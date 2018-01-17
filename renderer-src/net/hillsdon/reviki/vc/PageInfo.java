@@ -16,6 +16,12 @@ public interface PageInfo extends PageReference {
 
   PageInfo withAlternativeAttributes(Map<String, String> attributes);
 
-  SyntaxFormats getSyntax(Function<String, String> defaultSyntax);
+  /**
+   * @param defaultSyntaxFromFileName Function. Should return the name of a
+   *          {@link SyntaxFormats} member but returning something else will be
+   *          gracefully assumed to mean {@link SyntaxFormats#REVIKI}
+   * @return Syntax format for this page.
+   */
+  SyntaxFormats getSyntax(Function<String, String> defaultSyntaxFromFileName);
 
 }

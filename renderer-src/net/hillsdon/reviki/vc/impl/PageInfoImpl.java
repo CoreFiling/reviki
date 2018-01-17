@@ -52,7 +52,7 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
   }
 
   @Override
-  public SyntaxFormats getSyntax(final Function<String, String> defaultSyntax) {
+  public SyntaxFormats getSyntax(final Function<String, String> defaultSyntaxFromFileName) {
     String syntax = getAttributes().get("syntax");
     if (syntax != null) {
       SyntaxFormats format = SyntaxFormats.fromValue(syntax);
@@ -60,8 +60,8 @@ public class PageInfoImpl extends PageReferenceImpl implements PageInfo {
         return format;
       }
     }
-    if (defaultSyntax != null) {
-      syntax = defaultSyntax.apply(super.getPath());
+    if (defaultSyntaxFromFileName != null) {
+      syntax = defaultSyntaxFromFileName.apply(super.getPath());
       if (syntax != null) {
         final SyntaxFormats format = SyntaxFormats.fromValue(syntax);
         if (format != null) {
