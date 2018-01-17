@@ -10,8 +10,9 @@ Please see http://reviki.org for more details, including build instructions.
 Markdown is now supported as an alternative page format to WikiCreole.
 
 This can be switched on a per-page basis in the UI, or the default can be set
-across the wiki for all new pages by adding:
+across the wiki by adding:
 
 * = reviki:syntax=markdown
 
-to the bottom of the ConfigAutoProperties page.
+to the bottom of the ConfigAutoProperties page. Note that this will change the
+setting for all pages including editing existing ones written in creole.
