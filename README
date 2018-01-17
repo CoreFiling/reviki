@@ -4,3 +4,14 @@ wiki that uses Subversion as a data store.
 Please see http://reviki.org for more details, including build instructions.
 
 -- Matt Hillsdon <matt@hillsdon.net>
+
+# Markdown support
+
+Markdown is now supported as an alternative page format to WikiCreole.
+
+This can be switched on a per-page basis in the UI, or the default can be set
+across the wiki for all new pages by adding:
+
+* = reviki:syntax=markdown
+
+to the bottom of the ConfigAutoProperties page.
