@@ -16,9 +16,9 @@
 /*
  * Code adapted from {@link DefaultSVNOptions}, which takes a java.io.File
  * and can't be made to get the properties from a different source.
- * 
+ *
  * Original copyright follows.
- *  
+ *
  * ====================================================================
  * Copyright (c) 2004-2007 TMate Software Ltd.  All rights reserved.
  *
@@ -37,22 +37,23 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import net.hillsdon.reviki.vc.AutoProperties;
-import net.hillsdon.reviki.vc.PageStoreException;
-
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 
+import com.google.common.base.Function;
+
+import net.hillsdon.reviki.vc.AutoProperties;
+
 /**
- * 
- * 
+ *
+ *
  * @author mth
  */
 public class AutoPropertiesApplierImpl implements AutoPropertiesApplier {
 
   private final AutoProperties _autoprops;
-  
+
   /**
-   * Replaced by reading from {@link #_autoprops} in {@link #read()}. 
+   * Replaced by reading from {@link #_autoprops} in {@link #read()}.
    */
   private Map<String, String> _current = Collections.emptyMap();
 
@@ -60,10 +61,12 @@ public class AutoPropertiesApplierImpl implements AutoPropertiesApplier {
     _autoprops = autoprops;
   }
 
-  public void read() throws PageStoreException {
+  @Override
+  public void read() {
     _current = _autoprops.read();
   }
-  
+
+  @Override
   public Map<String, String> apply(final String filename) {
     final Map<String, String> result = new LinkedHashMap<String, String>();
     final Map<String, String> autoprops = _current;
@@ -91,6 +94,20 @@ public class AutoPropertiesApplierImpl implements AutoPropertiesApplier {
       }
     }
     return result;
+  }
+
+  public static Function<String, String> syntaxForFilename(final AutoPropertiesApplier propsApplier) {
+    return new Function<String, String>() {
+      @Override
+      public String apply(final String filename) {
+        if (propsApplier == null) {
+          // This will only happen in tests.
+          return "reviki";
+        }
+        propsApplier.read();
+        return propsApplier.apply(filename).get("reviki:syntax");
+      }
+    };
   }
 
 }

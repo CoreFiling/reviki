@@ -56,8 +56,10 @@ public interface VersionedPageInfo extends PageInfo  {
 
   VersionedPageInfo withoutLockToken();
 
+  @Override
   VersionedPageInfo withAlternativeContent(String content);
 
+  @Override
   VersionedPageInfo withAlternativeAttributes(Map<String, String> attributes);
 
 }

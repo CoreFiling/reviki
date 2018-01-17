@@ -79,11 +79,11 @@ public class TestDefaultPageImplSet extends TestCase {
     _store = createMock(CachingPageStore.class);
     _storeUnder = createMock(PageStore.class);
     _wikiUrls = new ExampleDotComWikiUrls();
-    _page = new DefaultPageImpl(null, _store, null, null, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, null, null, _diffGenerator, _wikiUrls, _feedWriter, null);
     _request = new MockHttpServletRequest();
     _response = null;
     _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", OLD_CONTENT, 0, 0, "user", new Date(), null, null, null);
-    _allMocks = new Object[] { _feedWriter, _diffGenerator, _store, _storeUnder};
+    _allMocks = new Object[] { _feedWriter, _diffGenerator, _store, _storeUnder };
   }
 
   private void verify() {

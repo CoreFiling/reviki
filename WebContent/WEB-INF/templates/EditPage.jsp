@@ -1,11 +1,21 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.hillsdon.net/ns/reviki/tags" prefix="sw" %>
 <tiles:insertTemplate template="SiteTemplate.jsp">
   <tiles:putAttribute name="title"><c:out value="*${pageInfo.title} - ${pageInfo.revisionName}"/></tiles:putAttribute>
   <tiles:putAttribute name="heading"><c:out value="${pageInfo.title}"/></tiles:putAttribute>
   <tiles:putAttribute name="content">
     <script type="text/javascript" src="<sw:resourceUrl path="sisyphus.min.js"/>"></script>
+    <c:choose>
+      <c:when test="${not empty pageInfo.attributes['syntax']}">
+        <c:set var="syntax" value="${pageInfo.attributes['syntax']}"/>
+      </c:when>
+      <c:otherwise>
+        <c:set var="syntax" value="${defaultSyntax}"/>
+      </c:otherwise>
+    </c:choose>
+
     <c:if test="${not empty preview or not empty markedUpDiff}">
       <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
@@ -43,6 +53,18 @@
     </c:if>
 
     <form class="form" role="form" name="editForm" action="<c:url value="${sw:urlEncode(page.name)}"/>" method="post">
+   	  <div class="row form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-offset-1 col-sm-1 control-label" for="syntax">Syntax:</label>
+          <div class="col-sm-2">
+            <select id="syntax" class="form-control" name="syntax">
+              <option value="reviki" <c:if test="${syntax == 'reviki'}">selected="selected"</c:if>>Reviki</option>
+      	      <option value="markdown" <c:if test="${syntax == 'markdown'}">selected="selected"</c:if>>Markdown</option>
+            </select>
+          </div><!--col-->
+        </div><!--form-group-->
+      </div><!--row-->
+
       <div class="form-group">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
@@ -129,9 +151,35 @@
       </script>
     </c:if>
     <div class="row">
-      <div class="col-sm-10 col-sm-offset-1">
+      <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-reviki" style="display: none">
         <jsp:include page="cheatsheet.html"></jsp:include>
       </div><!--col-->
+      <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-markdown" style="display: none">
+        <div class="markup_help">
+          <h3>Cheatsheet</h3>
+          <div>
+            All the core Markdown spec, as well tables from GFM.
+            See <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">this markdown cheatsheet</a> for reference.
+          </div>
+          <div>
+            An additional syntax for block quotes is also supported:
+            <pre>>>>
+Place your quote here.
+
+It can be multilined *and* have markdown syntax.
+>>></pre>
+          </div>
+        </div>
+      </div><!--col-->
     </div><!--row-->
+    <script type='text/javascript'>
+    function syntaxChanged() {
+      var selectedSyntax = $("#syntax option:selected").val();
+      $("#cheatsheet-reviki").css("display", selectedSyntax == "reviki" ? "block" : "none");
+      $("#cheatsheet-markdown").css("display", selectedSyntax == "markdown" ? "block" : "none");
+    }
+    syntaxChanged();
+    $("#syntax").change(syntaxChanged);
+    </script>
   </tiles:putAttribute>
 </tiles:insertTemplate>

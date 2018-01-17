@@ -33,7 +33,7 @@ public class TestSpecialPagePopulatingPageStore extends TestCase {
   @Override
   protected void setUp() throws Exception {
     _delegate = new SimplePageStore();
-    _special = new SpecialPagePopulatingPageStore(_delegate);
+    _special = new SpecialPagePopulatingPageStore(_delegate, null);
   }
 
   public void testAddsSpecialPagesToList() throws Exception {

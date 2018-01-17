@@ -8,7 +8,7 @@ import com.google.common.base.Suppliers;
 
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.SimplePageStore;
-import net.hillsdon.reviki.wiki.MarkupRenderer;
+import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
@@ -17,7 +17,7 @@ import net.hillsdon.reviki.wiki.renderer.macro.Macro;
  *
  * @author msw
  */
-public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
+public abstract class CreoleBasedRenderer extends HtmlRenderer {
 
   protected final SimplePageStore _pageStore;
 
@@ -26,8 +26,6 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
   protected final LinkPartsHandler _imageHandler;
 
   protected final Supplier<List<Macro>> _macros;
-
-  protected PageInfo _page;
 
   public CreoleBasedRenderer(final SimplePageStore pageStore, final LinkPartsHandler linkHandler, final LinkPartsHandler imageHandler, final Supplier<List<Macro>> macros) {
     _pageStore = pageStore;
@@ -55,8 +53,7 @@ public abstract class CreoleBasedRenderer<T> extends MarkupRenderer<T> {
 
   @Override
   public ASTNode parse(final PageInfo page) {
-    _page = page;
-    return CreoleRenderer.renderWithVisitor(getVisitor(_page), _macros);
+    return CreoleRenderer.renderWithVisitor(getVisitor(page), _macros);
   }
 
   /**

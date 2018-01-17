@@ -71,7 +71,7 @@ public class SvnWikiLinkPartHandler implements LinkPartsHandler {
       return _linkResolutionContext;
     }
     else {
-      return new LinkResolutionContext(_internalLinker, _interWikiLinker, _configuration, _store);
+      return new LinkResolutionContext(_internalLinker, interWikiLinker(), _configuration, _store);
     }
   }
 

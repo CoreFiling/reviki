@@ -115,6 +115,17 @@ public class TestAttachments extends WebTestSupport {
     assertEquals("File 3.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/a%20file%20with%20spaces")));
   }
 
+  public void testUploadAndDownloadAttachmentOnMarkdownPage() throws Exception {
+    String name = uniqueWikiPageName("AttachmentsTest");
+    HtmlPage page = editWikiPage(name, "Content", "", "", true);
+    HtmlPage attachments = uploadAttachment(ATTACHMENT_UPLOAD_FILE_1, name);
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(attachments, "file.txt")));
+
+    // A link should have been added to the page in markdown format.
+    page = getWikiPage(name);
+    assertEquals("File 1.", getTextAttachmentAtEndOfLink(getAnchorByHrefContains(page, "/attachments/file.txt")));
+  }
+
   //public void testUploadAndDownloadAttachmentWithDoubleQuotes() throws Exception {
   //  String name = uniqueWikiPageName("AttachmentsTestQuotes");
   //  HtmlPage page = editWikiPage(name, "Content", "", "", true);

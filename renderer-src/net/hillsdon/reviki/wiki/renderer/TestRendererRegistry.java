@@ -15,19 +15,19 @@
  */
 package net.hillsdon.reviki.wiki.renderer;
 
-import java.io.InputStream;
-
-import net.hillsdon.reviki.wiki.MarkupRenderer;
 import junit.framework.TestCase;
+import net.hillsdon.reviki.wiki.MarkupRenderer;
+
+import java.io.InputStream;
 
 public class TestRendererRegistry extends TestCase {
 
-  private HtmlRenderer _default;
+  private DelegatingRenderer _default;
 
   private RendererRegistry _registry;
 
   public void setUp() {
-    _default = new HtmlRenderer(null, null, null, null);
+    _default = new DelegatingRenderer(null, null, null, null, null);
     _registry = new RendererRegistry(_default);
   }
 

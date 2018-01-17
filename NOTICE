@@ -26,6 +26,15 @@ The code highlighting is provided by highlight.js by Ivan Sagalaev.
 The original software and related information is available at
 https://highlightjs.org
 
+Markdown support is provided by commonmark-java, which is open source
+software. The original software and related information is available at
+https://github.com/atlassian/commonmark-java
+
+Automatic linking in Markdown is provided by autolink-java, which is
+open source software. The original software and related information is
+available at
+https://github.com/robinst/autolink-java
+
 The following open source third-party libraries are used for 
 testing (i.e. not part of the WAR file):
 

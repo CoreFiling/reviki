@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.RevikiRenderer;
 import net.hillsdon.reviki.wiki.renderer.XHTML5Validator;
 
 import org.codehaus.jackson.JsonFactory;
@@ -56,7 +56,7 @@ public abstract class JsonDrivenRenderingTest extends RenderingTest {
       final String actual = render(input);
 
       // We ignore the CSS class we add to save cluttering the expectations.
-      String tidiedActual = actual.replaceAll(" " + HtmlRenderer.CSS_CLASS_ATTR, "");
+      String tidiedActual = actual.replaceAll(" " + RevikiRenderer.CSS_CLASS_ATTR, "");
       final boolean match = expected.equals(tidiedActual);
       if (bugExplanation != null) {
         assertFalse("You fixed " + caseName, match);

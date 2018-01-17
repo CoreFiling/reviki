@@ -30,7 +30,7 @@ public class TestRenderingExtensions extends JsonDrivenRenderingTest {
 
   @Override
   protected String render(final String input) throws IOException, PageStoreException {
-    HtmlRenderer renderer = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    RevikiRenderer renderer = new RevikiRenderer(pageStore, linkHandler, imageHandler, macros);
     return renderer.render(input).get();
   }
 }

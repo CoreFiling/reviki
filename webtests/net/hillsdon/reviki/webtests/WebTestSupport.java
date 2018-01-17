@@ -185,14 +185,22 @@ public abstract class WebTestSupport extends TestCase {
    * @throws IOException On failure.
    */
   public HtmlPage editWikiPage(final String name, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
-    return editWikiPage(getWikiPage(name), content, attributes, descriptionOfChange, isNew);
+    return editWikiPage(getWikiPage(name), content, attributes, descriptionOfChange, isNew, null);
+  }
+
+  public HtmlPage editWikiPage(final String name, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew, final String syntax) throws Exception {
+    return editWikiPage(getWikiPage(name), content, attributes, descriptionOfChange, isNew, syntax);
   }
 
   private void assertMatches(final String re, final String text) {
     assertTrue(text, text.matches(re));
   }
 
-  protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
+  protected HtmlPage editWikiPage(final HtmlPage page, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew) throws Exception {
+    return editWikiPage(page, content, attributes, descriptionOfChange, isNew, null);
+  }
+
+  protected HtmlPage editWikiPage(/* mutable */ HtmlPage page, final String content, final String attributes, final String descriptionOfChange, final Boolean isNew, final String syntax) throws Exception {
     URL pageUrl = page.getWebResponse().getWebRequest().getUrl();
     final String newSign = isNew != null && isNew ? " - New" : "";
     if (isNew != null) {
@@ -203,6 +211,9 @@ public abstract class WebTestSupport extends TestCase {
       assertMatches("test - [*][A-Z].*?" + newSign, page.getTitleText());
     }
     HtmlForm editForm = page.getFormByName("editForm");
+    if (syntax != null) {
+      editForm.getSelectByName("syntax").getOptionByValue(syntax).setSelected(true);
+    }
     editForm.getTextAreaByName("content").setText(content == null ? "" : content);
     editForm.getTextAreaByName("attributes").setText(attributes == null ? "" : attributes);
     editForm.getInputByName("description").setValueAttribute(descriptionOfChange == null ? "" : descriptionOfChange);

@@ -36,29 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.hillsdon.fij.io.LazyOutputStream;
-import net.hillsdon.fij.text.Strings;
-import net.hillsdon.reviki.vc.AlreadyLockedException;
-import net.hillsdon.reviki.vc.AttachmentHistory;
-import net.hillsdon.reviki.vc.ChangeInfo;
-import net.hillsdon.reviki.vc.ChangeType;
-import net.hillsdon.reviki.vc.ConflictException;
-import net.hillsdon.reviki.vc.ContentTypedSink;
-import net.hillsdon.reviki.vc.InterveningCommitException;
-import net.hillsdon.reviki.vc.LostLockException;
-import net.hillsdon.reviki.vc.MimeIdentifier;
-import net.hillsdon.reviki.vc.NotFoundException;
-import net.hillsdon.reviki.vc.PageInfo;
-import net.hillsdon.reviki.vc.VersionedPageInfo;
-import net.hillsdon.reviki.vc.PageReference;
-import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
-import net.hillsdon.reviki.vc.PageStoreException;
-import net.hillsdon.reviki.vc.PageStoreInvalidException;
-import net.hillsdon.reviki.vc.RenameException;
-import net.hillsdon.reviki.vc.SaveException;
-import net.hillsdon.reviki.vc.StoreKind;
-import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
-
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNException;
@@ -74,6 +51,30 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+
+import net.hillsdon.fij.io.LazyOutputStream;
+import net.hillsdon.fij.text.Strings;
+import net.hillsdon.reviki.vc.AlreadyLockedException;
+import net.hillsdon.reviki.vc.AttachmentHistory;
+import net.hillsdon.reviki.vc.ChangeInfo;
+import net.hillsdon.reviki.vc.ChangeType;
+import net.hillsdon.reviki.vc.ConflictException;
+import net.hillsdon.reviki.vc.ContentTypedSink;
+import net.hillsdon.reviki.vc.InterveningCommitException;
+import net.hillsdon.reviki.vc.LostLockException;
+import net.hillsdon.reviki.vc.MimeIdentifier;
+import net.hillsdon.reviki.vc.NotFoundException;
+import net.hillsdon.reviki.vc.PageInfo;
+import net.hillsdon.reviki.vc.PageReference;
+import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
+import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.PageStoreInvalidException;
+import net.hillsdon.reviki.vc.RenameException;
+import net.hillsdon.reviki.vc.SaveException;
+import net.hillsdon.reviki.vc.StoreKind;
+import net.hillsdon.reviki.vc.SyntaxFormats;
+import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.wiki.renderer.creole.PageLinkTarget;
 
 /**
  * Stores pages in an SVN repository.
@@ -114,6 +115,7 @@ public class SVNPageStore extends AbstractPageStore {
   }
 
   private static final Predicate<ChangeInfo> IS_CHANGE_TO_PAGE = new Predicate<ChangeInfo>() {
+    @Override
     public boolean apply(final ChangeInfo in) {
       return in.getKind() == StoreKind.PAGE;
     }
@@ -138,10 +140,12 @@ public class SVNPageStore extends AbstractPageStore {
     _mimeIdentifier = mimeIdentifier;
   }
 
+  @Override
   public List<ChangeInfo> recentChanges(final long limit) throws PageStoreException {
     return _operations.log("", limit, LogEntryFilter.DESCENDANTS, true, 0, -1);
   }
 
+  @Override
   public List<ChangeInfo> history(final PageReference ref) throws PageStoreException {
     final List<ChangeInfo> changes = new ArrayList<ChangeInfo>();
     final ChangeInfo deletedIn = getChangeThatDeleted(ref);
@@ -162,6 +166,7 @@ public class SVNPageStore extends AbstractPageStore {
     return Ordering.from(DeletesAfterOtherSameRevisionChanges.INSTANCE).sortedCopy(result);
   }
 
+  @Override
   public Set<PageReference> list() throws PageStoreException {
     Set<PageReference> names = new LinkedHashSet<PageReference>();
     for (String page : _tracker.currentExistingEntries()) {
@@ -169,7 +174,8 @@ public class SVNPageStore extends AbstractPageStore {
     }
     return names;
   }
-  
+
+  @Override
   public Collection<PageInfo> getPages(final Collection<PageReference> pages, final long revision) throws PageStoreException {
     List<PageInfo> outputPages = new LinkedList<PageInfo>();
     Map<String, ByteArrayOutputStream> contents = new LinkedHashMap<String, ByteArrayOutputStream>();
@@ -186,6 +192,7 @@ public class SVNPageStore extends AbstractPageStore {
     return outputPages;
   }
 
+  @Override
   public VersionedPageInfo get(final PageReference ref, final long revision) throws PageStoreException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Map<String, String> properties = new HashMap<String, String>();
@@ -200,7 +207,8 @@ public class SVNPageStore extends AbstractPageStore {
       String lockToken = null;
       Date lockedSince = null;
       final Map<String, String> filteredProperties = Maps.filterKeys(properties, new Predicate<String>() {
-        public boolean apply(String key) {
+        @Override
+        public boolean apply(final String key) {
           return key.startsWith(REVIKI_ATTRIBUTE_PREFIX);
         }
       });
@@ -244,7 +252,7 @@ public class SVNPageStore extends AbstractPageStore {
     }
   }
 
-  private Map<String, String> stripPrefix(Map<String, String> properties, String propertyPrefix) {
+  private Map<String, String> stripPrefix(final Map<String, String> properties, final String propertyPrefix) {
     Map<String, String> attributes = new LinkedHashMap<String, String>();
     for(Map.Entry<String, String> entry: properties.entrySet()) {
       attributes.put(entry.getKey().substring(propertyPrefix.length()), entry.getValue());
@@ -256,6 +264,7 @@ public class SVNPageStore extends AbstractPageStore {
     return _tracker.getChangeThatDeleted(ref.getPath());
   }
 
+  @Override
   public VersionedPageInfo tryToLock(final PageReference ref) throws PageStoreException {
     final VersionedPageInfo page = get(ref, -1);
     if (page.isNewPage()) {
@@ -274,10 +283,12 @@ public class SVNPageStore extends AbstractPageStore {
     return get(ref, revision);
   }
 
+  @Override
   public void unlock(final PageReference path, final String lockToken) throws PageStoreException {
     _operations.unlock(path, lockToken);
   }
 
+  @Override
   public long set(final PageInfo page, final String lockToken, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
     final String path = page.getPath();
     final String content = page.getContent();
@@ -307,7 +318,7 @@ public class SVNPageStore extends AbstractPageStore {
     });
   }
 
-  private Map<String, String> addPrefix(Map<String, String> attributes, String prefix) {
+  private Map<String, String> addPrefix(final Map<String, String> attributes, final String prefix) {
     Map<String, String> properties = new LinkedHashMap<String, String>();
     for(Map.Entry<String, String> entry: attributes.entrySet()) {
       properties.put(REVIKI_ATTRIBUTE_PREFIX + entry.getKey(), entry.getValue());
@@ -325,6 +336,7 @@ public class SVNPageStore extends AbstractPageStore {
     return VersionedPageInfo.DELETED;
   }
 
+  @Override
   public long deleteAttachment(final PageReference pageRef, final String attachmentName, final long baseRevision, final String commitMessage) throws PageStoreAuthenticationException, PageStoreException {
     final String path = SVNPathUtil.append(pageRef.getAttachmentPath(), attachmentName);
     return _operations.execute(new SVNEditAction(commitMessage) {
@@ -344,6 +356,17 @@ public class SVNPageStore extends AbstractPageStore {
     }
   }
 
+  private String getLink(final SyntaxFormats syntax, final String destination, final boolean isImage) {
+    switch (syntax) {
+      case MARKDOWN:
+        return (isImage ? "!" : "") + "[" + destination + "](attachments/" + destination.replace(" ", "%20") + ")";
+      case REVIKI:
+      default:
+        return (isImage ? "{{" : "[[") + "attachments/" + destination + "|" + destination + (isImage ? "}}" : "]]");
+    }
+  }
+
+  @Override
   public void attach(final PageReference pageRef, final String storeName, final long baseRevision, final InputStream in, final String commitMessage) throws PageStoreException {
     _autoPropertiesApplier.read();
 
@@ -377,8 +400,9 @@ public class SVNPageStore extends AbstractPageStore {
 
         if (addLinkToPage) {
           final boolean isImage = _mimeIdentifier.isImage(storeName);
-          final String link = (isImage ? "{{" : "[[") + "attachments/" + storeName + "|" + storeName + (isImage ? "}}" : "]]");
+          final String link = getLink(versionedPageInfo.getSyntax(AutoPropertiesApplierImpl.syntaxForFilename(_autoPropertiesApplier)), storeName, isImage);
           final String newContent = versionedPageInfo.getContent() + Strings.CRLF + link + Strings.CRLF;
+
           commitEditor.openDir(SVNPathUtil.removeTail(pageRef.getPath()), -1);
           if(versionedPageInfo.isNewPage()) {
             // create the page
@@ -393,6 +417,7 @@ public class SVNPageStore extends AbstractPageStore {
     });
   }
 
+  @Override
   public Collection<AttachmentHistory> attachments(final PageReference ref) throws PageStoreException {
     final String attachmentPath = ref.getAttachmentPath();
     final Map<String, AttachmentHistory> results = new LinkedHashMap<String, AttachmentHistory>();
@@ -413,7 +438,9 @@ public class SVNPageStore extends AbstractPageStore {
         if (!results.containsKey(attachment.getName())) {
           AttachmentHistory history = new AttachmentHistory(false);
           ChangeInfo change = new ChangeInfo(ref.getName(), attachment.getName(), attachment.getAuthor(), attachment.getDate(), attachment.getRevision(), attachment.getCommitMessage(), StoreKind.ATTACHMENT, ChangeType.ADDED, null, -1);
-          if(change.getChangeType()!=ChangeType.DELETED) history.getVersions().add(change);
+          if(change.getChangeType()!=ChangeType.DELETED) {
+            history.getVersions().add(change);
+          }
           results.put(attachment.getName(), history);
         }
       }
@@ -422,6 +449,7 @@ public class SVNPageStore extends AbstractPageStore {
     return results.values();
   }
 
+  @Override
   public void attachment(final PageReference ref, final String attachment, final long revision, final ContentTypedSink sink) throws NotFoundException, PageStoreException {
     final String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
     final Map<String, String> properties = new HashMap<String, String>();
@@ -450,6 +478,7 @@ public class SVNPageStore extends AbstractPageStore {
     _operations.getFile(path, revision, null, out);
   }
 
+  @Override
   public byte[] attachmentBytes(final PageReference ref, final String attachment, final long revision) throws NotFoundException, PageStoreException {
     String path = SVNPathUtil.append(ref.getAttachmentPath(), attachment);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -458,6 +487,7 @@ public class SVNPageStore extends AbstractPageStore {
     return out.toByteArray();
   }
 
+  @Override
   public Collection<PageReference> getChangedBetween(final long start, final long end) throws PageStoreException {
     List<ChangeInfo> log = _operations.log("", -1, LogEntryFilter.DESCENDANTS, false, start, end);
     Set<PageReference> pages = new LinkedHashSet<PageReference>(log.size());
@@ -469,10 +499,12 @@ public class SVNPageStore extends AbstractPageStore {
     return pages;
   }
 
+  @Override
   public long getLatestRevision() throws PageStoreAuthenticationException, PageStoreException {
     return _operations.getLatestRevision();
   }
 
+  @Override
   public long copy(final PageReference from, final long fromRevision, final PageReference to, final String commitMessage) throws PageStoreException {
     return _operations.execute(new SVNEditAction(commitMessage) {
       @Override
@@ -482,6 +514,7 @@ public class SVNPageStore extends AbstractPageStore {
     });
   }
 
+  @Override
   public long rename(final PageReference from, final PageReference to, final long baseRevision, final String commitMessage) throws InterveningCommitException, PageStoreException {
     final boolean needToMoveAttachmentDir =  _operations.checkPath(from.getAttachmentPath(), baseRevision) == SVNNodeKind.DIR;
     return _operations.execute(new SVNRenameAction(commitMessage, to, needToMoveAttachmentDir, from, baseRevision));
@@ -497,6 +530,7 @@ public class SVNPageStore extends AbstractPageStore {
     return lockToken == null ? Collections.<String, String> emptyMap() : Collections.<String, String> singletonMap(path, lockToken);
   }
 
+  @Override
   public void assertValid() throws PageStoreInvalidException, PageStoreAuthenticationException {
     try {
       if (_operations.checkPath("", -1) == SVNNodeKind.NONE) {
@@ -513,6 +547,7 @@ public class SVNPageStore extends AbstractPageStore {
     }
   }
 
+  @Override
   public String getWiki() throws PageStoreException {
     return _wiki;
   }

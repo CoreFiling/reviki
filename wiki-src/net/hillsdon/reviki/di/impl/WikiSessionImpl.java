@@ -119,8 +119,8 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
       }
 
       @Override
-      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(ast,  urlOutputFilter);
+      public String render(PageInfo page, ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+        return _renderer.render(page, ast,  urlOutputFilter);
       }
     };
 
@@ -142,11 +142,13 @@ public class WikiSessionImpl extends AbstractSession implements WikiSession {
         macros.addAll(_plugins.getImplementations(Macro.class));
         return macros;
       }
-    });
+    }, autoPropertiesApplier);
 
     _plugins = new PluginsImpl(pageStore);
     searchEngine.setPageStore(pageStore);
     autoProperties.setPageStore(cachingPageStore);
+
+    container.addComponent(autoPropertiesApplier);
 
     container.addComponent(authSearch.getRequestLifecycleAware()); // This needs adding so that RequestLifecycleAwareness works, but it shouldn't show up as the search engine
     container.addComponent(tracker);

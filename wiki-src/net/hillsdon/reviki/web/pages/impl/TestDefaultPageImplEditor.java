@@ -28,7 +28,7 @@ import net.hillsdon.reviki.web.pages.DiffGenerator;
 import net.hillsdon.reviki.web.urls.WikiUrls;
 import net.hillsdon.reviki.wiki.feeds.FeedWriter;
 import net.hillsdon.reviki.wiki.graph.WikiGraph;
-import net.hillsdon.reviki.wiki.renderer.HtmlRenderer;
+import net.hillsdon.reviki.wiki.renderer.DelegatingRenderer;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.*;
 
@@ -49,7 +49,7 @@ public class TestDefaultPageImplEditor extends TestCase {
   private DefaultPageImpl _page;
   private CachingPageStore _store;
   private PageStore _pageStore;
-  private HtmlRenderer _renderer;
+  private DelegatingRenderer _renderer;
   private RendererRegistry _renderers;
   private WikiGraph _graph;
   private DiffGenerator _diffGenerator;
@@ -67,13 +67,13 @@ public class TestDefaultPageImplEditor extends TestCase {
     _store = createMock(CachingPageStore.class);
     _pageStore = createMock(PageStore.class);
     _pageInfo = new VersionedPageInfoImpl("wiki", "ThePage", "content", 0, 0, "user", new Date(), "user", LOCK_TOKEN, null);
-    _renderer = new HtmlRenderer(_pageStore, null, null, null);
+    _renderer = new DelegatingRenderer(_pageStore, null, null, null, null);
     _renderers = new RendererRegistry(_renderer);
     _graph = createMock(WikiGraph.class);
     _diffGenerator = createMock(DiffGenerator.class);
     _wikiUrls = createMock(WikiUrls.class);
     _feedWriter = createMock(FeedWriter.class);
-    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter);
+    _page = new DefaultPageImpl(null, _store, _renderers, _graph, _diffGenerator, _wikiUrls, _feedWriter, null);
     expect(_store.getUnderlying()).andStubReturn(_pageStore);
   }
 

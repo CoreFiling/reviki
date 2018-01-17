@@ -15,6 +15,7 @@ import net.hillsdon.reviki.vc.VersionedPageInfo;
 import net.hillsdon.reviki.vc.PageReference;
 import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore;
 import net.hillsdon.reviki.vc.impl.InMemoryDeletedRevisionTracker;
 import net.hillsdon.reviki.vc.impl.RepositoryBasicSVNOperations;
@@ -104,8 +105,8 @@ public class SearchIndexBuilder implements Runnable {
       }
 
       @Override
-      public String render(ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
-        return _renderer.render(ast, urlOutputFilter);
+      public String render(PageInfo page, ASTNode ast, URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+        return _renderer.render(page, ast, urlOutputFilter);
       }
     };
     LuceneSearcher searcher = new LuceneSearcher(wikiConf.getWikiName(), primarySearchDir, otherSearchDirs, renderer);
@@ -135,7 +136,8 @@ public class SearchIndexBuilder implements Runnable {
           macros.addAll(_plugins.getImplementations(Macro.class));
           return macros;
         }
-      });
+      },
+      new AutoPropertiesApplierImpl(autoProperties));
 
       latestRevision = operations.getLatestRevision();
       long latestIndexed = searcher.getHighestIndexedRevision();

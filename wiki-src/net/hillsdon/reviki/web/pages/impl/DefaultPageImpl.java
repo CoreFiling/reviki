@@ -37,6 +37,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
+
 import net.hillsdon.fij.text.Strings;
 import net.hillsdon.reviki.configuration.WikiConfiguration;
 import net.hillsdon.reviki.search.QuerySyntaxException;
@@ -52,6 +63,8 @@ import net.hillsdon.reviki.vc.PageStoreAuthenticationException;
 import net.hillsdon.reviki.vc.PageStoreException;
 import net.hillsdon.reviki.vc.RenameException;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.vc.impl.CachingPageStore;
 import net.hillsdon.reviki.vc.impl.PageInfoImpl;
 import net.hillsdon.reviki.vc.impl.PageReferenceImpl;
@@ -76,17 +89,6 @@ import net.hillsdon.reviki.wiki.graph.WikiGraph;
 import net.hillsdon.reviki.wiki.renderer.RendererRegistry;
 import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
 
 public class DefaultPageImpl implements DefaultPage {
 
@@ -121,6 +123,8 @@ public class DefaultPageImpl implements DefaultPage {
   public static final String PARAM_COMMIT_MESSAGE = "description";
 
   public static final String PARAM_MINOR_EDIT = "minorEdit";
+
+  public static final String PARAM_SYNTAX = "syntax";
 
   public static final String PARAM_DIFF_REVISION = "diff";
 
@@ -165,6 +169,8 @@ public class DefaultPageImpl implements DefaultPage {
 
   private static final String ATTR_FROM_PAGE = "fromPage";
 
+  private static final String ATTR_DEFAULT_SYNTAX = "defaultSyntax";
+
   private final CachingPageStore _store;
 
   private final RendererRegistry _renderers;
@@ -179,7 +185,9 @@ public class DefaultPageImpl implements DefaultPage {
 
   private final WikiConfiguration _configuration;
 
-  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter) {
+  private final AutoPropertiesApplier _propsApplier;
+
+  public DefaultPageImpl(final WikiConfiguration configuration, final CachingPageStore store, final RendererRegistry renderers, final WikiGraph graph, final DiffGenerator diffGenerator, final WikiUrls wikiUrls, final FeedWriter feedWriter, final AutoPropertiesApplier propsApplier) {
     _configuration = configuration;
     _store = store;
     _graph = graph;
@@ -187,8 +195,10 @@ public class DefaultPageImpl implements DefaultPage {
     _wikiUrls = wikiUrls;
     _feedWriter = feedWriter;
     _renderers = renderers;
+    _propsApplier = propsApplier;
   }
 
+  @Override
   public View attach(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     if (!ServletFileUpload.isMultipartContent(request)) {
       throw new InvalidInputException("multipart request expected.");
@@ -275,6 +285,7 @@ public class DefaultPageImpl implements DefaultPage {
     _store.attach(page, storeName, baseRevision, in, message);
   }
 
+  @Override
   public View deleteAttachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws PageStoreAuthenticationException, PageStoreException {
     final String attachmentName = path.next();
     final long baseRevision = -1;
@@ -282,20 +293,25 @@ public class DefaultPageImpl implements DefaultPage {
     return new RedirectToPageView(_wikiUrls, page, "/attachments/");
   }
 
+  @Override
   public View attachment(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String attachmentName = path.next();
     return new View() {
+      @Override
       public void render(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException, NotFoundException, PageStoreException, InvalidInputException {
         _store.attachment(page, attachmentName, getRevision(request), new ContentTypedSink() {
+          @Override
           public void setContentType(final String contentType) {
             response.setContentType(contentType);
           }
 
+          @Override
           public void setFileName(final String name) {
             final String quoteEscapedAttachmentName = attachmentName.replace("\\", "\\\\").replace("\"", "\\\"");
             response.setHeader("Content-Disposition", "inline; filename=\"" + quoteEscapedAttachmentName + "\"");
           }
 
+          @Override
           public OutputStream stream() throws IOException {
             return response.getOutputStream();
           }
@@ -304,6 +320,7 @@ public class DefaultPageImpl implements DefaultPage {
     };
   }
 
+  @Override
   public View attachments(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     Collection<AttachmentHistory> allAttachments = _store.attachments(page);
     Collection<AttachmentHistory> currentAttachments = new LinkedList<AttachmentHistory>();
@@ -336,9 +353,11 @@ public class DefaultPageImpl implements DefaultPage {
     return requestedSessionId != null && postedSessionId != null && postedSessionId.equals(requestedSessionId) && request.isRequestedSessionIdValid();
   }
 
+  @Override
   public View editor(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean preview = request.getParameter(SUBMIT_PREVIEW) != null;
     VersionedPageInfo pageInfo = _store.getUnderlying().tryToLock(page);
+    request.setAttribute(ATTR_DEFAULT_SYNTAX, pageInfo.getSyntax(AutoPropertiesApplierImpl.syntaxForFilename(_propsApplier)).value());
     request.setAttribute(ATTR_PAGE_INFO, pageInfo);
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     copySessionIdAsAttribute(request);
@@ -361,6 +380,7 @@ public class DefaultPageImpl implements DefaultPage {
           final String newContent = getContent(request);
           pageInfo = pageInfo.withAlternativeContent(newContent);
           pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+            @Override
             public boolean apply(final String value) {
               if (value == null) {
                 return false;
@@ -382,6 +402,7 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_SESSION_ID, request.getSession().getId());
   }
 
+  @Override
   public View get(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final String revisionParam = request.getParameter(PARAM_REVISION);
     final String diffParam = request.getParameter(PARAM_DIFF_REVISION);
@@ -405,11 +426,11 @@ public class DefaultPageImpl implements DefaultPage {
     else if (_renderers.hasRenderer(ctypeParam)) {
       MarkupRenderer<InputStream> renderer = _renderers.getRenderer(ctypeParam);
       InputStream stream = renderer.render(main, new ResponseSessionURLOutputFilter(request, response)).get();
-      return new StreamView(renderer.getContentType(), stream);
+      return new StreamView(renderer.getContentType(main), stream);
     }
     else {
       ASTNode ast = _renderers.getDefaultRenderer().parse(main);
-      String rendered = _renderers.getDefaultRenderer().render(ast, new ResponseSessionURLOutputFilter(request, response));
+      String rendered = _renderers.getDefaultRenderer().render(main, ast, new ResponseSessionURLOutputFilter(request, response));
       request.setAttribute(ATTR_RENDERED_CONTENTS, rendered);
       if (main.isRenamed()) {
         LinkPartsHandler linkPartsHandler = _renderers.getDefaultRenderer().getLinkPartsHandler();
@@ -446,6 +467,7 @@ public class DefaultPageImpl implements DefaultPage {
     request.setAttribute(ATTR_BACKLINKS, pageNames);
   }
 
+  @Override
   public View history(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     List<ChangeInfo> changes = _store.history(page);
     if (ViewTypeConstants.is(request, CTYPE_ATOM)) {
@@ -456,6 +478,7 @@ public class DefaultPageImpl implements DefaultPage {
     return new JspView("History");
   }
 
+  @Override
   public View set(final PageReference page, final ConsumedPath path, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final boolean hasSaveParam = request.getParameter(SUBMIT_SAVE) != null;
     final boolean hasCopyParam = request.getParameter(SUBMIT_COPY) != null;
@@ -566,6 +589,7 @@ public class DefaultPageImpl implements DefaultPage {
     }
     request.setAttribute(ATTR_ORIGINAL_ATTRIBUTES, pageInfo.getAttributes());
     pageInfo = pageInfo.withAlternativeAttributes(Maps.filterValues(getAttributes(request), new Predicate<String>() {
+      @Override
       public boolean apply(final String value) {
         if (value == null) {
           return false;
@@ -610,6 +634,7 @@ public class DefaultPageImpl implements DefaultPage {
         attributes.put(attr, null);
       }
     }
+    attributes.put("syntax", request.getParameter(PARAM_SYNTAX));
     return attributes;
   }
 

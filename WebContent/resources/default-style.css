@@ -160,26 +160,26 @@ code.wiki-content {
   font-family: monospace;
 }
 
-div#MarkupHelp {
+div.markup_help {
   background-color: white; color: #333;
   font-family: Verdana, Arial, Helvetica, sans-serif; line-height: 1.3em;
 }
-div#MarkupHelp table {
+div.markup_help table {
   margin-bottom: 0; border-top: 3px solid #999; border-left: 3px solid #999;
   border-right: 3px solid #BBB; border-bottom: 3px solid #BBB
 }
 
-div#MarkupHelp td {
+div.markup_help td {
   font-size: 80%; padding: 0.3em; margin: 0; border: 1px solid #999; border-width: 1px 0 1px 0;
   vertical-align: top; white-space: nowrap;
 }
-div#MarkupHelp td.arrow {
+div.markup_help td.arrow {
   padding-right: 5px; padding: 0 0.75em; color: #999;
 }
-div#MarkupHelp h3 {
+div.markup_help h3 {
   font-size: 90%; font-weight: bold; margin: 0 0 5px 0; padding: 5px 0 0 0;
 }
-div#MarkupHelp p {
+div.markup_help p {
   font-size: 70%;
 }
 
@@ -187,11 +187,11 @@ div.markup_table {
   height: 35em;
 }
 
-#MarkupHelp td {
+.markup_help td {
   padding: 0;
 }
 
-#MarkupHelp table {
+.markup_help table {
   border-spacing: 0;
   border-collapse: separate;
   float: left;

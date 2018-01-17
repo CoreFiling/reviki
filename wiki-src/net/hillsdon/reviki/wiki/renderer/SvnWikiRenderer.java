@@ -18,9 +18,13 @@ package net.hillsdon.reviki.wiki.renderer;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Supplier;
+
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.PageStore;
 import net.hillsdon.reviki.vc.PageStoreException;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplier;
+import net.hillsdon.reviki.vc.impl.AutoPropertiesApplierImpl;
 import net.hillsdon.reviki.web.common.ViewTypeConstants;
 import net.hillsdon.reviki.web.urls.InternalLinker;
 import net.hillsdon.reviki.web.urls.URLOutputFilter;
@@ -30,16 +34,14 @@ import net.hillsdon.reviki.wiki.renderer.creole.LinkPartsHandler;
 import net.hillsdon.reviki.wiki.renderer.creole.ast.ASTNode;
 import net.hillsdon.reviki.wiki.renderer.macro.Macro;
 
-import com.google.common.base.Supplier;
-
 public class SvnWikiRenderer extends MarkupRenderer<String> {
   private final RendererRegistry _registry;
 
-  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros) {
+  public SvnWikiRenderer(final PageStoreConfiguration configuration, final PageStore pageStore, final InternalLinker internalLinker, final Supplier<List<Macro>> macros, final AutoPropertiesApplier propsApplier) {
     final LinkPartsHandler linkHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.ANCHOR, pageStore, internalLinker, configuration);
     final LinkPartsHandler imageHandler = new SvnWikiLinkPartHandler(SvnWikiLinkPartHandler.IMAGE, pageStore, internalLinker, configuration);
 
-    HtmlRenderer html = new HtmlRenderer(pageStore, linkHandler, imageHandler, macros);
+    DelegatingRenderer html = new DelegatingRenderer(pageStore, linkHandler, imageHandler, macros, AutoPropertiesApplierImpl.syntaxForFilename(propsApplier));
     RawRenderer raw = new RawRenderer();
 
     _registry = new RendererRegistry(html);
@@ -60,8 +62,8 @@ public class SvnWikiRenderer extends MarkupRenderer<String> {
   }
 
   @Override
-  public String render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
+  public String render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException {
     MarkupRenderer<String> renderer = _registry.getDefaultRenderer();
-    return renderer.render(ast, urlOutputFilter);
+    return renderer.render(page, ast, urlOutputFilter);
   }
 }

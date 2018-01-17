@@ -16,7 +16,7 @@ public class TestSvnWikiRenderer extends TestCase {
   private RendererRegistry _renderers;
 
   public void setUp() {
-    _renderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()));
+    _renderer = new SvnWikiRenderer(new FakeConfiguration(), new SimplePageStore(), new InternalLinker(new ExampleDotComWikiUrls()), Suppliers.ofInstance(Collections.<Macro> emptyList()), null);
     _renderers = _renderer.getRenderers();
   }
 

@@ -1,0 +1,58 @@
+[
+  {
+    "name":   "Auto-linking extension",
+    "input":  "http://www.example.com/foo/",
+    "output": "<p><a href=\"http://www.example.com/foo/\">http://www.example.com/foo/</a></p>\n"
+  },
+  {
+    "name":   "Inter-wiki link handling",
+    "input":  "[foo:1234](foo:1234)",
+    "output": "<p><a href=\"http://www.example.com/foo/Wiki?1234\">foo:1234</a></p>\n"
+  },
+  {
+    "name":   "Raw HTML",
+    "input":  "<div class='unusual'></div>",
+    "output": "<div class='unusual'></div>\n"
+  },
+  {
+    "name":   "Reviki-format macro",
+    "input":  "[revikimacro:Args here]",
+    "output": "<p><em>Reviki: Args here</em></p>\n"
+  },
+  {
+    "name":   "XHTML-format macro",
+    "input":  "[htmlmacro:Args here]",
+    "output": "<p><i>HTML: Args here</i></p>\n"
+  },
+  {
+    "name":   "Extra content",
+    "input":  "stuff that isn't a macro [htmlmacro:Args here] stuff that isn't a macro",
+    "output": "<p>stuff that isn't a macro <i>HTML: Args here</i> stuff that isn't a macro</p>\n"
+  },
+  {
+    "name":   "Multiple macros",
+    "input":  "Before [htmlmacro:macro1][htmlmacro:macro2] between [notamacro:really][revikimacro:macro3] after",
+    "output": "<p>Before <i>HTML: macro1</i><i>HTML: macro2</i> between [notamacro:really]<em>Reviki: macro3</em> after</p>\n"
+  },
+  {
+    "name":   "Macro without arguments",
+    "input":  "[htmlmacro]",
+    "output": "<p><i>HTML: (no args)</i></p>\n"
+  },
+  {
+    "name":   "Unexpanded macro node",
+    "input":  "[unknownmacro:args]",
+    "output": "<p>[unknownmacro:args]</p>\n"
+  },
+  {
+    "name":   "Macro-style macro args",
+    "input":  "[htmlmacro:Weird [macro:args] args]",
+    "output": "<p><i>HTML: Weird [macro:args</i> args]</p>\n"
+  },
+  {
+    "name":   "Special blockquotes syntax",
+    "input":  ">>>\nQuoted text\n\nNew line\n>>>",
+    "output": "<blockquote>\n<p>Quoted text</p>\n<p>New line</p>\n</blockquote>\n"
+  }
+]
+

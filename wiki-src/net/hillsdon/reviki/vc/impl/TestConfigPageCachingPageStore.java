@@ -15,6 +15,8 @@
  */
 package net.hillsdon.reviki.vc.impl;
 
+import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isCacheableConfigPage;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,14 +26,13 @@ import junit.framework.TestCase;
 import net.hillsdon.reviki.vc.ChangeInfo;
 import net.hillsdon.reviki.vc.PageInfo;
 import net.hillsdon.reviki.vc.VersionedPageInfo;
-import static net.hillsdon.reviki.vc.impl.ConfigPageCachingPageStore.isConfigPage;
 
 public class TestConfigPageCachingPageStore extends TestCase {
 
   public void testIsConfigPage() {
-    assertFalse(isConfigPage("Config"));
-    assertTrue(isConfigPage("ConfigFoo"));
-    assertFalse(isConfigPage("ConfiguringStuff"));
+    assertFalse(isCacheableConfigPage("Config"));
+    assertTrue(isCacheableConfigPage("ConfigFoo"));
+    assertFalse(isCacheableConfigPage("ConfiguringStuff"));
   }
 
   public void testDoesntCacheOldRevisionsOfConfigPages() throws Exception {

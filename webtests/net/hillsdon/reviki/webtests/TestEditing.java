@@ -23,10 +23,13 @@ import net.hillsdon.reviki.vc.PageReference;
 import org.jaxen.JaxenException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 
@@ -65,6 +68,22 @@ public class TestEditing extends WebTestSupport {
     HtmlPage edited = editWikiPage(name, "Initial Status: <<attr:status>>", "status = completed", "", false);
     String editedPageText = edited.asText();
     assertTrue(editedPageText.contains("Initial Status: completed"));
+  }
+
+  public void testEditSyntax() throws Exception {
+    String name = uniqueWikiPageName("EditPageTest");
+    HtmlPage edited = editWikiPage(name, "# Text", "", "", true);
+    String editedText = edited.querySelector("#wiki-rendering li").asText();
+    assertEquals("Text", editedText);
+
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlSelect syntaxSelect = form.getSelectByName("syntax");
+    syntaxSelect.getOptionByText("Markdown").setSelected(true);
+    edited = (HtmlPage) form.getButtonByName("save").click();
+
+    editedText = edited.querySelector("#wiki-rendering h1").asText();
+    assertEquals("Text", editedText);
   }
 
   public void testEditAttributesNewPage() throws Exception {
@@ -154,7 +173,7 @@ public class TestEditing extends WebTestSupport {
     HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
     HtmlTextArea attributes = form.getTextAreaByName("attributes");
     String expectedContent = "SomeContent";
-    String expectedAttributes = "\"text\" = \"" + expectedContent + "\"";
+    String expectedAttributes = "\"text\" = \"" + expectedContent + "\"\n\"syntax\" = \"reviki\"";
     attributes.setText(expectedAttributes);
     HtmlTextArea content = form.getTextAreaByName("content");
     String expectedContentSource = "<<attr:text>>";
@@ -169,6 +188,45 @@ public class TestEditing extends WebTestSupport {
     assertEquals(expectedAttributes + NEWLINE_TEXTAREA, attributes.getText());
     content = form.getTextAreaByName("content");
     assertEquals(expectedContentSource + NEWLINE_TEXTAREA, content.getText());
+  }
+
+  public void testPreviewWithMarkdownSyntax() throws Exception {
+    String name = uniqueWikiPageName("PreviewPageTest");
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlSelect syntaxSelect = form.getSelectByName("syntax");
+    syntaxSelect.getOptionByText("Markdown").setSelected(true);
+    HtmlTextArea content = form.getTextAreaByName("content");
+    String expectedContentSource = "# Some markdown";
+    content.setText(expectedContentSource);
+
+    // Now if we preview we should get the previewed text rendered, and in
+    // the edit area.
+    editPage = (HtmlPage) form.getButtonByName("preview").click();
+    DomNode renderedHeader = editPage.querySelector("#wiki-rendering h1");
+    assertEquals("Some markdown", renderedHeader.asText());
+    form = editPage.getFormByName(ID_EDIT_FORM);
+    syntaxSelect = form.getSelectByName("syntax");
+    assertTrue(syntaxSelect.getOptionByText("Markdown").isSelected());
+    content = form.getTextAreaByName("content");
+    assertEquals(expectedContentSource + NEWLINE_TEXTAREA, content.getText());
+  }
+
+  public void testHelpSheets() throws Exception {
+    String name = uniqueWikiPageName("HelpSheetPageTest");
+    HtmlPage editPage = clickEditLink(getWikiPage(name));
+    HtmlForm form = editPage.getFormByName(ID_EDIT_FORM);
+    HtmlSelect syntaxSelect = form.getSelectByName("syntax");
+    syntaxSelect.getOptionByText("Markdown").setSelected(true);
+    DomElement revikiHelp = editPage.getElementById("cheatsheet-reviki");
+    DomElement markdownHelp = editPage.getElementById("cheatsheet-markdown");
+    assertEquals("display:none;", revikiHelp.getAttribute("style").replaceAll("\\s", ""));
+    assertEquals("display:block;", markdownHelp.getAttribute("style").replaceAll("\\s", ""));
+
+    syntaxSelect.getOptionByText("Reviki").setSelected(true);
+    markdownHelp = editPage.getElementById("cheatsheet-markdown");
+    assertEquals("display:block;", revikiHelp.getAttribute("style").replaceAll("\\s", ""));
+    assertEquals("display:none;", markdownHelp.getAttribute("style").replaceAll("\\s", ""));
   }
 
   private void editThenCancel(final String name) throws Exception {

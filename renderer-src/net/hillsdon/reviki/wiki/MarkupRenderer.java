@@ -48,7 +48,7 @@ public abstract class MarkupRenderer<T> {
       return new Raw(page.getContent());
     }
 
-    public ASTNode render(final ASTNode ast, final URLOutputFilter urlOutputFilter) {
+    public ASTNode render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) {
       return ast;
     }
   };
@@ -89,7 +89,7 @@ public abstract class MarkupRenderer<T> {
   public final Optional<T> render(final PageInfo page, final URLOutputFilter urlOutputFilter) {
     try {
       ASTNode rendered = parse(page);
-      return Optional.of(render(rendered, urlOutputFilter));
+      return Optional.of(render(page, rendered, urlOutputFilter));
     }
 
     catch (IOException e) {
@@ -105,19 +105,19 @@ public abstract class MarkupRenderer<T> {
    * Like {@link #render(ASTNode, URLOutputFilter)}, but with the null URL
    * output filter.
    */
-  public final T render(final ASTNode ast) throws IOException, PageStoreException {
-    return render(ast, URLOutputFilter.NULL);
+  public final T render(final PageInfo page, final ASTNode ast) throws IOException, PageStoreException {
+    return render(page, ast, URLOutputFilter.NULL);
   }
 
   /**
    * Render a page, and then turn it into the desired output type.
    */
-  public abstract T render(final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
+  public abstract T render(final PageInfo page, final ASTNode ast, final URLOutputFilter urlOutputFilter) throws IOException, PageStoreException;
 
   /**
    * Return the MIME type of the generated output.
    */
-  public String getContentType() {
+  public String getContentType(final PageInfo page) {
     return "application/octet-stream";
   }
 }

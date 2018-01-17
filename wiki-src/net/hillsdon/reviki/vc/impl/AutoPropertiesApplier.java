@@ -36,7 +36,7 @@ public interface AutoPropertiesApplier {
    * 
    * @throws PageStoreException If we fail to read them.
    */
-  void read() throws PageStoreException;
+  void read();
 
   /**
    * Applies the current
