@@ -17,6 +17,7 @@ import org.commonmark.ext.autolink.AutolinkExtension;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.AbstractVisitor;
+import org.commonmark.node.FencedCodeBlock;
 import org.commonmark.node.HtmlInline;
 import org.commonmark.node.Image;
 import org.commonmark.node.Link;
@@ -136,6 +137,18 @@ public class MarkdownRenderer extends HtmlRenderer {
     public MarkdownVisitor(final PageInfo page, final URLOutputFilter urlOutputFilter) {
       _page = page;
       _urlOutputFilter = urlOutputFilter;
+    }
+
+    @Override
+    public void visit(final FencedCodeBlock fencedCodeBlock) {
+      Optional<? extends Node> macro = handleMacro(fencedCodeBlock.getInfo(), fencedCodeBlock.getLiteral());
+      if (macro.isPresent()) {
+        fencedCodeBlock.insertBefore(macro.get());
+        fencedCodeBlock.unlink();
+      }
+      else {
+        super.visit(fencedCodeBlock);
+      }
     }
 
     @Override
