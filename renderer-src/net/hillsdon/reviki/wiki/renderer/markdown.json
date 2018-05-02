@@ -50,6 +50,21 @@
     "output": "<p><i>HTML: Weird [macro:args</i> args]</p>\n"
   },
   {
+    "name":   "Multi-line macro args",
+    "input":  "Before\n```htmlmacro\nTest with\nnewlines\n\n  Don't break?\n```\nAfter",
+    "output": "<p>Before</p>\n<i>HTML: Test with\nnewlines\n\n  Don't break?\n</i>\n<p>After</p>\n"
+  },
+  {
+    "name":   "Multi-line unrecognised macro",
+    "input":  "Before\n```java\nclass Foo() {\n}\n```\nAfter",
+    "output": "<p>Before</p>\n<pre><code class=\"language-java\">class Foo() {\n}\n</code></pre>\n<p>After</p>\n"
+  },
+  {
+    "name":   "Multi-line code block with no language",
+    "input":  "Before\n```\nclass Foo() {\n}\n```\nAfter",
+    "output": "<p>Before</p>\n<pre><code>class Foo() {\n}\n</code></pre>\n<p>After</p>\n"
+  },
+  {
     "name":   "Special blockquotes syntax",
     "input":  ">>>\nQuoted text\n\nNew line\n>>>",
     "output": "<blockquote>\n<p>Quoted text</p>\n<p>New line</p>\n</blockquote>\n"
