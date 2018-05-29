@@ -274,7 +274,7 @@
       <jvmarg value="-Dwiki.altusername=${wiki.altusername}" />
       <jvmarg value="-Dwiki.altpassword=${wiki.altpassword}" />
       <jvmarg value="-Dwiki.svn=${wiki.svn}" />
-      <jvmarg value="-Xss512k" />
+      <jvmarg value="-Xss1m" />
       <jvmarg value="-XX:ThreadStackSize=2048" />
       <formatter type="plain" usefile="false"/>
       <classpath>
