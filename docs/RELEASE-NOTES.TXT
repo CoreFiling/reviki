@@ -1,6 +1,22 @@
 Reviki
 
                               Version History
+0.7.0 (2018-05-21)
+------------------
+
+* Added support for GitHub-flavored Markdown syntax.  This is enabled on a
+  per-page basis in the Edit UI and has a per-wiki default by adding the
+  following to the bottom of the ConfigAutoProperties page:
+
+  * = reviki:syntax=markdown
+
+  Note this default applies to all pages which have not had their syntax
+  set explicitly.  See the cheat-sheet on the Edit page for supported markup.
+  [consistency#14]
+
+* Added include-html plugin to include arbitrary HTML from an external source.
+
+
 0.6.2 (2015-11-16)
 ------------------
 
@@ -80,7 +96,7 @@ Reviki
   cells ("||") from being parsed correctly.
   [REVIKI-573]
 
-* Fixed an issue that meant reviki always used the obsolete SSLv3 protocol 
+* Fixed an issue that meant reviki always used the obsolete SSLv3 protocol
   when using HTTPS to communicate with the SVN server.
   [REVIKI-570]
 
@@ -226,7 +242,7 @@ Enhancements and bug fixes:
 
 * Added page-scoped attributes that can be defined with a simple key value
   syntax and referenced via a macro and in search queries.
-  
+
 * Added the ability to delete attachments.
   [dbug 5814]
 
