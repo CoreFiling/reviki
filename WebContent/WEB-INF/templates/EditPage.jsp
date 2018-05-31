@@ -155,21 +155,7 @@
         <jsp:include page="cheatsheet.html"></jsp:include>
       </div><!--col-->
       <div class="col-sm-10 col-sm-offset-1" id="cheatsheet-markdown" style="display: none">
-        <div class="markup_help">
-          <h3>Cheatsheet</h3>
-          <div>
-            All the core Markdown spec, as well tables from GFM.
-            See <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">this markdown cheatsheet</a> for reference.
-          </div>
-          <div>
-            An additional syntax for block quotes is also supported:
-            <pre>>>>
-Place your quote here.
-
-It can be multilined *and* have markdown syntax.
->>></pre>
-          </div>
-        </div>
+        <jsp:include page="cheatsheet-markdown.html"></jsp:include>
       </div><!--col-->
     </div><!--row-->
     <script type='text/javascript'>
