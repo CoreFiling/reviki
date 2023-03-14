@@ -12,7 +12,7 @@
   </presetdef>
 
   <property name="buildNumber" value="dev" />   
-  <property name="version" value="0.6.2" />
+  <property name="version" value="0.7.0" />
   <property name="build-details" value="${version} r${buildNumber}" />
   <property name="generated-source" value="src-gen" />
   <property name="wiki-source" value="wiki-src" />
