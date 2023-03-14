@@ -169,7 +169,7 @@
   </target>
 
   <target name="functional-tests-compile" depends="compile">
-    <rjavac srcdir="${source-webtests}" destdir="${build-webtests}" target="1.5" debug="true">
+    <rjavac srcdir="${source-webtests}" destdir="${build-webtests}" source="1.7" target="1.7" debug="true">
       <classpath>
         <path refid="classpath" />
         <pathelement location="${build-wiki}"/>
